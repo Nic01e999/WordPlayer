@@ -20,7 +20,7 @@
  * Cormorant Garamond: 优雅的衬线字体，用于正文内容
  * display=swap: 确保字体加载时先使用系统字体，避免文字闪烁
  */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@400;500;600;700&display=swap');
 
 /* #region 基础样式 */
 /* ===================================================================
@@ -39,10 +39,12 @@ body {
      */
     background: linear-gradient(135deg, #fff5f5 0%, #fef6f0 50%, #fff8f5 100%);
 
+    /* 使用 flex 布局，让 menu 和 container 正确分配空间 */
+    display: flex;
+    flex-direction: column;
     overflow: hidden;           /* 隐藏溢出内容，防止出现滚动条 */
-    position: fixed;            /* 固定定位，使页面不随滚动移动 */
+    height: 100vh;              /* 固定视口高度 */
     width: 100%;                /* 宽度占满整个视口 */
-    min-height: 100vh;          /* 最小高度为视口高度，确保背景覆盖全屏 */
 }
 
 /*
@@ -82,21 +84,44 @@ body::before {
  */
 #menu {
     position: relative;         /* 相对定位，作为子元素的定位参考 */
-    text-align: center;         /* 内容居中对齐 */
+    overflow: visible;          /* 允许内容超出显示 */
 
-    /* 垂直渐变背景，从上到下由浅粉过渡到稍深的粉色 */
-    background: linear-gradient(180deg, #fff9f9 0%, #fff5f0 100%);
+    /* Flexbox 布局，让标题和按钮排成一行 */
+    display: flex;
+    align-items: center;        /* 垂直居中 */
+    justify-content: center;    /* 水平居中 */
+    gap: 30px;                  /* 元素之间的间距 */
+    flex-wrap: wrap;            /* 宽度不够时换行 */
 
-    /* 底部边框，半透明粉色，分隔菜单栏和内容区 */
-    border-bottom: 1px solid rgba(255, 182, 193, 0.5);
+    /* 粉色渐变背景 */
+    background: linear-gradient(180deg, #ffd6e0 0%, #ffccd5 100%);
 
-    padding: 15px;              /* 内边距，增加菜单栏高度 */
+    /* 底部边框，半透明深粉色 */
+    border-bottom: 1px solid rgba(255, 150, 170, 0.4);
+
+    padding: 15px 20px;         /* 内边距 */
 
     /* 柔和的粉色阴影，增加层次感 */
-    box-shadow: 0 2px 15px rgba(255, 182, 193, 0.2);
+    box-shadow: 0 3px 12px rgba(255, 182, 193, 0.25);
 
     z-index: 100;               /* 较高层级，确保菜单栏显示在内容之上 */
 }
+
+/* 铁线圈装订效果 - 只在听写模式显示 */
+body.dictation-mode #menu::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -30px;  /* 超出菜单底部 */
+    height: 50px;
+    margin: 0 3%;
+    background: url('scr/iron.PNG') repeat-x center top;
+    background-size: auto 100%;
+    z-index: 101;
+    pointer-events: none;
+}
+
 
 /*
  * 菜单栏标题样式
@@ -104,11 +129,13 @@ body::before {
  */
 #menu h1 {
     font-family: 'Cinzel', 'Georgia', serif; /* 使用哥特风格字体 */
-    color: #d4a5a5;             /* 柔和的玫瑰棕色 */
-    margin: 0 0 10px 0;         /* 仅设置底部外边距 */
+    color: #8b5a5a;             /* 深玫瑰棕色，在粉色背景上更醒目 */
+    margin: 0;                  /* 无外边距 */
     font-weight: 500;           /* 中等字重 */
     letter-spacing: 4px;        /* 字母间距，增加高级感 */
     font-size: 36px;            /* 标题字号 - 放大 */
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3); /* 轻微白色阴影提升可读性 */
+    white-space: nowrap;        /* 防止标题换行 */
 }
 
 /*
@@ -123,21 +150,24 @@ body::before {
     font-weight: 500;           /* 中等字重 */
     padding: 14px 28px;         /* 内边距：上下 14px，左右 28px */
 
-    /* 粉色渐变背景，从浅粉到稍深的粉色 */
-    background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);
+    /* 浅色玻璃质感背景 */
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,248,250,0.85) 100%);
 
-    /* 半透明粉色边框 */
-    border: 1px solid rgba(255, 182, 193, 0.6);
+    /* 柔和的白色边框 */
+    border: 1px solid rgba(255, 255, 255, 0.7);
 
     /* 过渡动画：所有属性变化在 0.3 秒内平滑过渡 */
     transition: all 0.3s ease;
 
     box-sizing: border-box;     /* 边框和内边距计入宽度 */
-    color: #8b6f6f;             /* 深玫瑰棕色文字 */
+    color: #a07070;             /* 玫瑰棕色文字 */
     cursor: pointer;            /* 鼠标悬停时显示手型光标 */
-    margin: 0 10px;             /* 按钮之间的间距 */
+    margin: 0;                  /* 间距由 flex gap 控制 */
     text-transform: uppercase;  /* 文字转为大写 */
     letter-spacing: 2px;        /* 字母间距 */
+
+    /* 轻微阴影增加立体感 */
+    box-shadow: 0 2px 8px rgba(180, 140, 150, 0.15);
 }
 
 /*
@@ -146,18 +176,15 @@ body::before {
  */
 #menu button:hover {
     transform: translateY(-2px);    /* 向上微移 2px，产生浮起效果 */
-    border-color: #ffb6c1;          /* 边框颜色加深 */
-    color: #6b4f4f;                 /* 文字颜色加深 */
+    border-color: rgba(255, 200, 210, 0.8); /* 边框带粉色 */
+    color: #8b5a5a;                 /* 文字颜色加深 */
 
-    /* 背景渐变变浅，营造高亮效果 */
-    background: linear-gradient(135deg, #ffe4e9 0%, #ffd1dc 100%);
+    /* 悬停时带一点粉色 */
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,245,0.9) 100%);
 
-    /* 添加粉色发光阴影 */
-    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+    /* 添加柔和发光阴影 */
+    box-shadow: 0 4px 15px rgba(200, 150, 160, 0.25);
 }
-
-
-
 
 
 /*
@@ -165,10 +192,7 @@ body::before {
  * 包含齿轮图标和悬停时显示的设置面板
  */
 .settings-trigger {
-    position: absolute;         /* 绝对定位 */
-    right: 10%;                 /* 距离右边 10% */
-    top: 30%;                   /* 距离顶部 30% */
-    transform: translateY(-50%); /* 垂直居中修正 */
+    text-align: center;
 }
 
 /*
@@ -176,26 +200,48 @@ body::before {
  * 点击/悬停可打开设置面板
  */
 .gear-icon {
-    font-size: 26px;            /* 图标大小 */
-    cursor: pointer;            /* 手型光标 */
-    transition: all 0.4s ease;  /* 平滑过渡动画 */
-    display: inline-block;      /* 行内块元素，支持 transform */
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 0;               /* 隐藏emoji文字 */
+    color: transparent;
+}
 
-    /*
-     * 滤镜效果：
-     * grayscale(20%) - 轻微灰度化
-     * brightness(1) - 正常亮度
-     */
-    filter: grayscale(20%) brightness(1);
+/* 背景十字线（不转动） */
+.gear-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120%;
+    height: 120%;
+    background: url('scr/setBackground_icon.PNG') no-repeat center center;
+    background-size: contain;
+    z-index: 1;
+}
+
+/* 齿轮图案（转动） */
+.gear-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('scr/set_icon.PNG') no-repeat center center;
+    background-size: contain;
+    z-index: 2;
+    transition: transform 0.7s ease;
 }
 
 /*
  * 齿轮图标悬停动画
  * 鼠标悬停时齿轮旋转 180 度
  */
-.settings-trigger:hover .gear-icon {
-    transform: rotate(180deg);  /* 旋转 180 度 */
-    filter: brightness(1.1);    /* 略微提高亮度 */
+.settings-trigger:hover .gear-icon::after {
+    transform: rotate(270deg);  /* 旋转 180 度 */
 }
 
 /*
@@ -380,7 +426,8 @@ body::before {
  */
 .container {
     display: flex;              /* 弹性盒布局 */
-    height: 100vh;              /* 占满视口高度 */
+    flex: 1;                    /* 占据 menu 之外的剩余空间 */
+    min-height: 0;              /* 允许 flex 子元素收缩，修复滚动问题 */
     position: relative;         /* 相对定位 */
     z-index: 1;                 /* 层级高于背景装饰 */
 }
@@ -391,9 +438,13 @@ body::before {
  */
 .main {
     flex: 1;                    /* 占据剩余所有空间 */
-    padding: 30px;              /* 内边距 */
+    min-height: 0;              /* 关键：允许收缩，让 overflow 滚动生效 */
+    padding: 15px 30px 30px 30px; /* 内边距 */
     background: transparent;    /* 透明背景，显示 body 的渐变 */
     overflow-y: auto;           /* 垂直方向可滚动 */
+    overflow-x: hidden;         /* 水平方向隐藏溢出 */
+    -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
+    overscroll-behavior: contain;      /* 防止滚动穿透 */
 }
 
 /*
@@ -401,8 +452,9 @@ body::before {
  * 包含实际的功能界面
  */
 #workplace {
-    overflow: auto;             /* 内容溢出时显示滚动条 */
-    margin: 0px 0px 200px 0px;  /* 底部留出 200px 空间，避免内容被遮挡 */
+    position: relative;         /* 相对定位，让伪元素能正确定位 */
+    overflow: visible;          /* 允许内容超出显示 */
+    margin: 0px 0px 100px 0px;   /* 底部留出适当空间 */
 }
 #workplace h3{
     font-size: 200%;
@@ -497,11 +549,16 @@ body::before {
 }
 
 /*
- * 隐藏滚动条
+ * 隐藏滚动条（仅复读模式的滚动区域）
  * 保持界面简洁美观
  */
-::-webkit-scrollbar {
+.repeater-scroll::-webkit-scrollbar {
     display: none;              /* Chrome/Safari/Edge 隐藏滚动条 */
+}
+
+.repeater-scroll {
+    -ms-overflow-style: none;   /* IE and Edge */
+    scrollbar-width: none;      /* Firefox */
 }
 
 /*
@@ -606,139 +663,370 @@ body::before {
 }
 /* #endregion */
 
-/* #region  听写模式样式（Dictation Mode） */
+/* #region  听写模式样式（Dictation Mode）- 纸质试卷批改风格 */
 /* ===================================================================
- * 听写模式样式区域
- * 包含输入弹窗、结果列表等组件
+ * 听写模式样式区域 - 仿真纸质试卷批改风格
+ * 设计理念：模拟真实的作业本/试卷批改效果
+ * 保持粉嫩少女风的整体色调
  * =================================================================== */
 
 /*
- * 弹窗容器
- * 听写时显示的输入界面
+ * 听写模式专用 - 模拟试卷纸张
+ * 米黄色纸张背景 + 装订线效果
+ */
+body.dictation-mode #workplace {
+    background-image:
+        /* 左侧装订线 */
+        linear-gradient(90deg,
+            transparent 0px,
+            rgba(255, 182, 193, 0.3) 2px,
+            transparent 3px,
+            transparent 30px,
+            rgba(255, 182, 193, 0.15) 31px,
+            transparent 32px,
+            transparent 100px,
+            rgb(223, 151, 162) 101px,
+            transparent 102px
+        ),
+        /* 横线纹理 - 模拟作业本格子 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 39px,
+            rgba(200, 180, 170, 0.2) 39px,
+            rgba(200, 180, 170, 0.2) 40px
+        ),
+        /* 纸张底色 - 米黄色 */
+        linear-gradient(180deg, #fffef8 0%, #fdf8f0 50%, #faf5eb 100%);
+
+    background-repeat: repeat, repeat, repeat;
+    background-position: top left, top left, top left;
+    background-size: auto, auto, auto;
+
+    padding: 25px 25px 25px 45px;  /* 左边留出装订线空间 */
+    margin: 80px 10px 30px 10px;   /* 上80 右10 下30 左10 */
+    border-radius: 8px;
+
+    /* 纸张阴影和边缘效果 */
+    box-shadow:
+        /* 纸张厚度阴影 */
+        2px 3px 8px rgba(139, 111, 111, 0.1),
+        /* 纸张边缘高光 */
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        /* 底部折痕阴影 */
+        inset 0 -2px 5px rgba(200, 180, 170, 0.1);
+
+    /* 纸张微微卷曲效果 */
+    border: 1px solid rgba(200, 180, 170, 0.3);
+}
+
+/* 撕裂纸条效果 - 只在听写模式显示 */
+body.dictation-mode #workplace::before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: -45px;  /* 超出容器顶部 */
+    height: 50px;
+    background: url("scr/break.PNG") repeat-x center center;
+    background-size: auto 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* 纸张右下角卷边效果 - 只在听写模式显示 */
+body.dictation-mode #workplace::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg,
+        transparent 50%,
+        rgba(255, 240, 235, 0.8) 50%,
+        rgba(250, 235, 225, 0.9) 100%);
+    border-radius: 0 0 8px 0;
+    box-shadow: -2px -2px 5px rgba(139, 111, 111, 0.05);
+}
+
+/*
+ * 弹窗容器 - 模拟草稿纸/便签
  */
 .popup {
-    position: fixed;            /* 固定定位 */
-    top:40%;                   /* 垂直居中 */
-    left: 50%;                  /* 水平居中 */
-    transform: translate(-50%, -50%); /* 修正居中偏移 */
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-1deg); /* 微微倾斜，更自然 */
 
-    /*
-     * 毛玻璃效果背景
-     * 多层半透明渐变
-     */
-    background: linear-gradient(135deg,
-        rgba(255, 255, 245, 0.4) 0%,
-        rgba(255, 240, 240, 0.3) 50%,
-        rgba(255, 200, 230, 0.25) 100%);
+    /* 便签纸背景 */
+    background:
+        /* 横线 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 27px,
+            rgba(200, 180, 170, 0.25) 27px,
+            rgba(200, 180, 170, 0.25) 28px
+        ),
+        /* 纸张色 */
+        linear-gradient(180deg, #fffef5 0%, #fff9f0 100%);
 
-    padding: 5px;              /* 内边距 */
-    border-radius: 25px;        /* 大圆角 */
-    border: 1px solid rgba(255, 255, 255, 0.5); /* 白色边框 */
+    padding: 20px 25px 25px 25px;
+    border-radius: 3px;  /* 纸张的轻微圆角 */
 
-    /*
-     * 多层阴影：
-     * 1. 外部粉色阴影
-     * 2. 内部白色高光
-     * 3. 底部深色阴影增加立体感
-     */
+    /* 纸张边缘 */
+    border: 1px solid rgba(200, 180, 170, 0.4);
+    border-top: 3px solid #ffb6c1; /* 顶部粉色装饰条 */
+
+    /* 纸张阴影 - 浮起效果 */
     box-shadow:
-        0 8px 32px rgba(255, 182, 193, 0.2),
-        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-        0 20px 40px rgba(0, 0, 0, 0.05);
+        3px 4px 12px rgba(139, 111, 111, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        /* 折痕效果 */
+        inset 0 60px 50px -50px rgba(255, 255, 255, 0.3);
 
-    z-index: 10;                /* 显示层级 */
-    min-width: 300px;           /* 最小宽度 */
-    text-align: center;         /* 内容居中 */
+    z-index: 100;
+    min-width: 320px;
+    text-align: center;
+}
 
-    /* 背景模糊效果 */
-    backdrop-filter: blur(1px) saturate(180%);
-    -webkit-backdrop-filter: blur(1px) saturate(180%);
+/* 便签纸顶部撕边效果 - 大头钉位置留空 */
+.popup::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    right: 10px;
+    height: 8px;
+    background: repeating-linear-gradient(90deg,
+        transparent 0px,
+        transparent 8px,
+        #fffef5 8px,
+        #fffef5 10px,
+        transparent 10px,
+        transparent 12px
+    );
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+    /* 中间留出大头钉的空间 */
+    clip-path: polygon(0 0, 42% 0, 42% 100%, 58% 100%, 58% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/*
+ * 弹窗拖拽手柄 - 顶部区域（大头钉图片）
+ */
+.popup-drag-handle {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    cursor: grab;
+    z-index: 10;
+    transition: transform 0.2s ease;
+    /* 使用大头钉图片 */
+    background: url('scr/pin.png') no-repeat center center;
+    background-size: contain;
+    /* 添加阴影效果 */
+    filter: drop-shadow(0 2px 3px rgba(139, 111, 111, 0.3));
+}
+
+.popup-drag-handle:hover {
+    transform: translateX(-50%) scale(1.05);
+    filter: drop-shadow(0 3px 5px rgba(139, 111, 111, 0.4)) brightness(1.05);
+}
+
+.popup-drag-handle:active {
+    cursor: grabbing;
+    transform: translateX(-50%) translateY(-1px) scale(1.2);
+}
+
+/* 拖拽时的弹窗样式 */
+.popup.dragging {
+    opacity: 0.9;
+    box-shadow:
+        5px 8px 25px rgba(139, 111, 111, 0.25),
+        0 0 0 2px rgba(255, 182, 193, 0.4);
+    transition: none; /* 拖拽时禁用过渡，提高响应速度 */
 }
 
 #dictationPopup h3 {
+    font-family: 'Caveat', cursive;  /* 手写风格 */
     color: #8b6f6f;
+    font-size: 24px;
+    margin: 5px 0 15px 0;
+    font-weight: 600;
 }
-#retryInfo{
-    color: #8b6f6f;
+
+#retryInfo {
+    font-family: 'Caveat', cursive;
+    color: #c48b8b;
+    font-size: 18px;
+    margin-bottom: 10px;
 }
 
 /*
- * 弹窗输入框
- * 用户输入听写答案
+ * 弹窗输入框 - 模拟手写答题区
  */
 .popup input {
-    font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
-    font-size: 28px;            /* 较大字号 - 放大 */
-    padding: 18px 24px;         /* 内边距 */
-    width: 65%;                 /* 宽度 */
-    border: 1px solid rgba(255, 182, 193, 0.5); /* 粉色边框 */
-    border-radius: 15px;        /* 圆角 */
-    background: #fffafa;        /* 淡粉背景 */
-    color: #8b6f6f;             /* 文字颜色 */
-    text-align: center;         /* 文字居中 */
-    transition: all 0.3s;       /* 过渡动画 */
+    font-family: 'Caveat', cursive;  /* 手写风格字体 */
+    font-size: 26px;
+    padding: 12px 20px;
+    width: 70%;
+
+    /* 只有底部边框，像书写线 */
+    border: none;
+    border-bottom: 2px dashed rgba(139, 111, 111, 0.3);
+    border-radius: 0;
+
+    background: transparent;
+    color: #5a4a4a;
+    text-align: center;
+    transition: all 0.3s;
 }
 
-/* 输入框获得焦点时的样式 */
 .popup input:focus {
-    outline: none;              /* 移除默认轮廓 */
-    border-color: #ffb6c1;      /* 边框颜色加深 */
-    box-shadow: 0 0 15px rgba(255, 182, 193, 0.3); /* 发光效果 */
+    outline: none;
+    border-bottom-color: #c48b8b;
+    border-bottom-style: solid;
+}
+
+.popup input::placeholder {
+    color: #c9b8b8;
+    font-style: italic;
 }
 
 /*
- * 结果项容器
- * 显示每个单词的听写结果
+ * 结果项容器 - 模拟试卷上的一道题
  */
 .result-item {
-    font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
-    display: flex;              /* 弹性布局 */
-    padding: 18px;              /* 内边距 */
-    margin: 10px 0;             /* 上下外边距 */
-    background: #fff9f9;        /* 淡粉背景 */
-    border: 1px solid rgba(255, 182, 193, 0.3); /* 浅粉边框 */
-    border-radius: 15px;        /* 圆角 */
-    transition: all 0.2s;       /* 过渡动画 */
-    font-size: 20px;            /* 字号 - 添加 */
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 15px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(200, 180, 170, 0.15);
+    border-radius: 0;
+    transition: background 0.2s;
+    font-size: 18px;
+    position: relative;
 }
 
-/* 结果项悬停效果 */
+.result-item:last-child {
+    border-bottom: none;
+}
+
+/* 悬停时轻微高亮，像用荧光笔划过 */
 .result-item:hover {
-    border-color: rgba(255, 182, 193, 0.6); /* 边框加深 */
-    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); /* 添加阴影 */
+    background: rgba(255, 245, 200, 0.3);
 }
 
 /*
- * 结果序号
- * 显示单词编号
+ * 结果序号 - 题号样式
  */
 .result-index {
-    font-family: 'Cinzel', 'Georgia', serif; /* 哥特字体 */
-    font-weight: 600;           /* 粗体 */
-    min-width: 35px;            /* 最小宽度，保持对齐 */
-    color: #c48b8b;             /* 玫瑰棕色 */
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 600;
+    min-width: 40px;
+    color: #8b6f6f;
+    font-size: 16px;
 }
 
 /*
- * 答题尝试次数
- * 显示用户的输入历史
+ * 答题尝试记录 - 批改区域
  */
 .result-attempts {
-    flex: 1;                    /* 占据剩余空间 */
-    color: #9c7a7a;             /* 淡棕色 */
+    flex: 1;
+    font-family: 'Caveat', cursive;  /* 手写风格 */
+    font-size: 22px;
+    color: #5a4a4a;
+    line-height: 1.6;
+}
+
+/* 每次尝试的样式 */
+.result-attempts > div {
+    padding: 4px 8px;
+    margin: 2px 0;
+    border-radius: 3px;
+    position: relative;
 }
 
 /*
- * 结果汇总框
- * 听写完成后显示整体结果
+ * 结果汇总框 - 成绩单风格
  */
 .results-box {
-    margin-top: 20px;           /* 顶部间距 */
-    padding: 25px;              /* 内边距 */
-    background: rgba(255, 240, 240, 0.6); /* 半透明粉色背景 */
-    border: 1px solid rgba(255, 182, 193, 0.4); /* 粉色边框 */
-    border-radius: 20px;        /* 圆角 */
-    box-shadow: 0 4px 20px rgba(255, 182, 193, 0.1); /* 柔和阴影 */
+    position: relative;
+    margin: 20px 10px;
+    padding: 30px;
+
+    /* 成绩单纸张背景 */
+    background:
+        /* 顶部装饰边框 */
+        linear-gradient(180deg,
+            #ffb6c1 0px,
+            #ffb6c1 4px,
+            transparent 4px),
+        /* 纸张色 */
+        linear-gradient(180deg, #fffef8 0%, #fdf8f0 100%);
+
+    border: 1px solid rgba(200, 180, 170, 0.4);
+    border-radius: 5px;
+    box-shadow:
+        3px 4px 15px rgba(139, 111, 111, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    text-align: center;
+}
+
+/* 成绩单标题 */
+.results-box h3 {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6f6f;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px double rgba(255, 182, 193, 0.5);
+    letter-spacing: 2px;
+}
+
+/* 分数显示 - 大红色手写风格 */
+.results-box p strong {
+    font-family: 'Caveat', cursive;
+    font-size: 48px;
+    color: #e25555;
+    display: block;
+    margin: 15px 0;
+    /* 红笔书写效果 */
+    text-shadow: 1px 1px 0 rgba(200, 50, 50, 0.1);
+}
+
+/* 统计项 */
+.results-box p {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: #6b5a5a;
+    margin: 8px 0;
+}
+
+/* 印章效果 - 装饰性 */
+.results-box::after {
+    content: '批阅';
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 14px;
+    color: rgba(200, 80, 80, 0.6);
+    border: 2px solid rgba(200, 80, 80, 0.5);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-15deg);
+    /* 印章褪色效果 */
+    opacity: 0.7;
 }
 /* #endregion */
 
@@ -775,12 +1063,6 @@ body::before {
     color: #6b4f4f;
 }
 
-.btn-pause:hover {
-    box-shadow: 0 4px 15px rgba(255, 200, 160, 0.4);
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #ffe4cc 0%, #ffd9b3 100%);
-}
-
 /*
  * 播放按钮 - 绿色调
  */
@@ -811,7 +1093,7 @@ body::before {
 }
 
 /* 声音按钮悬停状态 */
-.btn-sound:hover {
+.btn-sound:hover, .btn-pause:hover {
     box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4); /* 粉色发光 */
     transform: translateY(-2px); /* 上浮效果 */
     background: linear-gradient(135deg, #ffe4e9 0%, #ffd1dc 100%); /* 背景变浅 */
@@ -820,32 +1102,66 @@ body::before {
 
 /* #region 状态颜色*/
 /* ===================================================================
- * 状态颜色区域
- * 定义不同状态的文字颜色
+ * 状态颜色区域 - 试卷批改风格
+ * 模拟老师红笔批改的效果
  * =================================================================== */
 
 /*
- * 正确状态
- * 绿色，表示答案正确
+ * 正确状态 - 红色对勾效果
+ * 模拟老师用红笔打勾
  */
 .correct {
-    color: #76ab80;             /* 柔和的绿色 */
+    color: #d45555;             /* 批改红色 */
+    font-weight: 600;
+    position: relative;
+}
+
+/* 正确答案样式 */
+.result-attempts .correct {
+    padding: 2px 6px;
 }
 
 /*
- * 警告状态
- * 橙色，表示需要注意或部分正确
+ * 警告状态 - 橙色波浪线效果
+ * 表示答错但还有机会
  */
 .warning {
-    color: #ec8b1d;             /* 柔和的橙色 */
+    color: #cc7a22;             /* 橙色铅笔色 */
+    position: relative;
+}
+
+/* 波浪下划线效果 */
+.result-attempts .warning {
+    padding: 2px 6px;
+    /* 波浪线装饰 */
+    text-decoration: underline wavy rgba(204, 122, 34, 0.5);
+    text-underline-offset: 3px;
 }
 
 /*
- * 失败状态
- * 红色，表示答案错误
+ * 失败状态 - 红色删除线效果
+ * 模拟老师划掉错误答案
  */
 .failed {
-    color: #c16f72;             /* 柔和的玫瑰红色 */
+    color: #c55555;             /* 红笔颜色 */
+    position: relative;
+}
+
+/* 删除线效果 */
+.result-attempts .failed {
+    text-decoration: line-through;
+    text-decoration-color: rgba(200, 80, 80, 0.7);
+    text-decoration-thickness: 2px;
+    padding: 2px 6px;
+}
+
+/* 正确答案提示 - 绿色手写风格 */
+.result-attempts .failed .correct,
+.result-attempts .correct span {
+    color: #4a8f4a;
+    font-style: italic;
+    text-decoration: none;
+    background: none;
 }
 /* #endregion */
 
@@ -866,6 +1182,13 @@ body::before {
     .popup input { font-size: 32px; }
     .result-item { font-size: 22px; }
     .play-count { font-size: 20px; }
+    /* 听写模式 - 大屏适配 */
+    body.dictation-mode #workplace { padding: 30px 30px 30px 55px; }
+    .result-attempts { font-size: 26px; }
+    .results-box h3 { font-size: 24px; }
+    .results-box p strong { font-size: 56px; }
+    .results-box p { font-size: 22px; }
+    #dictationPopup h3 { font-size: 28px; }
 }
 
 /* 大屏幕 (1200px - 1399px) - 默认样式已设置 */
@@ -880,50 +1203,34 @@ body::before {
     .word-item .translation { font-size: 16px; }
     .popup input { font-size: 26px; }
     .result-item { font-size: 18px; }
+    /* 听写模式 - 中屏适配 */
+    .result-attempts { font-size: 20px; }
+    .results-box p strong { font-size: 44px; }
 }
 
 /* 小屏幕 / 平板 (600px - 899px) */
 @media (min-width: 600px) and (max-width: 899px) {
-    #menu h1 { font-size: 26px; letter-spacing: 2px; }
-    #menu button { font-size: 14px; width: 160px; padding: 10px 20px; margin: 0 8px; }
-    #menu { padding: 12px; }
+    #menu h1 { font-size: 24px; letter-spacing: 2px; }
+    #menu button { font-size: 14px; width: 150px; padding: 10px 18px; }
+    #menu { padding: 12px 15px; gap: 20px; }
     .main { padding: 20px; }
     .current-word { font-size: 28px; }
     .current-translation { font-size: 16px; }
     .word-item strong { font-size: 18px; }
     .word-item .translation { font-size: 14px; }
-    .popup { min-width: 320px; padding: 25px; }
+    .popup { min-width: 320px; padding: 20px; }
     .popup input { font-size: 22px; width: 70%; }
     .repeater-container { height: 350px; }
-    .result-item { font-size: 16px; padding: 14px; }
+    .result-item { font-size: 16px; padding: 10px 12px; }
     .settings-trigger { right: 5%; }
     .settings-trigger .sidebar { width: 220px; }
+    /* 听写模式 - 平板适配 */
+    body.dictation-mode #workplace { padding: 20px 20px 20px 40px; margin: 8px; }
+    .result-attempts { font-size: 18px; }
+    .results-box { padding: 25px; }
+    .results-box p strong { font-size: 40px; }
+    .results-box::after { width: 45px; height: 45px; font-size: 12px; }
+    #dictationPopup h3 { font-size: 22px; }
 }
 
-/* 手机屏幕 (<600px) */
-@media (max-width: 599px) {
-    #menu h1 { font-size: 20px; letter-spacing: 1px; }
-    #menu button { font-size: 12px; width: 120px; padding: 10px 14px; margin: 0 4px; border-radius: 18px; }
-    #menu { padding: 10px; }
-    .main { padding: 15px; }
-    .current-word { font-size: 24px; }
-    .current-translation { font-size: 16px; }
-    .word-item { height: 55px; padding: 0 12px; }
-    .word-item strong { font-size: 16px; }
-    .word-item .translation { font-size: 13px; }
-    .popup { min-width: 90%; padding: 20px; border-radius: 18px; }
-    .popup input { font-size: 20px; width: 80%; padding: 14px 18px; }
-    .popup h3 { font-size: 18px; }
-    .repeater-container { height: 280px; border-radius: 18px; }
-    .center-pointer { height: 55px; }
-    .word-info { padding: 18px; border-radius: 18px; }
-    .play-count { font-size: 16px; }
-    .settings-trigger { right: 3%; top: 50%; }
-    .settings-trigger .sidebar { width: 200px; padding: 18px; }
-    .settings-trigger .sidebar h3 { font-size: 13px; }
-    .settings-trigger .sidebar label { font-size: 13px; }
-    .settings-trigger .sidebar textarea { height: 140px; font-size: 13px; }
-    .btn-pause, .btn-play, .btn-sound { width: 45px; height: 45px; font-size: 18px; }
-    .result-item { padding: 12px; font-size: 16px; }
-}
 /* #endregion */

@@ -12,76 +12,78 @@
             <h1>🎧 English Dictation</h1>
             <button id="Dictation-bnt" onclick="Dictation.switchToDictation()">📝 Dictation</button>
             <button id="Repeater-bnt" onclick="Repeater.switchToRepeater()">📖 Repeater</button>
-            <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font: size 12px; color:#888;"></span>
-            <div class="settings-trigger">
-                <span class="gear-icon">⚙️</span>
-                <!-- 右侧：设置边栏 -->
-                <div class="sidebar">
-                    <div id="settings">
-                        <h3>Settings</h3>
-                        <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
-                        <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
-                        <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
-                        <label>Slow: <input type="checkbox" id="slow"></label>
-                        <label>Shuffle: <input type="checkbox" id="shuffle"></label>
-                    </div>
+            <div>
+                <div class="settings-trigger">
+                    <span class="gear-icon">⚙️</span>
+                    <!-- 右侧：设置边栏 -->
+                    <div class="sidebar">
+                        <div id="settings">
+                            <h3>Settings</h3>
+                            <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
+                            <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
+                            <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
+                            <label>Slow: <input type="checkbox" id="slow"></label>
+                            <label>Shuffle: <input type="checkbox" id="shuffle"></label>
+                        </div>
 
-                    <div id="wordSection">
-                        <h3>Word List</h3>
-                        <textarea id="wordInput" placeholder="Enter words (separated by spaces or newlines)">
-friend
-furniture
-game
-gas
-global
-golf
-guide
-hair
-handle
-history
-hotel
-house
-human
-hunting
-India
-innovation
-insurance
-introduction
-January
-juice
-June
-knowledge
-laundry
-learning
-level
-lifestyle
-manager
-mathematic
-meal
-meat
-medicine
-mineral
-modern
-monthly
-music
-natural
-negative
-night
-north
-nutrition
-object
-organization
-passport
-person
-personal
-photo
-photocopy
-piano
-plastic
-point
-                        </textarea>
+                        <div id="wordSection">
+                            <h3>Word List</h3>
+                            <textarea id="wordInput" placeholder="Enter words (separated by spaces or newlines)">
+    friend
+    furniture
+    game
+    gas
+    global
+    golf
+    guide
+    hair
+    handle
+    history
+    hotel
+    house
+    human
+    hunting
+    India
+    innovation
+    insurance
+    introduction
+    January
+    juice
+    June
+    knowledge
+    laundry
+    learning
+    level
+    lifestyle
+    manager
+    mathematic
+    meal
+    meat
+    medicine
+    mineral
+    modern
+    monthly
+    music
+    natural
+    negative
+    night
+    north
+    nutrition
+    object
+    organization
+    passport
+    person
+    personal
+    photo
+    photocopy
+    piano
+    plastic
+    point
+                            </textarea>
+                        </div>
                     </div>
                 </div>
+                <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font-size: 12px; color:#888;"></span>
             </div>
         </div>
 

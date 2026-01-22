@@ -448,6 +448,8 @@ class Repeater {
         const myId = this.playId;  // 保存当前 ID，用于检测是否被取消
         currentRepeaterState = null;
         currentActiveMode = "repeater";
+        document.body.classList.remove('dictation-mode');
+        document.body.classList.add('repeater-mode');
 
         // 清空工作区
         clearWorkplace();
@@ -882,6 +884,8 @@ class Repeater {
         if (!currentRepeaterState) return;
 
         currentActiveMode = "repeater";
+        document.body.classList.remove('dictation-mode');
+        document.body.classList.add('repeater-mode');
 
         // 清空工作区并重新渲染 UI
         clearWorkplace();
@@ -919,6 +923,8 @@ class Dictation {
         this.closePopup();
         this.state = null;
         currentActiveMode = "dictation";
+        document.body.classList.remove('repeater-mode');
+        document.body.classList.add('dictation-mode');
 
         clearWorkplace();
 
@@ -978,6 +984,7 @@ class Dictation {
         popup.id = "dictationPopup";
         popup.className = "popup";
         popup.innerHTML = `
+            <div class="popup-drag-handle" title="拖拽移动"></div>
             <h3>Word #${i + 1}</h3>
             <p id="retryInfo">Attempts: ${retries}/${s.maxRetry}</p>
 
@@ -996,6 +1003,9 @@ class Dictation {
 
         // 将弹窗添加到页面
         document.body.append(popup);
+
+        // 初始化拖拽功能
+        this.initDrag(popup);
 
         // 如果没有暂停，500ms 后自动播放发音
         if (!s.isPaused) {
@@ -1019,6 +1029,94 @@ class Dictation {
      */
     static closePopup() {
         $("dictationPopup")?.remove();
+    }
+
+    /**
+     * 初始化弹窗拖拽功能
+     * @param {HTMLElement} popup - 弹窗元素
+     */
+    static initDrag(popup) {
+        const handle = popup.querySelector('.popup-drag-handle');
+        if (!handle) return;
+
+        let isDragging = false;
+        let startX, startY;
+        let initialX, initialY;
+
+        // 获取初始位置（居中时的位置）
+        const rect = popup.getBoundingClientRect();
+        initialX = rect.left;
+        initialY = rect.top;
+
+        // 移除 CSS transform 居中，改用绝对定位
+        popup.style.left = initialX + 'px';
+        popup.style.top = initialY + 'px';
+        popup.style.transform = 'rotate(-1deg)'; // 保留倾斜效果
+
+        // 鼠标按下开始拖拽
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = popup.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+
+            popup.classList.add('dragging');
+            e.preventDefault();
+        });
+
+        // 鼠标移动
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            popup.style.left = (initialX + deltaX) + 'px';
+            popup.style.top = (initialY + deltaY) + 'px';
+        });
+
+        // 鼠标松开结束拖拽
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                popup.classList.remove('dragging');
+            }
+        });
+
+        // 触摸支持（移动端）
+        handle.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+
+            const rect = popup.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+
+            popup.classList.add('dragging');
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+
+            popup.style.left = (initialX + deltaX) + 'px';
+            popup.style.top = (initialY + deltaY) + 'px';
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                popup.classList.remove('dragging');
+            }
+        });
     }
 
     // -------------------- 核心操作 --------------------
@@ -1248,6 +1346,8 @@ class Dictation {
         if (!this.state) return;
 
         currentActiveMode = "dictation";
+        document.body.classList.remove('repeater-mode');
+        document.body.classList.add('dictation-mode');
 
         // 清空工作区并重新渲染 UI
         clearWorkplace();
