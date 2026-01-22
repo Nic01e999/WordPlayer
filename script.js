@@ -1,0 +1,975 @@
+/**
+ * =====================================================
+ * 英语听写/复读工具 - JavaScript 主程序
+ * =====================================================
+ *
+ * 这个程序有两个模式：
+ * 1. Repeater（复读模式）：自动播放单词发音，可滚动选择
+ * 2. Dictation（听写模式）：听发音写单词，记录对错
+ *
+ * 主要技术：
+ * - 后端 TTS API：用于文字转语音
+ * - Fetch API：用于调用翻译和 TTS 接口
+ * - DOM 操作：动态生成和修改页面内容
+ * - 事件监听：处理用户交互（点击、滚动等）
+ */
+
+// =====================================================
+// 全局状态
+// =====================================================
+
+/**
+ * 复读模式的状态对象
+ * 为 null 表示复读模式未启动
+ */
+let currentRepeaterState = null;
+
+// =====================================================
+// 工具函数（Utils）
+// =====================================================
+
+/**
+ * 简化版的 document.getElementById
+ * 用法：$("myId") 等同于 document.getElementById("myId")
+ *
+ * @param {string} id - 元素的 ID
+ * @returns {HTMLElement|null} - 找到的元素，或 null
+ */
+const $ = id => document.getElementById(id);
+
+/**
+ * 从设置面板读取用户配置
+ *
+ * @returns {Object} 包含所有设置的对象
+ *   - repeat: 每个单词重复几次
+ *   - retry: 听写模式最多尝试几次
+ *   - slow: 是否慢速播放
+ *   - shuffle: 是否打乱顺序
+ */
+function getSettings() {
+    return {
+        repeat: parseInt($("repeat").value) || 1,  // parseInt 将字符串转为整数
+        retry: parseInt($("retry").value) || 1,
+        slow: $("slow").checked,      // checkbox 用 .checked 获取布尔值
+        shuffle: $("shuffle").checked
+    };
+}
+
+/**
+ * 从文本框读取单词列表
+ *
+ * @returns {string[]} 单词数组
+ *
+ * 处理过程：
+ * 1. 获取文本框内容
+ * 2. 用正则表达式 /\s+/ 按空白字符分割（空格、换行、Tab等）
+ * 3. trim() 去除每个单词两端的空白
+ * 4. filter(w => w) 过滤掉空字符串
+ */
+function loadWordsFromTextarea() {
+    return $("wordInput").value
+        .split(/\s+/)           // 按空白字符分割
+        .map(w => w.trim())     // 去除两端空白
+        .filter(w => w);        // 过滤空字符串
+}
+
+/**
+ * 打乱数组顺序（Fisher-Yates 洗牌算法）
+ *
+ * @param {Array} arr - 要打乱的数组
+ * @returns {Array} 打乱后的新数组（不修改原数组）
+ *
+ * 算法原理：
+ * 从最后一个元素开始，随机选一个前面的元素与之交换
+ * 然后处理倒数第二个，以此类推
+ */
+function shuffleArray(arr) {
+    const a = [...arr];  // [...arr] 创建数组的浅拷贝，不修改原数组
+    for (let i = a.length - 1; i > 0; i--) {
+        // Math.random() 返回 0-1 之间的随机数
+        // Math.floor() 向下取整
+        const j = Math.floor(Math.random() * (i + 1));
+        // 解构赋值交换两个元素
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/**
+ * 清空工作区
+ */
+function clearWorkplace() {
+    $("workplace").innerHTML = "";
+}
+
+/**
+ * 向工作区追加 HTML 内容
+ *
+ * @param {string} html - 要追加的 HTML 字符串
+ *
+ * insertAdjacentHTML 的位置参数：
+ * - "beforebegin": 元素前面
+ * - "afterbegin": 元素内部最前面
+ * - "beforeend": 元素内部最后面（我们用这个）
+ * - "afterend": 元素后面
+ */
+function logToWorkplace(html) {
+    $("workplace").insertAdjacentHTML("beforeend", html);
+}
+
+// 后端API地址
+const API_BASE = "http://localhost:5001";
+
+// 当前播放的音频对象（用于停止播放）
+let currentAudio = null;
+
+/**
+ * 调用后端翻译 API 获取单词的中文翻译
+ *
+ * @param {string} word - 要翻译的英文单词
+ * @returns {Promise<string>} 翻译结果
+ */
+async function translateWord(word) {
+    try {
+        const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.translation || "翻译失败";
+    } catch {
+        return "翻译失败";
+    }
+}
+
+/**
+ * 停止当前播放的音频
+ */
+function stopAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+}
+
+/**
+ * 检查音频是否正在播放
+ */
+function isAudioPlaying() {
+    return currentAudio && !currentAudio.paused && !currentAudio.ended;
+}
+
+/**
+ * 使用后端 TTS API 朗读单词
+ *
+ * @param {string} word - 要朗读的单词
+ * @param {boolean} slow - 是否慢速播放
+ */
+function speakWord(word, slow = false) {
+    stopAudio();
+    const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}`;
+    currentAudio = new Audio(url);
+    currentAudio.play();
+}
+
+// =====================================================
+// 复读模式（Repeater Mode）
+// =====================================================
+
+/**
+ * 复读模式类
+ *
+ * 使用 static（静态）方法和属性，因为：
+ * 1. 全局只需要一个复读器实例
+ * 2. 不需要用 new 创建对象，直接 Repeater.方法名() 调用
+ */
+class Repeater {
+    // -------------------- 静态属性 --------------------
+
+    /** 每个单词项的高度（像素），用于计算滚动位置 */
+    static ITEM_HEIGHT = 60;
+
+    /** 滚动结束检测的定时器 ID */
+    static scrollTimeout = null;
+
+    /**
+     * 播放周期 ID
+     * 每次开始新的播放循环时 +1
+     * 用于取消旧的播放（如果 ID 不匹配，说明已被取消）
+     */
+    static playId = 0;
+
+    // -------------------- 启动和初始化 --------------------
+
+    /**
+     * 启动复读模式
+     * async 函数可以使用 await 等待异步操作
+     */
+    static async startRepeater() {
+        // 如果听写模式正在进行，暂停它（保留状态）
+        if (Dictation.state) {
+            stopAudio();
+            Dictation.closePopup();
+        }
+
+        // 检查单词列表和设置是否变化
+        const currentWords = loadWordsFromTextarea();
+        const currentSettings = getSettings();
+        const wordsChanged = !currentRepeaterState ||
+            JSON.stringify(currentWords) !== JSON.stringify(currentRepeaterState.originalWords);
+        const settingsChanged = currentRepeaterState &&
+            JSON.stringify(currentSettings) !== JSON.stringify(currentRepeaterState.originalSettings);
+
+        // 如果复读模式已有保留的状态且单词列表和设置未变化，恢复继续
+        if (currentRepeaterState && !wordsChanged && !settingsChanged) {
+            clearWorkplace();
+            currentRepeaterState.isPaused = false;
+            this.renderUI();
+            // 延迟滚动到当前位置，等待 DOM 渲染完成
+            setTimeout(() => {
+                this.scrollToIndex(currentRepeaterState.currentIndex, false);
+                this.startPlayLoop();
+            }, 100);
+            return;
+        }
+
+        // 单词列表或设置变化了，停止播放并清除旧状态
+        this.playId++;
+        stopAudio();
+        currentRepeaterState = null;
+
+        // 清空工作区
+        clearWorkplace();
+
+        // 读取单词列表
+        const words = loadWordsFromTextarea();
+        if (!words.length) {
+            logToWorkplace("<p>⚠️ No words provided.</p>");
+            return;
+        }
+
+        // 读取设置
+        const settings = getSettings();
+
+        // 根据设置决定是否打乱顺序
+        // [...words] 创建副本，避免修改原数组
+        const list = settings.shuffle ? shuffleArray(words) : [...words];
+
+        // 初始化状态对象
+        currentRepeaterState = {
+            words: list,           // 单词列表
+            originalWords: [...currentWords],  // 保存原始单词列表用于比较
+            originalSettings: {...settings},   // 保存原始设置用于比较
+            currentIndex: 0,       // 当前播放的单词索引
+            currentRepeat: 0,      // 当前单词已播放次数
+            settings,              // 用户设置
+            isPaused: false,       // 是否暂停
+            translations: []       // 翻译列表（稍后填充）
+        };
+
+        // 显示加载提示
+        logToWorkplace(`<h3>📖 Repeater Mode</h3><p>Loading translations...</p>`);
+
+        // 逐个获取翻译（await 等待每个翻译完成）
+        for (const word of list) {
+            const translation = await translateWord(word);
+            currentRepeaterState.translations.push(translation);
+        }
+
+        // 翻译完成后，渲染界面并开始播放
+        clearWorkplace();
+        this.renderUI();
+        this.startPlayLoop();
+    }
+
+    /**
+     * 渲染复读模式的界面
+     *
+     * 模板字符串（反引号 ``）可以：
+     * 1. 包含换行
+     * 2. 用 ${表达式} 插入变量
+     */
+    static renderUI() {
+        $("workplace").innerHTML = `
+            <!-- 主容器：包含滚动列表和中心指示器 -->
+            <div id="repeaterContainer" class="repeater-container">
+                <!-- 中心指示器：显示当前选中的单词位置 -->
+                <div id="centerPointer" class="center-pointer">
+                    <div class="pointer-arrow"></div>
+                </div>
+
+                <!-- 滚动区域 -->
+                <div id="repeaterScroll" class="repeater-scroll">
+                    <!-- 上方占位，让第一个单词可以滚动到中心 -->
+                    <div style="height:170px"></div>
+
+                    <!-- 单词列表容器 -->
+                    <div id="repeaterContent"></div>
+
+                    <!-- 下方占位，让最后一个单词可以滚动到中心 -->
+                    <div style="height:170px"></div>
+                </div>
+            </div>
+
+            <!-- 暂停/播放按钮 -->
+            <div style="margin:15px 0;text-align:center">
+                <button onclick="Repeater.playPause()" id="playPauseBtn" class="btn-pause">⏸️ Pause</button>
+            </div>
+
+            <!-- 当前单词信息显示区 -->
+            <div id="currentWordInfo" class="word-info"></div>
+        `;
+
+        // 渲染单词列表内容
+        this.renderContent();
+
+        // 设置滚动监听
+        this.setupScrollListener();
+    }
+
+    /**
+     * 渲染单词列表内容
+     */
+    static renderContent() {
+        const content = $("repeaterContent");
+        if (!content || !currentRepeaterState) return;
+
+        // 使用 map 将单词数组转换为 HTML 字符串数组，再用 join 连接
+        content.innerHTML = currentRepeaterState.words.map((word, i) => `
+            <div id="word-${i}" class="word-item ${i === currentRepeaterState.currentIndex ? 'active' : ''}">
+                <strong>${i + 1}. ${word}</strong>
+                <span class="translation">${currentRepeaterState.translations[i] || "..."}</span>
+            </div>
+        `).join('');
+
+        // 更新底部信息区
+        this.updateInfo();
+    }
+
+    /**
+     * 更新底部的当前单词信息
+     */
+    static updateInfo() {
+        const info = $("currentWordInfo");
+        if (!info || !currentRepeaterState) return;
+
+        // 解构赋值：从对象中提取多个属性
+        const { words, translations, currentIndex, currentRepeat, settings } = currentRepeaterState;
+
+        info.innerHTML = `
+            <div class="current-word">${words[currentIndex]}</div>
+            <div class="current-translation">${translations[currentIndex]}</div>
+            <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
+        `;
+    }
+
+    // -------------------- 滚动处理 --------------------
+
+    /**
+     * 设置滚动相关的事件监听
+     *
+     * 核心逻辑：
+     * 1. 用户开始触摸/点击时，停止当前播放
+     * 2. 用户结束操作后，等待滚动稳定，然后对齐到最近的单词并继续播放
+     */
+    static setupScrollListener() {
+        const scroll = $("repeaterScroll");
+        if (!scroll) return;
+
+        // 标记用户是否正在触摸/拖动
+        let userTouching = false;
+
+        /**
+         * 用户开始触摸/点击时的处理
+         */
+        const onStart = () => {
+            userTouching = true;
+
+            // 清除之前的定时器
+            clearTimeout(this.scrollTimeout);
+
+            // 取消当前播放
+            // playId++ 使得旧的播放循环检测到 ID 不匹配而停止
+            this.playId++;
+            stopAudio();  // 立即停止语音
+        };
+
+        /**
+         * 用户结束触摸/点击时的处理
+         */
+        const onEnd = () => {
+            if (!userTouching) return;
+            userTouching = false;
+
+            // 清除之前的定时器，设置新的
+            clearTimeout(this.scrollTimeout);
+
+            // 200ms 后处理滚动结束
+            // 这个延迟让滚动有时间稳定下来
+            this.scrollTimeout = setTimeout(() => this.onUserScrollEnd(), 200);
+        };
+
+        /**
+         * 鼠标滚轮事件的处理
+         * 滚轮没有明确的"开始"和"结束"，每次滚动都重置定时器
+         */
+        const onWheel = () => {
+            clearTimeout(this.scrollTimeout);
+            this.playId++;
+            stopAudio();
+            this.scrollTimeout = setTimeout(() => this.onUserScrollEnd(), 200);
+        };
+
+        // 添加事件监听
+        // { passive: true } 告诉浏览器这个监听器不会调用 preventDefault()，可以提升滚动性能
+        scroll.addEventListener("touchstart", onStart, { passive: true });
+        scroll.addEventListener("mousedown", onStart);
+        scroll.addEventListener("touchend", onEnd);
+        scroll.addEventListener("mouseup", onEnd);
+        scroll.addEventListener("mouseleave", onEnd);  // 鼠标离开也算结束
+        scroll.addEventListener("wheel", onWheel, { passive: true });
+
+        // 初始滚动到第一个单词
+        this.scrollToIndex(0, false);
+    }
+
+
+    /**
+     * 用户滚动结束后的处理
+     * 1. 计算最近的单词索引
+     * 2. 对齐到该单词
+     * 3. 继续播放
+     */
+    static onUserScrollEnd() {
+        if (!currentRepeaterState) return;
+
+        const scroll = $("repeaterScroll");
+        if (!scroll) return;
+
+        // 根据滚动位置计算最近的单词索引
+        // Math.round 四舍五入到最近的整数
+        const newIndex = Math.round(scroll.scrollTop / this.ITEM_HEIGHT);
+
+        // 确保索引在有效范围内
+        // Math.max 取较大值，Math.min 取较小值
+        const idx = Math.max(0, Math.min(newIndex, currentRepeaterState.words.length - 1));
+
+        // 更新状态
+        currentRepeaterState.currentIndex = idx;
+        currentRepeaterState.currentRepeat = 0;  // 重置播放次数
+
+        // 更新界面
+        this.highlightCurrent();
+        this.updateInfo();
+
+        // 滚动对齐到单词位置
+        this.scrollToIndex(idx);
+
+        // 如果没有暂停，继续播放
+        if (!currentRepeaterState.isPaused) {
+            // 延迟一下再开始，等待滚动动画完成
+            setTimeout(() => this.startPlayLoop(), 400);
+        }
+    }
+
+    /**
+     * 滚动到指定索引的单词
+     *
+     * @param {number} index - 单词索引
+     * @param {boolean} smooth - 是否平滑滚动
+     */
+    static scrollToIndex(index, smooth = true) {
+        const scroll = $("repeaterScroll");
+        if (!scroll) return;
+
+        // 计算目标滚动位置
+        const target = index * this.ITEM_HEIGHT;
+
+        // scrollTo 滚动到指定位置
+        // behavior: 'smooth' 平滑滚动，'instant' 立即跳转
+        scroll.scrollTo({
+            top: target,
+            behavior: smooth ? 'smooth' : 'instant'
+        });
+    }
+
+    /**
+     * 高亮当前单词
+     * 通过添加/移除 'active' CSS 类来实现
+     */
+    static highlightCurrent() {
+        if (!currentRepeaterState) return;
+
+        // querySelectorAll 返回所有匹配的元素
+        // forEach 遍历每个元素
+        document.querySelectorAll("#repeaterContent .word-item").forEach((div, i) => {
+            // classList.toggle(类名, 条件)
+            // 条件为 true 时添加类，false 时移除类
+            div.classList.toggle('active', i === currentRepeaterState.currentIndex);
+        });
+    }
+
+    // -------------------- 播放控制 --------------------
+
+    /**
+     * 开始一个新的播放循环
+     * 每次调用都会 playId++，使旧的循环失效
+     */
+    static startPlayLoop() {
+        this.playId++;
+        this.playCurrentWord(this.playId);
+    }
+
+    /**
+     * 播放当前单词
+     *
+     * @param {number} myId - 这次播放的 ID
+     *
+     * 如果 myId 与当前 playId 不匹配，说明这个播放已被取消
+     */
+    static playCurrentWord(myId) {
+        // 检查状态
+        if (!currentRepeaterState || currentRepeaterState.isPaused) return;
+        if (myId !== this.playId) return;  // ID 不匹配，已被取消
+
+        // 播放语音
+        speakWord(
+            currentRepeaterState.words[currentRepeaterState.currentIndex],
+            currentRepeaterState.settings.slow
+        );
+
+        // 更新界面
+        this.updateInfo();
+
+        // 等待语音结束
+        this.waitSpeechEnd(myId);
+    }
+
+    /**
+     * 等待语音播放结束，然后进行下一步
+     *
+     * @param {number} myId - 播放 ID，用于检查是否被取消
+     *
+     * setInterval 每隔一段时间执行一次回调
+     * 这里每 100ms 检查一次语音是否结束
+     */
+    static waitSpeechEnd(myId) {
+        const check = setInterval(() => {
+            // 检查是否被取消
+            if (myId !== this.playId) {
+                clearInterval(check);  // 停止定时器
+                return;
+            }
+
+            // isAudioPlaying() 为 false 表示语音已结束
+            if (!isAudioPlaying()) {
+                clearInterval(check);  // 停止定时器
+
+                // 再次检查状态
+                if (!currentRepeaterState || currentRepeaterState.isPaused) return;
+
+                // 增加播放次数
+                currentRepeaterState.currentRepeat++;
+                this.updateInfo();
+
+                // 检查是否需要切换到下一个单词
+                if (currentRepeaterState.currentRepeat >= currentRepeaterState.settings.repeat) {
+                    // 重置播放次数
+                    currentRepeaterState.currentRepeat = 0;
+
+                    // 移动到下一个单词
+                    currentRepeaterState.currentIndex++;
+
+                    // 如果到达末尾，回到开头（循环播放）
+                    if (currentRepeaterState.currentIndex >= currentRepeaterState.words.length) {
+                        currentRepeaterState.currentIndex = 0;
+                    }
+
+                    // 更新界面
+                    this.highlightCurrent();
+                    this.scrollToIndex(currentRepeaterState.currentIndex);
+                }
+
+                // 延迟 800ms 后播放下一个
+                // 这个延迟让用户有时间消化刚听到的单词
+                setTimeout(() => this.playCurrentWord(myId), 800);
+            }
+        }, 100);  // 每 100ms 检查一次
+    }
+
+    /**
+     * 暂停/继续播放
+     */
+    static playPause() {
+        if (!currentRepeaterState) return;
+
+        // 切换暂停状态
+        currentRepeaterState.isPaused = !currentRepeaterState.isPaused;
+
+        const btn = $("playPauseBtn");
+
+        if (currentRepeaterState.isPaused) {
+            // 暂停
+            this.playId++;              // 取消当前播放循环
+            stopAudio();   // 立即停止语音
+            btn.textContent = "▶️ Play";
+            btn.className = "btn-play";
+        } else {
+            // 继续
+            btn.textContent = "⏸️ Pause";
+            btn.className = "btn-pause";
+            this.startPlayLoop();       // 开始新的播放循环
+        }
+    }
+}
+
+// =====================================================
+// 听写模式（Dictation Mode）
+// =====================================================
+
+/**
+ * 听写模式类
+ */
+class Dictation {
+    /** 听写状态对象 */
+    static state = null;
+
+    // -------------------- 启动和初始化 --------------------
+
+    /**
+     * 启动听写模式
+     */
+    static async startDictation() {
+        // 如果复读模式正在进行，暂停它（保留状态）
+        if (currentRepeaterState) {
+            Repeater.playId++;
+            stopAudio();
+            currentRepeaterState.isPaused = true;
+        }
+
+        // 检查单词列表和设置是否变化
+        const currentWords = loadWordsFromTextarea();
+        const currentSettings = getSettings();
+        const wordsChanged = !this.state ||
+            JSON.stringify(currentWords) !== JSON.stringify(this.state.originalWords);
+        const settingsChanged = this.state &&
+            JSON.stringify(currentSettings) !== JSON.stringify(this.state.originalSettings);
+
+        // 如果听写模式已有保留的状态且单词列表和设置未变化，恢复继续
+        if (this.state && !wordsChanged && !settingsChanged) {
+            clearWorkplace();
+            this.renderDictationUI();
+            this.updateWorkplace();
+            this.showPopup();
+            return;
+        }
+
+        // 单词列表变化了，清除旧状态
+        this.state = null;
+
+        clearWorkplace();
+
+        const words = loadWordsFromTextarea();
+        if (!words.length) {
+            logToWorkplace("<p>⚠️ No words provided.</p>");
+            return;
+        }
+
+        const settings = getSettings();
+        const list = settings.shuffle ? shuffleArray(words) : [...words];
+
+        // 初始化状态
+        this.state = {
+            words: list,                    // 单词列表
+            originalWords: [...currentWords],  // 保存原始单词列表用于比较
+            originalSettings: {...settings},   // 保存原始设置用于比较
+            currentIndex: 0,                // 当前单词索引
+            maxRetry: settings.retry,       // 最大尝试次数
+            attempts: list.map(() => []),   // 每个单词的尝试记录
+            results: list.map(() => null),  // 每个单词的最终结果
+            slow: settings.slow             // 是否慢速
+        };
+
+        // 渲染初始界面
+        this.renderDictationUI();
+
+        // 显示第一个单词的弹窗
+        this.showPopup();
+    }
+
+    /**
+     * 渲染听写模式的基础界面
+     */
+    static renderDictationUI() {
+        const s = this.state;
+        logToWorkplace(`
+            <h3>📝 Dictation Mode</h3>
+            <p>Total ${s.words.length} words, max ${s.maxRetry} attempts each</p>
+
+            <!-- 听写记录显示区 -->
+            <div id="dictationWorkplace"></div>
+
+            <!-- 继续听写按钮（暂停时显示） -->
+            <div style="margin:10px 0">
+                <button onclick="Dictation.resume()" id="dictationResumeBtn" class="btn-play" style="display:none">▶️ Resume</button>
+            </div>
+        `);
+    }
+
+    // -------------------- 弹窗相关 --------------------
+
+    /**
+     * 显示听写弹窗
+     */
+    static showPopup() {
+        const s = this.state;
+
+        // 如果状态无效或已完成所有单词，显示结果
+        if (!s || s.currentIndex >= s.words.length) {
+            this.showResults();
+            return;
+        }
+
+        const i = s.currentIndex;
+        const retries = s.attempts[i].length;
+
+        // 创建遮罩层（半透明黑色背景）
+        const overlay = document.createElement("div");
+        overlay.id = "dictationOverlay";
+        overlay.className = "overlay";
+
+        // 创建弹窗
+        const popup = document.createElement("div");
+        popup.id = "dictationPopup";
+        popup.className = "popup";
+        popup.innerHTML = `
+            <h3>Word #${i + 1}</h3>
+            <p id="retryInfo">Attempts: ${retries}/${s.maxRetry}</p>
+
+            <!-- 播放发音按钮 -->
+            <button onclick="Dictation.play()" class="btn-sound">🔊 Play</button>
+            <br><br>
+
+            <!-- 输入框 -->
+            <input type="text" id="dictationInput" placeholder="Type the word" autofocus>
+            <br><br>
+
+            <!-- 操作按钮 -->
+            <button onclick="Dictation.pause()" class="btn-pause">⏸️ Pause</button>
+        `;
+
+        // 将遮罩和弹窗添加到页面
+        document.body.append(overlay, popup);
+
+        // 500ms 后自动播放发音
+        setTimeout(() => this.play(), 500);
+
+        // 监听回车键提交
+        $("dictationInput").addEventListener("keypress", e => {
+            if (e.key === "Enter") this.submit();
+        });
+    }
+
+    /**
+     * 关闭弹窗
+     * ?. 是可选链操作符，如果元素不存在不会报错
+     */
+    static closePopup() {
+        $("dictationPopup")?.remove();
+        $("dictationOverlay")?.remove();
+    }
+
+    // -------------------- 核心操作 --------------------
+
+    /**
+     * 播放当前单词的发音
+     */
+    static play() {
+        if (this.state) {
+            speakWord(this.state.words[this.state.currentIndex], this.state.slow);
+        }
+    }
+
+    /**
+     * 提交答案
+     */
+    static submit() {
+        const s = this.state;
+        if (!s) return;
+
+        const input = $("dictationInput");
+        const answer = input.value.trim().toLowerCase();  // 转小写便于比较
+        const correct = s.words[s.currentIndex].toLowerCase();
+        const i = s.currentIndex;
+
+        // 记录这次尝试
+        s.attempts[i].push({
+            answer,                      // 用户输入
+            isCorrect: answer === correct // 是否正确
+        });
+
+        if (answer === correct) {
+            // 回答正确
+            s.results[i] = { status: "correct", retries: s.attempts[i].length };
+            this.updateWorkplace();
+            this.closePopup();
+            s.currentIndex++;
+            // 500ms 后显示下一个单词
+            setTimeout(() => this.showPopup(), 500);
+        } else {
+            // 回答错误
+            this.updateWorkplace();
+
+            if (s.attempts[i].length >= s.maxRetry) {
+                // 已用完所有尝试次数
+                s.results[i] = { status: "failed", retries: s.attempts[i].length };
+                this.updateWorkplace();
+                this.closePopup();
+                s.currentIndex++;
+                setTimeout(() => this.showPopup(), 500);
+            } else {
+                // 还有尝试机会
+                $("retryInfo").textContent = `Attempts: ${s.attempts[i].length}/${s.maxRetry}`;
+                input.value = "";
+                input.focus();
+            }
+        }
+    }
+
+    /**
+     * 更新听写记录显示
+     */
+    static updateWorkplace() {
+        const s = this.state;
+        const wp = $("dictationWorkplace");
+        if (!wp || !s) return;
+
+        // 生成每个单词的尝试记录 HTML
+        wp.innerHTML = s.attempts.map((attempts, i) => {
+            // 如果这个单词还没有尝试，跳过
+            if (!attempts.length) return '';
+
+            const result = s.results[i];
+
+            // 生成每次尝试的 HTML
+            const rows = attempts.map((a, j) => {
+                const isLast = j === attempts.length - 1;  // 是否是最后一次尝试
+                let symbol, cls;
+
+                // 根据结果设置图标和样式
+                if (a.isCorrect) {
+                    symbol = "✅";
+                    cls = "correct";
+                } else if (isLast && result?.status === "failed") {
+                    // 最后一次尝试且最终失败
+                    symbol = "❌";
+                    cls = "failed";
+                } else {
+                    // 错误但还有机会
+                    symbol = "⚠️";
+                    cls = "warning";
+                }
+
+                // 如果失败，显示正确答案
+                const extra = (isLast && result?.status === "failed")
+                    ? ` <span class="correct">(Correct: ${s.words[i]})</span>`
+                    : '';
+
+                return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
+            }).join('');
+
+            // 返回这个单词的完整记录
+            return `<div class="result-item">
+                <span class="result-index">${i + 1}.</span>
+                <div class="result-attempts">${rows}</div>
+            </div>`;
+        }).join('');
+
+        // 滚动到最新记录
+        wp.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    /**
+     * 显示最终结果
+     */
+    static showResults() {
+        const s = this.state;
+        this.closePopup();
+
+        // 统计结果
+        let correct = 0;   // 一次正确
+        let warning = 0;   // 多次正确
+        let failed = 0;    // 最终失败
+
+        s.results.forEach((r, i) => {
+            if (r?.status === "correct" && s.attempts[i].length === 1) {
+                correct++;
+            } else if (r?.status === "correct") {
+                warning++;
+            } else if (r?.status === "failed") {
+                failed++;
+            }
+        });
+
+        // 计算得分：一次正确得满分，多次正确得半分
+        const score = ((correct + warning * 0.5) / s.words.length * 100).toFixed(1);
+
+        // 显示结果
+        logToWorkplace(`
+            <div class="results-box">
+                <h3>📊 Dictation Complete!</h3>
+                <p><strong>Score: ${score}</strong></p>
+                <p>✅ First try correct: ${correct}</p>
+                <p>⚠️ Multiple tries: ${warning}</p>
+                <p>❌ Failed: ${failed}</p>
+            </div>
+        `);
+
+        // 清除状态
+        this.state = null;
+    }
+
+    // -------------------- 控制操作 --------------------
+
+    /**
+     * 暂停听写
+     */
+    static pause() {
+        if (!this.state) return;
+        stopAudio();
+        this.closePopup();
+
+        // 显示继续按钮
+        const btn = $("dictationResumeBtn");
+        if (btn) btn.style.display = "inline-block";
+    }
+
+    /**
+     * 继续听写
+     */
+    static resume() {
+        if (!this.state) return;
+
+        // 隐藏继续按钮
+        const btn = $("dictationResumeBtn");
+        if (btn) btn.style.display = "none";
+
+        // 重新显示弹窗
+        this.showPopup();
+    }
+
+    /**
+     * 重新开始听写
+     */
+    static restart() {
+        if (!this.state) return;
+
+        // 确认对话框
+        if (!confirm("Are you sure you want to restart?")) return;
+
+        stopAudio();
+        this.closePopup();
+        this.state = null;
+
+        // 重新开始
+        this.startDictation();
+    }
+}
