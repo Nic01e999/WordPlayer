@@ -12,31 +12,21 @@
             <h1>🎧 English Dictation</h1>
             <button id="Dictation-bnt" onclick="Dictation.startDictation()">📝 Dictation</button>
             <button id="Repeater-bnt" onclick="Repeater.startRepeater()">📖 Repeater</button>
-        </div>
+            <div class="settings-trigger">
+                <span class="gear-icon">⚙️</span>
+                <!-- 右侧：设置边栏 -->
+                <div class="sidebar">
+                    <div id="settings">
+                        <h3>Settings</h3>
+                        <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
+                        <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
+                        <label>Slow: <input type="checkbox" id="slow"></label>
+                        <label>Shuffle: <input type="checkbox" id="shuffle"></label>
+                    </div>
 
-        <div class="container">
-
-            <!-- 左侧：结果显示 -->
-            <div class="main">
-                
-                <div id="workplace">
-
-                </div>
-            </div>
-        
-            <!-- 右侧：设置边栏 -->
-            <div class="sidebar">
-                <div id="settings">
-                    <h3>Settings</h3>
-                    <label>Repeat: <input type="number" id="repeat" value="2" min="1"><br></label>
-                    <label>Max Retry: <input type="number" id="retry" value="3" min="1"><br></label>
-                    <label>Slow: <input type="checkbox" id="slow"><br></label>
-                    <label>Shuffle: <input type="checkbox" id="shuffle"><br></label>
-                </div>
-
-                <div id="wordSection">
-                    <h3>Word List</h3>
-                    <textarea id="wordInput" placeholder="Enter words (separated by spaces or newlines)">
+                    <div id="wordSection">
+                        <h3>Word List</h3>
+                        <textarea id="wordInput" placeholder="Enter words (separated by spaces or newlines)">
 friend
 furniture
 game
@@ -87,12 +77,21 @@ photocopy
 piano
 plastic
 point
-                    </textarea><br>
-                    <!-- <button onclick="loadWords()">Load Words</button> -->
+                        </textarea>
+                    </div>
                 </div>
-
             </div>
-        
+        </div>
+
+        <div class="container">
+
+            <!-- 左侧：结果显示 -->
+            <div class="main">
+                
+                <div id="workplace">
+
+                </div>
+            </div>
         </div>
 
         

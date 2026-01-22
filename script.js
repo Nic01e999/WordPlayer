@@ -159,15 +159,36 @@ function isAudioPlaying() {
 
 /**
  * 使用后端 TTS API 朗读单词
- *
- * @param {string} word - 要朗读的单词
- * @param {boolean} slow - 是否慢速播放
  */
 function speakWord(word, slow = false) {
     stopAudio();
     const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}`;
     currentAudio = new Audio(url);
-    currentAudio.play();
+    currentAudio.onerror = () => console.warn("音频加载失败，请检查后端服务是否运行");
+    currentAudio.play().catch(() => {});
+}
+
+/**
+ * 更新播放/暂停按钮状态
+ */
+function updatePlayPauseBtn(btn, isPaused) {
+    if (!btn) return;
+    btn.className = isPaused ? "btn-play" : "btn-pause";
+    btn.textContent = isPaused ? "▶" : "⏸";
+}
+
+/**
+ * 暂停另一个模式
+ */
+function pauseOtherMode(isRepeater) {
+    stopAudio();
+    if (isRepeater && Dictation.state) {
+        Dictation.state.isPaused = true;
+        Dictation.closePopup();
+    } else if (!isRepeater && currentRepeaterState) {
+        Repeater.playId++;
+        currentRepeaterState.isPaused = true;
+    }
 }
 
 // =====================================================
@@ -204,36 +225,9 @@ class Repeater {
      * async 函数可以使用 await 等待异步操作
      */
     static async startRepeater() {
-        // 如果听写模式正在进行，暂停它（保留状态）
-        if (Dictation.state) {
-            stopAudio();
-            Dictation.closePopup();
-        }
-
-        // 检查单词列表和设置是否变化
-        const currentWords = loadWordsFromTextarea();
-        const currentSettings = getSettings();
-        const wordsChanged = !currentRepeaterState ||
-            JSON.stringify(currentWords) !== JSON.stringify(currentRepeaterState.originalWords);
-        const settingsChanged = currentRepeaterState &&
-            JSON.stringify(currentSettings) !== JSON.stringify(currentRepeaterState.originalSettings);
-
-        // 如果复读模式已有保留的状态且单词列表和设置未变化，恢复继续
-        if (currentRepeaterState && !wordsChanged && !settingsChanged) {
-            clearWorkplace();
-            currentRepeaterState.isPaused = false;
-            this.renderUI();
-            // 延迟滚动到当前位置，等待 DOM 渲染完成
-            setTimeout(() => {
-                this.scrollToIndex(currentRepeaterState.currentIndex, false);
-                this.startPlayLoop();
-            }, 100);
-            return;
-        }
-
-        // 单词列表或设置变化了，停止播放并清除旧状态
+        // 暂停听写模式，每次进入复读模式都重新开始
+        pauseOtherMode(true);
         this.playId++;
-        stopAudio();
         currentRepeaterState = null;
 
         // 清空工作区
@@ -256,8 +250,6 @@ class Repeater {
         // 初始化状态对象
         currentRepeaterState = {
             words: list,           // 单词列表
-            originalWords: [...currentWords],  // 保存原始单词列表用于比较
-            originalSettings: {...settings},   // 保存原始设置用于比较
             currentIndex: 0,       // 当前播放的单词索引
             currentRepeat: 0,      // 当前单词已播放次数
             settings,              // 用户设置
@@ -311,7 +303,7 @@ class Repeater {
 
             <!-- 暂停/播放按钮 -->
             <div style="margin:15px 0;text-align:center">
-                <button onclick="Repeater.playPause()" id="playPauseBtn" class="btn-pause">⏸️ Pause</button>
+                <button onclick="Repeater.playPause()" id="playPauseBtn" class="btn-pause">⏸</button>
             </div>
 
             <!-- 当前单词信息显示区 -->
@@ -601,22 +593,14 @@ class Repeater {
     static playPause() {
         if (!currentRepeaterState) return;
 
-        // 切换暂停状态
         currentRepeaterState.isPaused = !currentRepeaterState.isPaused;
-
-        const btn = $("playPauseBtn");
+        updatePlayPauseBtn($("playPauseBtn"), currentRepeaterState.isPaused);
 
         if (currentRepeaterState.isPaused) {
-            // 暂停
-            this.playId++;              // 取消当前播放循环
-            stopAudio();   // 立即停止语音
-            btn.textContent = "▶️ Play";
-            btn.className = "btn-play";
+            this.playId++;
+            stopAudio();
         } else {
-            // 继续
-            btn.textContent = "⏸️ Pause";
-            btn.className = "btn-pause";
-            this.startPlayLoop();       // 开始新的播放循环
+            this.startPlayLoop();
         }
     }
 }
@@ -638,31 +622,9 @@ class Dictation {
      * 启动听写模式
      */
     static async startDictation() {
-        // 如果复读模式正在进行，暂停它（保留状态）
-        if (currentRepeaterState) {
-            Repeater.playId++;
-            stopAudio();
-            currentRepeaterState.isPaused = true;
-        }
-
-        // 检查单词列表和设置是否变化
-        const currentWords = loadWordsFromTextarea();
-        const currentSettings = getSettings();
-        const wordsChanged = !this.state ||
-            JSON.stringify(currentWords) !== JSON.stringify(this.state.originalWords);
-        const settingsChanged = this.state &&
-            JSON.stringify(currentSettings) !== JSON.stringify(this.state.originalSettings);
-
-        // 如果听写模式已有保留的状态且单词列表和设置未变化，恢复继续
-        if (this.state && !wordsChanged && !settingsChanged) {
-            clearWorkplace();
-            this.renderDictationUI();
-            this.updateWorkplace();
-            this.showPopup();
-            return;
-        }
-
-        // 单词列表变化了，清除旧状态
+        // 暂停复读模式，每次进入听写模式都重新开始
+        pauseOtherMode(false);
+        this.closePopup();
         this.state = null;
 
         clearWorkplace();
@@ -679,13 +641,12 @@ class Dictation {
         // 初始化状态
         this.state = {
             words: list,                    // 单词列表
-            originalWords: [...currentWords],  // 保存原始单词列表用于比较
-            originalSettings: {...settings},   // 保存原始设置用于比较
             currentIndex: 0,                // 当前单词索引
             maxRetry: settings.retry,       // 最大尝试次数
             attempts: list.map(() => []),   // 每个单词的尝试记录
             results: list.map(() => null),  // 每个单词的最终结果
-            slow: settings.slow             // 是否慢速
+            slow: settings.slow,            // 是否慢速
+            isPaused: false                 // 是否暂停
         };
 
         // 渲染初始界面
@@ -706,11 +667,6 @@ class Dictation {
 
             <!-- 听写记录显示区 -->
             <div id="dictationWorkplace"></div>
-
-            <!-- 继续听写按钮（暂停时显示） -->
-            <div style="margin:10px 0">
-                <button onclick="Dictation.resume()" id="dictationResumeBtn" class="btn-play" style="display:none">▶️ Resume</button>
-            </div>
         `);
     }
 
@@ -731,11 +687,6 @@ class Dictation {
         const i = s.currentIndex;
         const retries = s.attempts[i].length;
 
-        // 创建遮罩层（半透明黑色背景）
-        const overlay = document.createElement("div");
-        overlay.id = "dictationOverlay";
-        overlay.className = "overlay";
-
         // 创建弹窗
         const popup = document.createElement("div");
         popup.id = "dictationPopup";
@@ -745,26 +696,29 @@ class Dictation {
             <p id="retryInfo">Attempts: ${retries}/${s.maxRetry}</p>
 
             <!-- 播放发音按钮 -->
-            <button onclick="Dictation.play()" class="btn-sound">🔊 Play</button>
+            <button onclick="Dictation.play()" class="btn-sound">🎧</button>
             <br><br>
+
+            <!-- 暂停/播放按钮 -->
+            <button onclick="Dictation.playPause()" id="dictationPlayPauseBtn" class="${s.isPaused ? 'btn-play' : 'btn-pause'}">${s.isPaused ? '▶' : '⏸'}</button>
 
             <!-- 输入框 -->
-            <input type="text" id="dictationInput" placeholder="Type the word" autofocus>
+            <input type="text" id="dictationInput" placeholder="Type the word" ${s.isPaused ? 'disabled' : ''}>
             <br><br>
 
-            <!-- 操作按钮 -->
-            <button onclick="Dictation.pause()" class="btn-pause">⏸️ Pause</button>
         `;
 
-        // 将遮罩和弹窗添加到页面
-        document.body.append(overlay, popup);
+        // 将弹窗添加到页面
+        document.body.append(popup);
 
-        // 500ms 后自动播放发音
-        setTimeout(() => this.play(), 500);
+        // 如果没有暂停，500ms 后自动播放发音
+        if (!s.isPaused) {
+            setTimeout(() => this.play(), 500);
+        }
 
         // 监听回车键提交
         $("dictationInput").addEventListener("keypress", e => {
-            if (e.key === "Enter") this.submit();
+            if (e.key === "Enter" && !this.state?.isPaused) this.submit();
         });
     }
 
@@ -774,7 +728,6 @@ class Dictation {
      */
     static closePopup() {
         $("dictationPopup")?.remove();
-        $("dictationOverlay")?.remove();
     }
 
     // -------------------- 核心操作 --------------------
@@ -796,17 +749,17 @@ class Dictation {
         if (!s) return;
 
         const input = $("dictationInput");
-        const answer = input.value.trim().toLowerCase();  // 转小写便于比较
-        const correct = s.words[s.currentIndex].toLowerCase();
+        const answer = input.value.trim();  // 保留用户原始输入，不改大小写
+        const correct = s.words[s.currentIndex];
         const i = s.currentIndex;
 
-        // 记录这次尝试
+        // 记录这次尝试（比较时忽略大小写，但保存原始输入）
         s.attempts[i].push({
-            answer,                      // 用户输入
-            isCorrect: answer === correct // 是否正确
+            answer,                      // 用户输入（保留原始大小写）
+            isCorrect: answer.toLowerCase() === correct.toLowerCase() // 比较时忽略大小写
         });
 
-        if (answer === correct) {
+        if (answer.toLowerCase() === correct.toLowerCase()) {
             // 回答正确
             s.results[i] = { status: "correct", retries: s.attempts[i].length };
             this.updateWorkplace();
@@ -856,7 +809,7 @@ class Dictation {
 
                 // 根据结果设置图标和样式
                 if (a.isCorrect) {
-                    symbol = "✅";
+                    symbol = "✔️";
                     cls = "correct";
                 } else if (isLast && result?.status === "failed") {
                     // 最后一次尝试且最终失败
@@ -930,46 +883,24 @@ class Dictation {
     // -------------------- 控制操作 --------------------
 
     /**
-     * 暂停听写
+     * 暂停/播放切换
      */
-    static pause() {
-        if (!this.state) return;
-        stopAudio();
-        this.closePopup();
-
-        // 显示继续按钮
-        const btn = $("dictationResumeBtn");
-        if (btn) btn.style.display = "inline-block";
-    }
-
-    /**
-     * 继续听写
-     */
-    static resume() {
+    static playPause() {
         if (!this.state) return;
 
-        // 隐藏继续按钮
-        const btn = $("dictationResumeBtn");
-        if (btn) btn.style.display = "none";
+        this.state.isPaused = !this.state.isPaused;
+        updatePlayPauseBtn($("dictationPlayPauseBtn"), this.state.isPaused);
 
-        // 重新显示弹窗
-        this.showPopup();
-    }
-
-    /**
-     * 重新开始听写
-     */
-    static restart() {
-        if (!this.state) return;
-
-        // 确认对话框
-        if (!confirm("Are you sure you want to restart?")) return;
-
-        stopAudio();
-        this.closePopup();
-        this.state = null;
-
-        // 重新开始
-        this.startDictation();
+        const input = $("dictationInput");
+        if (this.state.isPaused) {
+            stopAudio();
+            if (input) input.disabled = true;
+        } else {
+            if (input) {
+                input.disabled = false;
+                input.focus();
+            }
+            this.play();
+        }
     }
 }
