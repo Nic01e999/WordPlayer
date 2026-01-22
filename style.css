@@ -108,7 +108,7 @@ body::before {
     margin: 0 0 10px 0;         /* 仅设置底部外边距 */
     font-weight: 500;           /* 中等字重 */
     letter-spacing: 4px;        /* 字母间距，增加高级感 */
-    font-size: 28px;            /* 标题字号 */
+    font-size: 36px;            /* 标题字号 - 放大 */
 }
 
 /*
@@ -118,10 +118,10 @@ body::before {
 #menu button {
     font-family: 'Cinzel', 'Georgia', serif; /* 哥特风格字体 */
     border-radius: 25px;        /* 圆角边框，呈胶囊形状 */
-    width: 200px;               /* 固定宽度，保持按钮一致 */
-    font-size: 16px;            /* 按钮文字大小 */
+    width: 220px;               /* 固定宽度，保持按钮一致 */
+    font-size: 18px;            /* 按钮文字大小 - 放大 */
     font-weight: 500;           /* 中等字重 */
-    padding: 12px 24px;         /* 内边距：上下 12px，左右 24px */
+    padding: 14px 28px;         /* 内边距：上下 14px，左右 28px */
 
     /* 粉色渐变背景，从浅粉到稍深的粉色 */
     background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);
@@ -155,6 +155,10 @@ body::before {
     /* 添加粉色发光阴影 */
     box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
 }
+
+
+
+
 
 /*
  * 设置触发器容器
@@ -538,7 +542,7 @@ body::before {
  */
 .word-item strong {
     font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体，保留大小写 */
-    font-size: 18px;            /* 较大字号 */
+    font-size: 22px;            /* 较大字号 - 放大 */
     font-weight: 600;           /* 粗体 */
     transition: all 0.3s;       /* 过渡动画 */
 }
@@ -553,7 +557,7 @@ body::before {
  */
 .word-item .translation {
     color: #c9a8a8;             /* 淡玫瑰色 */
-    font-size: 14px;            /* 较小字号 */
+    font-size: 18px;            /* 字号 - 放大 */
 }
 
 /*
@@ -575,7 +579,7 @@ body::before {
  */
 .current-word {
     font-family: 'Cinzel', 'Georgia', serif; /* 哥特字体 */
-    font-size: 28px;            /* 大字号 */
+    font-size: 36px;            /* 大字号 - 放大 */
     font-weight: 600;           /* 粗体 */
     color: #c48b8b;             /* 玫瑰棕色 */
 }
@@ -585,7 +589,7 @@ body::before {
  */
 .current-translation {
     font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
-    font-size: 16px;            /* 字号 */
+    font-size: 20px;            /* 字号 - 放大 */
     color: #9c7a7a;             /* 淡棕色 */
     margin-top: 8px;            /* 顶部间距 */
 }
@@ -595,7 +599,7 @@ body::before {
  */
 .play-count {
     font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
-    font-size: 14px;            /* 小字号 */
+    font-size: 18px;            /* 字号 - 放大 */
     color: #d4a5a5;             /* 玫瑰色 */
     margin-top: 8px;            /* 顶部间距 */
     font-weight: 600;           /* 粗体 */
@@ -651,22 +655,28 @@ body::before {
     -webkit-backdrop-filter: blur(1px) saturate(180%);
 }
 
+#dictationPopup h3 {
+    color: #8b6f6f;
+}
+#retryInfo{
+    color: #8b6f6f;
+}
+
 /*
  * 弹窗输入框
  * 用户输入听写答案
  */
 .popup input {
     font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
-    font-size: 25px;            /* 较大字号，便于输入 */
-    padding: 15px 20px;         /* 内边距 */
-    width: 60%;                 /* 宽度占弹窗 80% */
+    font-size: 28px;            /* 较大字号 - 放大 */
+    padding: 18px 24px;         /* 内边距 */
+    width: 65%;                 /* 宽度 */
     border: 1px solid rgba(255, 182, 193, 0.5); /* 粉色边框 */
     border-radius: 15px;        /* 圆角 */
     background: #fffafa;        /* 淡粉背景 */
     color: #8b6f6f;             /* 文字颜色 */
     text-align: center;         /* 文字居中 */
     transition: all 0.3s;       /* 过渡动画 */
-    
 }
 
 /* 输入框获得焦点时的样式 */
@@ -683,12 +693,13 @@ body::before {
 .result-item {
     font-family: 'Cormorant Garamond', 'Georgia', serif; /* 正文字体 */
     display: flex;              /* 弹性布局 */
-    padding: 15px;              /* 内边距 */
-    margin: 8px 0;              /* 上下外边距 */
+    padding: 18px;              /* 内边距 */
+    margin: 10px 0;             /* 上下外边距 */
     background: #fff9f9;        /* 淡粉背景 */
     border: 1px solid rgba(255, 182, 193, 0.3); /* 浅粉边框 */
     border-radius: 15px;        /* 圆角 */
     transition: all 0.2s;       /* 过渡动画 */
+    font-size: 20px;            /* 字号 - 添加 */
 }
 
 /* 结果项悬停效果 */
@@ -818,7 +829,7 @@ body::before {
  * 绿色，表示答案正确
  */
 .correct {
-    color: #9fcca8;             /* 柔和的绿色 */
+    color: #76ab80;             /* 柔和的绿色 */
 }
 
 /*
@@ -826,7 +837,7 @@ body::before {
  * 橙色，表示需要注意或部分正确
  */
 .warning {
-    color: #e7d35e;             /* 柔和的橙色 */
+    color: #ec8b1d;             /* 柔和的橙色 */
 }
 
 /*
@@ -834,6 +845,85 @@ body::before {
  * 红色，表示答案错误
  */
 .failed {
-    color: #d4878a;             /* 柔和的玫瑰红色 */
+    color: #c16f72;             /* 柔和的玫瑰红色 */
+}
+/* #endregion */
+
+/* #region 响应式设计 */
+/* ===================================================================
+ * 响应式设计区域
+ * 根据屏幕大小调整字体和布局
+ * =================================================================== */
+
+/* 超大屏幕 (>1400px) */
+@media (min-width: 1400px) {
+    #menu h1 { font-size: 42px; }
+    #menu button { font-size: 20px; width: 240px; padding: 16px 32px; }
+    .current-word { font-size: 42px; }
+    .current-translation { font-size: 24px; }
+    .word-item strong { font-size: 26px; }
+    .word-item .translation { font-size: 20px; }
+    .popup input { font-size: 32px; }
+    .result-item { font-size: 22px; }
+    .play-count { font-size: 20px; }
+}
+
+/* 大屏幕 (1200px - 1399px) - 默认样式已设置 */
+
+/* 中等屏幕 (900px - 1199px) */
+@media (min-width: 900px) and (max-width: 1199px) {
+    #menu h1 { font-size: 32px; }
+    #menu button { font-size: 16px; width: 200px; padding: 12px 24px; }
+    .current-word { font-size: 32px; }
+    .current-translation { font-size: 18px; }
+    .word-item strong { font-size: 20px; }
+    .word-item .translation { font-size: 16px; }
+    .popup input { font-size: 26px; }
+    .result-item { font-size: 18px; }
+}
+
+/* 小屏幕 / 平板 (600px - 899px) */
+@media (min-width: 600px) and (max-width: 899px) {
+    #menu h1 { font-size: 26px; letter-spacing: 2px; }
+    #menu button { font-size: 14px; width: 160px; padding: 10px 20px; margin: 0 8px; }
+    #menu { padding: 12px; }
+    .main { padding: 20px; }
+    .current-word { font-size: 28px; }
+    .current-translation { font-size: 16px; }
+    .word-item strong { font-size: 18px; }
+    .word-item .translation { font-size: 14px; }
+    .popup { min-width: 320px; padding: 25px; }
+    .popup input { font-size: 22px; width: 70%; }
+    .repeater-container { height: 350px; }
+    .result-item { font-size: 16px; padding: 14px; }
+    .settings-trigger { right: 5%; }
+    .settings-trigger .sidebar { width: 220px; }
+}
+
+/* 手机屏幕 (<600px) */
+@media (max-width: 599px) {
+    #menu h1 { font-size: 20px; letter-spacing: 1px; }
+    #menu button { font-size: 12px; width: 120px; padding: 10px 14px; margin: 0 4px; border-radius: 18px; }
+    #menu { padding: 10px; }
+    .main { padding: 15px; }
+    .current-word { font-size: 24px; }
+    .current-translation { font-size: 16px; }
+    .word-item { height: 55px; padding: 0 12px; }
+    .word-item strong { font-size: 16px; }
+    .word-item .translation { font-size: 13px; }
+    .popup { min-width: 90%; padding: 20px; border-radius: 18px; }
+    .popup input { font-size: 20px; width: 80%; padding: 14px 18px; }
+    .popup h3 { font-size: 18px; }
+    .repeater-container { height: 280px; border-radius: 18px; }
+    .center-pointer { height: 55px; }
+    .word-info { padding: 18px; border-radius: 18px; }
+    .play-count { font-size: 16px; }
+    .settings-trigger { right: 3%; top: 50%; }
+    .settings-trigger .sidebar { width: 200px; padding: 18px; }
+    .settings-trigger .sidebar h3 { font-size: 13px; }
+    .settings-trigger .sidebar label { font-size: 13px; }
+    .settings-trigger .sidebar textarea { height: 140px; font-size: 13px; }
+    .btn-pause, .btn-play, .btn-sound { width: 45px; height: 45px; font-size: 18px; }
+    .result-item { padding: 12px; font-size: 16px; }
 }
 /* #endregion */

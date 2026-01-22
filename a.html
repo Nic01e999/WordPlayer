@@ -10,8 +10,9 @@
     <body>
         <div id="menu">
             <h1>🎧 English Dictation</h1>
-            <button id="Dictation-bnt" onclick="Dictation.startDictation()">📝 Dictation</button>
-            <button id="Repeater-bnt" onclick="Repeater.startRepeater()">📖 Repeater</button>
+            <button id="Dictation-bnt" onclick="Dictation.switchToDictation()">📝 Dictation</button>
+            <button id="Repeater-bnt" onclick="Repeater.switchToRepeater()">📖 Repeater</button>
+            <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font: size 12px; color:#888;"></span>
             <div class="settings-trigger">
                 <span class="gear-icon">⚙️</span>
                 <!-- 右侧：设置边栏 -->
@@ -20,6 +21,7 @@
                         <h3>Settings</h3>
                         <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
                         <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
+                        <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
                         <label>Slow: <input type="checkbox" id="slow"></label>
                         <label>Shuffle: <input type="checkbox" id="shuffle"></label>
                     </div>
