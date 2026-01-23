@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "启动服务器",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+            "program": "${workspaceFolder}/server.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

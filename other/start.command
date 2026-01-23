@@ -14,14 +14,14 @@ if [ -n "$OLD_PID" ]; then
 fi
 
 # 启动 Python 服务器
-python3 server.py &
+python3 ../server.py &
 SERVER_PID=$!
 
 # 等待服务器启动
 sleep 2
 
 # 打开浏览器
-open "$(pwd)/a.html"
+open "../a.html"
 
 echo "服务器已启动 (PID: $SERVER_PID)"
 echo "按 Ctrl+C 停止服务器"

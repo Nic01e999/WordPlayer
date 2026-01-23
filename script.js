@@ -160,8 +160,8 @@ function logToWorkplace(html) {
     $("workplace").insertAdjacentHTML("beforeend", html);
 }
 
-// 后端API地址
-const API_BASE = "/";
+// 后端API地址（自动检测：如果通过Flask访问则用相对路径，否则指向5001端口）
+const API_BASE = location.port === "5001" ? "" : `http://${location.hostname}:5001`;
 
 // 当前播放的音频对象（用于停止播放）
 let currentAudio = null;
@@ -1355,9 +1355,9 @@ class Dictation {
                     cls = "warning";
                 }
 
-                // 如果失败，显示正确答案（播放内容 - 期望输入）
+                // 如果失败，显示正确答案（单词 - 翻译/定义）
                 const extra = (isLast && result?.status === "failed")
-                    ? `<br><span class="correct">(${s.speakTexts[i]} - ${s.expectTexts[i]})</span>`
+                    ? `<br><span class="correct">(${s.entries[i].word} - ${s.entries[i].definition || preloadCache.translations[s.entries[i].word] || ''})</span>`
                     : '';
 
                 return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
