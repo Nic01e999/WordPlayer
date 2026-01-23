@@ -35,10 +35,10 @@ let currentActiveMode = null;
  * 用于后台预加载翻译和音频
  */
 const preloadCache = {
-    words: [],              // 已缓存的单词列表
-    translations: {},       // { word: translation }
-    audioUrls: {},          // { word: Blob URL } (正常速度)
-    slowAudioUrls: {},      // { word: Blob URL } (慢速)
+    entries: [],            // 已缓存的单词条目列表 { word, definition }
+    translations: {},       // { word: translation } - 如果有 definition 则直接使用
+    audioUrls: {},          // { text: Blob URL } (正常速度) - 支持单词和定义
+    slowAudioUrls: {},      // { text: Blob URL } (慢速) - 支持单词和定义
     loading: false,         // 是否正在加载
     loadId: 0,              // 加载 ID，用于取消旧的加载
     loaded: 0,              // 已加载数量
@@ -73,26 +73,47 @@ function getSettings() {
         retry: parseInt($("retry").value) || 1,
         interval: parseInt($("interval").value) || 300,  // 单词间隔（毫秒）
         slow: $("slow").checked,      // checkbox 用 .checked 获取布尔值
-        shuffle: $("shuffle").checked
+        shuffle: $("shuffle").checked,
+        dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB"  // 选中=听定义写单词
     };
 }
 
 /**
  * 从文本框读取单词列表
+ * 支持 a:b 格式，其中 a 是单词，b 是定义
  *
- * @returns {string[]} 单词数组
+ * @returns {Array<{word: string, definition: string|null}>} 单词条目数组
  *
  * 处理过程：
  * 1. 获取文本框内容
- * 2. 用正则表达式 /\s+/ 按空白字符分割（空格、换行、Tab等）
- * 3. trim() 去除每个单词两端的空白
- * 4. filter(w => w) 过滤掉空字符串
+ * 2. 按行分割
+ * 3. 解析每行，支持 a:b 格式
+ * 4. 过滤空行
  */
 function loadWordsFromTextarea() {
     return $("wordInput").value
-        .split(/\r?\n/)           // 分割
-        .map(w => w.trim())     // 去除两端空白
-        .filter(w => w);        // 过滤空字符串
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line)
+        .map(line => {
+            const colonIndex = line.indexOf(':');
+            if (colonIndex !== -1) {
+                return {
+                    word: line.substring(0, colonIndex).trim(),
+                    definition: line.substring(colonIndex + 1).trim() || null
+                };
+            }
+            return { word: line, definition: null };
+        });
+}
+
+/**
+ * 从单词条目数组中提取单词列表（向后兼容）
+ * @param {Array<{word: string, definition: string|null}>} entries
+ * @returns {string[]}
+ */
+function getWordsFromEntries(entries) {
+    return entries.map(e => e.word);
 }
 
 /**
@@ -249,7 +270,7 @@ function updatePreloadProgress() {
     const indicator = $("preloadIndicator");
     if (!indicator) return;
 
-    const wordCount = preloadCache.words.length;
+    const wordCount = preloadCache.entries.length;
 
     if (preloadCache.loading) {
         // 显示加载进度（内部用 loaded/total，但显示为单词数）
@@ -267,10 +288,11 @@ function updatePreloadProgress() {
 /**
  * 开始预加载翻译和音频
  * 并行加载所有内容
+ * 支持 a:b 格式，如果有 definition 则跳过翻译 API
  */
 async function startPreload() {
-    const words = loadWordsFromTextarea();
-    if (!words.length) {
+    const entries = loadWordsFromTextarea();
+    if (!entries.length) {
         preloadCache.loading = false;
         preloadCache.loaded = 0;
         preloadCache.total = 0;
@@ -279,11 +301,13 @@ async function startPreload() {
     }
 
     // 检查单词列表是否改变
-    const cacheSet = new Set(preloadCache.words);
-    const wordsChanged = words.length !== preloadCache.words.length ||
-        words.some(w => !cacheSet.has(w));
+    const entriesChanged = entries.length !== preloadCache.entries.length ||
+        entries.some((e, i) =>
+            e.word !== preloadCache.entries[i]?.word ||
+            e.definition !== preloadCache.entries[i]?.definition
+        );
 
-    if (!wordsChanged && !preloadCache.loading) {
+    if (!entriesChanged && !preloadCache.loading) {
         // 单词未改变，且已加载完成，无需重新加载
         return;
     }
@@ -293,15 +317,30 @@ async function startPreload() {
     const myId = preloadCache.loadId;
 
     // 重置缓存
-    preloadCache.words = [...words];
+    preloadCache.entries = entries.map(e => ({ ...e }));
     preloadCache.loading = true;
     preloadCache.loaded = 0;
-    preloadCache.total = words.length * 3; // 翻译 + 正常音频 + 慢速音频
+
+    // 计算需要加载的项目数：
+    // - 每个条目：翻译 + 单词音频(正常) + 单词音频(慢速)
+    // - 如果有 definition：额外加载 definition 音频(正常) + definition 音频(慢速)
+    const definitionCount = entries.filter(e => e.definition).length;
+    preloadCache.total = entries.length * 3 + definitionCount * 2;
     updatePreloadProgress();
 
-    // 并行加载所有翻译
-    const translationPromises = words.map(async (word) => {
-        if (myId !== preloadCache.loadId) return; // 已取消
+    // 并行加载所有翻译（如果有 definition 则直接使用）
+    const translationPromises = entries.map(async (entry) => {
+        if (myId !== preloadCache.loadId) return;
+
+        const { word, definition } = entry;
+
+        // 如果有 definition，直接使用它作为翻译
+        if (definition) {
+            preloadCache.translations[word] = definition;
+            preloadCache.loaded++;
+            updatePreloadProgress();
+            return;
+        }
 
         // 如果已有缓存，跳过
         if (preloadCache.translations[word]) {
@@ -315,7 +354,7 @@ async function startPreload() {
             const res = await fetch(url);
             const data = await res.json();
 
-            if (myId !== preloadCache.loadId) return; // 再次检查
+            if (myId !== preloadCache.loadId) return;
 
             preloadCache.translations[word] = data.translation || "翻译失败";
         } catch {
@@ -326,24 +365,31 @@ async function startPreload() {
         updatePreloadProgress();
     });
 
+    // 收集所有需要预加载音频的文本（单词 + definitions）
+    const textsToPreload = new Set();
+    entries.forEach(e => {
+        textsToPreload.add(e.word);
+        if (e.definition) textsToPreload.add(e.definition);
+    });
+
     // 并行加载所有音频（正常速度）
-    const audioPromises = words.map(async (word) => {
+    const audioPromises = Array.from(textsToPreload).map(async (text) => {
         if (myId !== preloadCache.loadId) return;
 
-        if (preloadCache.audioUrls[word]) {
+        if (preloadCache.audioUrls[text]) {
             preloadCache.loaded++;
             updatePreloadProgress();
             return;
         }
 
         try {
-            const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=0`;
+            const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=0`;
             const res = await fetch(url);
             const blob = await res.blob();
 
             if (myId !== preloadCache.loadId) return;
 
-            preloadCache.audioUrls[word] = URL.createObjectURL(blob);
+            preloadCache.audioUrls[text] = URL.createObjectURL(blob);
         } catch {
             // 音频加载失败，不缓存
         }
@@ -353,23 +399,23 @@ async function startPreload() {
     });
 
     // 并行加载所有音频（慢速）
-    const slowAudioPromises = words.map(async (word) => {
+    const slowAudioPromises = Array.from(textsToPreload).map(async (text) => {
         if (myId !== preloadCache.loadId) return;
 
-        if (preloadCache.slowAudioUrls[word]) {
+        if (preloadCache.slowAudioUrls[text]) {
             preloadCache.loaded++;
             updatePreloadProgress();
             return;
         }
 
         try {
-            const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=1`;
+            const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=1`;
             const res = await fetch(url);
             const blob = await res.blob();
 
             if (myId !== preloadCache.loadId) return;
 
-            preloadCache.slowAudioUrls[word] = URL.createObjectURL(blob);
+            preloadCache.slowAudioUrls[text] = URL.createObjectURL(blob);
         } catch {
             // 音频加载失败，不缓存
         }
@@ -497,9 +543,9 @@ class Repeater {
         // 清空工作区
         clearWorkplace();
 
-        // 读取单词列表
-        const words = loadWordsFromTextarea();
-        if (!words.length) {
+        // 读取单词条目列表
+        const entries = loadWordsFromTextarea();
+        if (!entries.length) {
             logToWorkplace("<p>⚠️ No words provided.</p>");
             return;
         }
@@ -508,15 +554,18 @@ class Repeater {
         const settings = getSettings();
 
         // 根据设置决定是否打乱顺序
-        // [...words] 创建副本，避免修改原数组
-        const list = settings.shuffle ? shuffleArray(words) : [...words];
+        const list = settings.shuffle ? shuffleArray(entries) : [...entries];
 
-        // 检查是否所有翻译都已缓存
-        const allCached = list.every(w => preloadCache.translations[w]);
+        // 提取单词列表
+        const words = list.map(e => e.word);
+
+        // 检查是否所有翻译都已缓存（有 definition 的已在预加载时存入缓存）
+        const allCached = words.every(w => preloadCache.translations[w]);
 
         // 初始化状态对象
         currentRepeaterState = {
-            words: list,           // 单词列表
+            entries: list,         // 单词条目列表 { word, definition }
+            words,                 // 单词列表（向后兼容）
             currentIndex: 0,       // 当前播放的单词索引
             currentRepeat: 0,      // 当前单词已播放次数
             settings,              // 用户设置
@@ -526,13 +575,18 @@ class Repeater {
 
         if (allCached) {
             // 所有翻译已缓存，直接使用
-            currentRepeaterState.translations = list.map(w => preloadCache.translations[w]);
+            currentRepeaterState.translations = words.map(w => preloadCache.translations[w]);
         } else {
             // 显示加载提示
             logToWorkplace(`<h3>📖 Repeater Mode</h3><p>Loading translations...</p>`);
 
-            // 并行获取所有翻译（比串行快得多）
-            const translationPromises = list.map(word => translateWord(word));
+            // 并行获取所有翻译（如果有 definition 则直接使用）
+            const translationPromises = list.map(entry => {
+                if (entry.definition) {
+                    return Promise.resolve(entry.definition);
+                }
+                return translateWord(entry.word);
+            });
             const translations = await Promise.all(translationPromises);
 
             // 检查是否被取消
@@ -901,7 +955,8 @@ class Repeater {
         // 检查是否有可恢复的复读状态
         if (currentRepeaterState) {
             // 检查单词列表是否改变（使用 Set 比较，忽略顺序，因为可能有 shuffle）
-            const currentWords = loadWordsFromTextarea();
+            const currentEntries = loadWordsFromTextarea();
+            const currentWords = currentEntries.map(e => e.word);
             const stateWords = currentRepeaterState.words;
             const currentSet = new Set(currentWords);
             const stateSet = new Set(stateWords);
@@ -959,6 +1014,9 @@ class Dictation {
 
     /**
      * 启动听写模式
+     * 支持两种模式：
+     * - listenA_writeB: 播放单词(a)，输入定义(b)
+     * - listenB_writeA: 播放定义(b)，输入单词(a)
      */
     static async startDictation() {
         // 暂停复读模式，每次进入听写模式都重新开始
@@ -971,18 +1029,48 @@ class Dictation {
 
         clearWorkplace();
 
-        const words = loadWordsFromTextarea();
-        if (!words.length) {
+        const entries = loadWordsFromTextarea();
+        if (!entries.length) {
             logToWorkplace("<p>⚠️ No words provided.</p>");
             return;
         }
 
         const settings = getSettings();
-        const list = settings.shuffle ? shuffleArray(words) : [...words];
+        const list = settings.shuffle ? shuffleArray(entries) : [...entries];
+
+        // 提取单词列表（向后兼容）
+        const words = list.map(e => e.word);
+
+        // 根据模式计算每个条目的"播放内容"和"期望输入"
+        // 对于没有 definition 的普通单词，无论什么模式都是播放单词、输入单词
+        const dictateMode = settings.dictateMode;
+        const speakTexts = [];   // 要播放的内容
+        const expectTexts = [];  // 期望用户输入的内容
+
+        list.forEach(entry => {
+            if (entry.definition) {
+                // 有 definition 的条目，根据模式决定
+                if (dictateMode === "listenA_writeB") {
+                    speakTexts.push(entry.word);        // 播放单词
+                    expectTexts.push(entry.definition); // 期望输入定义
+                } else {
+                    speakTexts.push(entry.definition);  // 播放定义
+                    expectTexts.push(entry.word);       // 期望输入单词
+                }
+            } else {
+                // 没有 definition 的普通单词
+                speakTexts.push(entry.word);
+                expectTexts.push(entry.word);
+            }
+        });
 
         // 初始化状态
         this.state = {
-            words: list,                    // 单词列表
+            entries: list,                  // 单词条目列表 { word, definition }
+            words,                          // 单词列表（向后兼容）
+            speakTexts,                     // 每个条目要播放的内容
+            expectTexts,                    // 每个条目期望输入的内容
+            dictateMode,                    // 听写模式
             currentIndex: 0,                // 当前单词索引
             maxRetry: settings.retry,       // 最大尝试次数
             attempts: list.map(() => []),   // 每个单词的尝试记录
@@ -1014,13 +1102,24 @@ class Dictation {
         const s = this.state;
 
         // 如果状态无效或已完成所有单词，显示结果
-        if (!s || s.currentIndex >= s.words.length) {
+        if (!s || s.currentIndex >= s.entries.length) {
             this.showResults();
             return;
         }
 
         const i = s.currentIndex;
         const retries = s.attempts[i].length;
+
+        // 确定提示文字：告诉用户需要写什么
+        const entry = s.entries[i];
+        let writeHint;
+        if (entry.definition) {
+            // 有 definition 的条目
+            writeHint = s.dictateMode === "listenB_writeA" ? "Write: Word" : "Write: Definition";
+        } else {
+            // 普通单词
+            writeHint = "Write: Word";
+        }
 
         // 创建弹窗
         const popup = document.createElement("div");
@@ -1029,7 +1128,7 @@ class Dictation {
         popup.innerHTML = `
             <div class="popup-drag-handle" title="拖拽移动"></div>
             <h3>Word #${i + 1}</h3>
-            <p id="retryInfo">Attempts: ${retries}/${s.maxRetry}</p>
+            <p id="retryInfo">Attempts: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
 
             <!-- 播放发音按钮 -->
             <button onclick="Dictation.play()" class="btn-sound">🎧</button>
@@ -1165,16 +1264,19 @@ class Dictation {
     // -------------------- 核心操作 --------------------
 
     /**
-     * 播放当前单词的发音
+     * 播放当前条目的发音
+     * 根据模式播放 speakTexts 中的内容
      */
     static play() {
         if (this.state) {
-            speakWord(this.state.words[this.state.currentIndex], this.state.slow);
+            const textToSpeak = this.state.speakTexts[this.state.currentIndex];
+            speakWord(textToSpeak, this.state.slow);
         }
     }
 
     /**
      * 提交答案
+     * 根据模式检验 expectTexts 中的内容
      */
     static submit() {
         const s = this.state;
@@ -1182,7 +1284,7 @@ class Dictation {
 
         const input = $("dictationInput");
         const answer = input.value.trim();  // 保留用户原始输入，不改大小写
-        const correct = s.words[s.currentIndex];
+        const correct = s.expectTexts[s.currentIndex];  // 使用期望输入的内容
         const i = s.currentIndex;
 
         // 记录这次尝试（比较时忽略大小写，但保存原始输入）
@@ -1253,9 +1355,9 @@ class Dictation {
                     cls = "warning";
                 }
 
-                // 如果失败，显示正确答案
+                // 如果失败，显示正确答案（播放内容 - 期望输入）
                 const extra = (isLast && result?.status === "failed")
-                    ? `<br><span class="correct">(${s.words[i]} - ${preloadCache.translations[s.words[i]] || ''})</span>`
+                    ? `<br><span class="correct">(${s.speakTexts[i]} - ${s.expectTexts[i]})</span>`
                     : '';
 
                 return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
@@ -1300,7 +1402,7 @@ class Dictation {
         });
 
         // 计算得分：一次正确得一分，多次正确得半分
-        const score = ((correct + warning * 0.5) / s.words.length * 100).toFixed(1);
+        const score = ((correct + warning * 0.5) / s.entries.length * 100).toFixed(1);
 
         // 显示结果
         logToWorkplace(`
@@ -1363,7 +1465,8 @@ class Dictation {
         // 检查是否有可恢复的听写状态
         if (this.state) {
             // 检查单词列表是否改变（使用 Set 比较，忽略顺序，因为可能有 shuffle）
-            const currentWords = loadWordsFromTextarea();
+            const currentEntries = loadWordsFromTextarea();
+            const currentWords = currentEntries.map(e => e.word);
             const stateWords = this.state.words;
             const currentSet = new Set(currentWords);
             const stateSet = new Set(stateWords);
@@ -1403,7 +1506,7 @@ class Dictation {
         this.state.isPaused = false;
 
         // 如果还没完成，显示当前单词的弹窗
-        if (this.state.currentIndex < this.state.words.length) {
+        if (this.state.currentIndex < this.state.entries.length) {
             this.showPopup();
         } else {
             // 已完成，显示结果
