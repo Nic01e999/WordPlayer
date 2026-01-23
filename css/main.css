@@ -1,0 +1,11 @@
+/**
+ * 英语听写/复读工具 - CSS 主入口
+ * 导入所有模块样式
+ */
+
+@import url('./base.css');
+@import url('./menu.css');
+@import url('./repeater.css');
+@import url('./dictation.css');
+@import url('./components.css');
+@import url('./responsive.css');

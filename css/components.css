@@ -1,0 +1,99 @@
+/**
+ * 通用组件样式 - 按钮、状态颜色
+ */
+
+/* ===== 按钮样式 ===== */
+
+/* 暂停/播放按钮 - 圆形显示 Unicode 符号 */
+.btn-pause, .btn-play {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    margin: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 暂停按钮 - 橙色调 */
+.btn-pause {
+    background: linear-gradient(135deg, #ffd1dc 0%, #ffd1dc 100%);
+    border-color: rgba(255, 200, 160, 0.6);
+    color: #6b4f4f;
+}
+
+/* 播放按钮 - 绿色调 */
+.btn-play {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-color: rgba(195, 230, 203, 0.6);
+    color: #4a7c59;
+}
+
+.btn-play:hover {
+    box-shadow: 0 4px 15px rgba(195, 230, 203, 0.4);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #e2f3e6 0%, #d4edda 100%);
+}
+
+/* 声音按钮 */
+.btn-sound {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 200%;
+    background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);
+    border: 1px solid transparent;
+}
+
+/* 声音按钮悬停状态 */
+.btn-sound:hover, .btn-pause:hover {
+    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #ffe4e9 0%, #ffd1dc 100%);
+}
+
+/* ===== 状态颜色 - 试卷批改风格 ===== */
+
+/* 正确状态 - 红色对勾效果 */
+.correct {
+    color: #d45555;
+    font-weight: 600;
+    position: relative;
+}
+
+/* 正确答案样式 */
+.result-attempts .correct {
+    padding: 2px 0px;
+}
+
+/* 警告状态 - 橙色波浪线效果 */
+.warning {
+    color: #cc7a22;
+    position: relative;
+}
+
+/* 波浪下划线效果 */
+.result-attempts .warning {
+    padding: 2px 6px;
+    text-decoration: underline wavy rgba(204, 122, 34, 0.5);
+    text-underline-offset: 3px;
+}
+
+.failed {
+    color: #c55555;
+    position: relative;
+}
+
+/* 正确答案提示 - 绿色手写风格 */
+.result-attempts .failed .correct,
+.result-attempts .correct span {
+    color: #4a8f4a;
+    font-style: italic;
+    text-decoration: none;
+    background: none;
+}

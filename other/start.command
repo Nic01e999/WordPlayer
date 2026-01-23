@@ -20,8 +20,8 @@ SERVER_PID=$!
 # 等待服务器启动
 sleep 2
 
-# 打开浏览器
-open "../a.html"
+# 打开浏览器（通过服务器访问）
+open "http://127.0.0.1:5001"
 
 echo "服务器已启动 (PID: $SERVER_PID)"
 echo "按 Ctrl+C 停止服务器"

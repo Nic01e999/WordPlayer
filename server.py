@@ -41,7 +41,7 @@ def get_lan_ip():
 @app.route("/")
 def index():
     """提供主页"""
-    return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "a.html"))
+    return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html"))
 
 # 翻译器实例
 translator = GoogleTranslator(source="en", target="zh-CN")

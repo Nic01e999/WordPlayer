@@ -1,0 +1,327 @@
+/**
+ * 听写模式样式 - 仿真纸质试卷批改风格
+ */
+
+/* 听写模式专用 - 模拟试卷纸张 */
+body.dictation-mode #workplace {
+    background-image:
+        /* 左侧装订线 */
+        linear-gradient(90deg,
+            transparent 0px,
+            rgba(255, 182, 193, 0.3) 2px,
+            transparent 3px,
+            transparent 30px,
+            rgba(255, 182, 193, 0.15) 31px,
+            transparent 32px,
+            transparent 100px,
+            rgb(223, 151, 162) 101px,
+            transparent 102px
+        ),
+        /* 横线纹理 - 模拟作业本格子 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 39px,
+            rgba(200, 180, 170, 0.2) 39px,
+            rgba(200, 180, 170, 0.2) 40px
+        ),
+        /* 纸张底色 - 米黄色 */
+        linear-gradient(180deg, #fffef8 0%, #fdf8f0 50%, #faf5eb 100%);
+
+    background-repeat: repeat, repeat, repeat;
+    background-position: top left, top left, top left;
+    background-size: auto, auto, auto;
+
+    padding: 25px 25px 25px 45px;
+    margin: 80px 10px 30px 10px;
+    border-radius: 8px;
+
+    /* 纸张阴影和边缘效果 */
+    box-shadow:
+        2px 3px 8px rgba(139, 111, 111, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -2px 5px rgba(200, 180, 170, 0.1);
+
+    border: 1px solid rgba(200, 180, 170, 0.3);
+}
+
+/* 撕裂纸条效果 - 只在听写模式显示 */
+body.dictation-mode #workplace::before {
+    content: '';
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: -45px;
+    height: 50px;
+    background: url("../assets/images/break.PNG") repeat-x center center;
+    background-size: auto 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* 纸张右下角卷边效果 - 只在听写模式显示 */
+body.dictation-mode #workplace::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg,
+        transparent 50%,
+        rgba(255, 240, 235, 0.8) 50%,
+        rgba(250, 235, 225, 0.9) 100%);
+    border-radius: 0 0 8px 0;
+    box-shadow: -2px -2px 5px rgba(139, 111, 111, 0.05);
+}
+
+/* 弹窗容器 - 模拟草稿纸/便签 */
+.popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-1deg);
+
+    /* 便签纸背景 */
+    background:
+        /* 横线 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 27px,
+            rgba(200, 180, 170, 0.25) 27px,
+            rgba(200, 180, 170, 0.25) 28px
+        ),
+        /* 纸张色 */
+        linear-gradient(180deg, #fffef5 0%, #fff9f0 100%);
+
+    padding: 20px 25px 25px 25px;
+    border-radius: 3px;
+
+    /* 纸张边缘 */
+    border: 1px solid rgba(200, 180, 170, 0.4);
+    border-top: 3px solid #ffb6c1;
+
+    /* 纸张阴影 - 浮起效果 */
+    box-shadow:
+        3px 4px 12px rgba(139, 111, 111, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        inset 0 60px 50px -50px rgba(255, 255, 255, 0.3);
+
+    z-index: 100;
+    min-width: 320px;
+    text-align: center;
+}
+
+/* 便签纸顶部撕边效果 - 大头钉位置留空 */
+.popup::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    right: 10px;
+    height: 8px;
+    background: repeating-linear-gradient(90deg,
+        transparent 0px,
+        transparent 8px,
+        #fffef5 8px,
+        #fffef5 10px,
+        transparent 10px,
+        transparent 12px
+    );
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+    clip-path: polygon(0 0, 42% 0, 42% 100%, 58% 100%, 58% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* 弹窗拖拽手柄 - 顶部区域（大头钉图片） */
+.popup-drag-handle {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    cursor: grab;
+    z-index: 10;
+    transition: transform 0.2s ease;
+    background: url('../assets/images/pin.png') no-repeat center center;
+    background-size: contain;
+    filter: drop-shadow(0 2px 3px rgba(139, 111, 111, 0.3));
+}
+
+.popup-drag-handle:hover {
+    transform: translateX(-50%) scale(1.05);
+    filter: drop-shadow(0 3px 5px rgba(139, 111, 111, 0.4)) brightness(1.05);
+}
+
+.popup-drag-handle:active {
+    cursor: grabbing;
+    transform: translateX(-50%) translateY(-1px) scale(1.2);
+}
+
+/* 拖拽时的弹窗样式 */
+.popup.dragging {
+    opacity: 0.9;
+    box-shadow:
+        5px 8px 25px rgba(139, 111, 111, 0.25),
+        0 0 0 2px rgba(255, 182, 193, 0.4);
+    transition: none;
+}
+
+#dictationPopup h3 {
+    font-family: 'Caveat', 'Ma Shan Zheng', cursive;
+    color: #8b6f6f;
+    font-size: 24px;
+    margin: 5px 0 15px 0;
+    font-weight: 600;
+}
+
+#retryInfo {
+    font-family: 'Caveat', cursive;
+    color: #c48b8b;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* 弹窗输入框 - 模拟手写答题区 */
+.popup input {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    padding: 12px 20px;
+    width: 70%;
+    border: none;
+    border-bottom: 2px dashed rgba(139, 111, 111, 0.3);
+    border-radius: 0;
+    background: transparent;
+    color: #5a4a4a;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.popup input:focus {
+    outline: none;
+    border-bottom-color: #c48b8b;
+    border-bottom-style: solid;
+}
+
+.popup input::placeholder {
+    color: #c9b8b8;
+    font-style: italic;
+}
+
+/* 结果项容器 - 模拟试卷上的一道题 */
+.result-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 15px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(200, 180, 170, 0.15);
+    border-radius: 0;
+    transition: background 0.2s;
+    font-size: 18px;
+    position: relative;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+/* 结果序号 - 题号样式 */
+.result-index {
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 600;
+    min-width: 40px;
+    color: #8b6f6f;
+    font-size: 16px;
+}
+
+/* 答题尝试记录 - 批改区域 */
+.result-attempts {
+    flex: 1;
+    font-family: 'Caveat', 'Ma Shan Zheng', cursive;
+    font-size: 22px;
+    color: #5a4a4a;
+    line-height: 1.6;
+}
+
+/* 每次尝试的样式 */
+.result-attempts > div {
+    padding: 4px 8px;
+    margin: 2px 0;
+    border-radius: 3px;
+    position: relative;
+}
+
+/* 结果汇总框 - 成绩单风格 */
+.results-box {
+    position: relative;
+    margin: 20px 10px;
+    padding: 30px;
+
+    /* 成绩单纸张背景 */
+    background:
+        /* 顶部装饰边框 */
+        linear-gradient(180deg,
+            #ffb6c1 0px,
+            #ffb6c1 4px,
+            transparent 4px),
+        /* 纸张色 */
+        linear-gradient(180deg, #fffef8 0%, #fdf8f0 100%);
+
+    border: 1px solid rgba(200, 180, 170, 0.4);
+    border-radius: 5px;
+    box-shadow:
+        3px 4px 15px rgba(139, 111, 111, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    text-align: center;
+}
+
+/* 成绩单标题 */
+.results-box h3 {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6f6f;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px double rgba(255, 182, 193, 0.5);
+    letter-spacing: 2px;
+}
+
+/* 分数显示 - 大红色手写风格 */
+.results-box p strong {
+    font-family: 'Caveat', cursive;
+    font-size: 48px;
+    color: #e25555;
+    display: block;
+    margin: 15px 0;
+    text-shadow: 1px 1px 0 rgba(200, 50, 50, 0.1);
+}
+
+/* 统计项 */
+.results-box p {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: #6b5a5a;
+    margin: 8px 0;
+}
+
+/* 印章效果 - 装饰性 */
+.results-box::after {
+    content: '批阅';
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 14px;
+    color: rgba(200, 80, 80, 0.6);
+    border: 2px solid rgba(200, 80, 80, 0.5);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-15deg);
+    opacity: 0.7;
+}
