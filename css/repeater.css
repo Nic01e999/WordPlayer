@@ -124,6 +124,12 @@
     margin-top: 8px;
 }
 
+.translation-error {
+    color: #c0392b;
+    font-size: 16px;
+    font-style: italic;
+}
+
 /* 播放次数显示 */
 .play-count {
     font-family: 'Cormorant Garamond', 'Georgia', serif;

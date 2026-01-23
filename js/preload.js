@@ -4,7 +4,7 @@
 
 import { preloadCache } from './state.js';
 import { $, loadWordsFromTextarea, debounce, adjustSidebarWidth } from './utils.js';
-import { API_BASE } from './api.js';
+import { API_BASE, getHttpErrorMessage, getFetchErrorMessage } from './api.js';
 
 /**
  * 更新预加载进度显示
@@ -86,13 +86,29 @@ export async function startPreload() {
         try {
             const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}`;
             const res = await fetch(url);
-            const data = await res.json();
 
             if (myId !== preloadCache.loadId) return;
 
-            preloadCache.translations[word] = data.translation || "翻译失败";
-        } catch {
-            preloadCache.translations[word] = "翻译失败";
+            if (!res.ok) {
+                preloadCache.translations[word] = getHttpErrorMessage(res.status);
+                return;
+            }
+
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                preloadCache.translations[word] = "翻译失败: 响应格式错误";
+                return;
+            }
+
+            if (data.error) {
+                preloadCache.translations[word] = `翻译失败: ${data.error}`;
+            } else {
+                preloadCache.translations[word] = data.translation || "翻译失败: 无翻译结果";
+            }
+        } catch (e) {
+            preloadCache.translations[word] = getFetchErrorMessage(e);
         }
 
         preloadCache.loaded++;

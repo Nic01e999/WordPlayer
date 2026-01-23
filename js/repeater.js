@@ -119,7 +119,7 @@ export class Repeater {
         content.innerHTML = state.words.map((word, i) => `
             <div id="word-${i}" class="word-item ${i === state.currentIndex ? 'active' : ''}">
                 <strong>${i + 1}. ${word}</strong>
-                <span class="translation">${state.translations[i] || "..."}</span>
+                <span class="translation">${state.translations[i]?.startsWith('翻译失败') ? '...' : (state.translations[i] || "...")}</span>
             </div>
         `).join('');
 
@@ -131,11 +131,13 @@ export class Repeater {
         const state = currentRepeaterState;
         if (!info || !state) return;
 
-        const { words, translations, currentIndex, currentRepeat, settings } = state;
+        const { words, currentIndex, currentRepeat, settings } = state;
+        const word = words[currentIndex];
+        const translation = preloadCache.translations[word] ?? state.translations[currentIndex];
 
         info.innerHTML = `
-            <div class="current-word">${words[currentIndex]}</div>
-            <div class="current-translation">${translations[currentIndex]}</div>
+            <div class="current-word">${word}</div>
+            <div class="current-translation ${translation?.startsWith('翻译失败') ? 'translation-error' : ''}">${translation ?? '加载中...'}</div>
             <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
         `;
     }

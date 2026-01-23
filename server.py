@@ -6,10 +6,11 @@
 import io
 import socket
 import os
+import asyncio
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-from gtts import gTTS
-from deep_translator import GoogleTranslator
+import edge_tts
+from deep_translator import MyMemoryTranslator
 
 app = Flask(__name__, static_folder=os.path.dirname(os.path.abspath(__file__)))
 CORS(app)  # 允许跨域请求
@@ -43,8 +44,8 @@ def index():
     """提供主页"""
     return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html"))
 
-# 翻译器实例
-translator = GoogleTranslator(source="en", target="zh-CN")
+# 翻译器实例（MyMemory 不需要 VPN）
+translator = MyMemoryTranslator(source="en-GB", target="zh-CN")
 
 
 @app.route("/api/translate", methods=["GET"])
@@ -65,10 +66,23 @@ def translate():
         return jsonify({"error": str(e)}), 500
 
 
+async def generate_tts(text: str, slow: bool = False) -> bytes:
+    """使用 Edge TTS 生成语音"""
+    voice = "en-US-AriaNeural"
+    rate = "-30%" if slow else "+0%"
+
+    communicate = edge_tts.Communicate(text, voice, rate=rate)
+    audio_data = b""
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio_data += chunk["data"]
+    return audio_data
+
+
 @app.route("/api/tts", methods=["GET"])
 def tts():
     """
-    生成单词发音
+    生成单词发音（使用 Edge TTS）
     GET /api/tts?word=hello&slow=0
     返回: MP3 音频文件
     """
@@ -79,13 +93,11 @@ def tts():
         return jsonify({"error": "缺少 word 参数"}), 400
 
     try:
-        # 生成语音到内存
-        audio = io.BytesIO()
-        tts = gTTS(text=word, lang="en", slow=slow)
-        tts.write_to_fp(audio)
-        audio.seek(0)
-
-        return send_file(audio, mimetype="audio/mpeg")
+        audio_data = asyncio.run(generate_tts(word, slow))
+        return send_file(
+            io.BytesIO(audio_data),
+            mimetype="audio/mpeg"
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
