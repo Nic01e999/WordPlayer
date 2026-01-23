@@ -8,24 +8,24 @@ body.dictation-mode #workplace {
         /* 左侧装订线 */
         linear-gradient(90deg,
             transparent 0px,
-            rgba(255, 182, 193, 0.3) 2px,
+            var(--bg-pink-subtle) 2px,
             transparent 3px,
             transparent 30px,
-            rgba(255, 182, 193, 0.15) 31px,
+            var(--shadow-pink-light) 31px,
             transparent 32px,
             transparent 100px,
-            rgb(223, 151, 162) 101px,
+            var(--accent-line) 101px,
             transparent 102px
         ),
         /* 横线纹理 - 模拟作业本格子 */
         repeating-linear-gradient(
             transparent 0px,
             transparent 39px,
-            rgba(200, 180, 170, 0.2) 39px,
-            rgba(200, 180, 170, 0.2) 40px
+            var(--bg-paper-line) 39px,
+            var(--bg-paper-line) 40px
         ),
         /* 纸张底色 - 米黄色 */
-        linear-gradient(180deg, #fffef8 0%, #fdf8f0 50%, #faf5eb 100%);
+        linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 50%, var(--bg-paper-end) 100%);
 
     background-repeat: repeat, repeat, repeat;
     background-position: top left, top left, top left;
@@ -37,11 +37,11 @@ body.dictation-mode #workplace {
 
     /* 纸张阴影和边缘效果 */
     box-shadow:
-        2px 3px 8px rgba(139, 111, 111, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        2px 3px 8px var(--shadow-brown),
+        inset 0 1px 0 var(--white-strong),
         inset 0 -2px 5px rgba(200, 180, 170, 0.1);
 
-    border: 1px solid rgba(200, 180, 170, 0.3);
+    border: 1px solid var(--border-paper);
 }
 
 /* 撕裂纸条效果 - 只在听写模式显示 */
@@ -87,24 +87,24 @@ body.dictation-mode #workplace::after {
         repeating-linear-gradient(
             transparent 0px,
             transparent 27px,
-            rgba(200, 180, 170, 0.25) 27px,
-            rgba(200, 180, 170, 0.25) 28px
+            var(--bg-paper-line-medium) 27px,
+            var(--bg-paper-line-medium) 28px
         ),
         /* 纸张色 */
-        linear-gradient(180deg, #fffef5 0%, #fff9f0 100%);
+        linear-gradient(180deg, var(--bg-popup-start) 0%, var(--bg-popup-end) 100%);
 
     padding: 20px 25px 25px 25px;
     border-radius: 3px;
 
     /* 纸张边缘 */
-    border: 1px solid rgba(200, 180, 170, 0.4);
-    border-top: 3px solid #ffb6c1;
+    border: 1px solid var(--border-paper-medium);
+    border-top: 3px solid var(--accent-primary);
 
     /* 纸张阴影 - 浮起效果 */
     box-shadow:
-        3px 4px 12px rgba(139, 111, 111, 0.15),
-        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
-        inset 0 60px 50px -50px rgba(255, 255, 255, 0.3);
+        3px 4px 12px var(--shadow-brown-medium),
+        0 0 0 1px var(--white-medium) inset,
+        inset 0 60px 50px -50px var(--white-soft);
 
     z-index: 100;
     min-width: 320px;
@@ -122,8 +122,8 @@ body.dictation-mode #workplace::after {
     background: repeating-linear-gradient(90deg,
         transparent 0px,
         transparent 8px,
-        #fffef5 8px,
-        #fffef5 10px,
+        var(--bg-popup-start) 8px,
+        var(--bg-popup-start) 10px,
         transparent 10px,
         transparent 12px
     );
@@ -144,12 +144,12 @@ body.dictation-mode #workplace::after {
     transition: transform 0.2s ease;
     background: url('../assets/images/pin.png') no-repeat center center;
     background-size: contain;
-    filter: drop-shadow(0 2px 3px rgba(139, 111, 111, 0.3));
+    filter: drop-shadow(0 2px 3px var(--shadow-brown));
 }
 
 .popup-drag-handle:hover {
     transform: translateX(-50%) scale(1.05);
-    filter: drop-shadow(0 3px 5px rgba(139, 111, 111, 0.4)) brightness(1.05);
+    filter: drop-shadow(0 3px 5px var(--shadow-brown-medium)) brightness(1.05);
 }
 
 .popup-drag-handle:active {
@@ -162,13 +162,13 @@ body.dictation-mode #workplace::after {
     opacity: 0.9;
     box-shadow:
         5px 8px 25px rgba(139, 111, 111, 0.25),
-        0 0 0 2px rgba(255, 182, 193, 0.4);
+        0 0 0 2px var(--shadow-pink-strong);
     transition: none;
 }
 
 #dictationPopup h3 {
     font-family: 'Caveat', 'Ma Shan Zheng', cursive;
-    color: #8b6f6f;
+    color: var(--text-label);
     font-size: 24px;
     margin: 5px 0 15px 0;
     font-weight: 600;
@@ -176,7 +176,7 @@ body.dictation-mode #workplace::after {
 
 #retryInfo {
     font-family: 'Caveat', cursive;
-    color: #c48b8b;
+    color: var(--text-accent);
     font-size: 18px;
     margin-bottom: 10px;
 }
@@ -188,22 +188,22 @@ body.dictation-mode #workplace::after {
     padding: 12px 20px;
     width: 70%;
     border: none;
-    border-bottom: 2px dashed rgba(139, 111, 111, 0.3);
+    border-bottom: 2px dashed var(--shadow-brown);
     border-radius: 0;
     background: transparent;
-    color: #5a4a4a;
+    color: var(--text-dark);
     text-align: center;
     transition: all 0.3s;
 }
 
 .popup input:focus {
     outline: none;
-    border-bottom-color: #c48b8b;
+    border-bottom-color: var(--text-accent);
     border-bottom-style: solid;
 }
 
 .popup input::placeholder {
-    color: #c9b8b8;
+    color: var(--text-placeholder);
     font-style: italic;
 }
 
@@ -215,7 +215,7 @@ body.dictation-mode #workplace::after {
     margin: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid rgba(200, 180, 170, 0.15);
+    border-bottom: 1px solid rgba(200, 180, 170, 0.15);  /* 保持原有透明度 */
     border-radius: 0;
     transition: background 0.2s;
     font-size: 18px;
@@ -231,7 +231,7 @@ body.dictation-mode #workplace::after {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 600;
     min-width: 40px;
-    color: #8b6f6f;
+    color: var(--text-label);
     font-size: 16px;
 }
 
@@ -240,7 +240,7 @@ body.dictation-mode #workplace::after {
     flex: 1;
     font-family: 'Caveat', 'Ma Shan Zheng', cursive;
     font-size: 22px;
-    color: #5a4a4a;
+    color: var(--text-dark);
     line-height: 1.6;
 }
 
@@ -262,17 +262,17 @@ body.dictation-mode #workplace::after {
     background:
         /* 顶部装饰边框 */
         linear-gradient(180deg,
-            #ffb6c1 0px,
-            #ffb6c1 4px,
+            var(--accent-primary) 0px,
+            var(--accent-primary) 4px,
             transparent 4px),
         /* 纸张色 */
-        linear-gradient(180deg, #fffef8 0%, #fdf8f0 100%);
+        linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
 
-    border: 1px solid rgba(200, 180, 170, 0.4);
+    border: 1px solid var(--border-paper-medium);
     border-radius: 5px;
     box-shadow:
         3px 4px 15px rgba(139, 111, 111, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        inset 0 1px 0 var(--white-strong);
 
     text-align: center;
 }
@@ -280,11 +280,11 @@ body.dictation-mode #workplace::after {
 /* 成绩单标题 */
 .results-box h3 {
     font-family: 'Cinzel', Georgia, serif;
-    color: #8b6f6f;
+    color: var(--text-label);
     font-size: 20px;
     margin: 0 0 20px 0;
     padding-bottom: 15px;
-    border-bottom: 2px double rgba(255, 182, 193, 0.5);
+    border-bottom: 2px double var(--glow-pink);
     letter-spacing: 2px;
 }
 
@@ -292,7 +292,7 @@ body.dictation-mode #workplace::after {
 .results-box p strong {
     font-family: 'Caveat', cursive;
     font-size: 48px;
-    color: #e25555;
+    color: var(--status-score);
     display: block;
     margin: 15px 0;
     text-shadow: 1px 1px 0 rgba(200, 50, 50, 0.1);
@@ -302,7 +302,7 @@ body.dictation-mode #workplace::after {
 .results-box p {
     font-family: 'Caveat', cursive;
     font-size: 20px;
-    color: #6b5a5a;
+    color: var(--text-stat);
     margin: 8px 0;
 }
 
@@ -314,8 +314,8 @@ body.dictation-mode #workplace::after {
     right: 25px;
     font-family: 'Cinzel', Georgia, serif;
     font-size: 14px;
-    color: rgba(200, 80, 80, 0.6);
-    border: 2px solid rgba(200, 80, 80, 0.5);
+    color: var(--bg-stamp);
+    border: 2px solid var(--border-stamp);
     border-radius: 50%;
     width: 50px;
     height: 50px;

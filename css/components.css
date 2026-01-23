@@ -22,22 +22,22 @@
 
 /* 暂停按钮 - 橙色调 */
 .btn-pause {
-    background: linear-gradient(135deg, #ffd1dc 0%, #ffd1dc 100%);
+    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-start) 100%);
     border-color: rgba(255, 200, 160, 0.6);
-    color: #6b4f4f;
+    color: var(--text-button);
 }
 
 /* 播放按钮 - 绿色调 */
 .btn-play {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    background: linear-gradient(135deg, var(--btn-play-start) 0%, var(--btn-play-end) 100%);
     border-color: rgba(195, 230, 203, 0.6);
-    color: #4a7c59;
+    color: var(--btn-play-text);
 }
 
 .btn-play:hover {
     box-shadow: 0 4px 15px rgba(195, 230, 203, 0.4);
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #e2f3e6 0%, #d4edda 100%);
+    background: linear-gradient(135deg, var(--btn-play-hover-start) 0%, var(--btn-play-hover-end) 100%);
 }
 
 /* 声音按钮 */
@@ -46,22 +46,22 @@
     height: 50px;
     border-radius: 50%;
     font-size: 200%;
-    background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);
+    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-end) 100%);
     border: 1px solid transparent;
 }
 
 /* 声音按钮悬停状态 */
 .btn-sound:hover, .btn-pause:hover {
-    box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+    box-shadow: 0 4px 15px var(--shadow-pink-strong);
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #ffe4e9 0%, #ffd1dc 100%);
+    background: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
 }
 
 /* ===== 状态颜色 - 试卷批改风格 ===== */
 
 /* 正确状态 - 红色对勾效果 */
 .correct {
-    color: #d45555;
+    color: var(--status-correct);
     font-weight: 600;
     position: relative;
 }
@@ -73,7 +73,7 @@
 
 /* 警告状态 - 橙色波浪线效果 */
 .warning {
-    color: #cc7a22;
+    color: var(--status-warning);
     position: relative;
 }
 
@@ -85,14 +85,14 @@
 }
 
 .failed {
-    color: #c55555;
+    color: var(--status-error);
     position: relative;
 }
 
 /* 正确答案提示 - 绿色手写风格 */
 .result-attempts .failed .correct,
 .result-attempts .correct span {
-    color: #4a8f4a;
+    color: var(--status-success);
     font-style: italic;
     text-decoration: none;
     background: none;

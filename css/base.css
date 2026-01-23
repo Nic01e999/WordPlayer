@@ -8,7 +8,7 @@
 body {
     margin: 0;
     font-family: 'Cormorant Garamond', 'Georgia', serif;
-    background: linear-gradient(135deg, #fff5f5 0%, #fef6f0 50%, #fff8f5 100%);
+    background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -24,7 +24,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(circle, rgba(255, 182, 193, 0.327) 2px, transparent 2px);
+    background-image: radial-gradient(circle, var(--bg-pink-dot) 2px, transparent 2px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
@@ -68,6 +68,6 @@ body::before {
 .hint {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
     font-size: 13px;
-    color: #c9a8a8;
+    color: var(--text-muted);
     margin-top: 10px;
 }

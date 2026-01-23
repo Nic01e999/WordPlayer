@@ -3,6 +3,7 @@
  * 导入所有模块样式
  */
 
+@import url('./colors.css');
 @import url('./base.css');
 @import url('./menu.css');
 @import url('./repeater.css');

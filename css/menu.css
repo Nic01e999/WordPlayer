@@ -9,12 +9,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
     flex-wrap: wrap;
-    background: linear-gradient(180deg, #ffd6e0 0%, #ffccd5 100%);
-    border-bottom: 1px solid rgba(255, 150, 170, 0.4);
+    background: linear-gradient(180deg, var(--bg-menu-start) 0%, var(--bg-menu-end) 100%);
+    border-bottom: 1px solid var(--border-menu);
     padding: 15px 30px 20px;
-    box-shadow: 0 3px 12px rgba(255, 182, 193, 0.25);
+    box-shadow: 0 3px 12px var(--shadow-pink-medium);
     z-index: 100;
 }
 
@@ -36,12 +35,12 @@ body.dictation-mode #menu::after {
 /* 菜单栏标题样式 */
 #menu h1 {
     font-family: 'Cinzel', 'Georgia', serif;
-    color: #8b5a5a;
+    color: var(--text-primary);
     margin: 0;
     font-weight: 500;
     letter-spacing: 4px;
     font-size: 36px;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 1px 2px var(--white-soft);
     white-space: nowrap;
 }
 
@@ -57,21 +56,20 @@ body.dictation-mode #menu::after {
     border: 1px solid rgba(255, 255, 255, 0.7);
     transition: all 0.3s ease-out;
     box-sizing: border-box;
-    color: #a07070;
+    color: var(--text-menu-btn);
     cursor: pointer;
-    margin: 0;
     text-transform: uppercase;
     letter-spacing: 2px;
-    box-shadow: 0 2px 8px rgba(180, 140, 150, 0.15);
+    box-shadow: 0 2px 8px var(--shadow-menu-btn);
 }
 
 /* 菜单按钮悬停状态 */
 #menu button:hover {
     transform: translateY(-2px) scale(1.1);
     border-color: rgba(255, 200, 210, 0.8);
-    color: #8b5a5a;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,245,0.9) 100%);
-    box-shadow: 0 4px 15px rgba(200, 150, 160, 0.55);
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
+    box-shadow: 0 4px 15px var(--shadow-menu-btn-hover);
 }
 
 #menu button:active {
@@ -142,7 +140,7 @@ body.dictation-mode #menu::after {
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 20px;
     box-shadow:
-        0 8px 32px rgba(255, 182, 193, 0.2),
+        0 8px 32px var(--shadow-pink-light),
         0 0 0 1px rgba(255, 255, 255, 0.1) inset;
     opacity: 0;
     visibility: hidden;
@@ -165,12 +163,12 @@ body.dictation-mode #menu::after {
 /* 设置面板标题样式 */
 .settings-trigger .sidebar h3 {
     font-family: 'Cinzel', 'Georgia', serif;
-    color: #c48b8b;
+    color: var(--text-accent);
     font-size: 14px;
     font-weight: 600;
     margin: 0 0 15px 0;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+    border-bottom: 1px solid var(--border-pink-light);
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -181,7 +179,7 @@ body.dictation-mode #menu::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #9c7a7a;
+    color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 12px;
     transition: color 0.2s;
@@ -189,17 +187,17 @@ body.dictation-mode #menu::after {
 
 /* 设置项标签悬停状态 */
 .settings-trigger .sidebar label:hover {
-    color: #8b6060;
+    color: var(--text-active);
 }
 
 /* 数字输入框样式 */
 .settings-trigger .sidebar input[type="number"] {
     width: 55px;
     padding: 6px 8px;
-    border: 1px solid rgba(255, 182, 193, 0.5);
+    border: 1px solid var(--border-pink-medium);
     border-radius: 8px;
-    background: #fff9f9;
-    color: #8b6f6f;
+    background: var(--bg-input);
+    color: var(--text-label);
     text-align: center;
     font-weight: 600;
     transition: all 0.2s;
@@ -209,15 +207,15 @@ body.dictation-mode #menu::after {
 /* 数字输入框获得焦点时的样式 */
 .settings-trigger .sidebar input[type="number"]:focus {
     outline: none;
-    border-color: #ffb6c1;
-    box-shadow: 0 0 10px rgba(255, 182, 193, 0.3);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 10px var(--bg-pink-subtle);
 }
 
 /* 复选框样式 */
 .settings-trigger .sidebar input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #ffb6c1;
+    accent-color: var(--accent-primary);
     cursor: pointer;
 }
 
@@ -228,10 +226,10 @@ body.dictation-mode #menu::after {
     height: 330px;
     padding: 12px 18px;
     margin: 0;
-    border: 1px solid rgba(255, 182, 193, 0.4);
+    border: 1px solid var(--border-pink-light);
     border-radius: 12px;
-    background: #fffafa;
-    color: #8b6f6f;
+    background: var(--bg-container);
+    color: var(--text-label);
     font-size: 14px;
     resize: none;
     box-sizing: border-box;
@@ -242,11 +240,11 @@ body.dictation-mode #menu::after {
 /* 文本域获得焦点时的样式 */
 .settings-trigger .sidebar textarea:focus {
     outline: none;
-    border-color: #ffb6c1;
-    box-shadow: 0 0 15px rgba(255, 182, 193, 0.2);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 15px var(--shadow-pink-light);
 }
 
 /* 文本域占位符样式 */
 .settings-trigger .sidebar textarea::placeholder {
-    color: #c9a8a8;
+    color: var(--text-muted);
 }

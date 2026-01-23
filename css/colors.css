@@ -1,0 +1,273 @@
+/**
+ * 颜色配置文件 - 集中管理所有颜色变量
+ * 使用语义化命名，方便理解和维护
+ *
+ * 注释格式：命名原因 | 使用位置
+ */
+
+:root {
+    /* {{{ 文字颜色 (text-) */
+
+    /* 主要文字 | 页面标题 h1, 菜单按钮悬停 */
+    --text-primary: #8b5a5a;
+
+    /* 次要文字 | 设置面板标签 */
+    --text-secondary: #9c7a7a;
+
+    /* 淡化/静音文字 | .hint, textarea placeholder */
+    --text-muted: #c9a8a8;
+
+    /* 深色文字 | 听写输入框, 答题文字 */
+    --text-dark: #5a4a4a;
+
+    /* 激活状态 | 当前播放单词 .current-word */
+    --text-active: #8b6060;
+
+    /* 标签文字 | 设置面板 input/select/textarea */
+    --text-label: #8b6f6f;
+
+    /* 按钮文字 | .btn-pause */
+    --text-button: #6b4f4f;
+
+    /* 菜单按钮文字 | #menu button 默认状态 */
+    --text-menu-btn: #a07070;
+
+    /* 强调文字 | 设置面板标题, .word-en */
+    --text-accent: #c48b8b;
+
+    /* 统计文字 | .stat-item */
+    --text-stat: #6b5a5a;
+
+    /* 计数文字 | .play-count */
+    --text-count: #d4a5a5;
+
+    /* 占位符 | placeholder */
+    --text-placeholder: #c9b8b8;
+
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+
+    /* 页面渐变起点 | body */
+    --bg-page-start: #fff5f5;
+
+    /* 页面渐变中点 | body */
+    --bg-page-mid: #fef6f0;
+
+    /* 页面渐变终点 | body */
+    --bg-page-end: #fff8f5;
+
+    /* 容器背景 | .repeater-container */
+    --bg-container: #fffafa;
+
+    /* 菜单栏渐变起点 | .menu-bar */
+    --bg-menu-start: #ffd6e0;
+
+    /* 菜单栏渐变终点 | .menu-bar */
+    --bg-menu-end: #ffccd5;
+
+    /* 输入框背景 | sidebar input/select */
+    --bg-input: #fff9f9;
+
+    /* 纸张渐变起点 | .results-box */
+    --bg-paper-start: #fffef8;
+
+    /* 纸张渐变中点 | .results-box */
+    --bg-paper-mid: #fdf8f0;
+
+    /* 纸张渐变终点 | .results-box */
+    --bg-paper-end: #faf5eb;
+
+    /* 弹窗渐变起点 | .dictation-popup */
+    --bg-popup-start: #fffef5;
+
+    /* 弹窗渐变终点 | .dictation-popup */
+    --bg-popup-end: #fff9f0;
+
+    /* 滚动区域中间色 | .scroll-container */
+    --bg-scroll-mid: #fff5f5;
+
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+
+    /* 主强调色 | 焦点边框, 按钮边框 */
+    --accent-primary: #ffb6c1;
+
+    /* 次强调色 | 渐变背景, 按钮背景 */
+    --accent-secondary: #ffd1dc;
+
+    /* 棕色强调 | 强调文字, 标题装饰 */
+    --accent-brown: #c48b8b;
+
+    /* 装订线 | .results-box::before */
+    --accent-line: rgb(223, 151, 162);
+
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+
+    /* 成功/正确答案 | .result-attempts .correct span */
+    --status-success: #4a8f4a;
+
+    /* 正确(批改红) | .correct */
+    --status-correct: #d45555;
+
+    /* 错误 | .failed */
+    --status-error: #c55555;
+
+    /* 警告 | .warning */
+    --status-warning: #cc7a22;
+
+    /* 分数显示 | .score-display */
+    --status-score: #e25555;
+
+    /* 翻译错误 | .translation-error */
+    --status-translate-error: #c0392b;
+
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+
+    /* 播放按钮渐变起点 | .btn-play */
+    --btn-play-start: #d4edda;
+
+    /* 播放按钮渐变终点 | .btn-play */
+    --btn-play-end: #c3e6cb;
+
+    /* 播放按钮悬停起点 | .btn-play:hover */
+    --btn-play-hover-start: #e2f3e6;
+
+    /* 播放按钮悬停终点 | .btn-play:hover */
+    --btn-play-hover-end: #d4edda;
+
+    /* 播放按钮文字 | .btn-play */
+    --btn-play-text: #4a7c59;
+
+    /* 暂停按钮渐变起点 | .btn-pause, .btn-sound */
+    --btn-pause-start: #ffd1dc;
+
+    /* 暂停按钮渐变终点 | .btn-pause, .btn-sound */
+    --btn-pause-end: #ffb6c1;
+
+    /* 悬停渐变起点 | .btn-sound:hover, .btn-pause:hover */
+    --btn-hover-start: #ffe4e9;
+
+    /* 悬停渐变终点 | .btn-sound:hover, .btn-pause:hover */
+    --btn-hover-end: #ffd1dc;
+
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+
+    /* 柔和阴影 | 通用 */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
+
+    /* 粉色轻阴影 | .repeater-container */
+    --shadow-pink-light: rgba(255, 182, 193, 0.15);
+
+    /* 粉色中等阴影 | .menu-bar */
+    --shadow-pink-medium: rgba(255, 182, 193, 0.25);
+
+    /* 粉色强阴影 | .btn-sound:hover */
+    --shadow-pink-strong: rgba(255, 182, 193, 0.4);
+
+    /* 棕色轻阴影 | 容器内阴影 */
+    --shadow-brown: rgba(139, 111, 111, 0.1);
+
+    /* 棕色中等阴影 | 容器内阴影 */
+    --shadow-brown-medium: rgba(139, 111, 111, 0.15);
+
+    /* 菜单按钮阴影 | #menu button */
+    --shadow-menu-btn: rgba(180, 140, 150, 0.15);
+
+    /* 菜单按钮悬停阴影 | #menu button:hover */
+    --shadow-menu-btn-hover: rgba(200, 150, 160, 0.55);
+
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+
+    /* 粉色轻边框 | .repeater-container */
+    --border-pink-light: rgba(255, 182, 193, 0.4);
+
+    /* 粉色中等边框 | sidebar input */
+    --border-pink-medium: rgba(255, 182, 193, 0.5);
+
+    /* 粉色强边框 | 焦点状态 */
+    --border-pink-strong: rgba(255, 182, 193, 0.6);
+
+    /* 菜单边框 | .menu-bar 底边框 */
+    --border-menu: rgba(255, 150, 170, 0.4);
+
+    /* 纸张边框 | .results-box */
+    --border-paper: rgba(200, 180, 170, 0.3);
+
+    /* 纸张中等边框 | .results-box */
+    --border-paper-medium: rgba(200, 180, 170, 0.4);
+
+    /* 白色边框 | 内发光 */
+    --border-white: rgba(255, 255, 255, 0.5);
+
+    /* 白色强边框 | 强内发光 */
+    --border-white-strong: rgba(255, 255, 255, 0.7);
+
+    /* 印章边框 | .results-box::after */
+    --border-stamp: rgba(200, 80, 80, 0.5);
+
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+
+    /* 圆点图案 | body::before */
+    --bg-pink-dot: rgba(255, 182, 193, 0.327);
+
+    /* 粉色遮罩 | .scroll-container 渐变 */
+    --bg-pink-overlay: rgba(255, 209, 220, 0.3);
+
+    /* 粉色轻遮罩 | 渐变 */
+    --bg-pink-overlay-light: rgba(255, 209, 220, 0.25);
+
+    /* 粉色微背景 | .current-word 背景 */
+    --bg-pink-subtle: rgba(255, 182, 193, 0.3);
+
+    /* 纸张横线 | .results-box 横线 */
+    --bg-paper-line: rgba(200, 180, 170, 0.2);
+
+    /* 纸张中等横线 | .results-box 横线 */
+    --bg-paper-line-medium: rgba(200, 180, 170, 0.25);
+
+    /* 印章背景 | .results-box::after 文字 */
+    --bg-stamp: rgba(200, 80, 80, 0.6);
+
+    /* }}} */
+
+    /* {{{ 白色系 (white-) */
+
+    /* 纯白 | 基础白色 */
+    --white-pure: #ffffff;
+
+    /* 30%白 | 轻透明 */
+    --white-soft: rgba(255, 255, 255, 0.3);
+
+    /* 50%白 | 中透明 */
+    --white-medium: rgba(255, 255, 255, 0.5);
+
+    /* 80%白 | 强透明 */
+    --white-strong: rgba(255, 255, 255, 0.8);
+
+    /* 按钮白 | #menu button 背景 */
+    --white-button: rgba(255, 255, 255, 0.9);
+
+    /* 按钮微粉白 | #menu button 渐变 */
+    --white-button-soft: rgba(255, 248, 250, 0.85);
+
+    /* 按钮悬停白 | #menu button:hover */
+    --white-button-hover: rgba(255, 255, 255, 0.95);
+
+    /* 按钮悬停微粉白 | #menu button:hover 渐变 */
+    --white-button-hover-soft: rgba(255, 240, 245, 0.9);
+
+    /* }}} */
+    
+}
