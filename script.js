@@ -161,7 +161,7 @@ function logToWorkplace(html) {
 }
 
 // 后端API地址
-const API_BASE = "http://localhost:5001";
+const API_BASE = "/";
 
 // 当前播放的音频对象（用于停止播放）
 let currentAudio = null;
