@@ -90,7 +90,7 @@ function getSettings() {
  */
 function loadWordsFromTextarea() {
     return $("wordInput").value
-        .split(/\s+/)           // 按空白字符分割
+        .split(/\r?\n/)           // 分割
         .map(w => w.trim())     // 去除两端空白
         .filter(w => w);        // 过滤空字符串
 }
@@ -391,6 +391,44 @@ async function startPreload() {
 const debouncedPreload = debounce(startPreload, 500);
 
 /**
+ * 测量文字实际宽度（使用 Canvas API）
+ */
+function measureTextWidth(text, font) {
+    const canvas = measureTextWidth.canvas || (measureTextWidth.canvas = document.createElement("canvas"));
+    const ctx = canvas.getContext("2d");
+    ctx.font = font;
+    return ctx.measureText(text).width;
+}
+
+/**
+ * 根据最长行自动调整侧边栏宽度
+ * - 不换行、不滚动，靠加宽 sidebar 容纳内容
+ */
+function adjustSidebarWidth() {
+    const wordInput = $("wordInput");
+    const sidebar = document.querySelector(".settings-trigger .sidebar");
+    if (!wordInput || !sidebar) return;
+
+    // 获取 textarea 的字体
+    const style = getComputedStyle(wordInput);
+    const font = `${style.fontSize} ${style.fontFamily}`;
+
+    // 按行分割，保留原始内容（含空格），过滤纯空行
+    const lines = wordInput.value.split(/\n/).filter(l => l.trim());
+    const maxTextWidth = lines.reduce((max, l) => Math.max(max, measureTextWidth(l, font)), 0);
+
+    // 计算所需宽度：文字宽度 + textarea padding(36) + border(2) + sidebar padding(40) + border(2) + margin
+    const baseWidth = 240;
+    const extraSpace = 85;
+    const neededWidth = maxTextWidth + extraSpace;
+
+    sidebar.style.minWidth = Math.max(baseWidth, neededWidth) + "px";
+}
+
+// 防抖版本（300ms）
+const debouncedAdjustSidebar = debounce(adjustSidebarWidth, 300);
+
+/**
  * 初始化预加载监听器
  * 在页面加载完成后调用
  */
@@ -399,10 +437,15 @@ function initPreloadListeners() {
     const wordInput = $("wordInput");
     if (wordInput) {
         wordInput.addEventListener("input", debouncedPreload);
+        wordInput.addEventListener("input", debouncedAdjustSidebar);
+        // 粘贴后延迟调整（等待内容插入完成）
+        wordInput.addEventListener("paste", () => setTimeout(adjustSidebarWidth, 0));
     }
 
     // 页面加载后立即开始预加载
     startPreload();
+    // 初始调整侧边栏宽度
+    adjustSidebarWidth();
 }
 
 // 页面加载完成后初始化
@@ -996,7 +1039,7 @@ class Dictation {
             <button onclick="Dictation.playPause()" id="dictationPlayPauseBtn" class="${s.isPaused ? 'btn-play' : 'btn-pause'}">${s.isPaused ? '▶' : '⏸'}</button>
 
             <!-- 输入框 -->
-            <input type="text" id="dictationInput" placeholder="Type the word" ${s.isPaused ? 'disabled' : ''}>
+            <input type="text" id="dictationInput" placeholder="Type the word" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${s.isPaused ? 'disabled' : ''}>
             <br><br>
 
         `;
@@ -1212,7 +1255,7 @@ class Dictation {
 
                 // 如果失败，显示正确答案
                 const extra = (isLast && result?.status === "failed")
-                    ? ` <span class="correct">(Correct: ${s.words[i]})</span>`
+                    ? `<br><span class="correct">(${s.words[i]} - ${preloadCache.translations[s.words[i]] || ''})</span>`
                     : '';
 
                 return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
@@ -1256,7 +1299,7 @@ class Dictation {
             }
         });
 
-        // 计算得分：一次正确得满分，多次正确得半分
+        // 计算得分：一次正确得一分，多次正确得半分
         const score = ((correct + warning * 0.5) / s.words.length * 100).toFixed(1);
 
         // 显示结果

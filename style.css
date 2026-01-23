@@ -20,7 +20,7 @@
  * Cormorant Garamond: 优雅的衬线字体，用于正文内容
  * display=swap: 确保字体加载时先使用系统字体，避免文字闪烁
  */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap');
 
 /* #region 基础样式 */
 /* ===================================================================
@@ -65,7 +65,7 @@ body::before {
      * 圆点颜色为半透明粉色 (rgba(255, 182, 193, 0.15))
      * 圆点半径 2px，超出部分透明
      */
-    background-image: radial-gradient(circle, rgba(255, 182, 193, 0.15) 2px, transparent 2px);
+    background-image: radial-gradient(circle, rgba(255, 182, 193, 0.327) 2px, transparent 2px);
     background-size: 40px 40px; /* 每个圆点图案单元格大小为 40x40 像素 */
     pointer-events: none;       /* 禁用鼠标事件，使点击能穿透到下层元素 */
     z-index: 0;                 /* 置于最底层 */
@@ -89,7 +89,7 @@ body::before {
     /* Flexbox 布局，让标题和按钮排成一行 */
     display: flex;
     align-items: center;        /* 垂直居中 */
-    justify-content: center;    /* 水平居中 */
+    justify-content:space-between;    /* 水平居中 */
     gap: 30px;                  /* 元素之间的间距 */
     flex-wrap: wrap;            /* 宽度不够时换行 */
 
@@ -99,7 +99,7 @@ body::before {
     /* 底部边框，半透明深粉色 */
     border-bottom: 1px solid rgba(255, 150, 170, 0.4);
 
-    padding: 15px 20px;         /* 内边距 */
+    padding: 15px  30px 20px;         /* 内边距 */
 
     /* 柔和的粉色阴影，增加层次感 */
     box-shadow: 0 3px 12px rgba(255, 182, 193, 0.25);
@@ -156,8 +156,8 @@ body.dictation-mode #menu::after {
     /* 柔和的白色边框 */
     border: 1px solid rgba(255, 255, 255, 0.7);
 
-    /* 过渡动画：所有属性变化在 0.3 秒内平滑过渡 */
-    transition: all 0.3s ease;
+    /* 过渡动画 */
+    transition: all 0.3s ease-out;
 
     box-sizing: border-box;     /* 边框和内边距计入宽度 */
     color: #a07070;             /* 玫瑰棕色文字 */
@@ -175,7 +175,7 @@ body.dictation-mode #menu::after {
  * 鼠标悬停时的视觉反馈
  */
 #menu button:hover {
-    transform: translateY(-2px);    /* 向上微移 2px，产生浮起效果 */
+    transform: translateY(-2px) scale(1.1);    /* 向上微移 2px，产生浮起效果 */
     border-color: rgba(255, 200, 210, 0.8); /* 边框带粉色 */
     color: #8b5a5a;                 /* 文字颜色加深 */
 
@@ -183,9 +183,12 @@ body.dictation-mode #menu::after {
     background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,245,0.9) 100%);
 
     /* 添加柔和发光阴影 */
-    box-shadow: 0 4px 15px rgba(200, 150, 160, 0.25);
+    box-shadow: 0 4px 15px rgba(200, 150, 160, 0.55);
 }
 
+#menu button:active{
+    transform: translateY(-2px) scale(1.0);    
+}
 
 /*
  * 设置触发器容器
@@ -193,6 +196,8 @@ body.dictation-mode #menu::after {
  */
 .settings-trigger {
     text-align: center;
+    flex-shrink: 0;             /* 不被 flex 压缩 */
+    width: 50px;                /* 固定宽度，只显示齿轮图标 */
 }
 
 /*
@@ -233,7 +238,7 @@ body.dictation-mode #menu::after {
     background: url('scr/set_icon.PNG') no-repeat center center;
     background-size: contain;
     z-index: 2;
-    transition: transform 0.7s ease;
+    transition: transform 0.7s ease-out;
 }
 
 /*
@@ -241,7 +246,7 @@ body.dictation-mode #menu::after {
  * 鼠标悬停时齿轮旋转 180 度
  */
 .settings-trigger:hover .gear-icon::after {
-    transform: rotate(270deg);  /* 旋转 180 度 */
+    transform: rotate(180deg);  /* 旋转 180 度 */
 }
 
 /*
@@ -250,7 +255,7 @@ body.dictation-mode #menu::after {
  */
 .settings-trigger .sidebar {
     position: absolute;         /* 绝对定位，相对于 .settings-trigger */
-    right: 0;                   /* 右对齐 */
+    right: 50px;                   /* 右对齐 */
     top: 100%;                  /* 位于触发器下方 */
     margin-top: 15px;           /* 与触发器的间距 */
     width: 240px;               /* 面板宽度 */
@@ -279,7 +284,7 @@ body.dictation-mode #menu::after {
     /* 初始状态：隐藏 */
     opacity: 0;                 /* 完全透明 */
     visibility: hidden;         /* 不可见，不占用交互空间 */
-    transform: translateY(-10px) scale(0.95); /* 略微上移并缩小 */
+    transform: translateY(-30px) scale(0.9); /* 略微上移并缩小 */
 
     /* 贝塞尔曲线过渡，实现流畅的弹出动画 */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -304,7 +309,7 @@ body.dictation-mode #menu::after {
 .settings-trigger:hover .sidebar {
     opacity: 1;                 /* 完全不透明 */
     visibility: visible;        /* 可见 */
-    transform: translateY(0) scale(1); /* 恢复正常位置和大小 */
+    transform: translateY(0) scale(1.1); /* 恢复正常位置和大小 */
 }
 
 /*
@@ -385,19 +390,20 @@ body.dictation-mode #menu::after {
  * 用于输入单词列表等多行文本
  */
 .settings-trigger .sidebar textarea {
-    font-family: 'Cormorant Garamond', 'Georgia', serif; /* 字体 */
-    width: 100%;                /* 占满容器宽度 */
-    height: 180px;              /* 固定高度 */
-    padding: 12px;              /* 内边距 */
-    margin: 0;                  /* 无外边距 */
-    border: 1px solid rgba(255, 182, 193, 0.4); /* 粉色边框 */
-    border-radius: 12px;        /* 圆角 */
-    background: #fffafa;        /* 淡粉背景 */
-    color: #8b6f6f;             /* 文字颜色 */
-    font-size: 14px;            /* 字号 */
-    resize: none;               /* 禁止用户调整大小 */
-    box-sizing: border-box;     /* 边框盒模型 */
-    transition: all 0.2s;       /* 过渡动画 */
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    width: 100%;
+    height: 330px;
+    padding: 12px 18px;
+    margin: 0;
+    border: 1px solid rgba(255, 182, 193, 0.4);
+    border-radius: 12px;
+    background: #fffafa;
+    color: #8b6f6f;
+    font-size: 14px;
+    resize: none;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    overflow-x: hidden;         /* 不滚动，靠 sidebar 加宽 */
 }
 
 /* 文本域获得焦点时的样式 */
@@ -850,7 +856,7 @@ body.dictation-mode #workplace::after {
 }
 
 #dictationPopup h3 {
-    font-family: 'Caveat', cursive;  /* 手写风格 */
+    font-family: 'Caveat', 'Ma Shan Zheng', cursive;  /* 英文+中文手写风格 */
     color: #8b6f6f;
     font-size: 24px;
     margin: 5px 0 15px 0;
@@ -916,10 +922,6 @@ body.dictation-mode #workplace::after {
     border-bottom: none;
 }
 
-/* 悬停时轻微高亮，像用荧光笔划过 */
-.result-item:hover {
-    background: rgba(255, 245, 200, 0.3);
-}
 
 /*
  * 结果序号 - 题号样式
@@ -937,7 +939,7 @@ body.dictation-mode #workplace::after {
  */
 .result-attempts {
     flex: 1;
-    font-family: 'Caveat', cursive;  /* 手写风格 */
+    font-family: 'Caveat', 'Ma Shan Zheng', cursive;  /* 英文+中文手写风格 */
     font-size: 22px;
     color: #5a4a4a;
     line-height: 1.6;
@@ -1118,7 +1120,7 @@ body.dictation-mode #workplace::after {
 
 /* 正确答案样式 */
 .result-attempts .correct {
-    padding: 2px 6px;
+    padding: 2px 0px;
 }
 
 /*
@@ -1138,21 +1140,10 @@ body.dictation-mode #workplace::after {
     text-underline-offset: 3px;
 }
 
-/*
- * 失败状态 - 红色删除线效果
- * 模拟老师划掉错误答案
- */
+
 .failed {
     color: #c55555;             /* 红笔颜色 */
     position: relative;
-}
-
-/* 删除线效果 */
-.result-attempts .failed {
-    text-decoration: line-through;
-    text-decoration-color: rgba(200, 80, 80, 0.7);
-    text-decoration-thickness: 2px;
-    padding: 2px 6px;
 }
 
 /* 正确答案提示 - 绿色手写风格 */
