@@ -46,39 +46,6 @@ export function getTranslatorProvider() {
 }
 
 /**
- * 调用后端翻译 API 获取单词的中文翻译
- */
-export async function translateWord(word) {
-    // 先检查缓存
-    if (preloadCache.translations[word]) {
-        return preloadCache.translations[word];
-    }
-
-    try {
-        const provider = getTranslatorProvider();
-        const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}&provider=${provider}`;
-        const res = await fetch(url);
-
-        if (!res.ok) return getHttpErrorMessage(res.status);
-
-        let data;
-        try {
-            data = await res.json();
-        } catch {
-            return "翻译失败: 响应格式错误";
-        }
-
-        if (data.error) return `翻译失败: ${data.error}`;
-
-        const translation = data.translation || "翻译失败: 无翻译结果";
-        preloadCache.translations[word] = translation;
-        return translation;
-    } catch (e) {
-        return getFetchErrorMessage(e);
-    }
-}
-
-/**
  * 获取 TTS URL
  */
 export function getTtsUrl(word, slow = false) {
@@ -86,35 +53,48 @@ export function getTtsUrl(word, slow = false) {
 }
 
 /**
- * 获取单词词典信息（含词性）
+ * 获取单词完整信息（使用 DeepSeek）
+ * 返回: { translation, definitions, examples, synonyms, antonyms }
  */
-export async function fetchDictionary(word) {
+export async function fetchWordInfo(word) {
     // 检查缓存
-    if (preloadCache.dictionaries[word]) {
-        return preloadCache.dictionaries[word];
+    if (preloadCache.wordInfo[word]) {
+        return preloadCache.wordInfo[word];
     }
 
     try {
-        const provider = getTranslatorProvider();
-        const url = `${API_BASE}/api/dictionary?word=${encodeURIComponent(word)}&provider=${provider}`;
+        const url = `${API_BASE}/api/wordinfo?word=${encodeURIComponent(word)}`;
         const res = await fetch(url);
 
         if (!res.ok) {
-            // 回退到简单翻译
-            const translation = await translateWord(word);
             const fallback = {
                 word,
-                phonetic: null,
+                translation: "加载失败",
                 definitions: [],
-                translation
+                examples: [],
+                synonyms: [],
+                antonyms: []
             };
-            preloadCache.dictionaries[word] = fallback;
+            preloadCache.wordInfo[word] = fallback;
             return fallback;
         }
 
         const data = await res.json();
-        preloadCache.dictionaries[word] = data;
 
+        if (data.error) {
+            const fallback = {
+                word,
+                translation: `错误: ${data.error}`,
+                definitions: [],
+                examples: [],
+                synonyms: [],
+                antonyms: []
+            };
+            preloadCache.wordInfo[word] = fallback;
+            return fallback;
+        }
+
+        preloadCache.wordInfo[word] = data;
         // 同时更新简单翻译缓存
         if (data.translation) {
             preloadCache.translations[word] = data.translation;
@@ -122,7 +102,17 @@ export async function fetchDictionary(word) {
 
         return data;
     } catch (e) {
-        console.error("Dictionary fetch error:", e);
-        return null;
+        console.error("WordInfo fetch error:", e);
+        const fallback = {
+            word,
+            translation: "网络错误",
+            definitions: [],
+            examples: [],
+            synonyms: [],
+            antonyms: []
+        };
+        preloadCache.wordInfo[word] = fallback;
+        return fallback;
     }
 }
+

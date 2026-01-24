@@ -5,7 +5,7 @@
 /* 超大屏幕 (>1400px) */
 @media (min-width: 1400px) {
     #menu h1 { font-size: 42px; }
-    #menu button { font-size: 20px; width: 240px; padding: 16px 32px; }
+    #mode-btn button { font-size: 20px; width: 240px; padding: 16px 32px; }
     .current-word { font-size: 42px; }
     .current-translation { font-size: 24px; }
     .word-item strong { font-size: 26px; }
@@ -27,7 +27,7 @@
 /* 中等屏幕 (900px - 1199px) */
 @media (min-width: 900px) and (max-width: 1199px) {
     #menu h1 { font-size: 32px; }
-    #menu button { font-size: 16px; width: 200px; padding: 12px 24px; }
+    #mode-btn button { font-size: 16px; width: 200px; padding: 12px 24px; }
     .current-word { font-size: 32px; }
     .current-translation { font-size: 18px; }
     .word-item strong { font-size: 20px; }
@@ -42,7 +42,7 @@
 /* 小屏幕 / 平板 (600px - 899px) */
 @media (min-width: 600px) and (max-width: 899px) {
     #menu h1 { font-size: 24px; letter-spacing: 2px; }
-    #menu button { font-size: 14px; width: 150px; padding: 10px 18px; }
+    #mode-btn button { font-size: 14px; width: 150px; padding: 10px 18px; }
     #menu { padding: 12px 15px; gap: 20px; }
     .main { padding: 20px; }
     .current-word { font-size: 28px; }

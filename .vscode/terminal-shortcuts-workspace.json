@@ -3,5 +3,10 @@
         "label": "get a UPL [edit me]",
         "command": "cloudflared tunnel --url http://localhost:5001",
         "group": "Workspace"
+    },
+    {
+        "label": "start",
+        "command": "python3 server.py",
+        "group": "Workspace"
     }
 ]

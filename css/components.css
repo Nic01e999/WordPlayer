@@ -120,7 +120,6 @@
 /* 保存按钮 */
 .btn-save-list {
     padding: 2px 8px;
-    margin-left: 8px;
     font-size: 12px;
     border: 1px solid var(--border-pink-medium);
     border-radius: 6px;
@@ -129,6 +128,8 @@
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .btn-save-list:hover {

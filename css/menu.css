@@ -153,6 +153,8 @@ body.dictation-mode #menu::after {
     top: 100%;
     margin-top: 15px;
     width: 240px;
+    max-height: 80vh;
+    overflow-y: auto;
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.45) 0%,
         rgba(255, 245, 245, 0.35) 50%,
@@ -184,13 +186,17 @@ body.dictation-mode #menu::after {
 .settings-trigger .sidebar h3 {
     font-family: 'Cinzel', 'Georgia', serif;
     color: var(--text-accent);
-    font-size: 14px;
+    font-size: 120%;
     font-weight: 600;
     margin: 0 0 15px 0;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--border-pink-light);
     text-transform: uppercase;
     letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
 }
 
 /* 设置项标签样式 */
@@ -239,13 +245,47 @@ body.dictation-mode #menu::after {
     cursor: pointer;
 }
 
-/* 文本域样式 */
-.settings-trigger .sidebar textarea {
+/* 模式设置分组 */
+.settings-trigger .sidebar .mode-settings {
+    margin-top: 15px;
+    padding-top: 5px;
+}
+/* 单词输入区域 - 主页左侧 */
+#wordSection {
+    width: 280px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+/* 进入模式后隐藏 Word List */
+body.dictation-mode #wordSection,
+body.repeater-mode #wordSection {
+    display: none;
+}
+
+#wordSection h3 {
+    font-family: 'Cinzel', 'Georgia', serif;
+    color: var(--text-accent);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-pink-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#wordSection textarea {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
+    flex: 1;
     width: 100%;
-    height: 330px;
-    padding: 12px 18px;
-    margin: 0;
+    padding: 12px;
     border: 1px solid var(--border-pink-light);
     border-radius: 12px;
     background: var(--bg-container);
@@ -254,17 +294,54 @@ body.dictation-mode #menu::after {
     resize: none;
     box-sizing: border-box;
     transition: all 0.2s;
-    overflow-x: hidden;
 }
 
-/* 文本域获得焦点时的样式 */
-.settings-trigger .sidebar textarea:focus {
+#wordSection textarea:focus {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 15px var(--shadow-pink-light);
 }
 
-/* 文本域占位符样式 */
-.settings-trigger .sidebar textarea::placeholder {
-    color: var(--text-muted);
+/* 发音选择器 */
+.accent-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.accent-selector > span {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* 分段控制按钮 */
+.segmented-control {
+    display: inline-flex;
+    background: var(--bg-tertiary, rgba(0,0,0,0.05));
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.segmented-control input[type="radio"] {
+    display: none;
+}
+
+.segmented-control label {
+    padding: 5px 14px !important;
+    margin: 0 !important;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.segmented-control input[type="radio"]:checked + label {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 2px 6px var(--shadow-pink-medium);
 }

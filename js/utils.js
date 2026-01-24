@@ -22,6 +22,15 @@ export function filterChinese(text) {
 }
 
 /**
+ * 获取用户选择的发音口音
+ * @returns {'us' | 'uk'}
+ */
+export function getAccent() {
+    const el = document.querySelector('input[name="accent"]:checked');
+    return el ? el.value : 'us';
+}
+
+/**
  * 从设置面板读取用户配置
  */
 export function getSettings() {
@@ -31,7 +40,8 @@ export function getSettings() {
         interval: parseInt($("interval").value) || 300,
         slow: $("slow").checked,
         shuffle: $("shuffle").checked,
-        dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB"
+        dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB",
+        accent: getAccent()
     };
 }
 

@@ -21,7 +21,7 @@ export let currentActiveMode = null;
 export const preloadCache = {
     entries: [],            // 已缓存的单词条目列表 { word, definition }
     translations: {},       // { word: translation } - 如果有 definition 则直接使用
-    dictionaries: {},       // { word: { phonetic, definitions: [{pos, meanings}], translation } }
+    wordInfo: {},           // { word: { translation, definitions, examples, synonyms, antonyms } } - DeepSeek 完整信息
     audioUrls: {},          // { text: Blob URL } (正常速度) - 支持单词和定义
     slowAudioUrls: {},      // { text: Blob URL } (慢速) - 支持单词和定义
     loading: false,         // 是否正在加载
@@ -30,6 +30,30 @@ export const preloadCache = {
     loaded: 0,              // 已加载数量
     total: 0                // 总数量
 };
+
+/**
+ * 从 localStorage 恢复 wordInfo 缓存
+ */
+function loadCacheFromStorage() {
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('wordinfo:')) {
+                const word = key.slice(9);
+                const data = localStorage.getItem(key);
+                if (data) {
+                    preloadCache.wordInfo[word] = JSON.parse(data);
+                    preloadCache.translations[word] = preloadCache.wordInfo[word].translation;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to load cache from localStorage:', e);
+    }
+}
+
+// 模块加载时自动恢复缓存
+loadCacheFromStorage();
 
 /**
  * 设置复读模式状态

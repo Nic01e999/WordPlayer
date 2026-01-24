@@ -6,16 +6,14 @@
 import io
 import socket
 import os
-import asyncio
 import requests
-
-# 设置 translators 区域（必须在导入前设置）
-os.environ["translators_default_region"] = "CN"
+import json
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-import edge_tts
-import translators as ts
+
+# DeepSeek API 配置
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "sk-0824195cfddf48db92c8a6fa482f7304")
 
 app = Flask(__name__, static_folder=os.path.dirname(os.path.abspath(__file__)))
 CORS(app)  # 允许跨域请求
@@ -50,151 +48,207 @@ def index():
     """提供主页"""
     return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html"))
 
-def abbreviate_pos(pos):
-    """将完整词性名称转换为缩写"""
-    mapping = {
-        "noun": "n.",
-        "verb": "v.",
-        "adjective": "adj.",
-        "adverb": "adv.",
-        "pronoun": "pron.",
-        "preposition": "prep.",
-        "conjunction": "conj.",
-        "interjection": "interj.",
-        "exclamation": "excl."
-    }
-    return mapping.get(pos.lower(), pos + ".")
-
-
-@app.route("/api/dictionary", methods=["GET"])
-def dictionary():
+@app.route("/api/wordinfo/batch", methods=["POST"])
+def wordinfo_batch():
     """
-    获取单词词典信息（含词性）
-    GET /api/dictionary?word=hello&provider=bing
-    返回: {
-        "word": "hello",
-        "phonetic": "/həˈloʊ/",
-        "definitions": [
-            {"pos": "n.", "meanings": ["问候", "招呼"]},
-            {"pos": "v.", "meanings": ["打招呼"]}
-        ],
-        "translation": "你好"
-    }
+    批量获取单词信息（更省 token）
+    POST /api/wordinfo/batch
+    Body: { "words": ["apple", "happy", "run"] }
+    返回: { "results": { "apple": {...}, "happy": {...}, "run": {...} } }
     """
-    word = request.args.get("word", "")
-    provider = request.args.get("provider", "bing")
+    data = request.get_json()
+    words = data.get("words", []) if data else []
 
-    if not word:
-        return jsonify({"error": "缺少 word 参数"}), 400
+    if not words:
+        return jsonify({"error": "缺少 words 参数"}), 400
 
-    result = {
-        "word": word,
-        "phonetic": None,
-        "definitions": [],
-        "translation": None
-    }
+    if not DEEPSEEK_API_KEY:
+        return jsonify({"error": "未配置 DEEPSEEK_API_KEY"}), 500
 
-    # 尝试从 Free Dictionary API 获取词性数据
-    try:
-        dict_res = requests.get(
-            f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}",
-            timeout=5
-        )
-        if dict_res.ok:
-            data = dict_res.json()
-            if data and isinstance(data, list):
-                entry = data[0]
-                result["phonetic"] = entry.get("phonetic")
-
-                seen_pos = {}
-                for meaning in entry.get("meanings", []):
-                    pos = meaning.get("partOfSpeech", "")
-                    pos_abbr = abbreviate_pos(pos)
-
-                    # 获取前2个释义
-                    definitions = [d.get("definition", "")
-                                   for d in meaning.get("definitions", [])[:2]]
-
-                    if pos_abbr in seen_pos:
-                        seen_pos[pos_abbr]["meanings"].extend(definitions)
-                    else:
-                        seen_pos[pos_abbr] = {
-                            "pos": pos_abbr,
-                            "meanings": definitions
-                        }
-
-                result["definitions"] = list(seen_pos.values())
-    except Exception as e:
-        print(f"Dictionary API error: {e}")
-
-    # 获取中文翻译
-    try:
-        translation = ts.translate_text(
-            word,
-            translator=provider,
-            to_language="zh",
-            if_use_cn_host=True
-        )
-        result["translation"] = translation
-    except Exception as e:
-        print(f"Translation error: {e}")
-
-    return jsonify(result)
-
-
-@app.route("/api/translate", methods=["GET"])
-def translate():
-    """
-    翻译单词
-    GET /api/translate?word=hello&provider=bing
-    返回: { "translation": "你好" }
-    """
-    word = request.args.get("word", "")
-    provider = request.args.get("provider", "bing")  # bing / google / baidu / youdao
-
-    if not word:
-        return jsonify({"error": "缺少 word 参数"}), 400
+    # 限制单次最多 20 个单词
+    words = words[:20]
 
     try:
-        result = ts.translate_text(
-            word,
-            translator=provider,
-            to_language="zh",
-            if_use_cn_host=True  # 国内可用
+        words_list = ", ".join(f'"{w}"' for w in words)
+        prompt = f'''For these English words: [{words_list}]
+
+Provide information for EACH word in this JSON format:
+{{
+  "word1": {{
+    "translation": "Chinese translation",
+    "definitions": [{{"pos": "n./v./adj.", "meanings": ["meaning1", "meaning2"]}}],
+    "examples": ["sentence1", "sentence2"],
+    "synonyms": ["syn1", "syn2"],
+    "antonyms": ["ant1", "ant2"]
+  }},
+  "word2": {{ ... }}
+}}
+
+Rules for each word:
+- translation: Most common Chinese translation (简体中文)
+- definitions: Group by part of speech, max 2 meanings per POS
+- examples: 2 natural sentences
+- synonyms: Up to 5 words
+- antonyms: Up to 3 words (empty array if none)
+
+Respond ONLY with valid JSON, no markdown.'''
+
+        response = requests.post(
+            "https://api.deepseek.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "deepseek-chat",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3
+            },
+            timeout=60  # 批量请求需要更长超时
         )
-        return jsonify({"translation": result})
+
+        if response.ok:
+            data = response.json()
+            content = data["choices"][0]["message"]["content"]
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("\n", 1)[1]
+                content = content.rsplit("```", 1)[0]
+
+            raw_results = json.loads(content)
+
+            # 标准化结果
+            results = {}
+            for word in words:
+                info = raw_results.get(word, {})
+                results[word] = {
+                    "word": word,
+                    "translation": info.get("translation", ""),
+                    "definitions": info.get("definitions", []),
+                    "examples": info.get("examples", [])[:2],
+                    "synonyms": info.get("synonyms", [])[:5],
+                    "antonyms": info.get("antonyms", [])[:3]
+                }
+
+            return jsonify({"results": results})
+        else:
+            print(f"DeepSeek API error: {response.status_code} - {response.text}")
+            return jsonify({"error": f"API 错误: {response.status_code}"}), 500
+
+    except json.JSONDecodeError as e:
+        print(f"JSON parse error: {e}")
+        return jsonify({"error": "解析响应失败"}), 500
     except Exception as e:
+        print(f"WordInfo batch error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
-async def generate_tts(text: str, slow: bool = False) -> bytes:
-    """使用 Edge TTS 生成语音"""
-    voice = "en-US-AriaNeural"
-    rate = "-30%" if slow else "+0%"
+@app.route("/api/wordinfo", methods=["GET"])
+def wordinfo():
+    """
+    使用 DeepSeek 获取单词完整信息（单个单词，保留兼容性）
+    GET /api/wordinfo?word=happy
+    """
+    word = request.args.get("word", "")
 
-    communicate = edge_tts.Communicate(text, voice, rate=rate)
-    audio_data = b""
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_data += chunk["data"]
-    return audio_data
+    if not word:
+        return jsonify({"error": "缺少 word 参数"}), 400
+
+    if not DEEPSEEK_API_KEY:
+        return jsonify({"error": "未配置 DEEPSEEK_API_KEY"}), 500
+
+    try:
+        prompt = f'''For the English word "{word}", provide comprehensive information in JSON format:
+{{
+  "translation": "Chinese translation (简体中文)",
+  "definitions": [
+    {{"pos": "part of speech abbreviation (n./v./adj./adv.)", "meanings": ["English definition 1", "English definition 2"]}}
+  ],
+  "examples": ["example sentence 1", "example sentence 2"],
+  "synonyms": ["synonym1", "synonym2", "synonym3"],
+  "antonyms": ["antonym1", "antonym2"]
+}}
+
+Rules:
+- translation: Provide the most common Chinese translation
+- definitions: Group by part of speech, max 2 meanings per POS
+- examples: 2 natural example sentences
+- synonyms: Up to 5 similar words
+- antonyms: Up to 3 opposite words (empty array if none)
+
+Respond ONLY with valid JSON, no markdown.'''
+
+        response = requests.post(
+            "https://api.deepseek.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "deepseek-chat",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3
+            },
+            timeout=20
+        )
+
+        if response.ok:
+            data = response.json()
+            content = data["choices"][0]["message"]["content"]
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("\n", 1)[1]
+                content = content.rsplit("```", 1)[0]
+
+            result = json.loads(content)
+            return jsonify({
+                "word": word,
+                "translation": result.get("translation", ""),
+                "definitions": result.get("definitions", []),
+                "examples": result.get("examples", [])[:2],
+                "synonyms": result.get("synonyms", [])[:5],
+                "antonyms": result.get("antonyms", [])[:3]
+            })
+        else:
+            print(f"DeepSeek API error: {response.status_code} - {response.text}")
+            return jsonify({"error": f"API 错误: {response.status_code}"}), 500
+
+    except json.JSONDecodeError as e:
+        print(f"JSON parse error: {e}")
+        return jsonify({"error": "解析响应失败"}), 500
+    except Exception as e:
+        print(f"WordInfo error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+def get_youdao_tts(text: str, slow: bool = False, accent: str = "us") -> bytes:
+    """使用有道 TTS 获取语音"""
+    # type=1 美式发音, type=2 英式发音
+    voice_type = 2 if accent == "uk" else 1
+    url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type={voice_type}"
+
+    response = requests.get(url, timeout=10)
+    if response.ok:
+        return response.content
+    raise Exception(f"有道 TTS 请求失败: {response.status_code}")
 
 
 @app.route("/api/tts", methods=["GET"])
 def tts():
     """
-    生成单词发音（使用 Edge TTS）
-    GET /api/tts?word=hello&slow=0
+    生成单词发音（使用有道 TTS）
+    GET /api/tts?word=hello&slow=0&accent=us
     返回: MP3 音频文件
     """
     word = request.args.get("word", "")
     slow = request.args.get("slow", "0") == "1"
+    accent = request.args.get("accent", "us")  # us 或 uk
 
     if not word:
         return jsonify({"error": "缺少 word 参数"}), 400
 
     try:
-        audio_data = asyncio.run(generate_tts(word, slow))
+        audio_data = get_youdao_tts(word, slow, accent)
         return send_file(
             io.BytesIO(audio_data),
             mimetype="audio/mpeg"

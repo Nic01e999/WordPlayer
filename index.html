@@ -20,26 +20,28 @@
                     <!-- 右侧：设置边栏 -->
                     <div class="sidebar">
                         <div id="settings">
-                            <h3>Settings</h3>
-                            <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
-                            <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
-                            <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
-                            <label>Slow: <input type="checkbox" id="slow"></label>
+                            <h3>General</h3>
                             <label>Shuffle: <input type="checkbox" id="shuffle"></label>
-                            <label>Word(write) : Def(listen)<input type="checkbox" id="dictateMode"></label>
-                            <label>Translator:
-                                <select id="translatorProvider">
-                                    <option value="bing">Bing</option>
-                                    <option value="google">Google</option>
-                                    <option value="baidu">百度</option>
-                                    <option value="youdao">有道</option>
-                                </select>
-                            </label>
+                            <label>Slow: <input type="checkbox" id="slow"></label>
+                            <div class="accent-selector">
+                                <span>Accent:</span>
+                                <div class="segmented-control">
+                                    <input type="radio" name="accent" id="accent-us" value="us" checked>
+                                    <label for="accent-us">US</label>
+                                    <input type="radio" name="accent" id="accent-uk" value="uk">
+                                    <label for="accent-uk">UK</label>
+                                </div>
+                            </div>
                         </div>
-
-                        <div id="wordSection">
-                            <h3>Word List <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button></h3>
-                            <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+                        <div id="dictation-settings" class="mode-settings">
+                            <h3>Dictation</h3>
+                            <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
+                            <label>Word(write) : Def(listen)<input type="checkbox" id="dictateMode"></label>
+                        </div>
+                        <div id="repeater-settings" class="mode-settings">
+                            <h3>Repeater</h3>
+                            <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
+                            <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
                         </div>
                     </div>
                 </div>
@@ -48,10 +50,14 @@
         </div>
 
         <div class="container">
+            <!-- 左侧：单词输入 -->
+            <div id="wordSection">
+                <h3>Word List <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button></h3>
+                <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+            </div>
 
-            <!-- 左侧：结果显示 -->
+            <!-- 右侧：结果显示 -->
             <div class="main">
-                
                 <div id="workplace">
 
                 </div>

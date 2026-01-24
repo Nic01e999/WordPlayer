@@ -4,7 +4,6 @@
 
 import { currentRepeaterState, setRepeaterState, setActiveMode, preloadCache } from './state.js';
 import { $, getSettings, loadWordsFromTextarea, shuffleArray, clearWorkplace, logToWorkplace } from './utils.js';
-import { translateWord } from './api.js';
 import { stopAudio, isAudioPlaying, speakWord, updatePlayPauseBtn } from './audio.js';
 
 // 导入时需要的外部引用（在 app.js 中设置）
@@ -32,6 +31,7 @@ export class Repeater {
     static ITEM_HEIGHT = 60;
     static scrollTimeout = null;
     static playId = 0;
+    static currentSliderPosition = 0; // 0=翻译, 1=释义, 2=例句, 3=同反
 
     static async startRepeater() {
         pauseOtherMode();
@@ -66,23 +66,8 @@ export class Repeater {
         };
         setRepeaterState(state);
 
-        if (allCached) {
-            state.translations = words.map(w => preloadCache.translations[w]);
-        } else {
-            logToWorkplace(`<h3>📖 Repeater Mode</h3><p>Loading translations...</p>`);
-
-            const translationPromises = list.map(entry => {
-                if (entry.definition) {
-                    return Promise.resolve(entry.definition);
-                }
-                return translateWord(entry.word);
-            });
-            const translations = await Promise.all(translationPromises);
-
-            if (myId !== this.playId) return;
-
-            state.translations = translations;
-        }
+        // 使用缓存的翻译，如果没有则显示"加载中"
+        state.translations = words.map(w => preloadCache.translations[w] || "加载中...");
 
         clearWorkplace();
         this.renderUI();
@@ -131,37 +116,135 @@ export class Repeater {
         const state = currentRepeaterState;
         if (!info || !state) return;
 
-        const { words, currentIndex, currentRepeat, settings } = state;
+        const { words, currentIndex, currentRepeat, settings, entries } = state;
         const word = words[currentIndex];
-        const dictData = preloadCache.dictionaries[word];
+        const entry = entries[currentIndex];
+        const isCustomWord = entry.definition !== null;
+        const wordInfo = preloadCache.wordInfo[word];
         const simpleTranslation = preloadCache.translations[word] ?? state.translations[currentIndex];
 
-        let translationHTML;
+        let contentHTML;
 
-        if (dictData && dictData.definitions && dictData.definitions.length > 0) {
-            // 显示词性释义
-            translationHTML = `
-                <div class="pos-translations">
-                    ${dictData.definitions.map(def => `
-                        <div class="pos-item">
-                            <span class="pos-tag">${def.pos}</span>
-                            <span class="pos-meaning">${def.meanings.slice(0, 2).join('; ')}</span>
-                        </div>
-                    `).join('')}
-                    ${dictData.translation ? `<div class="simple-translation">${dictData.translation}</div>` : ''}
-                </div>
-            `;
+        if (isCustomWord) {
+            // 自定义单词：只显示翻译，无滑动条
+            contentHTML = `<div class="current-translation">${simpleTranslation ?? '加载中...'}</div>`;
         } else {
-            // 回退到简单翻译
-            translationHTML = `<div class="current-translation ${simpleTranslation?.startsWith('翻译失败') ? 'translation-error' : ''}">${simpleTranslation ?? '加载中...'}</div>`;
+            // 非自定义单词：显示滑动条（4个按钮）
+            contentHTML = this.renderSliderContent(wordInfo, simpleTranslation);
         }
 
         info.innerHTML = `
             <div class="current-word">${word}</div>
-            ${dictData?.phonetic ? `<div class="phonetic">${dictData.phonetic}</div>` : ''}
-            ${translationHTML}
+            ${contentHTML}
             <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
         `;
+
+        // 设置滑动条按钮事件
+        if (!isCustomWord) {
+            this.setupSliderListeners();
+        }
+    }
+
+    static renderSliderContent(wordInfo, translation) {
+        const position = this.currentSliderPosition;
+        const labels = ['中文', '释义', '例句', '同反'];
+
+        return `
+            <div class="slider-container">
+                <div class="slider-content">
+                    ${this.renderViewContent(position, wordInfo, translation)}
+                </div>
+                <div class="slider-track">
+                    ${labels.map((label, i) => `
+                        <button class="slider-dot ${i === position ? 'active' : ''}"
+                                data-position="${i}">${label}</button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    static renderViewContent(position, wordInfo, translation) {
+        switch (position) {
+            case 0: // 中文翻译
+                return `<div class="view-translation">${translation ?? '加载中...'}</div>`;
+            case 1: // 词性 + 英文释义
+                return this.renderPosView(wordInfo);
+            case 2: // 例句
+                return this.renderExamplesView(wordInfo);
+            case 3: // 同义词/反义词
+                return this.renderSynonymsView(wordInfo);
+            default:
+                return '';
+        }
+    }
+
+    static renderPosView(wordInfo) {
+        if (!wordInfo?.definitions?.length) {
+            return '<div class="view-empty">No definitions available</div>';
+        }
+        return `
+            <div class="view-pos">
+                ${wordInfo.definitions.map(def => `
+                    <div class="pos-item">
+                        <span class="pos-tag">${def.pos}</span>
+                        <span class="pos-meaning">${def.meanings.slice(0, 2).join('; ')}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    static renderExamplesView(wordInfo) {
+        const examples = wordInfo?.examples || [];
+        if (examples.length === 0) {
+            return '<div class="view-empty">No examples available</div>';
+        }
+        return `
+            <div class="view-examples">
+                ${examples.slice(0, 2).map(ex => `<p class="example-sentence">${ex}</p>`).join('')}
+            </div>
+        `;
+    }
+
+    static renderSynonymsView(wordInfo) {
+        const synonyms = wordInfo?.synonyms || [];
+        const antonyms = wordInfo?.antonyms || [];
+
+        if (synonyms.length === 0 && antonyms.length === 0) {
+            return '<div class="view-empty">No synonyms/antonyms available</div>';
+        }
+
+        return `
+            <div class="view-synonyms">
+                ${synonyms.length > 0 ? `
+                    <div class="syn-group">
+                        <span class="syn-label">Syn:</span>
+                        <span class="syn-words">${synonyms.slice(0, 5).join(', ')}</span>
+                    </div>
+                ` : ''}
+                ${antonyms.length > 0 ? `
+                    <div class="ant-group">
+                        <span class="ant-label">Ant:</span>
+                        <span class="ant-words">${antonyms.slice(0, 3).join(', ')}</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    static setupSliderListeners() {
+        const dots = document.querySelectorAll('.slider-dot');
+        dots.forEach(dot => {
+            dot.onclick = (e) => {
+                e.stopPropagation();
+                const position = parseInt(e.target.dataset.position);
+                if (position !== this.currentSliderPosition) {
+                    this.currentSliderPosition = position;
+                    this.updateInfo();
+                }
+            };
+        });
     }
 
     static setupScrollListener() {
@@ -213,6 +296,7 @@ export class Repeater {
 
         state.currentIndex = idx;
         state.currentRepeat = 0;
+        this.currentSliderPosition = 0; // 用户滚动时重置滑动条
 
         this.highlightCurrent();
         this.updateInfo();
@@ -277,6 +361,7 @@ export class Repeater {
                 if (state.currentRepeat >= state.settings.repeat) {
                     state.currentRepeat = 0;
                     state.currentIndex++;
+                    this.currentSliderPosition = 0; // 切换单词时重置滑动条
 
                     if (state.currentIndex >= state.words.length) {
                         state.currentIndex = 0;
