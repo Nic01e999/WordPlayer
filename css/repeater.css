@@ -5,7 +5,7 @@
 /* 复读器主容器 */
 .repeater-container {
     position: relative;
-    height: 400px;
+    height: clamp(220px, calc(100vh - 420px), 400px);
     overflow: hidden;
     border-radius: 25px;
     perspective: 800px;
@@ -13,6 +13,7 @@
     border: 1px solid var(--border-pink-light);
     box-shadow: 0 8px 30px var(--shadow-pink-light);
     background: var(--bg-container);
+    flex-shrink: 0;
 }
 
 /* 中心指示条 */
@@ -55,13 +56,18 @@
     scrollbar-width: none;
 }
 
+/* 滚动区域上下留白（使首尾单词可居中） */
+.scroll-spacer {
+    height: calc(50% - 30px);
+}
+
 /* 单词项样式 */
 .word-item {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
     height: 60px;
     padding: 0 20px;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
@@ -98,20 +104,31 @@
 }
 
 /* 单词信息卡片 */
+.word-info-wrapper {
+    margin-top: 12px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .word-info {
     text-align: center;
-    padding: 20px;
+    padding: 30px 40px;
     background: rgba(255, 250, 250, 0.95);
     border: 1px solid var(--border-pink-light);
     border-radius: 20px;
-    margin-top: 15px;
     box-shadow: 0 4px 20px var(--shadow-pink-light);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
 /* 当前单词显示（大字） */
 .current-word {
     font-family: 'Cinzel', 'Georgia', serif;
-    font-size: 36px;
+    font-size: 48px;
     font-weight: 600;
     color: var(--text-accent);
 }
@@ -133,9 +150,9 @@
 /* 播放次数显示 */
 .play-count {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 18px;
+    font-size: 16px;
     color: var(--text-count);
-    margin-top: 8px;
+    margin-top: 4px;
     font-weight: 600;
 }
 
@@ -193,56 +210,130 @@
     text-align: center;
 }
 
-/* ===== 滑动条样式 ===== */
-
-/* 滑动条容器 */
-.slider-container {
-    margin-top: 12px;
-}
+/* ===== Apple 风格滑行条 ===== */
 
 /* 内容显示区域 */
 .slider-content {
-    min-height: 80px;
-    padding: 15px;
+    flex: 1;
+    min-height: 50px;
+    padding: clamp(8px, 2vw, 15px);
     background: rgba(255, 255, 255, 0.5);
     border-radius: 12px;
     border: 1px solid var(--border-pink-light);
-    margin-bottom: 12px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    overflow: auto;
 }
 
-/* 滑动条轨道（按钮容器） */
-.slider-track {
+.slider-content.fading {
+    opacity: 0;
+    transform: translateY(4px);
+}
+
+/* 滑行条容器 */
+.apple-slider {
+    margin: 8px auto 4px;
+    width: 50%;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+}
+
+.apple-slider:focus-visible .apple-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.4), 0 2px 8px var(--shadow-pink-medium);
+}
+
+/* 节点标签行 */
+.apple-slider-labels {
     display: flex;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-between;
+    padding: 0 2px;
+    margin-bottom: 10px;
 }
 
-/* 滑动条按钮 */
-.slider-dot {
-    padding: 6px 14px;
-    border: 1px solid var(--border-pink-medium);
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
-    color: var(--text-secondary);
+.apple-slider-label {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.2s, font-weight 0.2s;
 }
 
-.slider-dot:hover {
-    background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
-    box-shadow: 0 2px 8px var(--shadow-pink-light);
+.apple-slider-label.active {
+    color: var(--text-accent);
+    font-weight: 600;
 }
 
-.slider-dot.active {
-    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-end) 100%);
-    color: var(--text-button);
-    border-color: var(--accent-primary);
-    box-shadow: 0 2px 10px var(--shadow-pink-medium);
+/* 轨道 */
+.apple-slider-track {
+    position: relative;
+    height: 6px;
+    background: var(--bg-slider-track);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* 已填充部分 */
+.apple-slider-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--btn-pause-start), var(--btn-pause-end));
+    border-radius: 3px;
+    transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.apple-slider-fill.no-transition {
+    transition: none;
+}
+
+/* 节点标记 */
+.apple-slider-node {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    border: 2px solid white;
+    box-shadow: 0 1px 3px var(--shadow-pink-medium);
+    pointer-events: none;
+}
+
+/* 拖拽手柄 */
+.apple-slider-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--accent-primary);
+    box-shadow: 0 2px 8px var(--shadow-pink-medium);
+    cursor: grab;
+    transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.2s,
+                transform 0.2s;
+    z-index: 2;
+}
+
+.apple-slider-thumb:hover {
+    box-shadow: 0 3px 12px var(--shadow-pink-strong);
+}
+
+.apple-slider-thumb.dragging {
+    cursor: grabbing;
+    box-shadow: 0 4px 16px var(--shadow-pink-strong);
+    transform: translate(-50%, -50%) scale(1.15);
+    transition: box-shadow 0.2s, transform 0.1s;
 }
 
 /* ===== 滑动条视图样式 ===== */
@@ -250,16 +341,28 @@
 /* 翻译视图 */
 .view-translation {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-size: clamp(22px, 5vw, 36px);
     color: var(--text-secondary);
     text-align: center;
 }
 
-/* 词性视图 - 复用已有的 .pos-item, .pos-tag, .pos-meaning */
+/* 词性视图 - 并排布局 */
 .view-pos {
-    text-align: left;
-    max-width: 350px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
     width: 100%;
+    justify-content: center;
+}
+
+.view-pos .pos-item {
+    flex: 0 0 auto;
+    max-width: 48%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-size: clamp(16px, 3vw, 20px);
 }
 
 /* 例句视图 */
@@ -271,7 +374,7 @@
 
 .example-sentence {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
+    font-size: clamp(16px, 3.5vw, 24px);
     font-style: italic;
     color: var(--text-secondary);
     margin: 8px 0;
@@ -282,15 +385,18 @@
 
 /* 同义词/反义词视图 */
 .view-synonyms {
-    text-align: left;
-    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
     width: 100%;
 }
 
 .syn-group, .ant-group {
-    margin: 8px 0;
+    display: block;
+    text-align: center;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
+    font-size: clamp(20px, 4.5vw, 32px);
 }
 
 .syn-label, .ant-label {
@@ -314,4 +420,152 @@
     font-style: italic;
     color: var(--text-muted);
     text-align: center;
+}
+
+/* ===== 中文词性视图 ===== */
+.view-chinese-pos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.view-chinese-pos .pos-item {
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin: 0;
+    font-size: clamp(18px, 4vw, 24px);
+}
+
+.view-chinese-pos .pos-meaning {
+    color: var(--text-secondary);
+}
+
+/* ===== 左右分栏例句布局 ===== */
+.examples-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    width: 100%;
+    text-align: left;
+}
+
+.example-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.example-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.examples-grid .example-sentence {
+    font-size: clamp(14px, 2.5vw, 18px);
+    margin: 0;
+    padding-left: 10px;
+}
+
+/* 单词高亮 */
+.word-highlight {
+    color: var(--text-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-primary);
+    text-underline-offset: 2px;
+}
+
+/* ===== 可点击TTS元素 ===== */
+
+/* 例句 - 可点击 */
+.example-sentence.clickable-text {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.example-sentence.clickable-text:hover {
+    background: rgba(255, 182, 193, 0.15);
+    border-left-color: var(--text-accent);
+}
+
+.example-sentence.clickable-text:active {
+    transform: scale(0.98);
+}
+
+.example-sentence.clickable-text.playing {
+    background: rgba(255, 182, 193, 0.25);
+    border-left-width: 4px;
+}
+
+/* 近义词/反义词单词 - 可点击 */
+.clickable-word {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.clickable-word:hover {
+    background: rgba(255, 182, 193, 0.2);
+    transform: translateY(-1px);
+}
+
+.clickable-word:active {
+    transform: scale(0.95);
+}
+
+.clickable-word.playing {
+    background: rgba(255, 182, 193, 0.35);
+    box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+/* 播放状态动画 */
+@keyframes soundWave {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.clickable-text.playing,
+.clickable-word.playing {
+    animation: soundWave 0.6s ease-in-out infinite;
+}
+
+/* ===== 播放/暂停指示器 ===== */
+.play-pause-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    color: rgba(196, 139, 139, 0.85);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 20;
+}
+
+.play-pause-indicator.show {
+    animation: playPauseFlash 0.8s ease-out forwards;
+}
+
+@keyframes playPauseFlash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    15%  { opacity: 1; transform: scale(1.1); }
+    30%  { transform: scale(1.0); }
+    60%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.0); }
+}
+
+/* ===== 重复模式自适应布局 ===== */
+body.repeater-mode #workplace {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 180px);
 }

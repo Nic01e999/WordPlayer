@@ -12,20 +12,29 @@ English Dictation Tool - a web-based English learning application with two modes
 
 ```bash
 # Start the Flask backend server (runs on port 5001)
-python server.py
+python3 run.py
 ```
 
 Access at `http://127.0.0.1:5001` or via LAN IP shown in console.
 
-**Requirements**: macOS (uses system `say` command for TTS), Flask, flask-cors, deep-translator
+**Requirements**: macOS, Flask, flask-cors, requests
 
 ## Architecture
 
-### Backend (server.py)
+### Backend (server/)
 Flask server providing:
-- `/api/translate` - English to Chinese translation (MyMemory API)
-- `/api/tts` - Text-to-speech using macOS `say` command (offline, returns AIFF audio)
+- `/api/wordinfo/batch` - Batch word info via DeepSeek API (translation, definitions, examples, synonyms, antonyms)
+- `/api/tts` - Text-to-speech via Youdao TTS (US/UK accents)
 - Static file serving for frontend
+
+```
+server/
+├── app.py              # Flask entry point, static files
+├── api/
+│   ├── wordinfo.py     # DeepSeek word info API
+│   └── tts.py          # Youdao TTS API
+└── utils.py            # validate_word, get_lan_ip
+```
 
 ### Frontend (ES Modules)
 

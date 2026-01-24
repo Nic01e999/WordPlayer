@@ -52,8 +52,15 @@ body.dictation-mode #workplace::before {
     right: 0px;
     top: -45px;
     height: 50px;
-    background: url("../assets/images/break.PNG") repeat-x center center;
-    background-size: auto 100%;
+    background-color: var(--bg-paper-start);
+    -webkit-mask-image: url("../assets/images/break.PNG");
+    -webkit-mask-repeat: repeat-x;
+    -webkit-mask-position: center center;
+    -webkit-mask-size: auto 100%;
+    mask-image: url("../assets/images/break.PNG");
+    mask-repeat: repeat-x;
+    mask-position: center center;
+    mask-size: auto 100%;
     z-index: 10;
     pointer-events: none;
 }
@@ -144,12 +151,12 @@ body.dictation-mode #workplace::after {
     transition: transform 0.2s ease;
     background: url('../assets/images/pin.png') no-repeat center center;
     background-size: contain;
-    filter: drop-shadow(0 2px 3px var(--shadow-brown));
+    filter: drop-shadow(0 2px 3px var(--shadow-brown)) sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
 }
 
 .popup-drag-handle:hover {
     transform: translateX(-50%) scale(1.05);
-    filter: drop-shadow(0 3px 5px var(--shadow-brown-medium)) brightness(1.05);
+    filter: drop-shadow(0 3px 5px var(--shadow-brown-medium)) brightness(1.05) sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
 }
 
 .popup-drag-handle:active {

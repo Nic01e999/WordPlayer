@@ -4,7 +4,7 @@
 
 import { currentRepeaterState, setRepeaterState, setActiveMode, preloadCache } from './state.js';
 import { $, getSettings, loadWordsFromTextarea, shuffleArray, clearWorkplace, logToWorkplace } from './utils.js';
-import { stopAudio, isAudioPlaying, speakWord, updatePlayPauseBtn } from './audio.js';
+import { stopAudio, isAudioPlaying, speakWord } from './audio.js';
 
 // 导入时需要的外部引用（在 app.js 中设置）
 let Dictation = null;
@@ -32,6 +32,100 @@ export class Repeater {
     static scrollTimeout = null;
     static playId = 0;
     static currentSliderPosition = 0; // 0=翻译, 1=释义, 2=例句, 3=同反
+    static keydownHandler = null;
+
+    static setupKeyboardListener() {
+        if (this.keydownHandler) return;
+        this.keydownHandler = (e) => {
+            if (!currentRepeaterState) return;
+
+            switch (e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    this.playPause();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    this.goToPrevWord();
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    this.goToNextWord();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    this.sliderLeft();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    this.sliderRight();
+                    break;
+            }
+        };
+        document.addEventListener('keydown', this.keydownHandler);
+    }
+
+    static removeKeyboardListener() {
+        if (this.keydownHandler) {
+            document.removeEventListener('keydown', this.keydownHandler);
+            this.keydownHandler = null;
+        }
+    }
+
+    static goToPrevWord() {
+        const state = currentRepeaterState;
+        if (!state || state.currentIndex <= 0) return;
+
+        this.playId++;
+        stopAudio();
+        state.currentIndex--;
+        state.currentRepeat = 0;
+        this.highlightCurrent();
+        this.scrollToIndex(state.currentIndex);
+        this.updateInfo();
+    }
+
+    static goToNextWord() {
+        const state = currentRepeaterState;
+        if (!state || state.currentIndex >= state.words.length - 1) return;
+
+        this.playId++;
+        stopAudio();
+        state.currentIndex++;
+        state.currentRepeat = 0;
+        this.highlightCurrent();
+        this.scrollToIndex(state.currentIndex);
+        this.updateInfo();
+    }
+
+    static sliderLeft() {
+        if (this.currentSliderPosition > 0) {
+            const newPos = this.currentSliderPosition - 1;
+            this.updateSliderUI(newPos);
+            this.animateContentSwitch(newPos);
+        }
+    }
+
+    static sliderRight() {
+        if (this.currentSliderPosition < 3) {
+            const newPos = this.currentSliderPosition + 1;
+            this.updateSliderUI(newPos);
+            this.animateContentSwitch(newPos);
+        }
+    }
+
+    static updateSliderUI(position) {
+        const slider = document.getElementById('appleSlider');
+        if (!slider) return;
+
+        const thumb = slider.querySelector('.apple-slider-thumb');
+        const fill = slider.querySelector('.apple-slider-fill');
+        const labels = slider.querySelectorAll('.apple-slider-label');
+
+        if (thumb) thumb.style.left = `${(position / 3) * 100}%`;
+        if (fill) fill.style.width = `${(position / 3) * 100}%`;
+        labels?.forEach((l, i) => l.classList.toggle('active', i === position));
+    }
 
     static async startRepeater() {
         pauseOtherMode();
@@ -71,7 +165,9 @@ export class Repeater {
 
         clearWorkplace();
         this.renderUI();
-        this.startPlayLoop();
+        this.setupKeyboardListener();
+        // 切换模式时默认暂停，不自动播放
+        state.isPaused = true;
     }
 
     static renderUI() {
@@ -81,15 +177,15 @@ export class Repeater {
                     <div class="pointer-arrow"></div>
                 </div>
                 <div id="repeaterScroll" class="repeater-scroll">
-                    <div style="height:170px"></div>
+                    <div class="scroll-spacer"></div>
                     <div id="repeaterContent"></div>
-                    <div style="height:170px"></div>
+                    <div class="scroll-spacer"></div>
                 </div>
+                <div id="playPauseIndicator" class="play-pause-indicator"></div>
             </div>
-            <div style="margin:15px 0;text-align:center">
-                <button onclick="Repeater.playPause()" id="playPauseBtn" class="btn-pause">⏸</button>
+            <div class="word-info-wrapper">
+                <div id="currentWordInfo" class="word-info"></div>
             </div>
-            <div id="currentWordInfo" class="word-info"></div>
         `;
 
         this.renderContent();
@@ -101,12 +197,13 @@ export class Repeater {
         const state = currentRepeaterState;
         if (!content || !state) return;
 
-        content.innerHTML = state.words.map((word, i) => `
+        content.innerHTML = state.words.map((word, i) => {
+            return `
             <div id="word-${i}" class="word-item ${i === state.currentIndex ? 'active' : ''}">
                 <strong>${i + 1}. ${word}</strong>
-                <span class="translation">${state.translations[i]?.startsWith('翻译失败') ? '...' : (state.translations[i] || "...")}</span>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         this.updateInfo();
     }
@@ -120,28 +217,28 @@ export class Repeater {
         const word = words[currentIndex];
         const entry = entries[currentIndex];
         const isCustomWord = entry.definition !== null;
+        const isPhrase = word.includes(' ');
         const wordInfo = preloadCache.wordInfo[word];
         const simpleTranslation = preloadCache.translations[word] ?? state.translations[currentIndex];
 
         let contentHTML;
 
-        if (isCustomWord) {
-            // 自定义单词：只显示翻译，无滑动条
+        if (isCustomWord || isPhrase) {
             contentHTML = `<div class="current-translation">${simpleTranslation ?? '加载中...'}</div>`;
         } else {
-            // 非自定义单词：显示滑动条（4个按钮）
             contentHTML = this.renderSliderContent(wordInfo, simpleTranslation);
         }
 
         info.innerHTML = `
-            <div class="current-word">${word}</div>
             ${contentHTML}
             <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
         `;
 
-        // 设置滑动条按钮事件
-        if (!isCustomWord) {
+        if (!isCustomWord && !isPhrase) {
             this.setupSliderListeners();
+            // 设置例句和同反义词的点击事件
+            const sliderContent = document.getElementById('sliderContent');
+            this.setupContentClickHandlers(sliderContent);
         }
     }
 
@@ -150,33 +247,70 @@ export class Repeater {
         const labels = ['中文', '释义', '例句', '同反'];
 
         return `
-            <div class="slider-container">
-                <div class="slider-content">
-                    ${this.renderViewContent(position, wordInfo, translation)}
-                </div>
-                <div class="slider-track">
-                    ${labels.map((label, i) => `
-                        <button class="slider-dot ${i === position ? 'active' : ''}"
-                                data-position="${i}">${label}</button>
+            <div class="slider-content" id="sliderContent">
+                ${this.renderViewContent(position, wordInfo, translation)}
+            </div>
+            <div class="apple-slider" id="appleSlider" tabindex="0">
+                <div class="apple-slider-labels">
+                    ${labels.map((l, i) => `
+                        <span class="apple-slider-label ${i === position ? 'active' : ''}"
+                              data-index="${i}">${l}</span>
                     `).join('')}
+                </div>
+                <div class="apple-slider-track">
+                    <div class="apple-slider-fill" style="width:${(position / 3) * 100}%"></div>
+                    ${[0, 1, 2, 3].map(i => `
+                        <div class="apple-slider-node" style="left:${(i / 3) * 100}%"></div>
+                    `).join('')}
+                    <div class="apple-slider-thumb" style="left:${(position / 3) * 100}%"></div>
                 </div>
             </div>
         `;
     }
 
     static renderViewContent(position, wordInfo, translation) {
+        const word = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
         switch (position) {
-            case 0: // 中文翻译
-                return `<div class="view-translation">${translation ?? '加载中...'}</div>`;
+            case 0: // 词性 + 中文意思
+                return this.renderChinesePosView(wordInfo, translation);
             case 1: // 词性 + 英文释义
                 return this.renderPosView(wordInfo);
-            case 2: // 例句
-                return this.renderExamplesView(wordInfo);
+            case 2: // 例句 (4个：2常用+2有趣)
+                return this.renderExamplesView(wordInfo, word);
             case 3: // 同义词/反义词
                 return this.renderSynonymsView(wordInfo);
             default:
                 return '';
         }
+    }
+
+    static renderChinesePosView(wordInfo, fallbackTranslation) {
+        const chineseDefs = wordInfo?.chineseDefinitions || [];
+        if (chineseDefs.length === 0) {
+            // 如果没有词性分组的中文释义，显示简单翻译
+            return `<div class="view-translation">${fallbackTranslation ?? '加载中...'}</div>`;
+        }
+        return `
+            <div class="view-chinese-pos">
+                ${chineseDefs.map(def => `
+                    <div class="pos-item">
+                        <span class="pos-tag">${def.pos}</span>
+                        <span class="pos-meaning">${def.meanings.join('；')}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    static highlightWord(sentence, word) {
+        if (!sentence || !word) return sentence;
+        // 创建正则匹配单词（大小写不敏感）
+        const regex = new RegExp(`\\b(${word})\\b`, 'gi');
+        return sentence.replace(regex, '<span class="word-highlight">$1</span>');
+    }
+
+    static escapeHtml(text) {
+        return text.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     static renderPosView(wordInfo) {
@@ -195,14 +329,38 @@ export class Repeater {
         `;
     }
 
-    static renderExamplesView(wordInfo) {
-        const examples = wordInfo?.examples || [];
-        if (examples.length === 0) {
+    static renderExamplesView(wordInfo, word) {
+        const examples = wordInfo?.examples || {};
+        const commonExamples = examples.common || [];
+        const funExamples = examples.fun || [];
+
+        // 兼容旧格式：如果 examples 是数组
+        if (Array.isArray(wordInfo?.examples)) {
+            const oldExamples = wordInfo.examples;
+            if (oldExamples.length === 0) {
+                return '<div class="view-empty">No examples available</div>';
+            }
+            return `
+                <div class="view-examples">
+                    ${oldExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${this.escapeHtml(ex)}">${this.highlightWord(ex, word)}</p>`).join('')}
+                </div>
+            `;
+        }
+
+        if (commonExamples.length === 0 && funExamples.length === 0) {
             return '<div class="view-empty">No examples available</div>';
         }
+
         return `
-            <div class="view-examples">
-                ${examples.slice(0, 2).map(ex => `<p class="example-sentence">${ex}</p>`).join('')}
+            <div class="examples-grid">
+                <div class="example-column">
+                    <span class="example-label">常用</span>
+                    ${commonExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${this.escapeHtml(ex)}">${this.highlightWord(ex, word)}</p>`).join('')}
+                </div>
+                <div class="example-column">
+                    <span class="example-label">有趣</span>
+                    ${funExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${this.escapeHtml(ex)}">${this.highlightWord(ex, word)}</p>`).join('')}
+                </div>
             </div>
         `;
     }
@@ -215,36 +373,217 @@ export class Repeater {
             return '<div class="view-empty">No synonyms/antonyms available</div>';
         }
 
+        const renderClickableWords = (words) => words.map(w =>
+            `<span class="clickable-word" data-word="${this.escapeHtml(w)}">${w}</span>`
+        ).join(', ');
+
         return `
             <div class="view-synonyms">
                 ${synonyms.length > 0 ? `
                     <div class="syn-group">
                         <span class="syn-label">Syn:</span>
-                        <span class="syn-words">${synonyms.slice(0, 5).join(', ')}</span>
+                        <span class="syn-words">${renderClickableWords(synonyms.slice(0, 5))}</span>
                     </div>
                 ` : ''}
                 ${antonyms.length > 0 ? `
                     <div class="ant-group">
                         <span class="ant-label">Ant:</span>
-                        <span class="ant-words">${antonyms.slice(0, 3).join(', ')}</span>
+                        <span class="ant-words">${renderClickableWords(antonyms.slice(0, 3))}</span>
                     </div>
                 ` : ''}
             </div>
         `;
     }
 
-    static setupSliderListeners() {
-        const dots = document.querySelectorAll('.slider-dot');
-        dots.forEach(dot => {
-            dot.onclick = (e) => {
+    static setupContentClickHandlers(container) {
+        if (!container) return;
+
+        // 处理例句点击
+        container.querySelectorAll('.clickable-text').forEach(el => {
+            el.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const position = parseInt(e.target.dataset.position);
-                if (position !== this.currentSliderPosition) {
-                    this.currentSliderPosition = position;
-                    this.updateInfo();
+                const text = el.dataset.text;
+                if (text) {
+                    this.playTextWithFeedback(el, text);
                 }
-            };
+            });
         });
+
+        // 处理近义词/反义词点击
+        container.querySelectorAll('.clickable-word').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const word = el.dataset.word;
+                if (word) {
+                    this.playTextWithFeedback(el, word);
+                }
+            });
+        });
+    }
+
+    static async playTextWithFeedback(element, text) {
+        // 移除其他元素的 playing 状态
+        document.querySelectorAll('.playing').forEach(el => el.classList.remove('playing'));
+
+        // 添加视觉反馈
+        element.classList.add('playing');
+
+        // 动态导入并播放
+        const { speakText } = await import('./audio.js');
+        await speakText(text, false);
+
+        // 播放结束后移除状态
+        element.classList.remove('playing');
+    }
+
+    static setupSliderListeners() {
+        const slider = document.getElementById('appleSlider');
+        const track = slider?.querySelector('.apple-slider-track');
+        const thumb = slider?.querySelector('.apple-slider-thumb');
+        const fill = slider?.querySelector('.apple-slider-fill');
+        const labels = slider?.querySelectorAll('.apple-slider-label');
+
+        if (!slider || !track || !thumb) return;
+
+        let isDragging = false;
+        let dragStartX = 0;
+
+        const getPositionFromX = (clientX) => {
+            const rect = track.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            return ratio;
+        };
+
+        const getNearestNode = (ratio) => {
+            return Math.round(ratio * 3);
+        };
+
+        const updateThumbPosition = (ratio) => {
+            const percent = ratio * 100;
+            thumb.style.left = `${percent}%`;
+            fill.style.width = `${percent}%`;
+        };
+
+        const snapToNode = (nodeIndex) => {
+            // Animate thumb to node position
+            thumb.classList.remove('dragging');
+            fill.classList.remove('no-transition');
+            const percent = (nodeIndex / 3) * 100;
+            thumb.style.left = `${percent}%`;
+            fill.style.width = `${percent}%`;
+
+            if (nodeIndex === this.currentSliderPosition) return;
+
+            // Update labels
+            labels.forEach((l, i) => l.classList.toggle('active', i === nodeIndex));
+
+            // Fade content transition
+            this.animateContentSwitch(nodeIndex);
+        };
+
+        // Drag move
+        const onDragMove = (e) => {
+            if (!isDragging) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const ratio = getPositionFromX(clientX);
+            updateThumbPosition(ratio);
+        };
+
+        // Drag end
+        const onDragEnd = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            thumb.style.transition = '';
+            thumb.classList.remove('dragging');
+            fill.classList.remove('no-transition');
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('touchend', onDragEnd);
+            const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            const movedDistance = Math.abs(clientX - dragStartX);
+            if (movedDistance >= 5) {
+                Repeater.pauseIfPlaying();
+                const ratio = getPositionFromX(clientX);
+                const node = getNearestNode(ratio);
+                snapToNode(node);
+            }
+        };
+
+        // Drag start
+        const onDragStart = (e) => {
+            e.preventDefault();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            dragStartX = clientX;
+            isDragging = true;
+            thumb.classList.add('dragging');
+            fill.classList.add('no-transition');
+            thumb.style.transition = 'box-shadow 0.2s, transform 0.1s';
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('touchmove', onDragMove, { passive: true });
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchend', onDragEnd);
+        };
+
+        // Thumb events
+        thumb.addEventListener('mousedown', onDragStart);
+        thumb.addEventListener('touchstart', onDragStart, { passive: false });
+
+        // Click on track to jump
+        track.addEventListener('click', (e) => {
+            if (isDragging) return;
+            const ratio = getPositionFromX(e.clientX);
+            const node = getNearestNode(ratio);
+            snapToNode(node);
+        });
+
+        // Click on labels
+        labels.forEach(label => {
+            label.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                snapToNode(index);
+            });
+        });
+
+        // Keyboard navigation
+        slider.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                const next = Math.min(3, this.currentSliderPosition + 1);
+                snapToNode(next);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prev = Math.max(0, this.currentSliderPosition - 1);
+                snapToNode(prev);
+            }
+        });
+    }
+
+    static animateContentSwitch(newPosition) {
+        const content = document.getElementById('sliderContent');
+        if (!content) return;
+
+        // Fade out
+        content.classList.add('fading');
+
+        setTimeout(() => {
+            // Update position and content
+            this.currentSliderPosition = newPosition;
+            const state = currentRepeaterState;
+            if (!state) return;
+
+            const word = state.words[state.currentIndex];
+            const wordInfo = preloadCache.wordInfo[word];
+            const translation = preloadCache.translations[word] ?? state.translations[state.currentIndex];
+
+            content.innerHTML = this.renderViewContent(newPosition, wordInfo, translation);
+
+            // 设置例句和同反义词的点击事件
+            this.setupContentClickHandlers(content);
+
+            // Fade in
+            content.classList.remove('fading');
+        }, 150);
     }
 
     static setupScrollListener() {
@@ -252,9 +591,11 @@ export class Repeater {
         if (!scroll) return;
 
         let userTouching = false;
+        let scrollStartY = 0;
 
         const onStart = () => {
             userTouching = true;
+            scrollStartY = scroll.scrollTop;
             clearTimeout(this.scrollTimeout);
             this.playId++;
             stopAudio();
@@ -263,8 +604,13 @@ export class Repeater {
         const onEnd = () => {
             if (!userTouching) return;
             userTouching = false;
-            clearTimeout(this.scrollTimeout);
-            this.scrollTimeout = setTimeout(() => this.onUserScrollEnd(), 200);
+            const scrolled = Math.abs(scroll.scrollTop - scrollStartY) > 5;
+            if (!scrolled) {
+                this.playPause();
+            } else {
+                clearTimeout(this.scrollTimeout);
+                this.scrollTimeout = setTimeout(() => this.onUserScrollEnd(), 200);
+            }
         };
 
         const onWheel = () => {
@@ -296,7 +642,6 @@ export class Repeater {
 
         state.currentIndex = idx;
         state.currentRepeat = 0;
-        this.currentSliderPosition = 0; // 用户滚动时重置滑动条
 
         this.highlightCurrent();
         this.updateInfo();
@@ -361,7 +706,6 @@ export class Repeater {
                 if (state.currentRepeat >= state.settings.repeat) {
                     state.currentRepeat = 0;
                     state.currentIndex++;
-                    this.currentSliderPosition = 0; // 切换单词时重置滑动条
 
                     if (state.currentIndex >= state.words.length) {
                         state.currentIndex = 0;
@@ -382,7 +726,6 @@ export class Repeater {
         if (!state) return;
 
         state.isPaused = !state.isPaused;
-        updatePlayPauseBtn($("playPauseBtn"), state.isPaused);
 
         if (state.isPaused) {
             this.playId++;
@@ -390,6 +733,26 @@ export class Repeater {
         } else {
             this.startPlayLoop();
         }
+
+        this.showPlayPauseIndicator(state.isPaused);
+    }
+
+    static pauseIfPlaying() {
+        const state = currentRepeaterState;
+        if (state && !state.isPaused) {
+            state.isPaused = true;
+            this.playId++;
+            stopAudio();
+        }
+    }
+
+    static showPlayPauseIndicator(isPaused) {
+        const indicator = document.getElementById('playPauseIndicator');
+        if (!indicator) return;
+        indicator.textContent = isPaused ? '⏸' : '▶';
+        indicator.classList.remove('show');
+        void indicator.offsetWidth;
+        indicator.classList.add('show');
     }
 
     static switchToRepeater() {
@@ -436,9 +799,9 @@ export class Repeater {
         clearWorkplace();
         this.renderUI();
         this.scrollToIndex(state.currentIndex);
+        this.setupKeyboardListener();
 
-        state.isPaused = false;
-        updatePlayPauseBtn($("playPauseBtn"), false);
-        this.startPlayLoop();
+        // 切换模式时默认暂停，不自动播放
+        state.isPaused = true;
     }
 }

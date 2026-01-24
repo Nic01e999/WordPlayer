@@ -231,6 +231,9 @@
     /* 粉色微背景 | .current-word 背景 */
     --bg-pink-subtle: rgba(255, 182, 193, 0.3);
 
+    /* 滑块轨道 | .apple-slider-track */
+    --bg-slider-track: rgba(255, 182, 193, 0.3);
+
     /* 纸张横线 | .results-box 横线 */
     --bg-paper-line: rgba(200, 180, 170, 0.2);
 
@@ -269,5 +272,799 @@
     --white-button-hover-soft: rgba(255, 240, 245, 0.9);
 
     /* }}} */
-    
+
+    /* {{{ 图片滤镜 (filter-) */
+
+    /* 色相旋转角度 | 用于给黑白图片上色 */
+    --filter-hue: 330deg;
+
+    /* }}} */
+
+}
+
+/* ===================================
+ * 粉色深色主题 (Pink Dark Theme)
+ * =================================== */
+[data-theme-color="pink"][data-theme-mode="dark"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #e8c0c8;
+    --text-secondary: #d4a0a8;
+    --text-muted: #a07078;
+    --text-dark: #f4d8dc;
+    --text-active: #e8b0b8;
+    --text-label: #d4a0a8;
+    --text-button: #a07078;
+    --text-menu-btn: #c08898;
+    --text-accent: #ff8fa0;
+    --text-stat: #e8b0b8;
+    --text-count: #d49098;
+    --text-placeholder: #906068;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #2f1a1f;
+    --bg-page-mid: #281618;
+    --bg-page-end: #2a1a1c;
+    --bg-container: #351e23;
+    --bg-menu-start: #4a2a32;
+    --bg-menu-end: #42242c;
+    --bg-input: #3c2428;
+    --bg-paper-start: #2e1e22;
+    --bg-paper-mid: #281a1c;
+    --bg-paper-end: #221618;
+    --bg-popup-start: #301e22;
+    --bg-popup-end: #2a1a1e;
+    --bg-scroll-mid: #2a1a1e;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #ff8fa0;
+    --accent-secondary: #e87888;
+    --accent-brown: #d4909a;
+    --accent-line: rgb(220, 120, 140);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #6ab88a;
+    --status-correct: #ff8fa0;
+    --status-error: #e85555;
+    --status-warning: #e8a040;
+    --status-score: #ff8fa0;
+    --status-translate-error: #e85555;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #4a2a32;
+    --btn-play-end: #42242c;
+    --btn-play-hover-start: #5a3a42;
+    --btn-play-hover-end: #4a2a32;
+    --btn-play-text: #d4909a;
+    --btn-pause-start: #4a2832;
+    --btn-pause-end: #42222a;
+    --btn-hover-start: #5a3842;
+    --btn-hover-end: #4a2832;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.3);
+    --shadow-pink-light: rgba(255, 143, 160, 0.15);
+    --shadow-pink-medium: rgba(255, 143, 160, 0.25);
+    --shadow-pink-strong: rgba(255, 143, 160, 0.4);
+    --shadow-brown: rgba(140, 80, 100, 0.2);
+    --shadow-brown-medium: rgba(140, 80, 100, 0.3);
+    --shadow-menu-btn: rgba(180, 100, 120, 0.2);
+    --shadow-menu-btn-hover: rgba(220, 120, 140, 0.4);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(255, 143, 160, 0.3);
+    --border-pink-medium: rgba(255, 143, 160, 0.4);
+    --border-pink-strong: rgba(255, 143, 160, 0.5);
+    --border-menu: rgba(220, 120, 140, 0.4);
+    --border-paper: rgba(140, 80, 100, 0.3);
+    --border-paper-medium: rgba(140, 80, 100, 0.4);
+    --border-white: rgba(255, 255, 255, 0.15);
+    --border-white-strong: rgba(255, 255, 255, 0.25);
+    --border-stamp: rgba(255, 143, 160, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(255, 143, 160, 0.15);
+    --bg-pink-overlay: rgba(255, 143, 160, 0.15);
+    --bg-pink-overlay-light: rgba(255, 143, 160, 0.1);
+    --bg-pink-subtle: rgba(255, 143, 160, 0.2);
+    --bg-slider-track: rgba(255, 143, 160, 0.3);
+    --bg-paper-line: rgba(140, 80, 100, 0.2);
+    --bg-paper-line-medium: rgba(140, 80, 100, 0.25);
+    --bg-stamp: rgba(255, 143, 160, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #351e23;
+    --white-soft: rgba(53, 30, 35, 0.3);
+    --white-medium: rgba(53, 30, 35, 0.5);
+    --white-strong: rgba(53, 30, 35, 0.8);
+    --white-button: rgba(53, 30, 35, 0.9);
+    --white-button-soft: rgba(58, 35, 40, 0.85);
+    --white-button-hover: rgba(63, 40, 45, 0.95);
+    --white-button-hover-soft: rgba(68, 45, 50, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 330deg;
+}
+
+/* ===================================
+ * 绿色浅色主题 (Green Light Theme)
+ * =================================== */
+[data-theme-color="green"][data-theme-mode="light"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #5a8b5a;
+    --text-secondary: #7a9c7a;
+    --text-muted: #a8c9a8;
+    --text-dark: #4a5a4a;
+    --text-active: #608b60;
+    --text-label: #6f8b6f;
+    --text-button: #4f6b4f;
+    --text-menu-btn: #70a070;
+    --text-accent: #50c878;
+    --text-stat: #5a6b5a;
+    --text-count: #a5d4a5;
+    --text-placeholder: #b8c9b8;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #f5fff5;
+    --bg-page-mid: #f0fef0;
+    --bg-page-end: #f5fff8;
+    --bg-container: #fafffa;
+    --bg-menu-start: #d6f0d6;
+    --bg-menu-end: #ccf0cc;
+    --bg-input: #f9fff9;
+    --bg-paper-start: #f8fef8;
+    --bg-paper-mid: #f0fdf0;
+    --bg-paper-end: #ebfaeb;
+    --bg-popup-start: #f5fef5;
+    --bg-popup-end: #f0fff0;
+    --bg-scroll-mid: #f5fff5;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #50c878;
+    --accent-secondary: #a8e8b8;
+    --accent-brown: #8bc48b;
+    --accent-line: rgb(100, 180, 120);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #4a8f4a;
+    --status-correct: #50c878;
+    --status-error: #c55555;
+    --status-warning: #cc7a22;
+    --status-score: #50c878;
+    --status-translate-error: #c0392b;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #d4edda;
+    --btn-play-end: #c3e6cb;
+    --btn-play-hover-start: #e2f3e6;
+    --btn-play-hover-end: #d4edda;
+    --btn-play-text: #4a7c59;
+    --btn-pause-start: #d1f0d8;
+    --btn-pause-end: #b6e8c1;
+    --btn-hover-start: #e4f9e9;
+    --btn-hover-end: #d1f0d8;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
+    --shadow-pink-light: rgba(80, 200, 120, 0.15);
+    --shadow-pink-medium: rgba(80, 200, 120, 0.25);
+    --shadow-pink-strong: rgba(80, 200, 120, 0.4);
+    --shadow-brown: rgba(111, 139, 111, 0.1);
+    --shadow-brown-medium: rgba(111, 139, 111, 0.15);
+    --shadow-menu-btn: rgba(140, 180, 150, 0.15);
+    --shadow-menu-btn-hover: rgba(150, 200, 160, 0.55);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(80, 200, 120, 0.4);
+    --border-pink-medium: rgba(80, 200, 120, 0.5);
+    --border-pink-strong: rgba(80, 200, 120, 0.6);
+    --border-menu: rgba(80, 180, 100, 0.4);
+    --border-paper: rgba(170, 200, 180, 0.3);
+    --border-paper-medium: rgba(170, 200, 180, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
+    --border-stamp: rgba(80, 200, 80, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(80, 200, 120, 0.327);
+    --bg-pink-overlay: rgba(120, 220, 150, 0.3);
+    --bg-pink-overlay-light: rgba(120, 220, 150, 0.25);
+    --bg-pink-subtle: rgba(80, 200, 120, 0.3);
+    --bg-slider-track: rgba(80, 200, 120, 0.3);
+    --bg-paper-line: rgba(170, 200, 180, 0.2);
+    --bg-paper-line-medium: rgba(170, 200, 180, 0.25);
+    --bg-stamp: rgba(80, 200, 80, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #ffffff;
+    --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
+    --white-button: rgba(255, 255, 255, 0.9);
+    --white-button-soft: rgba(248, 255, 250, 0.85);
+    --white-button-hover: rgba(255, 255, 255, 0.95);
+    --white-button-hover-soft: rgba(240, 255, 245, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 120deg;
+}
+
+/* ===================================
+ * 绿色深色主题 (Green Dark Theme)
+ * 森林绿/翡翠色系
+ * =================================== */
+[data-theme-color="green"][data-theme-mode="dark"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #a8d5ba;
+    --text-secondary: #7ab892;
+    --text-muted: #5a8a6a;
+    --text-dark: #d4e8dc;
+    --text-active: #8fcea8;
+    --text-label: #7ab892;
+    --text-button: #5a8a6a;
+    --text-menu-btn: #6a9a7a;
+    --text-accent: #50c878;
+    --text-stat: #8fcea8;
+    --text-count: #6ab88a;
+    --text-placeholder: #4a7a5a;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #1a2f1a;
+    --bg-page-mid: #162816;
+    --bg-page-end: #1a2a1a;
+    --bg-container: #1e331e;
+    --bg-menu-start: #2a4a2a;
+    --bg-menu-end: #234523;
+    --bg-input: #243424;
+    --bg-paper-start: #1e2e1e;
+    --bg-paper-mid: #1a281a;
+    --bg-paper-end: #162216;
+    --bg-popup-start: #1e301e;
+    --bg-popup-end: #1a2a1a;
+    --bg-scroll-mid: #1a2a1a;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #50c878;
+    --accent-secondary: #3da862;
+    --accent-brown: #6ab88a;
+    --accent-line: rgb(80, 160, 100);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #6ab88a;
+    --status-correct: #50c878;
+    --status-error: #e85555;
+    --status-warning: #e8a040;
+    --status-score: #50c878;
+    --status-translate-error: #e85555;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #2a4a2a;
+    --btn-play-end: #234523;
+    --btn-play-hover-start: #3a5a3a;
+    --btn-play-hover-end: #2a4a2a;
+    --btn-play-text: #6ab88a;
+    --btn-pause-start: #2a4a2a;
+    --btn-pause-end: #234523;
+    --btn-hover-start: #3a5a3a;
+    --btn-hover-end: #2a4a2a;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.3);
+    --shadow-pink-light: rgba(80, 200, 120, 0.15);
+    --shadow-pink-medium: rgba(80, 200, 120, 0.25);
+    --shadow-pink-strong: rgba(80, 200, 120, 0.4);
+    --shadow-brown: rgba(80, 120, 80, 0.2);
+    --shadow-brown-medium: rgba(80, 120, 80, 0.3);
+    --shadow-menu-btn: rgba(80, 140, 100, 0.2);
+    --shadow-menu-btn-hover: rgba(100, 180, 120, 0.4);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(80, 200, 120, 0.3);
+    --border-pink-medium: rgba(80, 200, 120, 0.4);
+    --border-pink-strong: rgba(80, 200, 120, 0.5);
+    --border-menu: rgba(80, 160, 100, 0.4);
+    --border-paper: rgba(80, 120, 80, 0.3);
+    --border-paper-medium: rgba(80, 120, 80, 0.4);
+    --border-white: rgba(255, 255, 255, 0.15);
+    --border-white-strong: rgba(255, 255, 255, 0.25);
+    --border-stamp: rgba(80, 200, 120, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(80, 200, 120, 0.15);
+    --bg-pink-overlay: rgba(80, 200, 120, 0.15);
+    --bg-pink-overlay-light: rgba(80, 200, 120, 0.1);
+    --bg-pink-subtle: rgba(80, 200, 120, 0.2);
+    --bg-slider-track: rgba(80, 200, 120, 0.3);
+    --bg-paper-line: rgba(80, 120, 80, 0.2);
+    --bg-paper-line-medium: rgba(80, 120, 80, 0.25);
+    --bg-stamp: rgba(80, 200, 120, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 (dark mode uses dark backgrounds) */
+    --white-pure: #1e331e;
+    --white-soft: rgba(30, 51, 30, 0.3);
+    --white-medium: rgba(30, 51, 30, 0.5);
+    --white-strong: rgba(30, 51, 30, 0.8);
+    --white-button: rgba(30, 51, 30, 0.9);
+    --white-button-soft: rgba(35, 56, 35, 0.85);
+    --white-button-hover: rgba(40, 61, 40, 0.95);
+    --white-button-hover-soft: rgba(45, 66, 45, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 120deg;
+}
+
+/* ===================================
+ * 蓝色浅色主题 (Blue Light Theme)
+ * =================================== */
+[data-theme-color="blue"][data-theme-mode="light"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #5a6a8b;
+    --text-secondary: #7a8a9c;
+    --text-muted: #a8b8c9;
+    --text-dark: #4a5a6a;
+    --text-active: #6080a0;
+    --text-label: #6f7f8b;
+    --text-button: #4f5f6b;
+    --text-menu-btn: #7090b0;
+    --text-accent: #4da6ff;
+    --text-stat: #5a6a7a;
+    --text-count: #a5c5e5;
+    --text-placeholder: #b8c8d8;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #f5f8ff;
+    --bg-page-mid: #f0f6fe;
+    --bg-page-end: #f5faff;
+    --bg-container: #fafaff;
+    --bg-menu-start: #d6e4f0;
+    --bg-menu-end: #cce0f0;
+    --bg-input: #f9fbff;
+    --bg-paper-start: #f8fcff;
+    --bg-paper-mid: #f0f8fd;
+    --bg-paper-end: #ebf5fa;
+    --bg-popup-start: #f5faff;
+    --bg-popup-end: #f0f8ff;
+    --bg-scroll-mid: #f5f8ff;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #4da6ff;
+    --accent-secondary: #a8d8f8;
+    --accent-brown: #8bb4d4;
+    --accent-line: rgb(100, 160, 220);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #4a8f4a;
+    --status-correct: #4da6ff;
+    --status-error: #c55555;
+    --status-warning: #cc7a22;
+    --status-score: #4da6ff;
+    --status-translate-error: #c0392b;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #d4e8ed;
+    --btn-play-end: #c3dde6;
+    --btn-play-hover-start: #e2f0f6;
+    --btn-play-hover-end: #d4e8ed;
+    --btn-play-text: #4a7089;
+    --btn-pause-start: #d1e8f8;
+    --btn-pause-end: #b6d8f0;
+    --btn-hover-start: #e4f3fc;
+    --btn-hover-end: #d1e8f8;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
+    --shadow-pink-light: rgba(77, 166, 255, 0.15);
+    --shadow-pink-medium: rgba(77, 166, 255, 0.25);
+    --shadow-pink-strong: rgba(77, 166, 255, 0.4);
+    --shadow-brown: rgba(111, 130, 150, 0.1);
+    --shadow-brown-medium: rgba(111, 130, 150, 0.15);
+    --shadow-menu-btn: rgba(140, 170, 200, 0.15);
+    --shadow-menu-btn-hover: rgba(150, 180, 220, 0.55);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(77, 166, 255, 0.4);
+    --border-pink-medium: rgba(77, 166, 255, 0.5);
+    --border-pink-strong: rgba(77, 166, 255, 0.6);
+    --border-menu: rgba(77, 150, 220, 0.4);
+    --border-paper: rgba(170, 190, 210, 0.3);
+    --border-paper-medium: rgba(170, 190, 210, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
+    --border-stamp: rgba(77, 166, 255, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(77, 166, 255, 0.327);
+    --bg-pink-overlay: rgba(120, 180, 240, 0.3);
+    --bg-pink-overlay-light: rgba(120, 180, 240, 0.25);
+    --bg-pink-subtle: rgba(77, 166, 255, 0.3);
+    --bg-slider-track: rgba(77, 166, 255, 0.3);
+    --bg-paper-line: rgba(170, 190, 210, 0.2);
+    --bg-paper-line-medium: rgba(170, 190, 210, 0.25);
+    --bg-stamp: rgba(77, 166, 255, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #ffffff;
+    --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
+    --white-button: rgba(255, 255, 255, 0.9);
+    --white-button-soft: rgba(248, 252, 255, 0.85);
+    --white-button-hover: rgba(255, 255, 255, 0.95);
+    --white-button-hover-soft: rgba(240, 248, 255, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 210deg;
+}
+
+/* ===================================
+ * 蓝色深色主题 (Blue Dark Theme)
+ * 海洋蓝/钢蓝色系
+ * =================================== */
+[data-theme-color="blue"][data-theme-mode="dark"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #9ec5e8;
+    --text-secondary: #7aa8d4;
+    --text-muted: #5a88b4;
+    --text-dark: #d4e4f4;
+    --text-active: #8fbee8;
+    --text-label: #7aa8d4;
+    --text-button: #5a88b4;
+    --text-menu-btn: #6a98c4;
+    --text-accent: #4da6ff;
+    --text-stat: #8fbee8;
+    --text-count: #6aaae4;
+    --text-placeholder: #4a78a4;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #1a2530;
+    --bg-page-mid: #162028;
+    --bg-page-end: #1a2328;
+    --bg-container: #1e2a35;
+    --bg-menu-start: #2a3f52;
+    --bg-menu-end: #23384a;
+    --bg-input: #24303c;
+    --bg-paper-start: #1e2830;
+    --bg-paper-mid: #1a2428;
+    --bg-paper-end: #162024;
+    --bg-popup-start: #1e2a32;
+    --bg-popup-end: #1a262e;
+    --bg-scroll-mid: #1a2630;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #4da6ff;
+    --accent-secondary: #3d96ef;
+    --accent-brown: #6ab0e8;
+    --accent-line: rgb(77, 150, 220);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #6ab88a;
+    --status-correct: #4da6ff;
+    --status-error: #e85555;
+    --status-warning: #e8a040;
+    --status-score: #4da6ff;
+    --status-translate-error: #e85555;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #2a4552;
+    --btn-play-end: #23404a;
+    --btn-play-hover-start: #3a5562;
+    --btn-play-hover-end: #2a4552;
+    --btn-play-text: #6ab0e8;
+    --btn-pause-start: #2a4052;
+    --btn-pause-end: #233a4a;
+    --btn-hover-start: #3a5062;
+    --btn-hover-end: #2a4052;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.3);
+    --shadow-pink-light: rgba(77, 166, 255, 0.15);
+    --shadow-pink-medium: rgba(77, 166, 255, 0.25);
+    --shadow-pink-strong: rgba(77, 166, 255, 0.4);
+    --shadow-brown: rgba(60, 100, 140, 0.2);
+    --shadow-brown-medium: rgba(60, 100, 140, 0.3);
+    --shadow-menu-btn: rgba(70, 130, 180, 0.2);
+    --shadow-menu-btn-hover: rgba(90, 160, 220, 0.4);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(77, 166, 255, 0.3);
+    --border-pink-medium: rgba(77, 166, 255, 0.4);
+    --border-pink-strong: rgba(77, 166, 255, 0.5);
+    --border-menu: rgba(77, 150, 200, 0.4);
+    --border-paper: rgba(60, 100, 140, 0.3);
+    --border-paper-medium: rgba(60, 100, 140, 0.4);
+    --border-white: rgba(255, 255, 255, 0.15);
+    --border-white-strong: rgba(255, 255, 255, 0.25);
+    --border-stamp: rgba(77, 166, 255, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(77, 166, 255, 0.15);
+    --bg-pink-overlay: rgba(77, 166, 255, 0.15);
+    --bg-pink-overlay-light: rgba(77, 166, 255, 0.1);
+    --bg-pink-subtle: rgba(77, 166, 255, 0.2);
+    --bg-slider-track: rgba(77, 166, 255, 0.3);
+    --bg-paper-line: rgba(60, 100, 140, 0.2);
+    --bg-paper-line-medium: rgba(60, 100, 140, 0.25);
+    --bg-stamp: rgba(77, 166, 255, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #1e2a35;
+    --white-soft: rgba(30, 42, 53, 0.3);
+    --white-medium: rgba(30, 42, 53, 0.5);
+    --white-strong: rgba(30, 42, 53, 0.8);
+    --white-button: rgba(30, 42, 53, 0.9);
+    --white-button-soft: rgba(35, 47, 58, 0.85);
+    --white-button-hover: rgba(40, 52, 63, 0.95);
+    --white-button-hover-soft: rgba(45, 57, 68, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 210deg;
+}
+
+/* ===================================
+ * 紫色浅色主题 (Purple Light Theme)
+ * =================================== */
+[data-theme-color="purple"][data-theme-mode="light"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #6a5a8b;
+    --text-secondary: #8a7a9c;
+    --text-muted: #b8a8c9;
+    --text-dark: #5a4a6a;
+    --text-active: #7060a0;
+    --text-label: #7f6f8b;
+    --text-button: #5f4f6b;
+    --text-menu-btn: #9070b0;
+    --text-accent: #a855f7;
+    --text-stat: #6a5a7a;
+    --text-count: #c5a5e5;
+    --text-placeholder: #c8b8d8;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #f8f5ff;
+    --bg-page-mid: #f6f0fe;
+    --bg-page-end: #faf5ff;
+    --bg-container: #fafaff;
+    --bg-menu-start: #e4d6f0;
+    --bg-menu-end: #e0ccf0;
+    --bg-input: #fbf9ff;
+    --bg-paper-start: #fcf8ff;
+    --bg-paper-mid: #f8f0fd;
+    --bg-paper-end: #f5ebfa;
+    --bg-popup-start: #faf5ff;
+    --bg-popup-end: #f8f0ff;
+    --bg-scroll-mid: #f8f5ff;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #a855f7;
+    --accent-secondary: #d8a8f8;
+    --accent-brown: #b48bd4;
+    --accent-line: rgb(160, 100, 220);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #4a8f4a;
+    --status-correct: #a855f7;
+    --status-error: #c55555;
+    --status-warning: #cc7a22;
+    --status-score: #a855f7;
+    --status-translate-error: #c0392b;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #e4d8ed;
+    --btn-play-end: #d8cce6;
+    --btn-play-hover-start: #f0e6f6;
+    --btn-play-hover-end: #e4d8ed;
+    --btn-play-text: #6a5089;
+    --btn-pause-start: #e8d1f8;
+    --btn-pause-end: #d8b6f0;
+    --btn-hover-start: #f4e4fc;
+    --btn-hover-end: #e8d1f8;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
+    --shadow-pink-light: rgba(168, 85, 247, 0.15);
+    --shadow-pink-medium: rgba(168, 85, 247, 0.25);
+    --shadow-pink-strong: rgba(168, 85, 247, 0.4);
+    --shadow-brown: rgba(130, 111, 150, 0.1);
+    --shadow-brown-medium: rgba(130, 111, 150, 0.15);
+    --shadow-menu-btn: rgba(170, 140, 200, 0.15);
+    --shadow-menu-btn-hover: rgba(180, 150, 220, 0.55);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(168, 85, 247, 0.4);
+    --border-pink-medium: rgba(168, 85, 247, 0.5);
+    --border-pink-strong: rgba(168, 85, 247, 0.6);
+    --border-menu: rgba(150, 80, 220, 0.4);
+    --border-paper: rgba(190, 170, 210, 0.3);
+    --border-paper-medium: rgba(190, 170, 210, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
+    --border-stamp: rgba(168, 85, 247, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(168, 85, 247, 0.327);
+    --bg-pink-overlay: rgba(180, 120, 240, 0.3);
+    --bg-pink-overlay-light: rgba(180, 120, 240, 0.25);
+    --bg-pink-subtle: rgba(168, 85, 247, 0.3);
+    --bg-slider-track: rgba(168, 85, 247, 0.3);
+    --bg-paper-line: rgba(190, 170, 210, 0.2);
+    --bg-paper-line-medium: rgba(190, 170, 210, 0.25);
+    --bg-stamp: rgba(168, 85, 247, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #ffffff;
+    --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
+    --white-button: rgba(255, 255, 255, 0.9);
+    --white-button-soft: rgba(252, 248, 255, 0.85);
+    --white-button-hover: rgba(255, 255, 255, 0.95);
+    --white-button-hover-soft: rgba(248, 240, 255, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 270deg;
+}
+
+/* ===================================
+ * 紫色深色主题 (Purple Dark Theme)
+ * 皇家紫/紫水晶色系
+ * =================================== */
+[data-theme-color="purple"][data-theme-mode="dark"] {
+    /* {{{ 文字颜色 (text-) */
+    --text-primary: #c9b8e8;
+    --text-secondary: #a898d4;
+    --text-muted: #8878b4;
+    --text-dark: #e4daf4;
+    --text-active: #beace8;
+    --text-label: #a898d4;
+    --text-button: #8878b4;
+    --text-menu-btn: #9888c4;
+    --text-accent: #a855f7;
+    --text-stat: #beace8;
+    --text-count: #9a8ae4;
+    --text-placeholder: #7868a4;
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    --bg-page-start: #1f1a2f;
+    --bg-page-mid: #1a1628;
+    --bg-page-end: #1e1a2a;
+    --bg-container: #252035;
+    --bg-menu-start: #3a2a52;
+    --bg-menu-end: #32244a;
+    --bg-input: #2c243c;
+    --bg-paper-start: #231e30;
+    --bg-paper-mid: #1f1a28;
+    --bg-paper-end: #1b1624;
+    --bg-popup-start: #251e32;
+    --bg-popup-end: #211a2e;
+    --bg-scroll-mid: #201a2a;
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+    --accent-primary: #a855f7;
+    --accent-secondary: #9645e7;
+    --accent-brown: #b070e8;
+    --accent-line: rgb(150, 80, 200);
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+    --status-success: #6ab88a;
+    --status-correct: #a855f7;
+    --status-error: #e85555;
+    --status-warning: #e8a040;
+    --status-score: #a855f7;
+    --status-translate-error: #e85555;
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+    --btn-play-start: #352a52;
+    --btn-play-end: #2e254a;
+    --btn-play-hover-start: #453a62;
+    --btn-play-hover-end: #352a52;
+    --btn-play-text: #b070e8;
+    --btn-pause-start: #352852;
+    --btn-pause-end: #2e234a;
+    --btn-hover-start: #453862;
+    --btn-hover-end: #352852;
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+    --shadow-soft: rgba(0, 0, 0, 0.3);
+    --shadow-pink-light: rgba(168, 85, 247, 0.15);
+    --shadow-pink-medium: rgba(168, 85, 247, 0.25);
+    --shadow-pink-strong: rgba(168, 85, 247, 0.4);
+    --shadow-brown: rgba(100, 60, 140, 0.2);
+    --shadow-brown-medium: rgba(100, 60, 140, 0.3);
+    --shadow-menu-btn: rgba(130, 70, 180, 0.2);
+    --shadow-menu-btn-hover: rgba(160, 90, 220, 0.4);
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+    --border-pink-light: rgba(168, 85, 247, 0.3);
+    --border-pink-medium: rgba(168, 85, 247, 0.4);
+    --border-pink-strong: rgba(168, 85, 247, 0.5);
+    --border-menu: rgba(150, 80, 200, 0.4);
+    --border-paper: rgba(100, 60, 140, 0.3);
+    --border-paper-medium: rgba(100, 60, 140, 0.4);
+    --border-white: rgba(255, 255, 255, 0.15);
+    --border-white-strong: rgba(255, 255, 255, 0.25);
+    --border-stamp: rgba(168, 85, 247, 0.5);
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+    --bg-pink-dot: rgba(168, 85, 247, 0.15);
+    --bg-pink-overlay: rgba(168, 85, 247, 0.15);
+    --bg-pink-overlay-light: rgba(168, 85, 247, 0.1);
+    --bg-pink-subtle: rgba(168, 85, 247, 0.2);
+    --bg-slider-track: rgba(168, 85, 247, 0.3);
+    --bg-paper-line: rgba(100, 60, 140, 0.2);
+    --bg-paper-line-medium: rgba(100, 60, 140, 0.25);
+    --bg-stamp: rgba(168, 85, 247, 0.6);
+    /* }}} */
+
+    /* {{{ 白色系 */
+    --white-pure: #252035;
+    --white-soft: rgba(37, 32, 53, 0.3);
+    --white-medium: rgba(37, 32, 53, 0.5);
+    --white-strong: rgba(37, 32, 53, 0.8);
+    --white-button: rgba(37, 32, 53, 0.9);
+    --white-button-soft: rgba(42, 37, 58, 0.85);
+    --white-button-hover: rgba(47, 42, 63, 0.95);
+    --white-button-hover-soft: rgba(52, 47, 68, 0.9);
+    /* }}} */
+
+    /* 图片滤镜色相 */
+    --filter-hue: 270deg;
 }

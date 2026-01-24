@@ -32,6 +32,28 @@
                                     <label for="accent-uk">UK</label>
                                 </div>
                             </div>
+                            <div class="theme-selector">
+                                <span>Color:</span>
+                                <div class="segmented-control segmented-control-4">
+                                    <input type="radio" name="theme-color" id="color-pink" value="pink" checked>
+                                    <label for="color-pink">Pink</label>
+                                    <input type="radio" name="theme-color" id="color-green" value="green">
+                                    <label for="color-green">Green</label>
+                                    <input type="radio" name="theme-color" id="color-blue" value="blue">
+                                    <label for="color-blue">Blue</label>
+                                    <input type="radio" name="theme-color" id="color-purple" value="purple">
+                                    <label for="color-purple">Purple</label>
+                                </div>
+                            </div>
+                            <div class="theme-selector">
+                                <span>Mode:</span>
+                                <div class="segmented-control">
+                                    <input type="radio" name="theme-mode" id="mode-light" value="light" checked>
+                                    <label for="mode-light">Light</label>
+                                    <input type="radio" name="theme-mode" id="mode-dark" value="dark">
+                                    <label for="mode-dark">Dark</label>
+                                </div>
+                            </div>
                         </div>
                         <div id="dictation-settings" class="mode-settings">
                             <h3>Dictation</h3>
@@ -45,14 +67,17 @@
                         </div>
                     </div>
                 </div>
-                <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font-size: 12px; color:#888;"></span>
+                <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font-size: 12px; color:#888;">
+                    <span id="translationProgress"></span>
+                    <span id="audioProgress" style="margin-left: 8px;"></span>
+                </span>
             </div>
         </div>
 
         <div class="container">
             <!-- 左侧：单词输入 -->
             <div id="wordSection">
-                <h3>Word List <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button></h3>
+                <h3>Word List <button id="loadBtn" class="btn-load" title="Load translations">Load</button> <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button></h3>
                 <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
             </div>
 

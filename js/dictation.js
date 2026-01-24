@@ -18,6 +18,9 @@ export function setRepeaterRef(ref) {
  */
 function pauseOtherMode() {
     stopAudio();
+    if (Repeater) {
+        Repeater.removeKeyboardListener();
+    }
     if (currentRepeaterState) {
         if (Repeater) Repeater.playId++;
         currentRepeaterState.isPaused = true;

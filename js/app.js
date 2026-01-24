@@ -8,6 +8,10 @@ import { Repeater, setDictationRef } from './repeater.js';
 import { Dictation, setRepeaterRef } from './dictation.js';
 import { $, containsChinese, filterChinese } from './utils.js';
 import { initWordListUI, goHome } from './wordlist.js';
+import { initTheme, applyTheme, getStoredTheme } from './theme.js';
+
+// 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
+applyTheme(getStoredTheme());
 
 // 设置循环引用
 setDictationRef(Dictation);
@@ -68,6 +72,7 @@ function initChineseFilter() {
 
 // 页面加载完成后初始化
 document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
     initPreloadListeners();
     initChineseFilter();
     initWordListUI();
