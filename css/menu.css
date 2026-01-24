@@ -32,8 +32,8 @@ body.dictation-mode #menu::after {
     pointer-events: none;
 }
 
-/* 菜单栏标题样式 */
-#menu h1 {
+/* Home 按钮样式（标题按钮） */
+#home-btn {
     font-family: 'Cinzel', 'Georgia', serif;
     color: var(--text-primary);
     margin: 0;
@@ -42,10 +42,30 @@ body.dictation-mode #menu::after {
     font-size: 36px;
     text-shadow: 0 1px 2px var(--white-soft);
     white-space: nowrap;
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+    text-transform: none;
+    width: auto;
+    box-shadow: none;
 }
 
+#home-btn:hover {
+    transform: scale(1.05);
+}
+
+#home-btn:active {
+    transform: scale(0.98);
+}
+#mode-btn {
+    display: flex;
+    gap: 20px; /* 按钮之间的间距 */
+    justify-content: center; /* 可选：水平居中 */
+}
 /* 菜单栏按钮样式 */
-#menu button {
+#mode-btn button {
     font-family: 'Cinzel', 'Georgia', serif;
     border-radius: 25px;
     width: 220px;
@@ -64,7 +84,7 @@ body.dictation-mode #menu::after {
 }
 
 /* 菜单按钮悬停状态 */
-#menu button:hover {
+#mode-btn button:hover {
     transform: translateY(-2px) scale(1.1);
     border-color: rgba(255, 200, 210, 0.8);
     color: var(--text-primary);

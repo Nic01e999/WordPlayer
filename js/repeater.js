@@ -133,11 +133,33 @@ export class Repeater {
 
         const { words, currentIndex, currentRepeat, settings } = state;
         const word = words[currentIndex];
-        const translation = preloadCache.translations[word] ?? state.translations[currentIndex];
+        const dictData = preloadCache.dictionaries[word];
+        const simpleTranslation = preloadCache.translations[word] ?? state.translations[currentIndex];
+
+        let translationHTML;
+
+        if (dictData && dictData.definitions && dictData.definitions.length > 0) {
+            // 显示词性释义
+            translationHTML = `
+                <div class="pos-translations">
+                    ${dictData.definitions.map(def => `
+                        <div class="pos-item">
+                            <span class="pos-tag">${def.pos}</span>
+                            <span class="pos-meaning">${def.meanings.slice(0, 2).join('; ')}</span>
+                        </div>
+                    `).join('')}
+                    ${dictData.translation ? `<div class="simple-translation">${dictData.translation}</div>` : ''}
+                </div>
+            `;
+        } else {
+            // 回退到简单翻译
+            translationHTML = `<div class="current-translation ${simpleTranslation?.startsWith('翻译失败') ? 'translation-error' : ''}">${simpleTranslation ?? '加载中...'}</div>`;
+        }
 
         info.innerHTML = `
             <div class="current-word">${word}</div>
-            <div class="current-translation ${translation?.startsWith('翻译失败') ? 'translation-error' : ''}">${translation ?? '加载中...'}</div>
+            ${dictData?.phonetic ? `<div class="phonetic">${dictData.phonetic}</div>` : ''}
+            ${translationHTML}
             <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
         `;
     }

@@ -8,6 +8,20 @@
 export const $ = id => document.getElementById(id);
 
 /**
+ * 检测文本是否包含中文字符
+ */
+export function containsChinese(text) {
+    return /[\u4e00-\u9fff]/.test(text);
+}
+
+/**
+ * 过滤掉文本中的中文字符
+ */
+export function filterChinese(text) {
+    return text.replace(/[\u4e00-\u9fff]/g, '');
+}
+
+/**
  * 从设置面板读取用户配置
  */
 export function getSettings() {

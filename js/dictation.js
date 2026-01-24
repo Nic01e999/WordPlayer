@@ -298,10 +298,13 @@ export class Dictation {
                 return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
             }).join('');
 
+            const listenedText = s.speakTexts[i];
+            const hasCustomDef = s.entries[i].definition !== null;
             return `<div class="result-item">
-                <span class="result-index">${i + 1}.</span>
-                <div class="result-attempts">${rows}</div>
-            </div>`;
+                        <span class="result-index">${i + 1}.</span>
+                        ${hasCustomDef ? `<div class="result-listened">&lt${listenedText}&gt</div>` : ''}
+                        <div class="result-attempts">${rows}</div>
+                    </div>`;
         }).join('');
 
         setTimeout(() => {

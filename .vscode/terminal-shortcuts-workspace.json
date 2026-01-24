@@ -1,0 +1,7 @@
+[
+    {
+        "label": "get a UPL [edit me]",
+        "command": "cloudflared tunnel --url http://localhost:5001",
+        "group": "Workspace"
+    }
+]

@@ -97,3 +97,124 @@
     text-decoration: none;
     background: none;
 }
+
+/* ===== 输入警告 ===== */
+.input-warning {
+    display: none;
+    color: var(--status-warning);
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    background: rgba(255, 200, 160, 0.2);
+    border-radius: 4px;
+    animation: warningFade 0.3s ease-out;
+}
+
+@keyframes warningFade {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 单词表卡片 ===== */
+
+/* 保存按钮 */
+.btn-save-list {
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-size: 12px;
+    border: 1px solid var(--border-pink-medium);
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.btn-save-list:hover {
+    background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px var(--shadow-pink-light);
+}
+
+/* 空状态 */
+.wordlist-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.wordlist-empty p {
+    margin: 8px 0;
+}
+
+.wordlist-empty .hint {
+    font-size: 14px;
+    color: var(--text-placeholder);
+}
+
+/* 卡片网格 */
+.wordlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+/* 单词表卡片 */
+.wordlist-card {
+    background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
+    border: 1px solid var(--border-pink-light);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px var(--shadow-pink-light);
+}
+
+.wordlist-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px var(--shadow-pink-medium);
+    border-color: var(--border-pink-medium);
+}
+
+.wordlist-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.wordlist-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+    flex: 1;
+}
+
+.wordlist-delete {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.wordlist-delete:hover {
+    background: rgba(200, 80, 80, 0.1);
+    color: var(--status-error);
+}
+
+.wordlist-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+}

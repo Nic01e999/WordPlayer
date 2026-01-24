@@ -21,10 +21,12 @@ export let currentActiveMode = null;
 export const preloadCache = {
     entries: [],            // 已缓存的单词条目列表 { word, definition }
     translations: {},       // { word: translation } - 如果有 definition 则直接使用
+    dictionaries: {},       // { word: { phonetic, definitions: [{pos, meanings}], translation } }
     audioUrls: {},          // { text: Blob URL } (正常速度) - 支持单词和定义
     slowAudioUrls: {},      // { text: Blob URL } (慢速) - 支持单词和定义
     loading: false,         // 是否正在加载
     loadId: 0,              // 加载 ID，用于取消旧的加载
+    abortController: null,  // AbortController 用于取消 fetch 请求
     loaded: 0,              // 已加载数量
     total: 0                // 总数量
 };

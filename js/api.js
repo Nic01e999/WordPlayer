@@ -38,6 +38,14 @@ export function getFetchErrorMessage(e) {
 }
 
 /**
+ * 获取当前选择的翻译源
+ */
+export function getTranslatorProvider() {
+    const select = document.getElementById("translatorProvider");
+    return select ? select.value : "bing";
+}
+
+/**
  * 调用后端翻译 API 获取单词的中文翻译
  */
 export async function translateWord(word) {
@@ -47,7 +55,8 @@ export async function translateWord(word) {
     }
 
     try {
-        const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}`;
+        const provider = getTranslatorProvider();
+        const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}&provider=${provider}`;
         const res = await fetch(url);
 
         if (!res.ok) return getHttpErrorMessage(res.status);
@@ -74,4 +83,46 @@ export async function translateWord(word) {
  */
 export function getTtsUrl(word, slow = false) {
     return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}`;
+}
+
+/**
+ * 获取单词词典信息（含词性）
+ */
+export async function fetchDictionary(word) {
+    // 检查缓存
+    if (preloadCache.dictionaries[word]) {
+        return preloadCache.dictionaries[word];
+    }
+
+    try {
+        const provider = getTranslatorProvider();
+        const url = `${API_BASE}/api/dictionary?word=${encodeURIComponent(word)}&provider=${provider}`;
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            // 回退到简单翻译
+            const translation = await translateWord(word);
+            const fallback = {
+                word,
+                phonetic: null,
+                definitions: [],
+                translation
+            };
+            preloadCache.dictionaries[word] = fallback;
+            return fallback;
+        }
+
+        const data = await res.json();
+        preloadCache.dictionaries[word] = data;
+
+        // 同时更新简单翻译缓存
+        if (data.translation) {
+            preloadCache.translations[word] = data.translation;
+        }
+
+        return data;
+    } catch (e) {
+        console.error("Dictionary fetch error:", e);
+        return null;
+    }
 }

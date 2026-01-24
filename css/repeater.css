@@ -138,3 +138,57 @@
     margin-top: 8px;
     font-weight: 600;
 }
+
+/* ===== 词性翻译样式 ===== */
+
+/* 音标显示 */
+.phonetic {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* 词性翻译容器 */
+.pos-translations {
+    margin-top: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 单个词性项 */
+.pos-item {
+    display: flex;
+    align-items: baseline;
+    margin: 6px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+}
+
+/* 词性标签 (n., v., adj. 等) */
+.pos-tag {
+    min-width: 45px;
+    color: var(--text-accent);
+    font-weight: 600;
+    font-style: italic;
+    margin-right: 8px;
+}
+
+/* 词性释义 */
+.pos-meaning {
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+/* 简单翻译（中文翻译补充） */
+.pos-translations .simple-translation {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-pink-light);
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+}

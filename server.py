@@ -7,10 +7,15 @@ import io
 import socket
 import os
 import asyncio
+import requests
+
+# 设置 translators 区域（必须在导入前设置）
+os.environ["translators_default_region"] = "CN"
+
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import edge_tts
-from deep_translator import MyMemoryTranslator
+import translators as ts
 
 app = Flask(__name__, static_folder=os.path.dirname(os.path.abspath(__file__)))
 CORS(app)  # 允许跨域请求
@@ -33,6 +38,7 @@ def get_lan_ip():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
+        
         s.close()
         return ip
     except Exception:
@@ -44,23 +50,118 @@ def index():
     """提供主页"""
     return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html"))
 
-# 翻译器实例（MyMemory 不需要 VPN）
-translator = MyMemoryTranslator(source="en-GB", target="zh-CN")
+def abbreviate_pos(pos):
+    """将完整词性名称转换为缩写"""
+    mapping = {
+        "noun": "n.",
+        "verb": "v.",
+        "adjective": "adj.",
+        "adverb": "adv.",
+        "pronoun": "pron.",
+        "preposition": "prep.",
+        "conjunction": "conj.",
+        "interjection": "interj.",
+        "exclamation": "excl."
+    }
+    return mapping.get(pos.lower(), pos + ".")
+
+
+@app.route("/api/dictionary", methods=["GET"])
+def dictionary():
+    """
+    获取单词词典信息（含词性）
+    GET /api/dictionary?word=hello&provider=bing
+    返回: {
+        "word": "hello",
+        "phonetic": "/həˈloʊ/",
+        "definitions": [
+            {"pos": "n.", "meanings": ["问候", "招呼"]},
+            {"pos": "v.", "meanings": ["打招呼"]}
+        ],
+        "translation": "你好"
+    }
+    """
+    word = request.args.get("word", "")
+    provider = request.args.get("provider", "bing")
+
+    if not word:
+        return jsonify({"error": "缺少 word 参数"}), 400
+
+    result = {
+        "word": word,
+        "phonetic": None,
+        "definitions": [],
+        "translation": None
+    }
+
+    # 尝试从 Free Dictionary API 获取词性数据
+    try:
+        dict_res = requests.get(
+            f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}",
+            timeout=5
+        )
+        if dict_res.ok:
+            data = dict_res.json()
+            if data and isinstance(data, list):
+                entry = data[0]
+                result["phonetic"] = entry.get("phonetic")
+
+                seen_pos = {}
+                for meaning in entry.get("meanings", []):
+                    pos = meaning.get("partOfSpeech", "")
+                    pos_abbr = abbreviate_pos(pos)
+
+                    # 获取前2个释义
+                    definitions = [d.get("definition", "")
+                                   for d in meaning.get("definitions", [])[:2]]
+
+                    if pos_abbr in seen_pos:
+                        seen_pos[pos_abbr]["meanings"].extend(definitions)
+                    else:
+                        seen_pos[pos_abbr] = {
+                            "pos": pos_abbr,
+                            "meanings": definitions
+                        }
+
+                result["definitions"] = list(seen_pos.values())
+    except Exception as e:
+        print(f"Dictionary API error: {e}")
+
+    # 获取中文翻译
+    try:
+        translation = ts.translate_text(
+            word,
+            translator=provider,
+            to_language="zh",
+            if_use_cn_host=True
+        )
+        result["translation"] = translation
+    except Exception as e:
+        print(f"Translation error: {e}")
+
+    return jsonify(result)
 
 
 @app.route("/api/translate", methods=["GET"])
 def translate():
     """
     翻译单词
-    GET /api/translate?word=hello
+    GET /api/translate?word=hello&provider=bing
     返回: { "translation": "你好" }
     """
     word = request.args.get("word", "")
+    provider = request.args.get("provider", "bing")  # bing / google / baidu / youdao
+
     if not word:
         return jsonify({"error": "缺少 word 参数"}), 400
 
     try:
-        result = translator.translate(word)
+        result = ts.translate_text(
+            word,
+            translator=provider,
+            to_language="zh",
+            if_use_cn_host=True  # 国内可用
+        )
         return jsonify({"translation": result})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -9,8 +9,8 @@
     </head>
     <body>
         <div id="menu">
-            <h1>🎧 English Dictation</h1>
-            <div>
+            <button id="home-btn" onclick="goHome()">🎧 English Dictation</button>
+            <div id="mode-btn">
                 <button id="Dictation-bnt" onclick="Dictation.switchToDictation()">Dictation</button>
                 <button id="Repeater-bnt" onclick="Repeater.switchToRepeater()">Repeater</button>
             </div>
@@ -27,62 +27,19 @@
                             <label>Slow: <input type="checkbox" id="slow"></label>
                             <label>Shuffle: <input type="checkbox" id="shuffle"></label>
                             <label>Word(write) : Def(listen)<input type="checkbox" id="dictateMode"></label>
+                            <label>Translator:
+                                <select id="translatorProvider">
+                                    <option value="bing">Bing</option>
+                                    <option value="google">Google</option>
+                                    <option value="baidu">百度</option>
+                                    <option value="youdao">有道</option>
+                                </select>
+                            </label>
                         </div>
 
                         <div id="wordSection">
-                            <h3>Word List</h3>
-                            <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)">
-    friend
-    furniture
-    game
-    gas
-    global
-    golf
-    guide
-    hair
-    handle
-    history
-    hotel
-    house
-    human
-    hunting
-    India
-    innovation
-    insurance
-    introduction
-    January
-    juice
-    June
-    knowledge
-    laundry
-    learning
-    level
-    lifestyle
-    manager
-    mathematic
-    meal
-    meat
-    medicine
-    mineral
-    modern
-    monthly
-    music
-    natural
-    negative
-    night
-    north
-    nutrition
-    object
-    organization
-    passport
-    person
-    personal
-    photo
-    photocopy
-    piano
-    plastic
-    point
-                            </textarea>
+                            <h3>Word List <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button></h3>
+                            <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
                         </div>
                     </div>
                 </div>

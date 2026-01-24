@@ -4,7 +4,7 @@
 
 import { preloadCache } from './state.js';
 import { $, loadWordsFromTextarea, debounce, adjustSidebarWidth } from './utils.js';
-import { API_BASE, getHttpErrorMessage, getFetchErrorMessage } from './api.js';
+import { API_BASE, getHttpErrorMessage, getFetchErrorMessage, getTranslatorProvider } from './api.js';
 
 /**
  * 更新预加载进度显示
@@ -51,7 +51,13 @@ export async function startPreload() {
         return;
     }
 
-    // 增加加载 ID，取消旧的加载
+    // 取消旧的加载
+    if (preloadCache.abortController) {
+        preloadCache.abortController.abort();
+    }
+    preloadCache.abortController = new AbortController();
+    const signal = preloadCache.abortController.signal;
+
     preloadCache.loadId++;
     const myId = preloadCache.loadId;
 
@@ -64,33 +70,50 @@ export async function startPreload() {
     preloadCache.total = entries.length * 3 + definitionCount * 2;
     updatePreloadProgress();
 
-    // 并行加载所有翻译
-    const translationPromises = entries.map(async (entry) => {
+    // 并行加载所有词典数据（含词性和翻译）
+    const dictionaryPromises = entries.map(async (entry) => {
         if (myId !== preloadCache.loadId) return;
 
         const { word, definition } = entry;
 
+        // 如果用户提供了定义，使用用户定义
         if (definition) {
             preloadCache.translations[word] = definition;
+            preloadCache.dictionaries[word] = {
+                word,
+                phonetic: null,
+                definitions: [],
+                translation: definition
+            };
             preloadCache.loaded++;
             updatePreloadProgress();
             return;
         }
 
-        if (preloadCache.translations[word]) {
+        // 如果已缓存，跳过
+        if (preloadCache.dictionaries[word]) {
             preloadCache.loaded++;
             updatePreloadProgress();
             return;
         }
 
         try {
-            const url = `${API_BASE}/api/translate?word=${encodeURIComponent(word)}`;
-            const res = await fetch(url);
+            const provider = getTranslatorProvider();
+            const url = `${API_BASE}/api/dictionary?word=${encodeURIComponent(word)}&provider=${provider}`;
+            const res = await fetch(url, { signal });
 
             if (myId !== preloadCache.loadId) return;
 
             if (!res.ok) {
                 preloadCache.translations[word] = getHttpErrorMessage(res.status);
+                preloadCache.dictionaries[word] = {
+                    word,
+                    phonetic: null,
+                    definitions: [],
+                    translation: preloadCache.translations[word]
+                };
+                preloadCache.loaded++;
+                updatePreloadProgress();
                 return;
             }
 
@@ -99,20 +122,23 @@ export async function startPreload() {
                 data = await res.json();
             } catch {
                 preloadCache.translations[word] = "翻译失败: 响应格式错误";
+                preloadCache.loaded++;
+                updatePreloadProgress();
                 return;
             }
 
-            if (data.error) {
-                preloadCache.translations[word] = `翻译失败: ${data.error}`;
-            } else {
-                preloadCache.translations[word] = data.translation || "翻译失败: 无翻译结果";
-            }
+            // 缓存词典数据
+            preloadCache.dictionaries[word] = data;
+            // 同时缓存简单翻译
+            preloadCache.translations[word] = data.translation || "翻译失败: 无翻译结果";
+            preloadCache.loaded++;
+            updatePreloadProgress();
         } catch (e) {
+            if (e.name === 'AbortError') return;
             preloadCache.translations[word] = getFetchErrorMessage(e);
+            preloadCache.loaded++;
+            updatePreloadProgress();
         }
-
-        preloadCache.loaded++;
-        updatePreloadProgress();
     });
 
     // 收集所有需要预加载音频的文本
@@ -134,18 +160,20 @@ export async function startPreload() {
 
         try {
             const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=0`;
-            const res = await fetch(url);
+            const res = await fetch(url, { signal });
             const blob = await res.blob();
 
             if (myId !== preloadCache.loadId) return;
 
             preloadCache.audioUrls[text] = URL.createObjectURL(blob);
-        } catch {
+            preloadCache.loaded++;
+            updatePreloadProgress();
+        } catch (e) {
+            if (e.name === 'AbortError') return;
             // 音频加载失败，不缓存
+            preloadCache.loaded++;
+            updatePreloadProgress();
         }
-
-        preloadCache.loaded++;
-        updatePreloadProgress();
     });
 
     // 并行加载所有音频（慢速）
@@ -160,22 +188,24 @@ export async function startPreload() {
 
         try {
             const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=1`;
-            const res = await fetch(url);
+            const res = await fetch(url, { signal });
             const blob = await res.blob();
 
             if (myId !== preloadCache.loadId) return;
 
             preloadCache.slowAudioUrls[text] = URL.createObjectURL(blob);
-        } catch {
+            preloadCache.loaded++;
+            updatePreloadProgress();
+        } catch (e) {
+            if (e.name === 'AbortError') return;
             // 音频加载失败，不缓存
+            preloadCache.loaded++;
+            updatePreloadProgress();
         }
-
-        preloadCache.loaded++;
-        updatePreloadProgress();
     });
 
     // 等待所有加载完成
-    await Promise.all([...translationPromises, ...audioPromises, ...slowAudioPromises]);
+    await Promise.all([...dictionaryPromises, ...audioPromises, ...slowAudioPromises]);
 
     if (myId === preloadCache.loadId) {
         preloadCache.loading = false;
