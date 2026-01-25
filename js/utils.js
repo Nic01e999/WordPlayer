@@ -2,6 +2,8 @@
  * 工具函数模块
  */
 
+import { preloadCache } from './state.js';
+
 /**
  * 简化版的 document.getElementById
  */
@@ -35,11 +37,11 @@ export function getAccent() {
  */
 export function getSettings() {
     return {
-        repeat: parseInt($("repeat").value) || 1,
-        retry: parseInt($("retry").value) || 1,
-        interval: parseInt($("interval").value) || 300,
-        slow: $("slow").checked,
-        shuffle: $("shuffle").checked,
+        repeat: parseInt($("repeat")?.value) || 1,
+        retry: parseInt($("retry")?.value) || 1,
+        interval: parseInt($("interval")?.value) || 300,
+        slow: $("slow")?.checked ?? false,
+        shuffle: $("shuffle")?.checked ?? false,
         dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB",
         accent: getAccent()
     };
@@ -86,17 +88,20 @@ export function shuffleArray(arr) {
 }
 
 /**
- * 清空工作区
+ * 切换视图显示
+ * @param {'homeView' | 'repeaterView' | 'dictationView'} viewId
  */
-export function clearWorkplace() {
-    $("workplace").innerHTML = "";
+export function showView(viewId) {
+    document.querySelectorAll('.mode-view').forEach(v => v.classList.remove('active'));
+    const view = $(viewId);
+    if (view) view.classList.add('active');
 }
 
 /**
- * 向工作区追加 HTML 内容
+ * 向听写工作区追加 HTML 内容
  */
 export function logToWorkplace(html) {
-    $("workplace").insertAdjacentHTML("beforeend", html);
+    $("dictationWorkplace").insertAdjacentHTML("beforeend", html);
 }
 
 /**
@@ -121,6 +126,15 @@ export function measureTextWidth(text, font) {
 }
 
 /**
+ * HTML 实体转义（防止 XSS）
+ */
+export function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
  * 根据最长行自动调整侧边栏宽度
  */
 export function adjustSidebarWidth() {
@@ -139,4 +153,16 @@ export function adjustSidebarWidth() {
     const neededWidth = maxTextWidth + extraSpace;
 
     sidebar.style.minWidth = Math.max(baseWidth, neededWidth) + "px";
+}
+
+/**
+ * 根据预加载状态更新模式按钮的可用性
+ */
+export function updateModeButtonsState() {
+    const dictationBtn = document.getElementById("dictation-btn");
+    const repeaterBtn = document.getElementById("repeater-btn");
+    const hasEntries = preloadCache.entries.length > 0;
+
+    if (dictationBtn) dictationBtn.disabled = !hasEntries;
+    if (repeaterBtn) repeaterBtn.disabled = !hasEntries;
 }

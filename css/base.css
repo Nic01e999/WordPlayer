@@ -53,14 +53,14 @@ body::before {
     overscroll-behavior: contain;
 }
 
-/* 工作区容器 */
-#workplace {
+/* 听写工作区容器 */
+#dictationWorkplace {
     position: relative;
     overflow: visible;
     margin: 0px 0px 100px 0px;
 }
 
-#workplace h3 {
+#dictationWorkplace h3 {
     font-size: 200%;
 }
 

@@ -6,7 +6,7 @@
     },
     {
         "label": "start",
-        "command": "python3 server.py",
+        "command": "python3 run.py",
         "group": "Workspace"
     }
 ]

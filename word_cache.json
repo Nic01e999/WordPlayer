@@ -1,0 +1,423 @@
+{
+  "phenomenon": {
+    "word": "phenomenon",
+    "translation": "现象",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "现象",
+          "非凡的人（或事物）"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a fact or situation that is observed to exist or happen, especially one whose cause or explanation is in question",
+          "a remarkable person or thing"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The Northern Lights are a beautiful natural phenomenon.",
+        "Social media is a relatively recent phenomenon that has changed how we communicate."
+      ],
+      "fun": [
+        "The sudden craving for pickles and ice cream was a mysterious phenomenon her pregnancy explained.",
+        "In our office, the phenomenon of the disappearing coffee creamer remains unsolved."
+      ]
+    },
+    "synonyms": [
+      "occurrence",
+      "event",
+      "fact",
+      "sight",
+      "wonder"
+    ],
+    "antonyms": [
+      "normality",
+      "commonplace"
+    ]
+  },
+  "anonymous": {
+    "word": "anonymous",
+    "translation": "匿名的",
+    "chineseDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "匿名的",
+          "无特色的"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "(of a person) not identified by name; of unknown name",
+          "having no outstanding, individual, or unusual features; unremarkable or impersonal"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The donation was made by an anonymous benefactor.",
+        "She works for an anonymous government agency."
+      ],
+      "fun": [
+        "He posted his poetry online anonymously, terrified his friends would discover his secret romantic side.",
+        "The building was an anonymous glass box, indistinguishable from a hundred others in the financial district."
+      ]
+    },
+    "synonyms": [
+      "unnamed",
+      "unidentified",
+      "incognito",
+      "unspecified",
+      "faceless"
+    ],
+    "antonyms": [
+      "identified",
+      "named",
+      "known"
+    ]
+  },
+  "photography": {
+    "word": "photography",
+    "translation": "摄影",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "摄影",
+          "摄影术"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the art or practice of taking and processing photographs",
+          "the process or job of taking photographs"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She studied photography at art school.",
+        "Advances in digital photography have made it accessible to everyone."
+      ],
+      "fun": [
+        "His photography of street cats turned into a surprisingly popular Instagram account.",
+        "Time-lapse photography revealed the secret, graceful dance of the blooming flower."
+      ]
+    },
+    "synonyms": [
+      "photo-taking",
+      "camerawork",
+      "filming",
+      "shooting"
+    ],
+    "antonyms": []
+  },
+  "comfortable": {
+    "word": "comfortable",
+    "translation": "舒适的",
+    "chineseDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "舒适的",
+          "自在的",
+          "宽裕的"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "providing physical ease and relaxation",
+          "free from stress or fear",
+          "(of a situation) free from financial worry"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "This is the most comfortable chair I've ever sat in.",
+        "After a few meetings, she felt comfortable speaking up in the group."
+      ],
+      "fun": [
+        "The cat found the most comfortable spot in the house: a sunbeam directly on the keyboard.",
+        "He was comfortable enough with his cooking skills to attempt a soufflé for the first time."
+      ]
+    },
+    "synonyms": [
+      "cozy",
+      "relaxed",
+      "at ease",
+      "snug",
+      "content"
+    ],
+    "antonyms": [
+      "uncomfortable",
+      "uneasy",
+      "miserable"
+    ]
+  },
+  "temperature": {
+    "word": "temperature",
+    "translation": "温度",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "温度",
+          "体温",
+          "热度"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the degree or intensity of heat present in a substance or object",
+          "a body temperature above the normal; fever"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The temperature dropped sharply overnight.",
+        "The nurse took the patient's temperature."
+      ],
+      "fun": [
+        "The temperature of the debate rose with every accusation thrown across the room.",
+        "He could judge the oven's temperature just by the smell of the roasting chicken."
+      ]
+    },
+    "synonyms": [
+      "heat",
+      "warmth",
+      "fever",
+      "thermal reading"
+    ],
+    "antonyms": []
+  },
+  "necessary": {
+    "word": "necessary",
+    "translation": "必要的",
+    "chineseDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "必要的，必需的",
+          "必然的，不可避免的"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "required to be done, achieved, or present; needed; essential",
+          "determined, existing, or happening by natural laws or predestination; inevitable"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "A good diet is necessary for maintaining health.",
+        "It is necessary to fill out the application form completely."
+      ],
+      "fun": [
+        "For a wizard, a pointy hat is not just fashionable but absolutely necessary.",
+        "The cat deemed it necessary to knock the pen off the desk every five minutes."
+      ]
+    },
+    "synonyms": [
+      "essential",
+      "required",
+      "indispensable",
+      "mandatory",
+      "vital"
+    ],
+    "antonyms": [
+      "unnecessary",
+      "optional",
+      "dispensable"
+    ]
+  },
+  "psychology": {
+    "word": "psychology",
+    "translation": "心理学",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "心理学",
+          "心理，心理特点"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the scientific study of the human mind and its functions, especially those affecting behavior",
+          "the mental characteristics or attitude of a person or group"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She decided to major in psychology to understand human behavior better.",
+        "The marketing campaign used principles of consumer psychology."
+      ],
+      "fun": [
+        "Understanding the psychology of a squirrel hoarding nuts could explain my uncle's coupon collection.",
+        "The game designer applied reverse psychology by making the hardest level the most attractive."
+      ]
+    },
+    "synonyms": [
+      "behavioral science",
+      "mind science",
+      "psychiatry",
+      "mentality",
+      "mindset"
+    ],
+    "antonyms": []
+  },
+  "pneumonia": {
+    "word": "pneumonia",
+    "translation": "肺炎",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "肺炎"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a lung inflammation caused by bacterial or viral infection, in which the air sacs fill with pus and may become solid"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The elderly patient was hospitalized with a severe case of pneumonia.",
+        "Vaccines can help prevent certain types of pneumonia."
+      ],
+      "fun": [
+        "The pirate captain blamed his weak singing voice on a past bout of 'sea-faring pneumonia'.",
+        "My phone caught a digital pneumonia after downloading that suspicious file."
+      ]
+    },
+    "synonyms": [
+      "lung inflammation",
+      "pulmonary infection",
+      "bronchopneumonia"
+    ],
+    "antonyms": []
+  },
+  "gnome": {
+    "word": "gnome",
+    "translation": "侏儒，地精",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（传说中守护地下财宝的）地精，侏儒",
+          "格言，箴言"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a legendary dwarfish creature supposed to guard the earth's treasures underground",
+          "a short, pithy statement expressing a general truth; a maxim"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The garden was decorated with a small statue of a gnome.",
+        "He collected ancient books filled with philosophical gnomes."
+      ],
+      "fun": [
+        "The garden gnome claimed the best spot for sunbathing, right next to the petunias.",
+        "Her life's motto was a simple gnome: 'Never trust a squirrel with your snacks.'"
+      ]
+    },
+    "synonyms": [
+      "dwarf",
+      "goblin",
+      "sprite",
+      "maxim",
+      "aphorism"
+    ],
+    "antonyms": [
+      "giant",
+      "colossus"
+    ]
+  },
+  "strength": {
+    "word": "strength",
+    "translation": "力量",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "力气，力量",
+          "强度",
+          "长处，优点"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the quality or state of being physically strong",
+          "the capacity of an object or substance to withstand great force or pressure",
+          "a good or beneficial quality or attribute of a person or thing"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He lifted the heavy box with impressive strength.",
+        "The strength of the bridge was tested by engineers."
+      ],
+      "fun": [
+        "Her greatest strength was the ability to find the remote control in under ten seconds.",
+        "The strength of his argument was rivaled only by the weakness of his evidence."
+      ]
+    },
+    "synonyms": [
+      "power",
+      "might",
+      "force",
+      "stamina",
+      "fortitude"
+    ],
+    "antonyms": [
+      "weakness",
+      "frailty",
+      "powerlessness"
+    ]
+  }
+}

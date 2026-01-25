@@ -2,8 +2,6 @@
  * API 调用模块
  */
 
-import { preloadCache } from './state.js';
-
 // 后端API地址（自动检测）
 // - 通过 Flask 直接访问 (port 5001) → 用相对路径
 // - 通过 cloudflared 隧道访问 (trycloudflare.com) → 用相对路径
@@ -38,81 +36,10 @@ export function getFetchErrorMessage(e) {
 }
 
 /**
- * 获取当前选择的翻译源
- */
-export function getTranslatorProvider() {
-    const select = document.getElementById("translatorProvider");
-    return select ? select.value : "bing";
-}
-
-/**
  * 获取 TTS URL
  */
-export function getTtsUrl(word, slow = false) {
-    return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}`;
+export function getTtsUrl(word, slow = false, accent = 'us') {
+    return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}&accent=${accent}`;
 }
 
-/**
- * 获取单词完整信息（使用 DeepSeek）
- * 返回: { translation, definitions, examples, synonyms, antonyms }
- */
-export async function fetchWordInfo(word) {
-    // 检查缓存
-    if (preloadCache.wordInfo[word]) {
-        return preloadCache.wordInfo[word];
-    }
-
-    try {
-        const url = `${API_BASE}/api/wordinfo?word=${encodeURIComponent(word)}`;
-        const res = await fetch(url);
-
-        if (!res.ok) {
-            const fallback = {
-                word,
-                translation: "加载失败",
-                definitions: [],
-                examples: [],
-                synonyms: [],
-                antonyms: []
-            };
-            preloadCache.wordInfo[word] = fallback;
-            return fallback;
-        }
-
-        const data = await res.json();
-
-        if (data.error) {
-            const fallback = {
-                word,
-                translation: `错误: ${data.error}`,
-                definitions: [],
-                examples: [],
-                synonyms: [],
-                antonyms: []
-            };
-            preloadCache.wordInfo[word] = fallback;
-            return fallback;
-        }
-
-        preloadCache.wordInfo[word] = data;
-        // 同时更新简单翻译缓存
-        if (data.translation) {
-            preloadCache.translations[word] = data.translation;
-        }
-
-        return data;
-    } catch (e) {
-        console.error("WordInfo fetch error:", e);
-        const fallback = {
-            word,
-            translation: "网络错误",
-            definitions: [],
-            examples: [],
-            synonyms: [],
-            antonyms: []
-        };
-        preloadCache.wordInfo[word] = fallback;
-        return fallback;
-    }
-}
 

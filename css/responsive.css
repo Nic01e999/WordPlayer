@@ -14,7 +14,7 @@
     .result-item { font-size: 22px; }
     .play-count { font-size: 20px; }
     /* 听写模式 - 大屏适配 */
-    body.dictation-mode #workplace { padding: 30px 30px 30px 55px; }
+    body.dictation-mode #dictationWorkplace { padding: 30px 30px 30px 55px; }
     .result-attempts { font-size: 26px; }
     .results-box h3 { font-size: 24px; }
     .results-box p strong { font-size: 56px; }
@@ -56,10 +56,70 @@
     .settings-trigger { right: 5%; }
     .settings-trigger .sidebar { width: 220px; }
     /* 听写模式 - 平板适配 */
-    body.dictation-mode #workplace { padding: 20px 20px 20px 40px; margin: 8px; }
+    body.dictation-mode #dictationWorkplace { padding: 20px 20px 20px 40px; margin: 8px; }
     .result-attempts { font-size: 18px; }
     .results-box { padding: 25px; }
     .results-box p strong { font-size: 40px; }
     .results-box::after { width: 45px; height: 45px; font-size: 12px; }
     #dictationPopup h3 { font-size: 22px; }
+}
+
+/* 手机屏幕 (<600px) */
+@media (max-width: 599px) {
+    #menu {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    #menu h1 {
+        font-size: 20px;
+        letter-spacing: 1px;
+    }
+    #mode-btn {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+    #mode-btn button {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+    .settings-trigger {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+    .settings-trigger .sidebar {
+        width: 90vw;
+        right: -35px;
+    }
+    .main { padding: 10px; }
+    .popup {
+        min-width: 90vw;
+        padding: 15px;
+    }
+    .popup input {
+        width: 90%;
+        font-size: 20px;
+    }
+    .current-word { font-size: 24px; }
+    .current-translation { font-size: 14px; }
+    .word-item strong { font-size: 16px; }
+    .repeater-container { height: 300px; }
+    .wordlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        padding: 12px;
+    }
+    body.dictation-mode #dictationWorkplace {
+        margin: 60px 5px 20px 5px;
+        padding: 15px 15px 15px 35px;
+    }
+    .result-item { font-size: 14px; padding: 8px 10px; }
+    .result-attempts { font-size: 16px; }
+    .results-box { padding: 20px; }
+    .results-box p strong { font-size: 36px; }
+    .results-box::after { width: 40px; height: 40px; font-size: 10px; }
+    #dictationPopup h3 { font-size: 18px; }
 }

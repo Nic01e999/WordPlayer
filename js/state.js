@@ -61,6 +61,23 @@ export function loadCacheFromStorage() {
 loadCacheFromStorage();
 
 /**
+ * 清理 Blob URL 缓存（释放内存）
+ */
+export function clearAudioCache() {
+    // 释放所有 Blob URL
+    Object.values(preloadCache.audioUrls).forEach(url => URL.revokeObjectURL(url));
+    Object.values(preloadCache.slowAudioUrls).forEach(url => URL.revokeObjectURL(url));
+    Object.values(preloadCache.sentenceAudioUrls).forEach(url => URL.revokeObjectURL(url));
+
+    // 清空缓存对象
+    preloadCache.audioUrls = {};
+    preloadCache.slowAudioUrls = {};
+    preloadCache.sentenceAudioUrls = {};
+    preloadCache.audioLoaded = 0;
+    preloadCache.audioPartial = {};
+}
+
+/**
  * 设置复读模式状态
  */
 export function setRepeaterState(state) {
@@ -72,16 +89,4 @@ export function setRepeaterState(state) {
  */
 export function setActiveMode(mode) {
     currentActiveMode = mode;
-}
-
-/**
- * 根据预加载状态更新模式按钮的可用性
- */
-export function updateModeButtonsState() {
-    const dictationBtn = document.getElementById("Dictation-bnt");
-    const repeaterBtn = document.getElementById("Repeater-bnt");
-    const hasEntries = preloadCache.entries.length > 0;
-
-    if (dictationBtn) dictationBtn.disabled = !hasEntries;
-    if (repeaterBtn) repeaterBtn.disabled = !hasEntries;
 }

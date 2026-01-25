@@ -2,9 +2,9 @@
  * 预加载系统模块
  */
 
-import { preloadCache, updateModeButtonsState } from './state.js';
-import { $, loadWordsFromTextarea, debounce, adjustSidebarWidth } from './utils.js';
-import { API_BASE, getHttpErrorMessage, getFetchErrorMessage } from './api.js';
+import { preloadCache, clearAudioCache } from './state.js';
+import { $, loadWordsFromTextarea, debounce, adjustSidebarWidth, updateModeButtonsState } from './utils.js';
+import { API_BASE, getTtsUrl, getHttpErrorMessage, getFetchErrorMessage } from './api.js';
 
 // 追踪上一次的 loading 状态
 let wasLoading = false;
@@ -79,6 +79,7 @@ export async function startPreload(forceReload = false) {
 
     // 强制重新加载：清除当前单词的缓存
     if (forceReload) {
+        clearAudioCache(); // 释放 Blob URL 内存
         entries.forEach(({ word, definition }) => {
             if (!definition) {
                 delete preloadCache.wordInfo[word];
@@ -86,6 +87,11 @@ export async function startPreload(forceReload = false) {
                 localStorage.removeItem(`wordinfo:${word}`);
             }
         });
+    }
+
+    // 如果单词列表改变，也清理旧的音频缓存
+    if (entriesChanged) {
+        clearAudioCache();
     }
 
     // 取消旧的加载
@@ -323,7 +329,7 @@ export async function startPreload(forceReload = false) {
         }
 
         try {
-            const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=${slow ? 1 : 0}&accent=${accent}`;
+            const url = getTtsUrl(text, slow, accent);
             const res = await fetchWithTimeout(url, { signal }, 15000);
             const blob = await res.blob();
 

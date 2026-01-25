@@ -73,8 +73,8 @@ body.dictation-mode #menu::after {
     font-size: 18px;
     font-weight: 500;
     padding: 14px 28px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,248,250,0.85) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
+    border: 1px solid var(--border-white-strong);
     transition: all 0.3s ease-out;
     box-sizing: border-box;
     color: var(--text-menu-btn);
@@ -87,7 +87,7 @@ body.dictation-mode #menu::after {
 /* 菜单按钮悬停状态 */
 #mode-btn button:hover {
     transform: translateY(-2px) scale(1.1);
-    border-color: rgba(255, 200, 210, 0.8);
+    border-color: var(--border-pink-medium);
     color: var(--text-primary);
     background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
     box-shadow: 0 4px 15px var(--shadow-menu-btn-hover);
@@ -183,14 +183,14 @@ body.dictation-mode #menu::after {
     max-height: 80vh;
     overflow-y: auto;
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.45) 0%,
-        rgba(255, 245, 245, 0.35) 50%,
-        rgba(255, 220, 230, 0.3) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+        var(--white-medium) 0%,
+        var(--white-soft) 50%,
+        var(--bg-pink-overlay) 100%);
+    border: 1px solid var(--border-white);
     border-radius: 20px;
     box-shadow:
         0 8px 32px var(--shadow-pink-light),
-        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        0 0 0 1px var(--border-white) inset;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-30px) scale(0.9);

@@ -3,7 +3,7 @@
  */
 
 /* 听写模式专用 - 模拟试卷纸张 */
-body.dictation-mode #workplace {
+body.dictation-mode #dictationWorkplace {
     background-image:
         /* 左侧装订线 */
         linear-gradient(90deg,
@@ -39,20 +39,30 @@ body.dictation-mode #workplace {
     box-shadow:
         2px 3px 8px var(--shadow-brown),
         inset 0 1px 0 var(--white-strong),
-        inset 0 -2px 5px rgba(200, 180, 170, 0.1);
+        inset 0 -2px 5px var(--shadow-brown);
 
     border: 1px solid var(--border-paper);
 }
 
 /* 撕裂纸条效果 - 只在听写模式显示 */
-body.dictation-mode #workplace::before {
+body.dictation-mode #dictationWorkplace::before {
     content: '';
     position: absolute;
     left: 0px;
     right: 0px;
     top: -45px;
     height: 50px;
-    background-color: var(--bg-paper-start);
+    /* 使用与纸张相同的复合背景（包含横线纹理） */
+    background:
+        /* 横线纹理 - 与纸张一致 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 39px,
+            var(--bg-paper-line) 39px,
+            var(--bg-paper-line) 40px
+        ),
+        /* 纸张底色 */
+        var(--bg-paper-start);
     -webkit-mask-image: url("../assets/images/break.PNG");
     -webkit-mask-repeat: repeat-x;
     -webkit-mask-position: center center;
@@ -66,7 +76,7 @@ body.dictation-mode #workplace::before {
 }
 
 /* 纸张右下角卷边效果 - 只在听写模式显示 */
-body.dictation-mode #workplace::after {
+body.dictation-mode #dictationWorkplace::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -75,10 +85,10 @@ body.dictation-mode #workplace::after {
     height: 30px;
     background: linear-gradient(135deg,
         transparent 50%,
-        rgba(255, 240, 235, 0.8) 50%,
-        rgba(250, 235, 225, 0.9) 100%);
+        var(--bg-fold-light) 50%,
+        var(--bg-fold-dark) 100%);
     border-radius: 0 0 8px 0;
-    box-shadow: -2px -2px 5px rgba(139, 111, 111, 0.05);
+    box-shadow: -2px -2px 5px var(--shadow-fold);
 }
 
 /* 弹窗容器 - 模拟草稿纸/便签 */
@@ -134,7 +144,7 @@ body.dictation-mode #workplace::after {
         transparent 10px,
         transparent 12px
     );
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05));
+    filter: drop-shadow(0 1px 1px var(--shadow-soft));
     clip-path: polygon(0 0, 42% 0, 42% 100%, 58% 100%, 58% 0, 100% 0, 100% 100%, 0 100%);
 }
 
@@ -168,7 +178,7 @@ body.dictation-mode #workplace::after {
 .popup.dragging {
     opacity: 0.9;
     box-shadow:
-        5px 8px 25px rgba(139, 111, 111, 0.25),
+        5px 8px 25px var(--shadow-brown-medium),
         0 0 0 2px var(--shadow-pink-strong);
     transition: none;
 }
@@ -223,7 +233,7 @@ body.dictation-mode #workplace::after {
     margin: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid rgba(200, 180, 170, 0.15);  /* 保持原有透明度 */
+    border-bottom: 1px solid var(--bg-paper-line);
     border-radius: 0;
     transition: background 0.2s;
     font-size: 18px;
@@ -287,7 +297,7 @@ body.dictation-mode #workplace::after {
     border: 1px solid var(--border-paper-medium);
     border-radius: 5px;
     box-shadow:
-        3px 4px 15px rgba(139, 111, 111, 0.12),
+        3px 4px 15px var(--shadow-brown),
         inset 0 1px 0 var(--white-strong);
 
     text-align: center;
@@ -311,7 +321,7 @@ body.dictation-mode #workplace::after {
     color: var(--status-score);
     display: block;
     margin: 15px 0;
-    text-shadow: 1px 1px 0 rgba(200, 50, 50, 0.1);
+    text-shadow: 1px 1px 0 var(--shadow-soft);
 }
 
 /* 统计项 */

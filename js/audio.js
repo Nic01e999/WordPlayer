@@ -3,7 +3,7 @@
  */
 
 import { preloadCache } from './state.js';
-import { API_BASE } from './api.js';
+import { getTtsUrl } from './api.js';
 import { getAccent } from './utils.js';
 
 // 当前播放的音频对象
@@ -44,7 +44,7 @@ export function speakWord(word, slow = false) {
     const cacheKey = `${word}:${accent}`;
     const cachedUrl = cache[cacheKey];
 
-    const url = cachedUrl || `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}&accent=${accent}`;
+    const url = cachedUrl || getTtsUrl(word, slow, accent);
     currentAudio = new Audio(url);
     currentAudio.onerror = () => console.warn("音频加载失败，请检查后端服务是否运行");
     currentAudio.play().catch(() => {});
@@ -76,15 +76,21 @@ export async function speakText(text, slow = false) {
 
     if (cachedUrl) {
         currentAudio = new Audio(cachedUrl);
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             currentAudio.onended = resolve;
-            currentAudio.onerror = resolve;
-            currentAudio.play().catch(resolve);
+            currentAudio.onerror = (e) => {
+                console.warn('音频播放失败:', e);
+                resolve(); // 仍然 resolve 以避免阻塞流程
+            };
+            currentAudio.play().catch((e) => {
+                console.warn('音频播放失败:', e);
+                resolve(); // 仍然 resolve 以避免阻塞流程
+            });
         });
     }
 
     // 未缓存，fetch 并缓存
-    const url = `${API_BASE}/api/tts?word=${encodeURIComponent(text)}&slow=${slow ? 1 : 0}&accent=${accent}`;
+    const url = getTtsUrl(text, slow, accent);
 
     try {
         const res = await fetch(url);
@@ -99,8 +105,14 @@ export async function speakText(text, slow = false) {
         currentAudio = new Audio(blobUrl);
         return new Promise((resolve) => {
             currentAudio.onended = resolve;
-            currentAudio.onerror = resolve;
-            currentAudio.play().catch(resolve);
+            currentAudio.onerror = (e) => {
+                console.warn('音频播放失败:', e);
+                resolve();
+            };
+            currentAudio.play().catch((e) => {
+                console.warn('音频播放失败:', e);
+                resolve();
+            });
         });
     } catch (e) {
         console.warn('有道TTS失败，尝试Web Speech:', e.message);

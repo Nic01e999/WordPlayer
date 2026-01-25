@@ -103,6 +103,9 @@
     /* 装订线 | .results-box::before */
     --accent-line: rgb(223, 151, 162);
 
+    /* 发光粉色 | .results-box h3 border */
+    --glow-pink: rgba(255, 182, 193, 0.6);
+
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -280,6 +283,56 @@
 
     /* }}} */
 
+    /* {{{ 折角颜色 (fold-) */
+
+    /* 折角浅色 | 纸张折角外层 */
+    --bg-fold-light: rgba(230, 210, 200, 0.85);
+
+    /* 折角深色 | 纸张折角内层 */
+    --bg-fold-dark: rgba(210, 190, 180, 0.95);
+
+    /* 折角阴影 | 纸张折角投影 */
+    --shadow-fold: rgba(139, 111, 111, 0.15);
+
+    /* }}} */
+
+    /* {{{ 功能性颜色 (func-) */
+
+    /* 播放按钮边框 | .btn-play */
+    --border-play: rgba(195, 230, 203, 0.6);
+
+    /* 播放按钮悬停阴影 | .btn-play:hover */
+    --shadow-play-hover: rgba(195, 230, 203, 0.4);
+
+    /* 暂停按钮边框 | .btn-pause */
+    --border-pause: rgba(255, 200, 160, 0.6);
+
+    /* 警告背景 | .input-warning */
+    --bg-warning-light: rgba(255, 200, 160, 0.2);
+
+    /* 错误背景轻 | .wordlist-delete:hover */
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+
+    /* 错误背景中 | .folder-open-close:hover */
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+
+    /* 深色遮罩 | .folder-open-overlay */
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+
+    /* 大阴影 | .drag-clone, .folder-open-view */
+    --shadow-large: rgba(0, 0, 0, 0.2);
+
+    /* 放置指示器边框 | .drop-indicator */
+    --border-drop-indicator: rgba(255, 120, 160, 0.8);
+
+    /* 文件夹预览背景 | .wordlist-folder-preview-item */
+    --bg-folder-preview: rgba(255, 200, 220, 0.2);
+
+    /* 文件夹预览边框 | .wordlist-folder-preview-item */
+    --border-folder-preview: rgba(255, 180, 200, 0.3);
+
+    /* }}} */
+
 }
 
 /* ===================================
@@ -322,6 +375,7 @@
     --accent-secondary: #e87888;
     --accent-brown: #d4909a;
     --accent-line: rgb(220, 120, 140);
+    --glow-pink: rgba(255, 143, 160, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -390,6 +444,26 @@
     --white-button-hover-soft: rgba(68, 45, 50, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(80, 50, 60, 0.85);
+    --bg-fold-dark: rgba(100, 65, 75, 0.95);
+    --shadow-fold: rgba(200, 150, 160, 0.2);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(100, 180, 120, 0.6);
+    --shadow-play-hover: rgba(100, 180, 120, 0.4);
+    --border-pause: rgba(200, 120, 100, 0.6);
+    --bg-warning-light: rgba(200, 120, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.15);
+    --bg-error-medium: rgba(200, 80, 80, 0.25);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.5);
+    --shadow-large: rgba(0, 0, 0, 0.3);
+    --border-drop-indicator: rgba(255, 143, 160, 0.8);
+    --bg-folder-preview: rgba(255, 143, 160, 0.15);
+    --border-folder-preview: rgba(255, 143, 160, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 330deg;
 }
@@ -434,6 +508,7 @@
     --accent-secondary: #a8e8b8;
     --accent-brown: #8bc48b;
     --accent-line: rgb(100, 180, 120);
+    --glow-pink: rgba(80, 200, 120, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -502,6 +577,26 @@
     --white-button-hover-soft: rgba(240, 255, 245, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(200, 220, 200, 0.85);
+    --bg-fold-dark: rgba(180, 200, 180, 0.95);
+    --shadow-fold: rgba(111, 139, 111, 0.15);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(80, 200, 120, 0.6);
+    --shadow-play-hover: rgba(80, 200, 120, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+    --shadow-large: rgba(0, 0, 0, 0.2);
+    --border-drop-indicator: rgba(80, 200, 120, 0.8);
+    --bg-folder-preview: rgba(80, 200, 120, 0.15);
+    --border-folder-preview: rgba(80, 200, 120, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 120deg;
 }
@@ -547,6 +642,7 @@
     --accent-secondary: #3da862;
     --accent-brown: #6ab88a;
     --accent-line: rgb(80, 160, 100);
+    --glow-pink: rgba(80, 200, 120, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -615,6 +711,26 @@
     --white-button-hover-soft: rgba(45, 66, 45, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(50, 80, 55, 0.85);
+    --bg-fold-dark: rgba(65, 100, 70, 0.95);
+    --shadow-fold: rgba(100, 180, 120, 0.2);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(80, 200, 120, 0.6);
+    --shadow-play-hover: rgba(80, 200, 120, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.15);
+    --bg-error-medium: rgba(200, 80, 80, 0.25);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.5);
+    --shadow-large: rgba(0, 0, 0, 0.3);
+    --border-drop-indicator: rgba(80, 200, 120, 0.8);
+    --bg-folder-preview: rgba(80, 200, 120, 0.15);
+    --border-folder-preview: rgba(80, 200, 120, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 120deg;
 }
@@ -659,6 +775,7 @@
     --accent-secondary: #a8d8f8;
     --accent-brown: #8bb4d4;
     --accent-line: rgb(100, 160, 220);
+    --glow-pink: rgba(77, 166, 255, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -727,6 +844,26 @@
     --white-button-hover-soft: rgba(240, 248, 255, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(200, 210, 230, 0.85);
+    --bg-fold-dark: rgba(180, 190, 210, 0.95);
+    --shadow-fold: rgba(111, 130, 150, 0.15);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(77, 166, 255, 0.6);
+    --shadow-play-hover: rgba(77, 166, 255, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+    --shadow-large: rgba(0, 0, 0, 0.2);
+    --border-drop-indicator: rgba(77, 166, 255, 0.8);
+    --bg-folder-preview: rgba(77, 166, 255, 0.15);
+    --border-folder-preview: rgba(77, 166, 255, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 210deg;
 }
@@ -772,6 +909,7 @@
     --accent-secondary: #3d96ef;
     --accent-brown: #6ab0e8;
     --accent-line: rgb(77, 150, 220);
+    --glow-pink: rgba(77, 166, 255, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -840,6 +978,26 @@
     --white-button-hover-soft: rgba(45, 57, 68, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(50, 65, 85, 0.85);
+    --bg-fold-dark: rgba(65, 85, 105, 0.95);
+    --shadow-fold: rgba(77, 150, 220, 0.2);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(77, 166, 255, 0.6);
+    --shadow-play-hover: rgba(77, 166, 255, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.15);
+    --bg-error-medium: rgba(200, 80, 80, 0.25);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.5);
+    --shadow-large: rgba(0, 0, 0, 0.3);
+    --border-drop-indicator: rgba(77, 166, 255, 0.8);
+    --bg-folder-preview: rgba(77, 166, 255, 0.15);
+    --border-folder-preview: rgba(77, 166, 255, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 210deg;
 }
@@ -884,6 +1042,7 @@
     --accent-secondary: #d8a8f8;
     --accent-brown: #b48bd4;
     --accent-line: rgb(160, 100, 220);
+    --glow-pink: rgba(168, 85, 247, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -952,6 +1111,26 @@
     --white-button-hover-soft: rgba(248, 240, 255, 0.9);
     /* }}} */
 
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(220, 200, 230, 0.85);
+    --bg-fold-dark: rgba(200, 180, 210, 0.95);
+    --shadow-fold: rgba(130, 111, 150, 0.15);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(168, 85, 247, 0.6);
+    --shadow-play-hover: rgba(168, 85, 247, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+    --shadow-large: rgba(0, 0, 0, 0.2);
+    --border-drop-indicator: rgba(168, 85, 247, 0.8);
+    --bg-folder-preview: rgba(168, 85, 247, 0.15);
+    --border-folder-preview: rgba(168, 85, 247, 0.25);
+    /* }}} */
+
     /* 图片滤镜色相 */
     --filter-hue: 270deg;
 }
@@ -997,6 +1176,7 @@
     --accent-secondary: #9645e7;
     --accent-brown: #b070e8;
     --accent-line: rgb(150, 80, 200);
+    --glow-pink: rgba(168, 85, 247, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
@@ -1063,6 +1243,26 @@
     --white-button-soft: rgba(42, 37, 58, 0.85);
     --white-button-hover: rgba(47, 42, 63, 0.95);
     --white-button-hover-soft: rgba(52, 47, 68, 0.9);
+    /* }}} */
+
+    /* {{{ 折角颜色 */
+    --bg-fold-light: rgba(55, 45, 75, 0.85);
+    --bg-fold-dark: rgba(75, 60, 100, 0.95);
+    --shadow-fold: rgba(150, 80, 200, 0.2);
+    /* }}} */
+
+    /* {{{ 功能性颜色 */
+    --border-play: rgba(168, 85, 247, 0.6);
+    --shadow-play-hover: rgba(168, 85, 247, 0.4);
+    --border-pause: rgba(200, 160, 100, 0.6);
+    --bg-warning-light: rgba(200, 160, 100, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.15);
+    --bg-error-medium: rgba(200, 80, 80, 0.25);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.5);
+    --shadow-large: rgba(0, 0, 0, 0.3);
+    --border-drop-indicator: rgba(168, 85, 247, 0.8);
+    --bg-folder-preview: rgba(168, 85, 247, 0.15);
+    --border-folder-preview: rgba(168, 85, 247, 0.25);
     /* }}} */
 
     /* 图片滤镜色相 */

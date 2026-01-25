@@ -5,8 +5,8 @@
 
 @import url('./colors.css');
 @import url('./base.css');
+@import url('./components.css');
 @import url('./menu.css');
 @import url('./repeater.css');
 @import url('./dictation.css');
-@import url('./components.css');
 @import url('./responsive.css');

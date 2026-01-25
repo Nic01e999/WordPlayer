@@ -79,7 +79,7 @@
     background: linear-gradient(90deg,
         transparent 0%,
         var(--bg-pink-overlay-light) 20%,
-        rgba(255, 182, 193, 0.25) 80%,
+        var(--bg-pink-subtle) 80%,
         transparent 100%);
     color: var(--text-active);
 }
@@ -115,7 +115,7 @@
 .word-info {
     text-align: center;
     padding: 30px 40px;
-    background: rgba(255, 250, 250, 0.95);
+    background: var(--bg-container);
     border: 1px solid var(--border-pink-light);
     border-radius: 20px;
     box-shadow: 0 4px 20px var(--shadow-pink-light);
@@ -217,7 +217,7 @@
     flex: 1;
     min-height: 50px;
     padding: clamp(8px, 2vw, 15px);
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--white-medium);
     border-radius: 12px;
     border: 1px solid var(--border-pink-light);
     margin-top: 8px;
@@ -245,7 +245,7 @@
 }
 
 .apple-slider:focus-visible .apple-slider-thumb {
-    box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.4), 0 2px 8px var(--shadow-pink-medium);
+    box-shadow: 0 0 0 3px var(--shadow-pink-strong), 0 2px 8px var(--shadow-pink-medium);
 }
 
 /* 节点标签行 */
@@ -491,7 +491,7 @@
 }
 
 .example-sentence.clickable-text:hover {
-    background: rgba(255, 182, 193, 0.15);
+    background: var(--bg-pink-overlay-light);
     border-left-color: var(--text-accent);
 }
 
@@ -500,7 +500,7 @@
 }
 
 .example-sentence.clickable-text.playing {
-    background: rgba(255, 182, 193, 0.25);
+    background: var(--bg-pink-subtle);
     border-left-width: 4px;
 }
 
@@ -514,7 +514,7 @@
 }
 
 .clickable-word:hover {
-    background: rgba(255, 182, 193, 0.2);
+    background: var(--bg-pink-overlay-light);
     transform: translateY(-1px);
 }
 
@@ -523,7 +523,7 @@
 }
 
 .clickable-word.playing {
-    background: rgba(255, 182, 193, 0.35);
+    background: var(--bg-pink-subtle);
     box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
@@ -545,7 +545,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 64px;
-    color: rgba(196, 139, 139, 0.85);
+    color: var(--accent-brown);
     pointer-events: none;
     opacity: 0;
     z-index: 20;
@@ -564,7 +564,7 @@
 }
 
 /* ===== 重复模式自适应布局 ===== */
-body.repeater-mode #workplace {
+body.repeater-mode #repeaterView {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 180px);
