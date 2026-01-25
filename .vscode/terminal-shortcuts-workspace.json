@@ -5,8 +5,9 @@
         "group": "Workspace"
     },
     {
-        "label": "start",
-        "command": "python3 run.py",
+        "label": "start0",
+        "command": "DEEPSEEK_API_KEY='sk-0824195cfddf48db92c8a6fa482f7304' python3 run.py",
         "group": "Workspace"
     }
+
 ]

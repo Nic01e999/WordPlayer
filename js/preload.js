@@ -53,6 +53,9 @@ export function updatePreloadProgress() {
  * 开始预加载翻译和音频
  */
 export async function startPreload(forceReload = false) {
+    console.log('[startPreload] called, loadId:', preloadCache.loadId, 'loading:', preloadCache.loading);
+    console.trace('[startPreload] call stack');
+
     const entries = loadWordsFromTextarea();
     if (!entries.length) {
         preloadCache.loading = false;
@@ -196,6 +199,7 @@ export async function startPreload(forceReload = false) {
             if (myId !== preloadCache.loadId) return;
 
             const batch = wordsToFetch.slice(i, i + BATCH_SIZE);
+            console.log('[翻译] 开始请求批次:', batch, 'myId:', myId, 'loadId:', preloadCache.loadId);
 
             try {
                 const res = await fetch(`${API_BASE}/api/wordinfo/batch`, {
@@ -205,7 +209,12 @@ export async function startPreload(forceReload = false) {
                     signal
                 });
 
-                if (myId !== preloadCache.loadId) return;
+                if (myId !== preloadCache.loadId) {
+                    console.log('[翻译] myId !== loadId, 中断', myId, preloadCache.loadId);
+                    return;
+                }
+
+                console.log('[翻译] 收到响应, status:', res.status);
 
                 if (!res.ok) {
                     const errorMsg = getHttpErrorMessage(res.status);
@@ -264,6 +273,7 @@ export async function startPreload(forceReload = false) {
                 }
 
                 // 缓存结果到内存和 localStorage
+                console.log('[翻译] 成功获取数据:', Object.keys(data.results || {}));
                 const results = data.results || {};
                 batch.forEach(word => {
                     const info = results[word];
@@ -290,7 +300,11 @@ export async function startPreload(forceReload = false) {
                 });
                 updatePreloadProgress();
             } catch (e) {
-                if (e.name === 'AbortError') return;
+                console.log('[翻译] 请求出错:', e.name, e.message);
+                if (e.name === 'AbortError') {
+                    console.log('[翻译] AbortError, 退出');
+                    return;
+                }
                 const errorMsg = getFetchErrorMessage(e);
                 batch.forEach(word => {
                     preloadCache.translations[word] = errorMsg;

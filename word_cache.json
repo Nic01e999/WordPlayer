@@ -419,5 +419,436 @@
       "frailty",
       "powerlessness"
     ]
+  },
+  "length": {
+    "word": "length",
+    "translation": "长度",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（物体的）长度",
+          "（时间的）长短，期间",
+          "（电影、书籍等的）篇幅，片长"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the measurement of something from end to end",
+          "the amount of time something lasts",
+          "the extent of a piece of writing or a film"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The length of the swimming pool is 25 meters.",
+        "We discussed the issue at great length during the meeting."
+      ],
+      "fun": [
+        "My dog, in a moment of pure optimism, tried to measure the length of the sofa with his entire body.",
+        "The length of the movie was directly proportional to the number of times I checked my phone."
+      ]
+    },
+    "synonyms": [
+      "extent",
+      "duration",
+      "span",
+      "distance",
+      "measure"
+    ],
+    "antonyms": [
+      "brevity",
+      "shortness"
+    ]
+  },
+  "width": {
+    "word": "width",
+    "translation": "宽度",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "宽度",
+          "广度"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the measurement or extent of something from side to side",
+          "the distance across something"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The width of the new door is 90 centimeters.",
+        "Please measure the length and width of the room."
+      ],
+      "fun": [
+        "The width of his smile when he saw the cake was almost as wide as the cake itself.",
+        "Trying to park in that narrow spot felt like a high-stakes exam on the precise width of my car."
+      ]
+    },
+    "synonyms": [
+      "breadth",
+      "span",
+      "thickness",
+      "girth",
+      "diameter"
+    ],
+    "antonyms": [
+      "length",
+      "height"
+    ]
+  },
+  "debris": {
+    "word": "debris",
+    "translation": "碎片",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（破坏后留下的）碎片，残骸",
+          "碎石，瓦砾"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "scattered fragments, typically of something wrecked or destroyed",
+          "loose natural material consisting especially of broken pieces of rock"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "After the earthquake, rescue workers searched through the debris for survivors.",
+        "The storm left a trail of debris all over the streets."
+      ],
+      "fun": [
+        "My desk is currently an archaeological site, with layers of coffee cups, paper debris, and forgotten pens.",
+        "The toddler's lunchtime often looked like a tiny explosion, with food debris covering every surface within a two-meter radius."
+      ]
+    },
+    "synonyms": [
+      "rubble",
+      "wreckage",
+      "remains",
+      "detritus",
+      "fragments"
+    ],
+    "antonyms": []
+  },
+  "genre": {
+    "word": "genre",
+    "translation": "类型",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（文学、艺术、电影、音乐等的）类型，体裁",
+          "风格"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a category of artistic composition, as in music or literature, characterized by similarities in form, style, or subject matter",
+          "a style, especially in the arts, that involves a particular set of characteristics"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Science fiction is my favorite literary genre.",
+        "The film festival featured movies from a wide variety of genres."
+      ],
+      "fun": [
+        "His cooking defies genre; it's a fusion of chaos, bold flavors, and questionable plating.",
+        "My music playlist is a genre-hopping time machine, jumping from 80s synth-pop to medieval lute music in three songs."
+      ]
+    },
+    "synonyms": [
+      "category",
+      "style",
+      "type",
+      "kind",
+      "form"
+    ],
+    "antonyms": []
+  },
+  "february": {
+    "word": "February",
+    "translation": "二月",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "二月"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "the second month of the year, in the Gregorian calendar"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "My birthday is in February.",
+        "February is the shortest month of the year."
+      ],
+      "fun": [
+        "February is the month where my New Year's resolutions go to quietly hibernate, forgotten under a blanket of cold weather.",
+        "Spelling 'February' correctly without autocorrect feels like a minor personal victory every single time."
+      ]
+    },
+    "synonyms": [],
+    "antonyms": []
+  },
+  "library": {
+    "word": "library",
+    "translation": "图书馆",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "图书馆",
+          "藏书楼",
+          "藏书",
+          "文库",
+          "系列丛书"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a building or room containing collections of books, periodicals, and sometimes films and recorded music for use or borrowing",
+          "a collection of books and periodicals held in a library",
+          "a series of books or recordings issued by a company as a set"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I spent the afternoon studying in the quiet library.",
+        "You can borrow that novel from the public library."
+      ],
+      "fun": [
+        "My personal library is so vast, it has its own gravitational pull.",
+        "The squirrel's nest was a curious library of acorns and shiny bottle caps."
+      ]
+    },
+    "synonyms": [
+      "archive",
+      "collection",
+      "repository",
+      "reading room",
+      "athenaeum"
+    ],
+    "antonyms": []
+  },
+  "camera": {
+    "word": "camera",
+    "translation": "照相机",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "照相机",
+          "摄影机",
+          "摄像机",
+          "暗箱"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a device for recording visual images in the form of photographs, film, or video signals"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She brought her camera to capture the beautiful sunset.",
+        "Security cameras are installed throughout the building for safety."
+      ],
+      "fun": [
+        "The chameleon is nature's stealth camera, blending in before snapping up its prey.",
+        "My memory is a faulty camera that only develops blurry pictures of where I left my keys."
+      ]
+    },
+    "synonyms": [
+      "camcorder",
+      "video camera",
+      "photographic equipment"
+    ],
+    "antonyms": []
+  },
+  "sword": {
+    "word": "sword",
+    "translation": "剑",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "剑",
+          "刀剑",
+          "武力",
+          "兵权"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a weapon with a long metal blade and a hilt with a hand guard, used for thrusting or striking"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The knight drew his sword to defend the castle.",
+        "In the museum, we saw an ancient sword from the Roman era."
+      ],
+      "fun": [
+        "His wit was sharper than a double-edged sword, leaving his opponents speechless.",
+        "The chef wielded his kitchen knife with the precision of a master's sword."
+      ]
+    },
+    "synonyms": [
+      "blade",
+      "saber",
+      "cutlass",
+      "rapier",
+      "gladius"
+    ],
+    "antonyms": [
+      "plowshare",
+      "olive branch"
+    ]
+  },
+  "island": {
+    "word": "island",
+    "translation": "岛",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "岛",
+          "岛屿",
+          "安全岛",
+          "孤立体"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a piece of land surrounded by water",
+          "a thing resembling an island, especially in being isolated, detached, or surrounded in some way"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "They went on vacation to a tropical island in the Pacific.",
+        "The kitchen island provides extra counter space and storage."
+      ],
+      "fun": [
+        "In the sea of chatter, her quiet confidence was an island of calm.",
+        "My desk is a chaotic island surrounded by a ocean of carpet."
+      ]
+    },
+    "synonyms": [
+      "isle",
+      "islet",
+      "atoll",
+      "key",
+      "cay"
+    ],
+    "antonyms": [
+      "mainland",
+      "continent"
+    ]
+  },
+  "doubt": {
+    "word": "doubt",
+    "translation": "怀疑",
+    "chineseDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "怀疑",
+          "疑虑",
+          "疑惑"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "怀疑",
+          "不信",
+          "拿不准"
+        ]
+      }
+    ],
+    "definitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a feeling of uncertainty or lack of conviction"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "feel uncertain about",
+          "question the truth or fact of"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "There is no doubt that he is the most qualified candidate for the job.",
+        "I doubt we will arrive on time if we don't leave now."
+      ],
+      "fun": [
+        "His promise was so flimsy, doubt blew through it like a hurricane.",
+        "I have a tiny, nagging doubt that my cat understands English but chooses to ignore me."
+      ]
+    },
+    "synonyms": [
+      "uncertainty",
+      "skepticism",
+      "distrust",
+      "mistrust",
+      "hesitation"
+    ],
+    "antonyms": [
+      "certainty",
+      "confidence",
+      "trust"
+    ]
   }
 }
