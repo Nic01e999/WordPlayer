@@ -31,9 +31,9 @@ body.dictation-mode #dictationWorkplace {
     background-position: top left, top left, top left;
     background-size: auto, auto, auto;
 
-    padding: 25px 25px 25px 45px;
-    margin: 80px 10px 30px 10px;
-    border-radius: 8px;
+    padding: 1.5625rem 1.5625rem 1.5625rem 2.8125rem;
+    margin: 5rem 0.625rem 1.875rem 0.625rem;
+    border-radius: 0.5rem;
 
     /* 纸张阴影和边缘效果 */
     box-shadow:
@@ -48,10 +48,10 @@ body.dictation-mode #dictationWorkplace {
 body.dictation-mode #dictationWorkplace::before {
     content: '';
     position: absolute;
-    left: 0px;
-    right: 0px;
-    top: -45px;
-    height: 50px;
+    left: 0;
+    right: 0;
+    top: -2.8125rem;
+    height: 3.125rem;
     /* 使用与纸张相同的复合背景（包含横线纹理） */
     background:
         /* 横线纹理 - 与纸张一致 */
@@ -63,11 +63,11 @@ body.dictation-mode #dictationWorkplace::before {
         ),
         /* 纸张底色 */
         var(--bg-paper-start);
-    -webkit-mask-image: url("../assets/images/break.PNG");
+    -webkit-mask-image: url("../assets/images/break.png");
     -webkit-mask-repeat: repeat-x;
     -webkit-mask-position: center center;
     -webkit-mask-size: auto 100%;
-    mask-image: url("../assets/images/break.PNG");
+    mask-image: url("../assets/images/break.png");
     mask-repeat: repeat-x;
     mask-position: center center;
     mask-size: auto 100%;
@@ -81,13 +81,13 @@ body.dictation-mode #dictationWorkplace::after {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 30px;
-    height: 30px;
+    width: 1.875rem;
+    height: 1.875rem;
     background: linear-gradient(135deg,
         transparent 50%,
         var(--bg-fold-light) 50%,
         var(--bg-fold-dark) 100%);
-    border-radius: 0 0 8px 0;
+    border-radius: 0 0 0.5rem 0;
     box-shadow: -2px -2px 5px var(--shadow-fold);
 }
 
@@ -110,8 +110,8 @@ body.dictation-mode #dictationWorkplace::after {
         /* 纸张色 */
         linear-gradient(180deg, var(--bg-popup-start) 0%, var(--bg-popup-end) 100%);
 
-    padding: 20px 25px 25px 25px;
-    border-radius: 3px;
+    padding: 1.25rem 1.5625rem 1.5625rem 1.5625rem;
+    border-radius: 0.1875rem;
 
     /* 纸张边缘 */
     border: 1px solid var(--border-paper-medium);
@@ -121,10 +121,10 @@ body.dictation-mode #dictationWorkplace::after {
     box-shadow:
         3px 4px 12px var(--shadow-brown-medium),
         0 0 0 1px var(--white-medium) inset,
-        inset 0 60px 50px -50px var(--white-soft);
+        inset 0 3.75rem 3.125rem -3.125rem var(--white-soft);
 
     z-index: 100;
-    min-width: 320px;
+    min-width: 20rem;
     text-align: center;
 }
 
@@ -132,10 +132,10 @@ body.dictation-mode #dictationWorkplace::after {
 .popup::before {
     content: '';
     position: absolute;
-    top: -8px;
-    left: 10px;
-    right: 10px;
-    height: 8px;
+    top: -0.5rem;
+    left: 0.625rem;
+    right: 0.625rem;
+    height: 0.5rem;
     background: repeating-linear-gradient(90deg,
         transparent 0px,
         transparent 8px,
@@ -151,11 +151,11 @@ body.dictation-mode #dictationWorkplace::after {
 /* 弹窗拖拽手柄 - 顶部区域（大头钉图片） */
 .popup-drag-handle {
     position: absolute;
-    top: -9px;
+    top: -0.5625rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 32px;
-    height: 32px;
+    width: 2rem;
+    height: 2rem;
     cursor: grab;
     z-index: 10;
     transition: transform 0.2s ease;
@@ -186,23 +186,23 @@ body.dictation-mode #dictationWorkplace::after {
 #dictationPopup h3 {
     font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
     color: var(--text-label);
-    font-size: 24px;
-    margin: 5px 0 15px 0;
+    font-size: 1.5rem;
+    margin: 0.3125rem 0 0.9375rem 0;
     font-weight: 600;
 }
 
 #retryInfo {
     font-family: 'Caveat', cursive;
     color: var(--text-accent);
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 1.125rem;
+    margin-bottom: 0.625rem;
 }
 
 /* 弹窗输入框 - 模拟手写答题区 */
 .popup input {
     font-family: 'Caveat', cursive;
-    font-size: 26px;
-    padding: 12px 20px;
+    font-size: 1.625rem;
+    padding: 0.75rem 1.25rem;
     width: 70%;
     border: none;
     border-bottom: 2px dashed var(--shadow-brown);
@@ -229,14 +229,14 @@ body.dictation-mode #dictationWorkplace::after {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    padding: 12px 15px;
+    padding: 0.75rem 0.9375rem;
     margin: 0;
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--bg-paper-line);
     border-radius: 0;
     transition: background 0.2s;
-    font-size: 18px;
+    font-size: 1.125rem;
     position: relative;
 }
 
@@ -248,9 +248,9 @@ body.dictation-mode #dictationWorkplace::after {
 .result-index {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 600;
-    min-width: 40px;
+    min-width: 2.5rem;
     color: var(--text-label);
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 
@@ -259,30 +259,30 @@ body.dictation-mode #dictationWorkplace::after {
 .result-attempts {
     flex-basis: 100%;
     font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
-    font-size: 22px;
+    font-size: 1.375rem;
     color: var(--text-dark);
     line-height: 1.6;
 }
 .result-listened {
     font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
-    font-size: 30px;
+    font-size: 1.875rem;
     color: var(--text-dark);
-    padding: 4px 8px;
-    margin: 2px 0;
+    padding: 0.25rem 0.5rem;
+    margin: 0.125rem 0;
 }
 /* 每次尝试的样式 */
 .result-attempts > div {
-    padding: 4px 8px;
-    margin: 0px 0px 0px 45px;
-    border-radius: 3px;
+    padding: 0.25rem 0.5rem;
+    margin: 0 0 0 2.8125rem;
+    border-radius: 0.1875rem;
     position: relative;
 }
 
 /* 结果汇总框 - 成绩单风格 */
 .results-box {
     position: relative;
-    margin: 20px 10px;
-    padding: 30px;
+    margin: 1.25rem 0.625rem;
+    padding: 1.875rem;
 
     /* 成绩单纸张背景 */
     background:
@@ -295,7 +295,7 @@ body.dictation-mode #dictationWorkplace::after {
         linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
 
     border: 1px solid var(--border-paper-medium);
-    border-radius: 5px;
+    border-radius: 0.3125rem;
     box-shadow:
         3px 4px 15px var(--shadow-brown),
         inset 0 1px 0 var(--white-strong);
@@ -307,44 +307,44 @@ body.dictation-mode #dictationWorkplace::after {
 .results-box h3 {
     font-family: 'Cinzel', Georgia, serif;
     color: var(--text-label);
-    font-size: 20px;
-    margin: 0 0 20px 0;
-    padding-bottom: 15px;
+    font-size: 1.25rem;
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.9375rem;
     border-bottom: 2px double var(--glow-pink);
-    letter-spacing: 2px;
+    letter-spacing: 0.125rem;
 }
 
 /* 分数显示 - 大红色手写风格 */
 .results-box p strong {
     font-family: 'Caveat', cursive;
-    font-size: 48px;
+    font-size: 3rem;
     color: var(--status-score);
     display: block;
-    margin: 15px 0;
+    margin: 0.9375rem 0;
     text-shadow: 1px 1px 0 var(--shadow-soft);
 }
 
 /* 统计项 */
 .results-box p {
     font-family: 'Caveat', cursive;
-    font-size: 20px;
+    font-size: 1.25rem;
     color: var(--text-stat);
-    margin: 8px 0;
+    margin: 0.5rem 0;
 }
 
 /* 印章效果 - 装饰性 */
 .results-box::after {
     content: '批阅';
     position: absolute;
-    bottom: 20px;
-    right: 25px;
+    bottom: 1.25rem;
+    right: 1.5625rem;
     font-family: 'Cinzel', Georgia, serif;
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--bg-stamp);
     border: 2px solid var(--border-stamp);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
     display: flex;
     align-items: center;
     justify-content: center;

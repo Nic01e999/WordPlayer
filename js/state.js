@@ -18,6 +18,11 @@ export let currentActiveMode = null;
  * 预加载缓存对象
  * 用于后台预加载翻译和音频
  */
+/**
+ * 正在加载中的音频追踪（防止重复请求）
+ */
+export const loadingAudio = new Set();
+
 export const preloadCache = {
     entries: [],            // 已缓存的单词条目列表 { word, definition }
     translations: {},       // { word: translation } - 如果有 definition 则直接使用

@@ -9,6 +9,16 @@ const MODE_STORAGE_KEY = 'english-dictation-theme-mode';
 const VALID_COLORS = ['pink', 'green', 'blue', 'purple'];
 const VALID_MODES = ['light', 'dark'];
 
+// 主题变更回调
+let _onThemeChange = null;
+
+/**
+ * 设置主题变更回调
+ */
+export function setThemeChangeCallback(callback) {
+    _onThemeChange = callback;
+}
+
 /**
  * 从 localStorage 获取当前主题设置
  * @returns {{color: string, mode: string}} 主题设置
@@ -78,6 +88,7 @@ export function initTheme() {
             theme.color = e.target.value;
             applyTheme(theme);
             saveTheme(theme);
+            if (_onThemeChange) _onThemeChange();
         });
     });
 
@@ -88,6 +99,7 @@ export function initTheme() {
             theme.mode = e.target.value;
             applyTheme(theme);
             saveTheme(theme);
+            if (_onThemeChange) _onThemeChange();
         });
     });
 }

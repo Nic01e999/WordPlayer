@@ -1,11 +1,38 @@
 /**
  * 单词表布局管理模块
- * 管理卡片和文件夹的排列顺序
+ * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
 import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage } from './storage.js';
 
 const LAYOUT_KEY = 'wordlist_layout';
+const LAYOUT_VERSION = 3;
+
+/**
+ * 将旧版 row/col 布局转换为纯顺序数组
+ */
+function migrateFromGrid(oldLayout) {
+    const items = oldLayout.items || [];
+
+    // 如果已经没有 row/col，直接返回
+    if (items.length === 0 || items[0].row === undefined) {
+        return { version: LAYOUT_VERSION, items };
+    }
+
+    // 按 row/col 排序
+    const sortedItems = [...items].sort((a, b) => {
+        if (a.row !== b.row) return a.row - b.row;
+        return a.col - b.col;
+    });
+
+    // 删除 row/col 属性
+    const newItems = sortedItems.map(item => {
+        const { row, col, ...rest } = item;
+        return rest;
+    });
+
+    return { version: LAYOUT_VERSION, items: newItems };
+}
 
 /**
  * 获取布局
@@ -14,10 +41,24 @@ export function getLayout() {
     try {
         const data = localStorage.getItem(LAYOUT_KEY);
         if (data) {
-            const layout = JSON.parse(data);
+            let layout = JSON.parse(data);
+
+            // 检测并迁移旧版格式（有 row/col 的转为纯顺序）
+            if (Array.isArray(layout)) {
+                // v1 格式：直接是数组
+                layout = migrateFromGrid({ items: layout });
+                saveLayout(layout);
+            } else if (!layout.version || layout.version < LAYOUT_VERSION) {
+                // 旧版格式
+                layout = migrateFromGrid(layout);
+                saveLayout(layout);
+            }
+
             return syncLayout(layout);
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error('Failed to load layout:', e);
+    }
     return buildDefaultLayout();
 }
 
@@ -26,6 +67,9 @@ export function getLayout() {
  */
 export function saveLayout(layout) {
     try {
+        if (!layout.version) {
+            layout = { version: LAYOUT_VERSION, items: layout.items || [] };
+        }
         localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout));
     } catch (e) {
         console.error('Failed to save layout:', e);
@@ -40,7 +84,10 @@ function buildDefaultLayout() {
     const entries = Object.values(lists).sort((a, b) =>
         new Date(b.updated || b.created) - new Date(a.updated || a.created)
     );
-    return entries.map(list => ({ type: 'card', name: list.name }));
+
+    const items = entries.map(list => ({ type: 'card', name: list.name }));
+
+    return { version: LAYOUT_VERSION, items };
 }
 
 /**
@@ -52,13 +99,13 @@ function syncLayout(layout) {
     const layoutNames = new Set();
 
     // 收集 layout 中所有名称
-    layout.forEach(item => {
+    layout.items.forEach(item => {
         if (item.type === 'card') layoutNames.add(item.name);
         if (item.type === 'folder') item.items.forEach(n => layoutNames.add(n));
     });
 
     // 移除 layout 中已不存在的列表
-    layout = layout.filter(item => {
+    layout.items = layout.items.filter(item => {
         if (item.type === 'card') return allNames.has(item.name);
         if (item.type === 'folder') {
             item.items = item.items.filter(n => allNames.has(n));
@@ -67,10 +114,10 @@ function syncLayout(layout) {
         return false;
     });
 
-    // 添加新列表到末尾
+    // 新列表追加到末尾
     allNames.forEach(name => {
         if (!layoutNames.has(name)) {
-            layout.push({ type: 'card', name });
+            layout.items.push({ type: 'card', name });
         }
     });
 
@@ -85,7 +132,7 @@ export function deleteWordList(name) {
 
     // 从 layout 中移除
     let layout = getLayout();
-    layout = layout.filter(item => {
+    layout.items = layout.items.filter(item => {
         if (item.type === 'card' && item.name === name) return false;
         if (item.type === 'folder') {
             item.items = item.items.filter(n => n !== name);
@@ -98,18 +145,26 @@ export function deleteWordList(name) {
 }
 
 /**
+ * 检查文件夹名称是否已存在
+ */
+export function isFolderNameExists(folderName) {
+    const layout = getLayout();
+    return layout.items.some(item => item.type === 'folder' && item.name === folderName);
+}
+
+/**
  * 删除文件夹（同时删除其中的所有单词表）
  */
 export function deleteFolder(folderName) {
     const layout = getLayout();
-    const folderItem = layout.find(item => item.type === 'folder' && item.name === folderName);
+    const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
 
     if (folderItem) {
         // 删除文件夹中的所有单词表
         removeWordListsFromStorage(folderItem.items);
 
         // 从 layout 中移除文件夹
-        const newLayout = layout.filter(item => !(item.type === 'folder' && item.name === folderName));
-        saveLayout(newLayout);
+        layout.items = layout.items.filter(item => !(item.type === 'folder' && item.name === folderName));
+        saveLayout(layout);
     }
 }

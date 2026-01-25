@@ -2,7 +2,7 @@
  * 音频控制模块
  */
 
-import { preloadCache } from './state.js';
+import { preloadCache, loadingAudio } from './state.js';
 import { getTtsUrl } from './api.js';
 import { getAccent } from './utils.js';
 
@@ -33,21 +33,47 @@ export function isAudioPlaying() {
 /**
  * 使用后端 TTS API 朗读单词
  */
-export function speakWord(word, slow = false) {
-    stopAudio();
-
-    // 获取当前口音设置
+export async function speakWord(word, slow = false) {
     const accent = getAccent();
-
-    // 先检查缓存的 Blob URL（使用 text:accent 格式的 key）
     const cache = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
     const cacheKey = `${word}:${accent}`;
     const cachedUrl = cache[cacheKey];
 
-    const url = cachedUrl || getTtsUrl(word, slow, accent);
-    currentAudio = new Audio(url);
-    currentAudio.onerror = () => console.warn("音频加载失败，请检查后端服务是否运行");
-    currentAudio.play().catch(() => {});
+    // 缓存命中，直接播放
+    if (cachedUrl) {
+        stopAudio();
+        currentAudio = new Audio(cachedUrl);
+        currentAudio.onerror = () => console.warn("音频加载失败");
+        currentAudio.play().catch(() => {});
+        return;
+    }
+
+    // 正在加载中，跳过（不停止当前播放）
+    const loadingKey = `${cacheKey}:${slow}`;
+    if (loadingAudio.has(loadingKey)) {
+        return;
+    }
+
+    // 缓存未命中，fetch 并缓存
+    loadingAudio.add(loadingKey);
+    const url = getTtsUrl(word, slow, accent);
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`TTS请求失败: ${res.status}`);
+
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        cache[cacheKey] = blobUrl;
+
+        stopAudio();
+        currentAudio = new Audio(blobUrl);
+        currentAudio.onerror = () => console.warn("音频加载失败");
+        currentAudio.play().catch(() => {});
+    } catch (e) {
+        console.warn("音频请求失败:", e.message);
+    } finally {
+        loadingAudio.delete(loadingKey);
+    }
 }
 
 /**

@@ -7,9 +7,10 @@ import { $ } from '../utils.js';
 import { setActiveMode, setRepeaterState, preloadCache } from '../state.js';
 import { updatePreloadProgress } from '../preload.js';
 import { stopAudio } from '../audio.js';
+import { showPrompt, showAlert } from '../utils/dialog.js';
 
 // 导入子模块
-import { getWordLists, saveWordList, loadWordList } from './storage.js';
+import { getWordLists, saveWordList, loadWordList, isWordListNameExists } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, deleteFolder } from './layout.js';
 import { renderWordListCards, setRenderDeps, resetEventFlags } from './render.js';
 import {
@@ -17,6 +18,7 @@ import {
     getDragState, enterEditMode, setDragDeps, resetDragEventFlags
 } from './drag.js';
 import { openFolder, setFolderDeps } from './folder.js';
+import { setColorPickerDeps } from './colorpicker.js';
 
 // 设置延迟绑定（解决循环依赖）
 setRenderDeps({
@@ -33,6 +35,10 @@ setDragDeps({
 });
 
 setFolderDeps({
+    renderWordListCards
+});
+
+setColorPickerDeps({
     renderWordListCards
 });
 
@@ -65,12 +71,18 @@ export function goHome() {
 export function initWordListUI() {
     const saveBtn = $("saveListBtn");
     if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
+        saveBtn.addEventListener('click', async () => {
             const defaultName = `wordlist-${new Date().toISOString().slice(0, 10)}`;
-            const name = prompt("Enter list name:", defaultName);
+            const name = await showPrompt("输入单词表名称：", defaultName);
             if (!name || !name.trim()) return;
 
-            if (saveWordList(name.trim())) {
+            const trimmedName = name.trim();
+            if (isWordListNameExists(trimmedName)) {
+                await showAlert(`名称 "${trimmedName}" 已存在，请使用其他名称`);
+                return;
+            }
+
+            if (saveWordList(trimmedName)) {
                 renderWordListCards();
             }
         });

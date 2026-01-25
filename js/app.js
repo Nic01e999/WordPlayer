@@ -4,11 +4,11 @@
 
 import { currentActiveMode } from './state.js';
 import { initPreloadListeners } from './preload.js';
-import { Repeater, setDictationRef } from './repeater.js';
-import { Dictation, setRepeaterRef } from './dictation.js';
+import { Repeater, setDictationRef } from './repeater/index.js';
+import { Dictation, setRepeaterRef } from './dictation/index.js';
 import { $, containsChinese, filterChinese } from './utils.js';
-import { initWordListUI, goHome } from './wordlist.js';
-import { initTheme, applyTheme, getStoredTheme } from './theme.js';
+import { initWordListUI, goHome, renderWordListCards } from './wordlist/index.js';
+import { initTheme, applyTheme, getStoredTheme, setThemeChangeCallback } from './theme.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -76,4 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
     initPreloadListeners();
     initChineseFilter();
     initWordListUI();
+
+    // 主题切换时重新渲染卡片（更新原色卡片）
+    setThemeChangeCallback(() => {
+        if (!window.currentActiveMode) {
+            renderWordListCards();
+        }
+    });
 });

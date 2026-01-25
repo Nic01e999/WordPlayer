@@ -75,44 +75,37 @@
         </div>
 
         <div class="container">
-            <!-- 左侧：单词输入 -->
-            <div id="wordSection">
-                <h3>Word List 
-                    <button id="loadBtn" class="btn-load" title="Load translations">Load</button>
-                    <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button>
-                </h3>
-                <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+            <!-- 主页视图 -->
+            <div id="homeView" class="mode-view active">
+                <div id="wordSection">
+                    <h3>Word List
+                        <button id="loadBtn" class="btn-load" title="Load translations">Load</button>
+                        <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button>
+                    </h3>
+                    <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+                </div>
+                <div id="wordlistContent"></div>
             </div>
 
-            <!-- 右侧：结果显示 -->
-            <div class="main">
-                <!-- 主页视图 -->
-                <div id="homeView" class="mode-view active">
-                    <div id="wordlistContent"></div>
-                </div>
-
-                <!-- 复读模式视图 -->
-                <div id="repeaterView" class="mode-view">
-                    <div id="repeaterContainer" class="repeater-container">
-                        <div id="centerPointer" class="center-pointer">
-                            <div class="pointer-arrow"></div>
-                        </div>
-                        <div id="repeaterScroll" class="repeater-scroll">
-                            <div class="scroll-spacer"></div>
-                            <div id="repeaterContent"></div>
-                            <div class="scroll-spacer"></div>
-                        </div>
-                        <div id="playPauseIndicator" class="play-pause-indicator"></div>
+            <!-- 复读模式视图 -->
+            <div id="repeaterView" class="mode-view">
+                <div id="repeaterContainer" class="repeater-container">
+                    <div id="centerPointer" class="center-pointer"></div>
+                    <div id="repeaterScroll" class="repeater-scroll">
+                        <div class="scroll-spacer"></div>
+                        <div id="repeaterContent"></div>
+                        <div class="scroll-spacer"></div>
                     </div>
-                    <div class="word-info-wrapper">
-                        <div id="currentWordInfo" class="word-info"></div>
-                    </div>
+                    <div id="playPauseIndicator" class="play-pause-indicator"></div>
                 </div>
+                <div class="word-info-wrapper">
+                    <div id="currentWordInfo" class="word-info"></div>
+                </div>
+            </div>
 
-                <!-- 听写模式视图 -->
-                <div id="dictationView" class="mode-view">
-                    <div id="dictationWorkplace"></div>
-                </div>
+            <!-- 听写模式视图 -->
+            <div id="dictationView" class="mode-view">
+                <div id="dictationWorkplace"></div>
             </div>
         </div>
 

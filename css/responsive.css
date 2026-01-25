@@ -1,125 +1,147 @@
 /**
- * 响应式设计 - 根据屏幕大小调整字体和布局
+ * 响应式设计 - 使用 clamp() 后，仅保留必要的布局调整
+ * 大部分字体和尺寸已通过 clamp() 实现流式缩放
  */
 
-/* 超大屏幕 (>1400px) */
+/* 超大屏幕 (>1400px) - 微调听写模式间距 */
 @media (min-width: 1400px) {
-    #menu h1 { font-size: 42px; }
-    #mode-btn button { font-size: 20px; width: 240px; padding: 16px 32px; }
-    .current-word { font-size: 42px; }
-    .current-translation { font-size: 24px; }
-    .word-item strong { font-size: 26px; }
-    .word-item .translation { font-size: 20px; }
-    .popup input { font-size: 32px; }
-    .result-item { font-size: 22px; }
-    .play-count { font-size: 20px; }
-    /* 听写模式 - 大屏适配 */
-    body.dictation-mode #dictationWorkplace { padding: 30px 30px 30px 55px; }
-    .result-attempts { font-size: 26px; }
-    .results-box h3 { font-size: 24px; }
-    .results-box p strong { font-size: 56px; }
-    .results-box p { font-size: 22px; }
-    #dictationPopup h3 { font-size: 28px; }
+    body.dictation-mode #dictationWorkplace {
+        padding: 1.875rem 1.875rem 1.875rem 3.4375rem;
+    }
 }
 
-/* 大屏幕 (1200px - 1399px) - 默认样式已设置 */
-
-/* 中等屏幕 (900px - 1199px) */
-@media (min-width: 900px) and (max-width: 1199px) {
-    #menu h1 { font-size: 32px; }
-    #mode-btn button { font-size: 16px; width: 200px; padding: 12px 24px; }
-    .current-word { font-size: 32px; }
-    .current-translation { font-size: 18px; }
-    .word-item strong { font-size: 20px; }
-    .word-item .translation { font-size: 16px; }
-    .popup input { font-size: 26px; }
-    .result-item { font-size: 18px; }
-    /* 听写模式 - 中屏适配 */
-    .result-attempts { font-size: 20px; }
-    .results-box p strong { font-size: 44px; }
-}
+/* 中等屏幕 (900px - 1199px) - 无需特殊调整，clamp() 已处理 */
 
 /* 小屏幕 / 平板 (600px - 899px) */
 @media (min-width: 600px) and (max-width: 899px) {
-    #menu h1 { font-size: 24px; letter-spacing: 2px; }
-    #mode-btn button { font-size: 14px; width: 150px; padding: 10px 18px; }
-    #menu { padding: 12px 15px; gap: 20px; }
-    .main { padding: 20px; }
-    .current-word { font-size: 28px; }
-    .current-translation { font-size: 16px; }
-    .word-item strong { font-size: 18px; }
-    .word-item .translation { font-size: 14px; }
-    .popup { min-width: 320px; padding: 20px; }
-    .popup input { font-size: 22px; width: 70%; }
-    .repeater-container { height: 350px; }
-    .result-item { font-size: 16px; padding: 10px 12px; }
-    .settings-trigger { right: 5%; }
-    .settings-trigger .sidebar { width: 220px; }
+    #menu {
+        padding: 0.75rem 0.9375rem;
+        gap: 1.25rem;
+    }
+    .mode-view {
+        padding: 1.25rem;
+    }
+    .repeater-container {
+        height: clamp(13.75rem, calc(100vh - 26.25rem), 21.875rem);
+    }
+    .settings-trigger {
+        right: 5%;
+    }
+    .settings-trigger .sidebar {
+        width: 13.75rem;
+    }
     /* 听写模式 - 平板适配 */
-    body.dictation-mode #dictationWorkplace { padding: 20px 20px 20px 40px; margin: 8px; }
-    .result-attempts { font-size: 18px; }
-    .results-box { padding: 25px; }
-    .results-box p strong { font-size: 40px; }
-    .results-box::after { width: 45px; height: 45px; font-size: 12px; }
-    #dictationPopup h3 { font-size: 22px; }
+    body.dictation-mode #dictationWorkplace {
+        padding: 1.25rem 1.25rem 1.25rem 2.5rem;
+        margin: 0.5rem;
+    }
+    .results-box {
+        padding: 1.5625rem;
+    }
+    .results-box::after {
+        width: 2.8125rem;
+        height: 2.8125rem;
+        font-size: 0.75rem;
+    }
 }
 
 /* 手机屏幕 (<600px) */
 @media (max-width: 599px) {
     #menu {
         flex-direction: column;
-        padding: 10px;
-        gap: 10px;
-    }
-    #menu h1 {
-        font-size: 20px;
-        letter-spacing: 1px;
+        padding: 0.625rem;
+        gap: 0.625rem;
     }
     #mode-btn {
         flex-direction: column;
         width: 100%;
-        gap: 8px;
+        gap: 0.5rem;
     }
     #mode-btn button {
         width: 100%;
-        font-size: 14px;
-        padding: 10px 16px;
     }
     .settings-trigger {
         position: absolute;
-        right: 10px;
-        top: 10px;
+        right: 0.625rem;
+        top: 0.625rem;
     }
     .settings-trigger .sidebar {
         width: 90vw;
-        right: -35px;
+        right: -2.1875rem;
     }
-    .main { padding: 10px; }
+    .mode-view {
+        padding: 0.625rem;
+    }
     .popup {
         min-width: 90vw;
-        padding: 15px;
+        padding: 0.9375rem;
     }
     .popup input {
         width: 90%;
-        font-size: 20px;
     }
-    .current-word { font-size: 24px; }
-    .current-translation { font-size: 14px; }
-    .word-item strong { font-size: 16px; }
-    .repeater-container { height: 300px; }
+    .repeater-container {
+        height: clamp(12.5rem, calc(100vh - 20rem), 18.75rem);
+    }
+    /* iOS 风格网格 - 手机适配 */
     .wordlist-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 12px;
-        padding: 12px;
+        padding: 1rem 0.75rem;
     }
+    :root {
+        --icon-size: 3.75rem;
+        --icon-radius: 0.8125rem;
+    }
+    .folder-open-grid {
+        grid-template-columns: repeat(3, clamp(4.75rem, 7.5vw, 5.625rem));
+        gap: 1rem 0.75rem;
+    }
+    /* 听写模式 - 手机适配 */
     body.dictation-mode #dictationWorkplace {
-        margin: 60px 5px 20px 5px;
-        padding: 15px 15px 15px 35px;
+        margin: 3.75rem 0.3125rem 1.25rem 0.3125rem;
+        padding: 0.9375rem 0.9375rem 0.9375rem 2.1875rem;
     }
-    .result-item { font-size: 14px; padding: 8px 10px; }
-    .result-attempts { font-size: 16px; }
-    .results-box { padding: 20px; }
-    .results-box p strong { font-size: 36px; }
-    .results-box::after { width: 40px; height: 40px; font-size: 10px; }
-    #dictationPopup h3 { font-size: 18px; }
+    .results-box {
+        padding: 1.25rem;
+    }
+    .results-box::after {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 0.625rem;
+    }
+    /* 手机字体大幅放大 */
+    .wordlist-label {
+        font-size: 1rem;
+    }
+    .wordlist-icon-count {
+        font-size: 1.5rem;
+    }
+    .word-item strong {
+        font-size: 1.25rem;
+    }
+    .word-item .translation {
+        font-size: 1.125rem;
+    }
+    .current-word {
+        font-size: clamp(2rem, 8vw, 3rem);
+    }
+    .current-translation {
+        font-size: 1.25rem;
+    }
+    .popup input {
+        font-size: 2rem;
+    }
+    #dictationPopup h3 {
+        font-size: 1.75rem;
+    }
+    .result-attempts {
+        font-size: 1.5rem;
+    }
+    .result-listened {
+        font-size: 2rem;
+    }
+    #mode-btn button {
+        font-size: 1.125rem;
+    }
+    #home-btn {
+        font-size: 1.5rem;
+    }
 }

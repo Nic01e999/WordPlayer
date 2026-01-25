@@ -81,10 +81,11 @@ js/
 
 ```
 css/
-├── main.css       # Imports (order: colors→base→components→menu→repeater→dictation→responsive)
+├── main.css       # Imports (order: colors→base→components→home→menu→repeater→dictation→responsive)
 ├── colors.css     # CSS variables (theme colors)
 ├── base.css       # Base styles
-├── components.css # Shared components
+├── components.css # Shared components (buttons, status colors)
+├── home.css       # Home view (wordlist cards, folders, drag & drop)
 ├── menu.css       # Header & sidebar
 ├── repeater.css   # Repeater mode
 ├── dictation.css  # Dictation mode
@@ -94,3 +95,9 @@ css/
 ### Word Input Format
 
 Textarea supports `word:definition` format. Without definition, translation API is called.
+
+## Plan Mode Rules
+
+When the user reports a bug in Plan mode, always end the plan with:
+1. **Bug Summary** - Restate the bug in your own words
+2. **Fix Approach** - Explain what you plan to change

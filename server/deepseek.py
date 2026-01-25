@@ -110,7 +110,18 @@ Respond ONLY with valid JSON, no markdown.'''
 
         if response.ok:
             data = response.json()
-            content = data["choices"][0]["message"]["content"]
+
+            # 验证 API 响应结构
+            choices = data.get("choices")
+            if not choices or len(choices) == 0:
+                print(f"DeepSeek API 返回异常结构: {data}")
+                return jsonify({"error": "API 返回格式异常"}), 500
+            message = choices[0].get("message", {})
+            content = message.get("content", "")
+            if not content:
+                print(f"DeepSeek API 返回内容为空: {choices[0]}")
+                return jsonify({"error": "API 返回内容为空"}), 500
+
             content = content.strip()
             # 更健壮的 markdown 代码块提取
             if content.startswith("```"):

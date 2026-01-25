@@ -157,9 +157,9 @@ export function updateWorkplace() {
     }).join('');
 
     setTimeout(() => {
-        const main = document.querySelector(".main");
-        if (main) {
-            main.scrollTop = main.scrollHeight;
+        const view = document.getElementById("dictationView");
+        if (view) {
+            view.scrollTop = view.scrollHeight;
         }
     }, 50);
 }

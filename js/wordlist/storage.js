@@ -8,6 +8,7 @@ import { preloadCache, loadCacheFromStorage } from '../state.js';
 import { startPreload } from '../preload.js';
 
 const STORAGE_KEY = 'wordlists';
+const CARD_COLORS_KEY = 'cardColors';
 
 /**
  * 获取所有保存的单词表
@@ -87,6 +88,14 @@ export function removeWordListsFromStorage(names) {
 }
 
 /**
+ * 检查单词表名称是否已存在
+ */
+export function isWordListNameExists(name) {
+    const lists = getWordLists();
+    return name in lists;
+}
+
+/**
  * 加载单词表到 textarea（恢复翻译数据）
  */
 export function loadWordList(name) {
@@ -110,4 +119,44 @@ export function loadWordList(name) {
     $("wordInput").value = list.words;
     startPreload();
     return true;
+}
+
+/**
+ * 获取所有卡片的自定义颜色
+ */
+export function getCardColors() {
+    try {
+        const data = localStorage.getItem(CARD_COLORS_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch (e) {
+        console.error('Failed to load card colors:', e);
+        return {};
+    }
+}
+
+/**
+ * 获取单个卡片的颜色
+ */
+export function getCardColor(name) {
+    const colors = getCardColors();
+    return colors[name] || null;
+}
+
+/**
+ * 设置卡片颜色
+ */
+export function setCardColor(name, colorId) {
+    try {
+        const colors = getCardColors();
+        if (colorId === 'original' || !colorId) {
+            delete colors[name];
+        } else {
+            colors[name] = colorId;
+        }
+        localStorage.setItem(CARD_COLORS_KEY, JSON.stringify(colors));
+        return true;
+    } catch (e) {
+        console.error('Failed to save card color:', e);
+        return false;
+    }
 }

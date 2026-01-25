@@ -15,20 +15,26 @@ def get_youdao_tts(text: str, slow: bool = False, accent: str = "us") -> bytes:
     voice_type = 2 if accent == "uk" else 1
     url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type={voice_type}"
 
-    response = requests.get(url, timeout=10)
-    if response.ok:
-        return response.content
-    raise Exception(f"有道 TTS 请求失败: {response.status_code}")
+    try:
+        response = requests.get(url, timeout=10)
+        if response.ok:
+            return response.content
+        raise Exception(f"有道 TTS 请求失败: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"有道 TTS 网络错误: {str(e)}")
 
 
 def get_youdao_sentence_tts(text: str) -> bytes:
     """使用有道翻译 TTS 获取句子语音（fanyivoice API）"""
     url = f"https://tts.youdao.com/fanyivoice?word={requests.utils.quote(text)}&le=en&keyfrom=speaker-target"
 
-    response = requests.get(url, timeout=15)
-    if response.ok:
-        return response.content
-    raise Exception(f"有道句子 TTS 请求失败: {response.status_code}")
+    try:
+        response = requests.get(url, timeout=15)
+        if response.ok:
+            return response.content
+        raise Exception(f"有道句子 TTS 请求失败: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"有道句子 TTS 网络错误: {str(e)}")
 
 
 @tts_bp.route("/api/tts", methods=["GET"])
