@@ -71,15 +71,25 @@ export async function speakWord(word, slow = false) {
     const url = getTtsUrl(word, slow, accent, lang);
     try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`TTS请求失败: ${res.status}`);
+        if (!res.ok) {
+            console.error(`TTS请求失败: ${res.status}`, { word, lang, accent, slow });
+            if (res.status === 500) {
+                console.warn('可能的原因：accent 和 lang 参数不兼容');
+            }
+            throw new Error(`TTS请求失败: ${res.status}`);
+        }
 
         const blob = await res.blob();
         const blobManager = slow ? slowAudioBlobManager : audioBlobManager;
-        const blobUrl = blobManager.create(blob, cacheKey);
-        cache[cacheKey] = blobUrl;
+
+        // 检查是否已经有缓存（避免重复创建 Blob URL）
+        if (!cache[cacheKey]) {
+            const blobUrl = blobManager.create(blob, cacheKey);
+            cache[cacheKey] = blobUrl;
+        }
 
         stopAudio();
-        currentAudio = new Audio(blobUrl);
+        currentAudio = new Audio(cache[cacheKey]);
         currentAudio.onerror = () => console.warn(t('errorAudioLoad'));
         currentAudio.play().catch(() => {});
     } catch (e) {
@@ -135,6 +145,10 @@ export async function speakText(text, slow = false) {
     try {
         const res = await fetch(url);
         if (!res.ok) {
+            console.error(`TTS请求失败: ${res.status}`, { text, lang, accent, slow });
+            if (res.status === 500) {
+                console.warn('可能的原因：accent 和 lang 参数不兼容');
+            }
             throw new Error(`TTS请求失败: ${res.status}`);
         }
         const blob = await res.blob();

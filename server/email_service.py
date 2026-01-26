@@ -22,8 +22,15 @@ def send_reset_code(email: str, code: str) -> bool:
         bool: 发送成功返回 True，失败返回 False
     """
     if not Config.SMTP_USER or not Config.SMTP_PASSWORD:
+        # 开发环境：打印验证码到控制台
         print(f"[Email] SMTP 未配置，验证码: {code}")
-        return True  # 开发环境下直接返回成功
+        # 生产环境应该返回 False，这里为了开发方便返回 True
+        # 部署时建议检查环境变量 FLASK_ENV，如果是 production 则返回 False
+        import os
+        if os.environ.get('FLASK_ENV') == 'production':
+            print(f"[Email] 生产环境必须配置 SMTP")
+            return False
+        return True
 
     subject = "English Dictation - 密码重置验证码"
     html_content = f"""

@@ -3,9 +3,7 @@
  * 封装认证相关的 API 调用
  */
 
-import { API_BASE } from '../api.js';
-import { getAuthHeader } from './state.js';
-import { t } from '../i18n/index.js';
+import { apiPost, apiGet } from '../utils/api.js';
 
 /**
  * 注册新用户
@@ -14,17 +12,7 @@ import { t } from '../i18n/index.js';
  * @returns {Promise<{success: boolean, token?: string, user?: object, error?: string}>}
  */
 export async function register(email, password) {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Register failed:', e);
-        return { error: t('networkError') };
-    }
+    return apiPost('/api/auth/register', { email, password }, { auth: false });
 }
 
 /**
@@ -34,17 +22,7 @@ export async function register(email, password) {
  * @returns {Promise<{success: boolean, token?: string, user?: object, error?: string}>}
  */
 export async function login(email, password) {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Login failed:', e);
-        return { error: t('networkError') };
-    }
+    return apiPost('/api/auth/login', { email, password }, { auth: false });
 }
 
 /**
@@ -52,19 +30,7 @@ export async function login(email, password) {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function logout() {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/logout`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader()
-            }
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Logout failed:', e);
-        return { error: t('networkError') };
-    }
+    return apiPost('/api/auth/logout');
 }
 
 /**
@@ -72,19 +38,12 @@ export async function logout() {
  * @returns {Promise<{user?: object, error?: string}>}
  */
 export async function getCurrentUser() {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/me`, {
-            method: 'GET',
-            headers: getAuthHeader()
-        });
-        if (response.status === 401) {
-            return { error: 'unauthorized' };
-        }
-        return await response.json();
-    } catch (e) {
-        console.error('Get current user failed:', e);
-        return { error: t('networkError') };
+    const result = await apiGet('/api/auth/me');
+    // 保持向后兼容：401 错误返回特殊标记
+    if (result.error && result.error.includes('401')) {
+        return { error: 'unauthorized' };
     }
+    return result;
 }
 
 /**
@@ -93,17 +52,7 @@ export async function getCurrentUser() {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function forgotPassword(email) {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Forgot password failed:', e);
-        return { error: t('networkError') };
-    }
+    return apiPost('/api/auth/forgot-password', { email }, { auth: false });
 }
 
 /**
@@ -114,15 +63,5 @@ export async function forgotPassword(email) {
  * @returns {Promise<{success: boolean, token?: string, user?: object, error?: string}>}
  */
 export async function resetPassword(email, code, password) {
-    try {
-        const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code, password })
-        });
-        return await response.json();
-    } catch (e) {
-        console.error('Reset password failed:', e);
-        return { error: t('networkError') };
-    }
+    return apiPost('/api/auth/reset-password', { email, code, password }, { auth: false });
 }

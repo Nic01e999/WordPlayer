@@ -1268,3 +1268,18 @@
     /* 图片滤镜色相 */
     --filter-hue: 270deg;
 }
+
+/* ===================================
+ * 通用工具变量 (Utility Variables)
+ * =================================== */
+:root {
+    /* 过渡时间 */
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s ease;
+
+    /* 常用阴影 */
+    --shadow-sm: 0 2px 8px var(--shadow-pink-medium);
+    --shadow-md: 0 4px 15px var(--shadow-pink-strong);
+    --shadow-lg: 0 8px 24px var(--shadow-large);
+}

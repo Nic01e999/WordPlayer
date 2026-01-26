@@ -5,6 +5,7 @@
 import { preloadCache, clearAudioCache } from './state.js';
 import { audioBlobManager, slowAudioBlobManager } from './storage/blobManager.js';
 import { t } from './i18n/index.js';
+import { promiseAllWithLimit } from './utils/concurrency.js';
 import {
     $,
     loadWordsFromTextarea,
@@ -338,7 +339,7 @@ export async function startPreload(forceReload = false) {
         }
     };
 
-    // 并行加载所有音频
+    // 并行加载所有音频（限制并发数为 6，避免浏览器连接数耗尽）
     // 英语: 两种口音 × 两种速度 = 4个
     // 其他语言: 一种口音 × 两种速度 = 2个
     const accents = targetLang === 'en' ? ['us', 'uk'] : ['us'];  // 非英语只用一种
@@ -358,11 +359,11 @@ export async function startPreload(forceReload = false) {
         preloadCache.audioPartial[text] = cachedCount;
     });
 
-    const audioPromises = [];
+    const audioTasks = [];
     for (const text of textsToPreload) {
         for (const accent of accents) {
             for (const slow of speeds) {
-                audioPromises.push(
+                audioTasks.push(() =>
                     loadSingleAudio(text, accent, slow, targetLang).then((result) => {
                         if (myId !== preloadCache.loadId) return;
                         if (result.cached) return;  // 已缓存的不重复计数
@@ -380,8 +381,8 @@ export async function startPreload(forceReload = false) {
         }
     }
 
-    // 等待所有加载完成
-    await Promise.all([wordInfoPromise, ...audioPromises]);
+    // 等待所有加载完成（使用并发控制，最多同时 6 个请求）
+    await Promise.all([wordInfoPromise, promiseAllWithLimit(audioTasks, 6)]);
 
     if (myId === preloadCache.loadId) {
         preloadCache.loading = false;

@@ -91,6 +91,7 @@ function onUserScrollEnd() {
     _updateInfo?.();
     scrollToIndex(idx);
 
+    // 不自动重新开始播放，让用户手动控制
     if (!state.isPaused) {
         setTimeout(() => _startPlayLoop?.(), 400);
     }

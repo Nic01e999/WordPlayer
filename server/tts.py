@@ -87,6 +87,11 @@ def tts():
     if lang not in DICTVOICE_LANG_CODES:
         return jsonify({"error": f"不支持的语言: {lang}"}), 400
 
+    # 验证 accent 和 lang 的兼容性
+    if accent != 'us' and lang != 'en':
+        # 非英语语言不支持非 US 口音，自动重置
+        accent = 'us'
+
     try:
         # 句子使用 fanyivoice API
         if is_sentence or len(word.split()) > 3:

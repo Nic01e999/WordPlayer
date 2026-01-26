@@ -2,11 +2,28 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
+## Communication Language
+
+**IMPORTANT**: Always communicate with the user in Chinese (中文) when reporting progress, explaining changes, or discussing implementation details, and also use white background. 当和用户探讨计划的时候，不懂的多次询问一起确定方案，写log的时候服务器和网页控制台都发一份
+
+## Design Style
+
+**液态玻璃清新风 (Liquid Glass Fresh Style)**
+
+在进行 UI 修改时，务必保持这种设计风格：
+- 半透明玻璃效果 + 背景模糊
+- 流畅的动画和过渡效果
+- 轻盈明快的色彩搭配
+- 现代简约的界面元素
+- 柔和阴影和圆角
+
 ## Project Overview
 
-English Dictation Tool - a web-based English learning application with two modes:
-- **Dictation Mode**: Listen to words and type them (spelling practice)
-- **Repeater Mode**: Auto-play words with translations for vocabulary review
+多语言学习工具 - 支持英语、日语、韩语、法语、中文五种语言的学习。
+
+**两种核心模式**:
+- **Dictation Mode（听写模式）**: 听音频输入单词，练习拼写
+- **Repeater Mode（复读模式）**: 自动循环播放单词和翻译，用于词汇复习
 
 ## Running the Application
 
@@ -14,90 +31,39 @@ English Dictation Tool - a web-based English learning application with two modes
 python3 run.py
 ```
 
-Access at `http://127.0.0.1:5001` or via LAN IP shown in console.
+访问地址：`http://127.0.0.1:5001` 或控制台显示的局域网 IP
 
-**Requirements**: macOS, Flask, flask-cors, requests
+**依赖**: macOS, Flask, flask-cors, requests
 
-## Architecture
+## Detailed Documentation
 
-### Backend (server/)
+完整的技术文档请参考 `.claude/` 目录：
 
+- **[architecture.md](.claude/architecture.md)** - 项目架构概览（后端、前端、CSS、数据流）
+- **[frontend-modules.md](.claude/frontend-modules.md)** - 前端模块详细文档（14个核心模块）
+- **[backend-api.md](.claude/backend-api.md)** - 后端 API 详细文档（10个模块）
+- **[css-system.md](.claude/css-system.md)** - CSS 样式系统详细文档（主题系统、液态玻璃风格）
+- **[data-flow.md](.claude/data-flow.md)** - 数据流和状态管理详细文档（缓存、预加载、播放、同步）
+
+**使用建议**: 在修改代码前，先查阅相关文档了解模块的详细实现和依赖关系，避免破坏现有功能。
+
+## Quick Reference
+
+### 单词输入格式
 ```
-server/
-├── app.py        # Flask entry, static files, _get_lan_ip()
-├── deepseek.py   # DeepSeek API for word info, _validate_word()
-├── tts.py        # Youdao TTS API (US/UK accents)
-└── cache.py      # Word cache management
+apple:苹果
+happy:快乐的
 ```
+支持 `word:definition` 格式。不提供定义时会自动调用翻译 API。
 
-**API Endpoints:**
-- `/api/wordinfo/batch` - Batch word info (translation, definitions, examples, synonyms)
-- `/api/tts` - Text-to-speech
+### 关键技术
+- **四级缓存**: 内存 → localStorage → 服务端 → API
+- **playId 机制**: 防止异步竞态
+- **延迟绑定**: 解决循环依赖
+- **并发控制**: 限制 6 个并发请求
 
-### Frontend (ES Modules)
+### Plan Mode 规则
 
-```
-js/
-├── app.js        # Entry point, exposes to window
-├── api.js        # API calls, getTtsUrl()
-├── audio.js      # Audio playback
-├── state.js      # Global state (currentRepeaterState, preloadCache)
-├── preload.js    # Background preloading
-├── utils.js      # DOM helpers, settings
-├── theme.js      # Theme switching
-│
-├── wordlist.js   → re-export
-├── wordlist/
-│   ├── storage.js   # localStorage ops
-│   ├── layout.js    # Layout persistence
-│   ├── render.js    # Card rendering
-│   ├── drag.js      # Drag & drop
-│   ├── folder.js    # Folder ops
-│   └── index.js     # Module entry
-│
-├── repeater.js   → re-export
-├── repeater/
-│   ├── state.js     # Static props
-│   ├── keyboard.js  # Keyboard nav
-│   ├── slider.js    # Apple-style slider
-│   ├── scroll.js    # Scroll control
-│   ├── playback.js  # Play logic
-│   ├── render.js    # UI render
-│   └── index.js     # Repeater class
-│
-├── dictation.js  → re-export
-└── dictation/
-    ├── drag.js      # Popup drag
-    ├── quiz.js      # Quiz logic
-    └── index.js     # Dictation class
-```
-
-**Key Patterns:**
-- Lazy binding for circular deps (`setRenderDeps`, `setDragDeps`, etc.)
-- `playId` counter to cancel async ops on mode change
-- Re-export files for backward compatibility
-
-### CSS Structure
-
-```
-css/
-├── main.css       # Imports (order: colors→base→components→home→menu→repeater→dictation→responsive)
-├── colors.css     # CSS variables (theme colors)
-├── base.css       # Base styles
-├── components.css # Shared components (buttons, status colors)
-├── home.css       # Home view (wordlist cards, folders, drag & drop)
-├── menu.css       # Header & sidebar
-├── repeater.css   # Repeater mode
-├── dictation.css  # Dictation mode
-└── responsive.css # Mobile breakpoints
-```
-
-### Word Input Format
-
-Textarea supports `word:definition` format. Without definition, translation API is called.
-
-## Plan Mode Rules
-
-When the user reports a bug in Plan mode, always end the plan with:
-1. **Bug Summary** - Restate the bug in your own words
-2. **Fix Approach** - Explain what you plan to change
+当用户在 Plan mode 报告 bug 时，计划的结尾必须包含：
+1. **Bug Summary** - 用你自己的话重述 bug
+2. **Fix Approach** - 解释你计划如何修改

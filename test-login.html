@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登录测试</title>
+</head>
+<body>
+    <h1>登录API测试</h1>
+    <button onclick="testLogin()">测试登录</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testLogin() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = '正在测试...\n';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: '123456'
+                    })
+                });
+
+                resultEl.textContent += `状态码: ${response.status}\n`;
+                resultEl.textContent += `状态文本: ${response.statusText}\n\n`;
+
+                const data = await response.json();
+                resultEl.textContent += `响应数据:\n${JSON.stringify(data, null, 2)}`;
+
+            } catch (error) {
+                resultEl.textContent += `错误: ${error.message}\n`;
+                resultEl.textContent += `详细: ${error.stack}`;
+            }
+        }
+    </script>
+</body>
+</html>

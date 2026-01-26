@@ -45,6 +45,12 @@ export function getFetchErrorMessage(e) {
  * @param {string} lang - 语言代码 (en, ja, ko, fr, zh)
  */
 export function getTtsUrl(word, slow = false, accent = 'us', lang = 'en') {
+    // 验证参数兼容性
+    if (lang !== 'en' && accent !== 'us') {
+        console.warn(`[TTS] 非英语语言 ${lang} 不支持 ${accent} 口音，已重置为 us`);
+        accent = 'us';
+    }
+
     return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}&accent=${accent}&lang=${lang}`;
 }
 

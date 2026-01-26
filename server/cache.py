@@ -24,6 +24,7 @@ cache/wordinfo/{targetLang}.json
 import os
 import json
 import threading
+from collections import deque
 from typing import Dict, List, Tuple, Any, Optional
 
 # 缓存目录
@@ -35,8 +36,8 @@ MAX_CACHE_SIZE = 5000  # 每个语言文件最多缓存 5000 个单词
 
 # 内存缓存: { lang: { word: info, ... }, ... }
 _caches: Dict[str, Dict[str, Any]] = {}
-# LRU 访问顺序: { lang: [word1, word2, ...], ... }
-_access_orders: Dict[str, List[str]] = {}
+# LRU 访问顺序: { lang: deque([word1, word2, ...]), ... } - 使用 deque 优化性能
+_access_orders: Dict[str, deque] = {}
 # 线程锁
 _lock = threading.Lock()
 
@@ -79,7 +80,7 @@ def _get_or_load_cache(lang: str) -> Dict[str, Any]:
     """获取缓存，如果未加载则从文件加载"""
     if lang not in _caches:
         _caches[lang] = _load_lang_cache(lang)
-        _access_orders[lang] = list(_caches[lang].keys())
+        _access_orders[lang] = deque(_caches[lang].keys())
         print(f"[Cache] 已加载 {lang}.json ({len(_caches[lang])} 个单词)")
     return _caches[lang]
 
@@ -118,9 +119,11 @@ def get_cached_words(words: List[str], target_lang: str, native_lang: str) -> Tu
                         "synonyms": info.get("synonyms", []),
                         "antonyms": info.get("antonyms", [])
                     }
-                    # 更新 LRU 顺序
-                    if key in access_order:
+                    # 更新 LRU 顺序（deque 优化：先检查再移除）
+                    try:
                         access_order.remove(key)
+                    except ValueError:
+                        pass
                     access_order.append(key)
                 else:
                     # 有缓存但没有该母语翻译，需要补充翻译
@@ -195,14 +198,16 @@ def update_cache(results: Dict[str, Any], target_lang: str, native_lang: str):
                     }
                 }
 
-            # 更新 LRU 顺序
-            if key in access_order:
+            # 更新 LRU 顺序（deque 优化：先检查再移除）
+            try:
                 access_order.remove(key)
+            except ValueError:
+                pass
             access_order.append(key)
 
-        # LRU 淘汰
+        # LRU 淘汰（使用 deque.popleft() 优化为 O(1)）
         while len(cache) > MAX_CACHE_SIZE:
-            oldest = access_order.pop(0)
+            oldest = access_order.popleft()
             if oldest in cache:
                 del cache[oldest]
 

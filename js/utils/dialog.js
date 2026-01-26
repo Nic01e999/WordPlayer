@@ -39,40 +39,75 @@ function createDialog({ title, message, input, buttons }) {
 }
 
 /**
+ * 通用对话框显示和生命周期管理
+ *
+ * @param {Object} config - 对话框配置
+ * @param {string} config.message - 消息内容
+ * @param {Array} config.buttons - 按钮配置数组
+ * @param {Object} [config.input] - 输入框配置
+ * @param {Function} config.onShow - 显示后的回调（用于设置焦点等）
+ * @param {Function} config.handleAction - 处理用户操作的函数 (action, inputValue) => result
+ * @returns {Promise} 返回用户操作结果
+ */
+function showDialog(config) {
+    return new Promise((resolve) => {
+        const { message, buttons, input, onShow, handleAction } = config;
+
+        const overlay = createDialog({ message, input, buttons });
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const dialog = overlay.querySelector('.glass-dialog');
+        const inputElement = input ? dialog.querySelector('.glass-dialog-input') : null;
+
+        // 执行显示后的回调（设置焦点等）
+        if (onShow) {
+            onShow(dialog, inputElement);
+        }
+
+        // 关闭对话框
+        const close = (result) => {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 200);
+            resolve(result);
+        };
+
+        // 处理点击事件
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                // 点击遮罩层
+                close(handleAction('overlay', inputElement?.value));
+            } else if (e.target.dataset.action) {
+                // 点击按钮
+                close(handleAction(e.target.dataset.action, inputElement?.value));
+            }
+        });
+
+        // 处理键盘事件
+        const keydownTarget = inputElement || dialog;
+        keydownTarget.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                close(handleAction('enter', inputElement?.value));
+            } else if (e.key === 'Escape') {
+                close(handleAction('escape', inputElement?.value));
+            }
+        });
+    });
+}
+
+/**
  * 显示警告框
  * @param {string} message - 消息内容
  * @returns {Promise<void>}
  */
 export function showAlert(message) {
-    return new Promise((resolve) => {
-        const overlay = createDialog({
-            message,
-            buttons: [{ text: t('confirm'), action: 'ok' }]
-        });
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('show'));
-
-        const dialog = overlay.querySelector('.glass-dialog');
-        dialog.querySelector('.glass-dialog-btn').focus();
-
-        const close = () => {
-            overlay.classList.remove('show');
-            setTimeout(() => overlay.remove(), 200);
-            resolve();
-        };
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay || e.target.dataset.action === 'ok') {
-                close();
-            }
-        });
-
-        dialog.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-                close();
-            }
-        });
+    return showDialog({
+        message,
+        buttons: [{ text: t('confirm'), action: 'ok' }],
+        onShow: (dialog) => {
+            dialog.querySelector('.glass-dialog-btn').focus();
+        },
+        handleAction: () => undefined // alert 总是返回 undefined
     });
 }
 
@@ -82,44 +117,18 @@ export function showAlert(message) {
  * @returns {Promise<boolean>}
  */
 export function showConfirm(message) {
-    return new Promise((resolve) => {
-        const overlay = createDialog({
-            message,
-            buttons: [
-                { text: t('cancel'), action: 'cancel' },
-                { text: t('confirm'), action: 'ok' }
-            ]
-        });
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('show'));
-
-        const dialog = overlay.querySelector('.glass-dialog');
-        dialog.querySelector('.glass-dialog-btn.primary').focus();
-
-        const close = (result) => {
-            overlay.classList.remove('show');
-            setTimeout(() => overlay.remove(), 200);
-            resolve(result);
-        };
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                close(false);
-            } else if (e.target.dataset.action === 'ok') {
-                close(true);
-            } else if (e.target.dataset.action === 'cancel') {
-                close(false);
-            }
-        });
-
-        dialog.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                close(true);
-            } else if (e.key === 'Escape') {
-                close(false);
-            }
-        });
+    return showDialog({
+        message,
+        buttons: [
+            { text: t('cancel'), action: 'cancel' },
+            { text: t('confirm'), action: 'ok' }
+        ],
+        onShow: (dialog) => {
+            dialog.querySelector('.glass-dialog-btn.primary').focus();
+        },
+        handleAction: (action) => {
+            return action === 'ok' || action === 'enter';
+        }
     });
 }
 
@@ -130,44 +139,19 @@ export function showConfirm(message) {
  * @returns {Promise<string|null>}
  */
 export function showPrompt(message, defaultValue = '') {
-    return new Promise((resolve) => {
-        const overlay = createDialog({
-            message,
-            input: { defaultValue, placeholder: '' },
-            buttons: [
-                { text: t('cancel'), action: 'cancel' },
-                { text: t('confirm'), action: 'ok' }
-            ]
-        });
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('show'));
-
-        const dialog = overlay.querySelector('.glass-dialog');
-        const input = dialog.querySelector('.glass-dialog-input');
-        input.focus();
-        input.select();
-
-        const close = (result) => {
-            overlay.classList.remove('show');
-            setTimeout(() => overlay.remove(), 200);
-            resolve(result);
-        };
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay || e.target.dataset.action === 'cancel') {
-                close(null);
-            } else if (e.target.dataset.action === 'ok') {
-                close(input.value);
-            }
-        });
-
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                close(input.value);
-            } else if (e.key === 'Escape') {
-                close(null);
-            }
-        });
+    return showDialog({
+        message,
+        input: { defaultValue, placeholder: '' },
+        buttons: [
+            { text: t('cancel'), action: 'cancel' },
+            { text: t('confirm'), action: 'ok' }
+        ],
+        onShow: (dialog, input) => {
+            input.focus();
+            input.select();
+        },
+        handleAction: (action, inputValue) => {
+            return (action === 'ok' || action === 'enter') ? inputValue : null;
+        }
     });
 }

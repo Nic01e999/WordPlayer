@@ -337,35 +337,44 @@ function getSubmitButtonText() {
  * 登录后同步数据（纯服务端存储模式）
  */
 async function syncAfterLogin() {
+    console.log('[Sync] 开始从云端拉取数据...');
+
     // 从云端拉取数据
     const cloudData = await pullFromCloud();
 
     if (cloudData.error) {
-        console.error('Sync failed:', cloudData.error);
+        console.error('[Sync] 同步失败:', cloudData.error);
         return;
     }
 
+    console.log('[Sync] 云端数据拉取成功');
+
     // 将云端单词表存入内存缓存
     setWordListsCache(cloudData.wordlists || {});
+    console.log('[Sync] 单词表已更新:', Object.keys(cloudData.wordlists || {}).length, '个');
 
     // 同步布局配置（云端 -> 本地）
     if (cloudData.layout) {
         saveLayout(cloudData.layout);
+        console.log('[Sync] 布局配置已更新');
     }
 
     if (cloudData.cardColors && Object.keys(cloudData.cardColors).length > 0) {
         localStorage.setItem('cardColors', JSON.stringify(cloudData.cardColors));
+        console.log('[Sync] 卡片颜色已更新');
     }
 
     // 应用用户设置（语言、主题、播放设置等）
     if (cloudData.settings) {
         applySettings(cloudData.settings);
+        console.log('[Sync] 用户设置已应用');
     }
 
     // 如果本地有布局配置但云端没有，推送到云端
     const localLayout = getLayout();
     const localCardColors = getCardColors();
     if (localLayout && !cloudData.layout) {
+        console.log('[Sync] 推送本地布局到云端...');
         await pushToCloud({
             layout: localLayout,
             cardColors: localCardColors,
@@ -375,9 +384,11 @@ async function syncAfterLogin() {
 
     // 刷新 UI
     renderWordListCards();
+    console.log('[Sync] UI 已刷新');
 
     // 初始化 WebSocket 连接（实时同步）
     initWebSocket();
+    console.log('[Sync] WebSocket 连接已初始化');
 }
 
 /**
@@ -484,16 +495,20 @@ export async function initAuth() {
 
     // 尝试恢复登录状态
     if (state.restoreAuth()) {
+        console.log('[Auth] 检测到已登录状态，开始验证 token...');
         // 验证 token 是否有效
         const result = await api.getCurrentUser();
         if (result.error === 'unauthorized') {
             // token 无效，清除登录状态
+            console.log('[Auth] Token 已失效，清除登录状态');
             state.clearAuth();
         } else if (result.user) {
             // 更新用户信息
             state.setUser(result.user);
+            console.log('[Auth] Token 验证成功，开始自动同步数据...');
             // 页面加载时自动同步（拉取最新数据）
             await syncAfterLogin();
+            console.log('[Auth] 自动同步完成');
         }
     }
 

@@ -3,7 +3,7 @@
  */
 
 import { currentActiveMode, currentRepeaterState } from './state.js';
-import { initPreloadListeners } from './preload.js';
+import { initPreloadListeners, startPreload } from './preload.js';
 import { Repeater, setDictationRef } from './repeater/index.js';
 import { Dictation, setRepeaterRef } from './dictation/index.js';
 import {
@@ -13,9 +13,11 @@ import {
     getTargetLang,
     getTranslationLang,
     getUiLang,
+    getAccent,
     updateAccentSelectorVisibility,
     detectLanguageFromInput,
     setTargetLang,
+    loadLangSettings,
     LANG_NAMES
 } from './utils.js';
 import { initWordListUI, goHome, renderWordListCards } from './wordlist/index.js';
@@ -123,6 +125,46 @@ function initInputFilter() {
     }
 }
 
+// 防抖定时器
+let refreshModeTimer = null;
+
+/**
+ * 刷新当前模式（重新启动以应用新设置）
+ * 使用防抖避免快速修改多个设置时重复刷新
+ */
+function refreshCurrentMode() {
+    // 清除之前的定时器
+    if (refreshModeTimer) {
+        clearTimeout(refreshModeTimer);
+    }
+
+    // 300ms 防抖延迟
+    refreshModeTimer = setTimeout(() => {
+        const mode = window.currentActiveMode;
+
+        if (mode === 'repeater') {
+            // 重新启动 Repeater 模式
+            if (window.Repeater?.startRepeater) {
+                window.Repeater.startRepeater();
+            }
+        } else if (mode === 'dictation') {
+            // 重新启动 Dictation 模式
+            if (window.Dictation?.startDictation) {
+                window.Dictation.startDictation();
+            }
+        }
+        // 如果不在任何模式中，不做任何操作
+
+        // 界面刷新完成后，重新加载预加载数据
+        if (mode === 'repeater' || mode === 'dictation') {
+            console.log('[refreshCurrentMode] 触发 reload，重新加载预加载数据');
+            startPreload(true);
+        }
+
+        refreshModeTimer = null;
+    }, 300);
+}
+
 /**
  * 初始化设置控件事件监听
  * 当设置变更时更新播放状态并同步到服务端
@@ -137,6 +179,9 @@ function initSettingsListeners() {
                 currentRepeaterState.settings.shuffle = value;
             }
             await saveSettingToServer('shuffle_mode', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
         });
     }
 
@@ -149,6 +194,9 @@ function initSettingsListeners() {
                 currentRepeaterState.settings.slow = value;
             }
             await saveSettingToServer('slow_mode', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
         });
     }
 
@@ -161,6 +209,9 @@ function initSettingsListeners() {
                 currentRepeaterState.settings.repeat = value;
             }
             await saveSettingToServer('repeat_count', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
         });
     }
 
@@ -173,6 +224,9 @@ function initSettingsListeners() {
                 currentRepeaterState.settings.interval = value;
             }
             await saveSettingToServer('interval_ms', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
         });
     }
 
@@ -182,6 +236,9 @@ function initSettingsListeners() {
         retryInput.addEventListener("change", async () => {
             const value = parseInt(retryInput.value) || 1;
             await saveSettingToServer('retry_count', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
         });
     }
 
@@ -195,6 +252,18 @@ function initSettingsListeners() {
             await saveSettingToServer('accent', value);
         });
     });
+
+    // dictateMode 听写模式切换
+    const dictateModeCheckbox = $("dictateMode");
+    if (dictateModeCheckbox) {
+        dictateModeCheckbox.addEventListener("change", async () => {
+            const value = dictateModeCheckbox.checked;
+            await saveSettingToServer('dictate_mode', value);
+
+            // 立即刷新当前模式
+            refreshCurrentMode();
+        });
+    }
 }
 
 /**
@@ -248,6 +317,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initInputFilter();
     initWordListUI();
 
+    // 从 localStorage 恢复语言设置（未登录用户使用，已登录用户会被服务端设置覆盖）
+    loadLangSettings();
+
     // 初始化认证（会在登录后初始化 WebSocket 和加载设置）
     initAuth();
 
@@ -264,9 +336,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // 监听设置变更（从服务端同步时更新 UI）
     onSettingsChange((settings) => {
         // 更新目标语言内部状态
+        // 注意：只有在没有输入内容时才应用 target_lang，避免覆盖自动检测的语言
         if (settings.target_lang) {
-            setTargetLang(settings.target_lang);
-            updateAccentSelectorVisibility();
+            const wordInput = $("wordInput");
+            const hasInput = wordInput && wordInput.value.trim().length > 0;
+
+            // 只有在没有输入内容时，才使用设置中的 target_lang
+            if (!hasInput) {
+                setTargetLang(settings.target_lang);
+                updateAccentSelectorVisibility();
+            }
+
+            // 如果切换到非英语语言，自动重置 accent 为 'us'
+            if (settings.target_lang !== 'en') {
+                const currentAccent = getAccent();
+                if (currentAccent !== 'us') {
+                    console.log(`[设置] 非英语语言不支持 ${currentAccent} 口音，已重置为 us`);
+
+                    // 重置 UI
+                    const usRadio = document.querySelector('input[name="accent"][value="us"]');
+                    if (usRadio) usRadio.checked = true;
+
+                    // 更新 Repeater 状态
+                    if (window.currentRepeaterState?.settings) {
+                        window.currentRepeaterState.settings.accent = 'us';
+                    }
+
+                    // 同步到服务端
+                    saveSettingToServer('accent', 'us');
+                }
+            }
         }
         if (settings.translation_lang && $("translationLang")) {
             $("translationLang").value = settings.translation_lang;
@@ -297,6 +396,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (settings.retry_count !== undefined && $("retry")) {
             $("retry").value = settings.retry_count;
         }
+        if (settings.dictate_mode !== undefined && $("dictateMode")) {
+            $("dictateMode").checked = settings.dictate_mode;
+        }
         if (settings.accent) {
             const accentRadio = document.querySelector(`input[name="accent"][value="${settings.accent}"]`);
             if (accentRadio) accentRadio.checked = true;
@@ -309,6 +411,19 @@ document.addEventListener("DOMContentLoaded", () => {
             if (settings.repeat_count !== undefined) currentRepeaterState.settings.repeat = settings.repeat_count;
             if (settings.interval_ms !== undefined) currentRepeaterState.settings.interval = settings.interval_ms;
             if (settings.accent) currentRepeaterState.settings.accent = settings.accent;
+        }
+
+        // 检查是否有影响播放行为的设置变更
+        const playbackSettings = [
+            'shuffle_mode', 'slow_mode', 'repeat_count',
+            'interval_ms', 'retry_count', 'dictate_mode', 'accent'
+        ];
+
+        const hasPlaybackChange = playbackSettings.some(key => settings[key] !== undefined);
+
+        if (hasPlaybackChange) {
+            // 立即刷新当前模式以应用新设置
+            refreshCurrentMode();
         }
     });
 });

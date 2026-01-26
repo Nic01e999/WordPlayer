@@ -28,6 +28,7 @@ const eventListeners = {
 export function initWebSocket(serverUrl = '') {
     // 如果已连接，先断开
     if (socket) {
+        console.log('[WS] 断开现有连接...');
         socket.disconnect();
         socket = null;
     }
@@ -44,6 +45,7 @@ export function initWebSocket(serverUrl = '') {
     }
 
     const url = serverUrl || window.location.origin;
+    console.log('[WS] 正在连接到:', url);
 
     try {
         socket = io(url, {
@@ -57,21 +59,21 @@ export function initWebSocket(serverUrl = '') {
 
         // 连接事件
         socket.on('connect', () => {
-            console.log('[WS] 已连接');
+            console.log('[WS] ✓ WebSocket 已连接，实时同步已启用');
             isConnected = true;
             notifyListeners('connect', {});
         });
 
         // 断开事件
         socket.on('disconnect', (reason) => {
-            console.log('[WS] 已断开:', reason);
+            console.log('[WS] ✗ WebSocket 已断开:', reason);
             isConnected = false;
             notifyListeners('disconnect', { reason });
         });
 
         // 连接错误
         socket.on('connect_error', (error) => {
-            console.error('[WS] 连接错误:', error.message);
+            console.error('[WS] ✗ 连接错误:', error.message);
         });
 
         // 设置更新

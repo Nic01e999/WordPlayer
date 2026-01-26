@@ -57,12 +57,18 @@ ALLOWED_DIRS = {'js', 'css', 'assets'}
 ALLOWED_EXTENSIONS = {'.js', '.css', '.html', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf'}
 
 app = Flask(__name__)
-CORS(app)
 
-# 初始化 SocketIO（如果可用）
+# 初始化 SocketIO（如果可用）- 必须在 CORS 之前初始化
 socketio = None
 if HAS_SOCKETIO:
-    socketio = SocketIO(app, cors_allowed_origins="*")
+    socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+# 配置 CORS，显式支持所有方法（包括 OPTIONS 预检请求）
+CORS(app,
+     origins="*",
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=False)
 
 # 注册 API 蓝图
 app.register_blueprint(deepseek_bp)
@@ -99,19 +105,28 @@ if HAS_SOCKETIO:
     @socketio.on('connect')
     def handle_connect(auth):
         """处理 WebSocket 连接"""
-        token = auth.get('token') if auth else request.args.get('token')
-        user = verify_token(token)
+        try:
+            # 只从 auth 参数获取 token，避免 token 泄露到 URL 日志
+            token = auth.get('token') if auth else None
+            user = verify_token(token)
 
-        if not user:
-            return False  # 拒绝连接
+            if not user:
+                print(f"[WS] 连接被拒绝: token 验证失败 (sid: {request.sid})")
+                # 使用 disconnect 而不是返回 False，避免 WSGI 错误
+                from flask_socketio import disconnect
+                disconnect()
+                return False
 
-        user_id = user['id']
-        connected_users[request.sid] = user_id
+            user_id = user['id']
+            connected_users[request.sid] = user_id
 
-        # 加入用户专属房间（用于多设备同步）
-        join_room(f"user_{user_id}")
-        print(f"[WS] 用户 {user['email']} 已连接 (sid: {request.sid})")
-        return True
+            # 加入用户专属房间（用于多设备同步）
+            join_room(f"user_{user_id}")
+            print(f"[WS] 用户 {user['email']} 已连接 (sid: {request.sid})")
+            return True
+        except Exception as e:
+            print(f"[WS] 连接处理异常: {e}")
+            return False
 
     @socketio.on('disconnect')
     def handle_disconnect():
@@ -182,6 +197,9 @@ def static_files(filename):
 
 def main():
     lan_ip = _get_lan_ip()
+    # 从环境变量读取 debug 模式（生产环境应设置为 False）
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+
     print("=" * 40)
     print("后端服务已启动!")
     print(f"  本机访问: http://127.0.0.1:5001")
@@ -190,12 +208,13 @@ def main():
         print("  WebSocket: 已启用")
     else:
         print("  WebSocket: 未启用 (需安装 flask-socketio)")
+    print(f"  Debug 模式: {'开启' if debug_mode else '关闭'}")
     print("=" * 40)
 
     if HAS_SOCKETIO and socketio:
-        socketio.run(app, debug=True, host="0.0.0.0", port=5001)
+        socketio.run(app, debug=debug_mode, host="0.0.0.0", port=5001, allow_unsafe_werkzeug=True)
     else:
-        app.run(debug=True, host="0.0.0.0", port=5001)
+        app.run(debug=debug_mode, host="0.0.0.0", port=5001)
 
 
 if __name__ == "__main__":

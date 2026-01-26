@@ -3,8 +3,8 @@
  * 管理用户设置的服务端同步
  */
 
-import { API_BASE } from '../api.js';
-import { getAuthHeader, isLoggedIn } from '../auth/state.js';
+import { apiGet, apiPut, apiPost } from '../utils/api.js';
+import { isLoggedIn } from '../auth/state.js';
 import { setLocale } from '../i18n/index.js';
 
 // 默认设置
@@ -18,7 +18,8 @@ const DEFAULT_SETTINGS = {
     retry_count: 1,
     interval_ms: 300,
     slow_mode: false,
-    shuffle_mode: false
+    shuffle_mode: false,
+    dictate_mode: false
 };
 
 // 当前用户设置（内存中）
@@ -75,29 +76,16 @@ export async function loadSettingsFromServer() {
         return { success: false, error: '未登录' };
     }
 
-    try {
-        const response = await fetch(`${API_BASE}/api/settings`, {
-            method: 'GET',
-            headers: getAuthHeader()
-        });
+    const data = await apiGet('/api/settings');
 
-        if (!response.ok) {
-            return { success: false, error: '加载设置失败' };
-        }
-
-        const data = await response.json();
-        if (data.settings) {
-            userSettings = { ...DEFAULT_SETTINGS, ...data.settings };
-            setLocale(userSettings.ui_lang);
-            notifyListeners();
-            return { success: true, settings: userSettings };
-        }
-
-        return { success: false, error: '无效的响应' };
-    } catch (e) {
-        console.error('Load settings failed:', e);
-        return { success: false, error: '网络错误' };
+    if (data.settings) {
+        userSettings = { ...DEFAULT_SETTINGS, ...data.settings };
+        setLocale(userSettings.ui_lang);
+        notifyListeners();
+        return { success: true, settings: userSettings };
     }
+
+    return { success: false, error: data.error || '加载设置失败' };
 }
 
 /**
@@ -114,25 +102,14 @@ export async function saveSettingToServer(key, value) {
         return { success: true }; // 未登录时只更新本地
     }
 
-    try {
-        const response = await fetch(`${API_BASE}/api/settings`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader()
-            },
-            body: JSON.stringify({ key, value })
-        });
+    const result = await apiPut('/api/settings', { key, value });
 
-        if (!response.ok) {
-            return { success: false, error: '保存设置失败' };
-        }
-
-        return { success: true };
-    } catch (e) {
-        console.error('Save setting failed:', e);
-        return { success: false, error: '网络错误' };
+    // 检查结果
+    if (!result.success) {
+        console.error('设置保存失败:', result.error);
     }
+
+    return result;
 }
 
 /**
@@ -148,25 +125,7 @@ export async function saveSettingsToServer(settings) {
         return { success: true };
     }
 
-    try {
-        const response = await fetch(`${API_BASE}/api/settings`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                ...getAuthHeader()
-            },
-            body: JSON.stringify({ settings })
-        });
-
-        if (!response.ok) {
-            return { success: false, error: '保存设置失败' };
-        }
-
-        return { success: true };
-    } catch (e) {
-        console.error('Save settings failed:', e);
-        return { success: false, error: '网络错误' };
-    }
+    return apiPut('/api/settings', { settings });
 }
 
 /**
@@ -182,21 +141,7 @@ export async function resetSettings() {
         return { success: true };
     }
 
-    try {
-        const response = await fetch(`${API_BASE}/api/settings/reset`, {
-            method: 'POST',
-            headers: getAuthHeader()
-        });
-
-        if (!response.ok) {
-            return { success: false, error: '重置设置失败' };
-        }
-
-        return { success: true };
-    } catch (e) {
-        console.error('Reset settings failed:', e);
-        return { success: false, error: '网络错误' };
-    }
+    return apiPost('/api/settings/reset');
 }
 
 /**

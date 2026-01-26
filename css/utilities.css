@@ -1,0 +1,137 @@
+/**
+ * CSS 工具类
+ * 提供常用的可复用样式类，减少重复代码
+ */
+
+/* ===================================
+ * 布局工具类
+ * =================================== */
+
+/* Flex 居中 */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Flex 垂直居中 */
+.flex-center-v {
+    display: flex;
+    align-items: center;
+}
+
+/* Flex 水平居中 */
+.flex-center-h {
+    display: flex;
+    justify-content: center;
+}
+
+/* ===================================
+ * 形状工具类
+ * =================================== */
+
+/* 圆形元素 */
+.circle {
+    border-radius: 50%;
+}
+
+/* ===================================
+ * 视觉效果工具类
+ * =================================== */
+
+/* 毛玻璃效果 - 轻度 */
+.backdrop-blur-light {
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+}
+
+/* 毛玻璃效果 - 中度 */
+.backdrop-blur-medium {
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+/* 毛玻璃效果 - 强度 */
+.backdrop-blur-strong {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ===================================
+ * 过渡动画工具类
+ * =================================== */
+
+/* 快速过渡 */
+.transition-fast {
+    transition: all var(--transition-fast);
+}
+
+/* 平滑过渡 */
+.transition-smooth {
+    transition: all var(--transition-smooth);
+}
+
+/* 慢速过渡 */
+.transition-slow {
+    transition: all var(--transition-slow);
+}
+
+/* ===================================
+ * 阴影工具类
+ * =================================== */
+
+/* 小阴影 */
+.shadow-sm {
+    box-shadow: var(--shadow-sm);
+}
+
+/* 中等阴影 */
+.shadow-md {
+    box-shadow: var(--shadow-md);
+}
+
+/* 大阴影 */
+.shadow-lg {
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===================================
+ * 输入框焦点样式
+ * =================================== */
+
+/* 统一的输入框焦点样式 */
+.input-focus:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 10px var(--bg-pink-subtle);
+}
+
+/* ===================================
+ * 文本工具类
+ * =================================== */
+
+/* 文本不换行 */
+.text-nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 文本居中 */
+.text-center {
+    text-align: center;
+}
+
+/* ===================================
+ * 间距工具类
+ * =================================== */
+
+/* 无边距 */
+.m-0 {
+    margin: 0;
+}
+
+/* 无内边距 */
+.p-0 {
+    padding: 0;
+}

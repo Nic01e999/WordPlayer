@@ -369,3 +369,88 @@ export const LANG_NAMES = {
     fr: 'Français',
     zh: '中文'
 };
+
+/**
+ * 绑定设置控件到服务端同步
+ *
+ * @param {string} elementId - 元素 ID
+ * @param {string} settingKey - 设置键名
+ * @param {Object} options - 配置选项
+ * @param {Function} [options.getValue] - 自定义获取值的函数，默认根据元素类型自动判断
+ * @param {Function} [options.beforeSave] - 保存前的回调函数 (value) => void
+ * @param {Function} [options.afterSave] - 保存后的回调函数 (value) => void
+ * @param {Object} [options.stateObject] - 要同步更新的状态对象（如 currentRepeaterState.settings）
+ * @param {string} [options.stateKey] - 状态对象中的键名（默认从 settingKey 转换）
+ * @param {string} [options.eventType] - 监听的事件类型（默认 'change'）
+ */
+export function bindSettingControl(elementId, settingKey, options = {}) {
+    const {
+        getValue = null,
+        beforeSave = null,
+        afterSave = null,
+        stateObject = null,
+        stateKey = null,
+        eventType = 'change'
+    } = options;
+
+    const element = $(elementId);
+    if (!element) return;
+
+    // 默认的获取值函数
+    const defaultGetValue = (el) => {
+        if (el.type === 'checkbox') {
+            return el.checked;
+        } else if (el.type === 'number') {
+            return parseInt(el.value) || 0;
+        } else if (el.type === 'radio') {
+            return el.value;
+        } else {
+            return el.value;
+        }
+    };
+
+    const getValueFn = getValue || defaultGetValue;
+
+    element.addEventListener(eventType, async () => {
+        const value = getValueFn(element);
+
+        // 保存前回调
+        if (beforeSave) {
+            beforeSave(value);
+        }
+
+        // 更新状态对象
+        if (stateObject) {
+            // 将 snake_case 转换为 camelCase
+            const key = stateKey || settingKey.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+            stateObject[key] = value;
+        }
+
+        // 保存到服务端（需要从外部传入 saveSettingToServer）
+        if (window.saveSettingToServer) {
+            await window.saveSettingToServer(settingKey, value);
+        }
+
+        // 保存后回调
+        if (afterSave) {
+            afterSave(value);
+        }
+    });
+}
+
+/**
+ * 批量绑定设置控件
+ *
+ * @param {Array} bindings - 绑定配置数组
+ * @example
+ * bindSettingControls([
+ *   { elementId: 'shuffle', settingKey: 'shuffle_mode', stateObject: state.settings },
+ *   { elementId: 'slow', settingKey: 'slow_mode', stateObject: state.settings }
+ * ]);
+ */
+export function bindSettingControls(bindings) {
+    bindings.forEach(binding => {
+        const { elementId, settingKey, ...options } = binding;
+        bindSettingControl(elementId, settingKey, options);
+    });
+}
