@@ -1,0 +1,128 @@
+{
+  "二": {
+    "phonetic": "èr",
+    "targetDefinitions": [
+      {
+        "pos": "数词",
+        "meanings": [
+          "数字一加一的和",
+          "第二"
+        ]
+      },
+      {
+        "pos": "形容词",
+        "meanings": [
+          "两样的；别的（用于特定成语）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "我家有两只猫。",
+        "今天是二月二日。"
+      ],
+      "fun": [
+        "他做事总是三心二意。",
+        "这道题一加一等于二，太简单了！"
+      ]
+    },
+    "synonyms": [
+      "两",
+      "双",
+      "贰"
+    ],
+    "antonyms": [
+      "一",
+      "单"
+    ],
+    "translations": {
+      "en": "two"
+    },
+    "nativeDefinitions": {
+      "en": [
+        {
+          "pos": "num.",
+          "meanings": [
+            "the number 2",
+            "second"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "different; not the same (used in some idioms)"
+          ]
+        }
+      ]
+    }
+  },
+  "一": {
+    "phonetic": "yī",
+    "targetDefinitions": [
+      {
+        "pos": "数词",
+        "meanings": [
+          "最小的正整数",
+          "单个；单独"
+        ]
+      },
+      {
+        "pos": "形容词",
+        "meanings": [
+          "同一；整个的"
+        ]
+      },
+      {
+        "pos": "副词",
+        "meanings": [
+          "表示一次或短暂的动作；表示两件事时间上前后紧接"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "我买了一个苹果。",
+        "我们一起回家吧。"
+      ],
+      "fun": [
+        "他一听到音乐就忍不住跳舞。",
+        "万里长征第一步最难。"
+      ]
+    },
+    "synonyms": [
+      "壹",
+      "单",
+      "独"
+    ],
+    "antonyms": [
+      "多",
+      "众"
+    ],
+    "translations": {
+      "en": "one"
+    },
+    "nativeDefinitions": {
+      "en": [
+        {
+          "pos": "num.",
+          "meanings": [
+            "the number 1",
+            "single; alone"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "same; whole"
+          ]
+        },
+        {
+          "pos": "adv.",
+          "meanings": [
+            "once; as soon as"
+          ]
+        }
+      ]
+    }
+  }
+}

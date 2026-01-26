@@ -3,9 +3,10 @@
  * 处理卡片和文件夹的拖拽排序（CSS Grid + DOM 重排）
  */
 
-import { getLayout, saveLayout, isFolderNameExists } from './layout.js';
+import { getLayout, saveLayout, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
 import { showColorPicker, hideColorPicker, hasOpenColorPicker } from './colorpicker.js';
+import { t } from '../i18n/index.js';
 
 // 拖拽状态
 let dragState = null;
@@ -88,7 +89,7 @@ export function enterEditMode(workplace) {
 }
 
 /**
- * 退出编辑模式 - 停止抖动
+ * 退出编辑模式 - 停止抖动，上传布局到服务端
  */
 export function exitEditMode() {
     if (!editMode) return;
@@ -106,6 +107,9 @@ export function exitEditMode() {
         });
     }
     currentWorkplace = null;
+
+    // 退出编辑模式时上传布局到服务端
+    syncLayoutToServer();
 }
 
 /**
@@ -483,12 +487,12 @@ function isOverCenter(event, target) {
  * 创建新文件夹（异步弹窗）
  */
 async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, dragName) {
-    const folderName = await showPrompt('输入文件夹名称：', '新文件夹');
+    const folderName = await showPrompt(t('folderPromptName'), t('newFolder'));
     if (!folderName || !folderName.trim()) return;
 
     const trimmedName = folderName.trim();
     if (isFolderNameExists(trimmedName)) {
-        await showAlert(`文件夹名称 "${trimmedName}" 已存在，请使用其他名称`);
+        await showAlert(t('folderNameExists', { name: trimmedName }));
         return;
     }
 

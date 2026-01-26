@@ -1,189 +1,272 @@
 /**
  * 单词表存储模块
- * 使用 localStorage 保存和加载单词表
+ * 纯服务端存储，不再使用 localStorage 存储单词表数据
  */
 
-import { $ } from '../utils.js';
-import { preloadCache, loadCacheFromStorage, setLoadedWordList } from '../state.js';
+import { $, detectLanguageFromInput, setTargetLang, updateAccentSelectorVisibility } from '../utils.js';
+import { t } from '../i18n/index.js';
+import { preloadCache, setLoadedWordList } from '../state.js';
 import { startPreload } from '../preload.js';
-import { isLoggedIn, saveWordlistToCloud, deleteWordlistFromCloud } from '../auth.js';
+import { API_BASE } from '../api.js';
+import { isLoggedIn, getAuthHeader } from '../auth/state.js';
+import { showLoginDialog } from '../auth/login.js';
 
-const STORAGE_KEY = 'wordlists';
 const CARD_COLORS_KEY = 'cardColors';
 
+// 内存缓存：存储从服务端拉取的单词表列表
+let _wordlistsCache = {};
+
 /**
- * 获取所有保存的单词表
+ * 从服务端拉取所有单词表
+ * @returns {Promise<object>} 单词表对象 { name: { name, words, created, updated }, ... }
  */
-export function getWordLists() {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : {};
-    } catch (e) {
-        console.error('Failed to load word lists:', e);
+export async function fetchWordLists() {
+    if (!isLoggedIn()) {
+        _wordlistsCache = {};
         return {};
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/api/sync/pull`, {
+            method: 'GET',
+            headers: getAuthHeader()
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch wordlists:', response.status);
+            return _wordlistsCache;
+        }
+
+        const data = await response.json();
+        _wordlistsCache = data.wordlists || {};
+        return _wordlistsCache;
+    } catch (e) {
+        console.error('Failed to fetch wordlists:', e);
+        return _wordlistsCache;
     }
 }
 
 /**
- * 保存单词表列表到 localStorage
+ * 获取所有单词表（从内存缓存）
+ * 注意：调用前需要先调用 fetchWordLists() 从服务端拉取
  */
-export function saveWordListsToStorage(lists) {
+export function getWordLists() {
+    return _wordlistsCache;
+}
+
+/**
+ * 设置单词表缓存（用于登录后同步）
+ */
+export function setWordListsCache(wordlists) {
+    _wordlistsCache = wordlists || {};
+}
+
+/**
+ * 清空单词表缓存（用于登出）
+ */
+export function clearWordListsCache() {
+    _wordlistsCache = {};
+}
+
+/**
+ * 保存单词表到服务端
+ * @returns {Promise<boolean>} 是否成功
+ */
+export async function saveWordList(name) {
+    const words = $("wordInput").value.trim();
+    if (!words) return false;
+
+    if (!isLoggedIn()) {
+        showLoginDialog();
+        return false;
+    }
+
+    const existingList = _wordlistsCache[name];
+    const created = existingList?.created || new Date().toISOString();
+
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(lists));
+        const response = await fetch(`${API_BASE}/api/sync/wordlist`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeader()
+            },
+            body: JSON.stringify({
+                name,
+                words,
+                created
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to save wordlist:', response.status);
+            return false;
+        }
+
+        // 更新内存缓存
+        _wordlistsCache[name] = {
+            name,
+            words,
+            created,
+            updated: new Date().toISOString()
+        };
+
         return true;
     } catch (e) {
-        console.error('Failed to save word lists:', e);
+        console.error('Failed to save wordlist:', e);
         return false;
     }
 }
 
 /**
- * 保存单词表（同时保存翻译数据）
+ * 删除单词表
+ * @returns {Promise<boolean>} 是否成功
  */
-export function saveWordList(name) {
-    const words = $("wordInput").value.trim();
-    if (!words) return false;
-
-    const translations = {};
-    const wordInfo = {};
-
-    preloadCache.entries.forEach(entry => {
-        const word = entry.word;
-        if (preloadCache.translations[word]) {
-            translations[word] = preloadCache.translations[word];
-        }
-        if (preloadCache.wordInfo[word]) {
-            wordInfo[word] = preloadCache.wordInfo[word];
-        }
-    });
-
-    const lists = getWordLists();
-    const wordlist = {
-        name,
-        created: lists[name]?.created || new Date().toISOString(),
-        updated: new Date().toISOString(),
-        words,
-        translations,
-        wordInfo
-    };
-    lists[name] = wordlist;
-
-    const saved = saveWordListsToStorage(lists);
-
-    // 同步到云端（异步，不阻塞）
-    if (saved && isLoggedIn()) {
-        saveWordlistToCloud(name, wordlist).catch(e => {
-            console.error('Cloud sync failed:', e);
-        });
+export async function removeWordListFromStorage(name) {
+    if (!isLoggedIn()) {
+        // 未登录时只从内存缓存删除
+        delete _wordlistsCache[name];
+        return true;
     }
 
-    return saved;
-}
-
-/**
- * 删除单词表（仅从 wordlists 中删除，不处理 layout）
- */
-export function removeWordListFromStorage(name) {
-    const lists = getWordLists();
-    delete lists[name];
-    const saved = saveWordListsToStorage(lists);
-
-    // 同步删除到云端（异步，不阻塞）
-    if (saved && isLoggedIn()) {
-        deleteWordlistFromCloud(name).catch(e => {
-            console.error('Cloud delete failed:', e);
+    try {
+        const response = await fetch(`${API_BASE}/api/sync/wordlist/${encodeURIComponent(name)}`, {
+            method: 'DELETE',
+            headers: getAuthHeader()
         });
-    }
 
-    return saved;
+        if (!response.ok) {
+            console.error('Failed to delete wordlist:', response.status);
+            return false;
+        }
+
+        // 更新内存缓存
+        delete _wordlistsCache[name];
+        return true;
+    } catch (e) {
+        console.error('Failed to delete wordlist:', e);
+        return false;
+    }
 }
 
 /**
  * 批量删除多个单词表
+ * @returns {Promise<boolean>} 是否全部成功
  */
-export function removeWordListsFromStorage(names) {
-    const lists = getWordLists();
-    names.forEach(name => delete lists[name]);
-    return saveWordListsToStorage(lists);
+export async function removeWordListsFromStorage(names) {
+    const results = await Promise.all(
+        names.map(name => removeWordListFromStorage(name))
+    );
+    return results.every(r => r);
 }
 
 /**
  * 检查单词表名称是否已存在
  */
 export function isWordListNameExists(name) {
-    const lists = getWordLists();
-    return name in lists;
+    return name in _wordlistsCache;
 }
 
 /**
- * 加载单词表到 textarea（恢复翻译数据）
+ * 加载单词表到 textarea
+ * @returns {Promise<boolean>} 是否成功
  */
-export function loadWordList(name) {
-    const lists = getWordLists();
-    const list = lists[name];
+export async function loadWordList(name) {
+    // 优先从缓存获取
+    let list = _wordlistsCache[name];
+
+    // 如果缓存中没有且已登录，尝试从服务端获取
+    if (!list && isLoggedIn()) {
+        try {
+            const response = await fetch(`${API_BASE}/api/sync/wordlist/${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: getAuthHeader()
+            });
+
+            if (response.ok) {
+                list = await response.json();
+                // 更新缓存
+                _wordlistsCache[name] = list;
+            }
+        } catch (e) {
+            console.error('Failed to load wordlist from server:', e);
+        }
+    }
+
     if (!list) return false;
 
+    // 重置预加载缓存
     preloadCache.loadId++;
     preloadCache.translations = {};
     preloadCache.wordInfo = {};
     preloadCache.entries = [];
 
-    loadCacheFromStorage();
-
-    if (list.translations) {
-        Object.assign(preloadCache.translations, list.translations);
-    }
-    if (list.wordInfo) {
-        Object.assign(preloadCache.wordInfo, list.wordInfo);
-    }
+    // 设置 textarea 内容
     $("wordInput").value = list.words;
     setLoadedWordList(name, list.words);
+
+    // 自动检测语言
+    const detected = detectLanguageFromInput(list.words);
+    if (detected) {
+        setTargetLang(detected);
+        updateAccentSelectorVisibility();
+    }
+
+    // 启动预加载
     startPreload();
     return true;
 }
 
 /**
- * 更新已存在的单词表（不改变名称）
+ * 更新已存在的单词表
+ * @returns {Promise<boolean>} 是否成功
  */
-export function updateWordList(name) {
+export async function updateWordList(name) {
     const words = $("wordInput").value.trim();
     if (!words || !name) return false;
 
-    const lists = getWordLists();
-    if (!lists[name]) return false;
+    if (!_wordlistsCache[name]) return false;
 
-    const translations = {};
-    const wordInfo = {};
-
-    preloadCache.entries.forEach(entry => {
-        const word = entry.word;
-        if (preloadCache.translations[word]) {
-            translations[word] = preloadCache.translations[word];
-        }
-        if (preloadCache.wordInfo[word]) {
-            wordInfo[word] = preloadCache.wordInfo[word];
-        }
-    });
-
-    const wordlist = {
-        name,
-        created: lists[name].created,
-        updated: new Date().toISOString(),
-        words,
-        translations,
-        wordInfo
-    };
-    lists[name] = wordlist;
-
-    const saved = saveWordListsToStorage(lists);
-    if (saved && isLoggedIn()) {
-        saveWordlistToCloud(name, wordlist).catch(e => console.error('Cloud sync failed:', e));
+    if (!isLoggedIn()) {
+        showLoginDialog();
+        return false;
     }
 
-    if (saved) {
+    const created = _wordlistsCache[name].created;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/sync/wordlist`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeader()
+            },
+            body: JSON.stringify({
+                name,
+                words,
+                created
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to update wordlist:', response.status);
+            return false;
+        }
+
+        // 更新内存缓存
+        _wordlistsCache[name] = {
+            name,
+            words,
+            created,
+            updated: new Date().toISOString()
+        };
+
         setLoadedWordList(name, words);
+        return true;
+    } catch (e) {
+        console.error('Failed to update wordlist:', e);
+        return false;
     }
-    return saved;
 }
 
 /**
@@ -224,4 +307,10 @@ export function setCardColor(name, colorId) {
         console.error('Failed to save card color:', e);
         return false;
     }
+}
+
+// 为了兼容性，导出一个空的函数（这些函数已不再需要）
+export function saveWordListsToStorage() {
+    console.warn('saveWordListsToStorage is deprecated, use saveWordList instead');
+    return true;
 }

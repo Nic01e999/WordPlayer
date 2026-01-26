@@ -343,6 +343,45 @@
     text-align: center;
 }
 
+/* Mode 0: 音标+词性+翻译视图 */
+.view-phonetic-pos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.view-phonetic-pos .phonetic {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.view-phonetic-pos .pos-tags {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.view-phonetic-pos .pos-tags .pos-tag {
+    background: var(--bg-hover);
+    color: var(--text-accent);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+    font-weight: 500;
+}
+
+.view-phonetic-pos .main-translation {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.375rem, 5vw, 2.25rem);
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
 /* 词性视图 - 并排布局 */
 .view-pos {
     display: flex;

@@ -31,8 +31,7 @@ export {
     pushToCloud,
     saveWordlistToCloud,
     deleteWordlistFromCloud,
-    syncLayoutToCloud,
-    mergeData
+    syncLayoutToCloud
 } from './sync.js';
 
 // UI 功能
@@ -42,5 +41,6 @@ export {
     closeDialog,
     doLogout,
     updateUserDisplay,
-    initAuth
+    initAuth,
+    refreshLoginDialog
 } from './login.js';

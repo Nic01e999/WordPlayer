@@ -2,6 +2,8 @@
  * API 调用模块
  */
 
+import { t } from './i18n/index.js';
+
 // 后端API地址（自动检测）
 // - 通过 Flask 直接访问 (port 5001) → 用相对路径
 // - 通过 cloudflared 隧道访问 (trycloudflare.com) → 用相对路径
@@ -13,10 +15,10 @@ export const API_BASE = isDirectAccess ? "" : `http://${location.hostname}:5001`
  * 根据 HTTP 状态码生成错误消息
  */
 export function getHttpErrorMessage(status) {
-    if (status === 404) return "翻译失败: 未找到该单词";
-    if (status === 429) return "翻译失败: 请求过于频繁";
-    if (status >= 500) return "翻译失败: 服务器错误";
-    return `翻译失败: HTTP ${status}`;
+    if (status === 404) return t('errorNotFound');
+    if (status === 429) return t('errorRateLimit');
+    if (status >= 500) return t('errorServer');
+    return t('errorHttp', { status });
 }
 
 /**
@@ -25,21 +27,42 @@ export function getHttpErrorMessage(status) {
 export function getFetchErrorMessage(e) {
     if (e.name === "TypeError") {
         if (e.message.includes("fetch") || e.message.includes("network") || e.message.includes("Failed to fetch")) {
-            return "翻译失败: 网络连接错误";
+            return t('errorNetwork');
         }
-        return "翻译失败: 请求构造错误";
+        return t('errorRequest');
     }
-    if (e.name === "AbortError") return "翻译失败: 请求被中断";
-    if (e.name === "TimeoutError") return "翻译失败: 请求超时";
-    if (e.name === "SyntaxError") return "翻译失败: 响应解析错误";
-    return `翻译失败: ${e.message || "未知错误"}`;
+    if (e.name === "AbortError") return t('errorAborted');
+    if (e.name === "TimeoutError") return t('errorTimeout');
+    if (e.name === "SyntaxError") return t('errorParse');
+    return t('errorUnknown', { message: e.message || 'Unknown error' });
 }
 
 /**
- * 获取 TTS URL
+ * 获取 TTS URL（支持多语言）
+ * @param {string} word - 单词或文本
+ * @param {boolean} slow - 是否慢速
+ * @param {string} accent - 口音 (us/uk，仅英语有效)
+ * @param {string} lang - 语言代码 (en, ja, ko, fr, zh)
  */
-export function getTtsUrl(word, slow = false, accent = 'us') {
-    return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}&accent=${accent}`;
+export function getTtsUrl(word, slow = false, accent = 'us', lang = 'en') {
+    return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&slow=${slow ? 1 : 0}&accent=${accent}&lang=${lang}`;
+}
+
+/**
+ * 获取有道翻译 API URL
+ * @param {string} word - 要翻译的单词
+ * @param {string} fromLang - 源语言
+ * @param {string} toLang - 目标语言
+ */
+export function getYoudaoTranslateUrl(word, fromLang, toLang) {
+    return `${API_BASE}/api/youdao/translate?word=${encodeURIComponent(word)}&from=${fromLang}&to=${toLang}`;
+}
+
+/**
+ * 获取 DeepSeek 单词详情 API URL
+ */
+export function getWordDetailsUrl() {
+    return `${API_BASE}/api/wordinfo/details`;
 }
 
 

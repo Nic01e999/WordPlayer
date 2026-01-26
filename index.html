@@ -2,76 +2,98 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>English Dictation</title>
+        <title>Word player</title>
         <link rel="stylesheet" href="css/main.css">
+        <!-- Socket.IO 客户端（用于实时同步） -->
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
         <script type="module" src="js/app.js"></script>
 
     </head>
     <body>
         <div id="menu">
-            <button id="home-btn" onclick="goHome()">🎧 English Dictation</button>
+            <button id="home-btn" onclick="goHome()" data-i18n="homeBtn">🎧 word player</button>
             <div id="mode-btn">
-                <button id="dictation-btn" onclick="Dictation.switchToDictation()">Dictation</button>
-                <button id="repeater-btn" onclick="Repeater.switchToRepeater()">Repeater</button>
+                <button id="dictation-btn" onclick="Dictation.switchToDictation()" data-i18n="dictation">Dictation</button>
+                <button id="repeater-btn" onclick="Repeater.switchToRepeater()" data-i18n="repeater">Repeater</button>
             </div>
             <div style="display: flex; align-items: center;">
                 <div class="auth-section"></div>
                 <div class="settings-trigger">
                     <span class="gear-icon">⚙️</span>
+                    <span id="preloadIndicator" style="display:none;">
+                        <span id="translationProgress"></span>
+                        <span id="audioProgress"></span>
+                    </span>
                     <!-- 右侧：设置边栏 -->
                     <div class="sidebar">
                         <div id="settings">
-                            <h3>General</h3>
-                            <label>Shuffle: <input type="checkbox" id="shuffle"></label>
-                            <label>Slow: <input type="checkbox" id="slow"></label>
-                            <div class="accent-selector">
-                                <span>Accent:</span>
+                            <h3 data-i18n="general">General</h3>
+                            <label><span data-i18n="shuffle">Shuffle</span>: <input type="checkbox" id="shuffle"></label>
+                            <label><span data-i18n="slow">Slow</span>: <input type="checkbox" id="slow"></label>
+                            <div class="lang-selector">
+                                <span data-i18n="translation">翻译</span>:
+                                <select id="translationLang">
+                                    <option value="zh">中文</option>
+                                    <option value="en">English</option>
+                                    <option value="ja">日本語</option>
+                                    <option value="ko">한국어</option>
+                                    <option value="fr">Français</option>
+                                </select>
+                            </div>
+                            <div class="lang-selector">
+                                <span data-i18n="interface">界面</span>:
+                                <select id="uiLang">
+                                    <option value="zh">中文</option>
+                                    <option value="en">English</option>
+                                    <option value="ja">日本語</option>
+                                    <option value="ko">한국어</option>
+                                    <option value="fr">Français</option>
+                                </select>
+                            </div>
+                            <div class="accent-selector" id="accentSelector">
+                                <span data-i18n="accent">Accent</span>:
                                 <div class="segmented-control">
                                     <input type="radio" name="accent" id="accent-us" value="us" checked>
-                                    <label for="accent-us">US</label>
+                                    <label for="accent-us" data-i18n="us">US</label>
                                     <input type="radio" name="accent" id="accent-uk" value="uk">
-                                    <label for="accent-uk">UK</label>
+                                    <label for="accent-uk" data-i18n="uk">UK</label>
                                 </div>
                             </div>
                             <div class="theme-selector">
-                                <span>Color:</span>
+                                <span data-i18n="color">Color</span>:
                                 <div class="segmented-control segmented-control-4">
                                     <input type="radio" name="theme-color" id="color-pink" value="pink" checked>
-                                    <label for="color-pink">Pink</label>
+                                    <label for="color-pink" data-i18n="pink">Pink</label>
                                     <input type="radio" name="theme-color" id="color-green" value="green">
-                                    <label for="color-green">Green</label>
+                                    <label for="color-green" data-i18n="green">Green</label>
                                     <input type="radio" name="theme-color" id="color-blue" value="blue">
-                                    <label for="color-blue">Blue</label>
+                                    <label for="color-blue" data-i18n="blue">Blue</label>
                                     <input type="radio" name="theme-color" id="color-purple" value="purple">
-                                    <label for="color-purple">Purple</label>
+                                    <label for="color-purple" data-i18n="purple">Purple</label>
                                 </div>
                             </div>
                             <div class="theme-selector">
-                                <span>Mode:</span>
+                                <span data-i18n="mode">Mode</span>:
                                 <div class="segmented-control">
                                     <input type="radio" name="theme-mode" id="mode-light" value="light" checked>
-                                    <label for="mode-light">Light</label>
+                                    <label for="mode-light" data-i18n="light">Light</label>
                                     <input type="radio" name="theme-mode" id="mode-dark" value="dark">
-                                    <label for="mode-dark">Dark</label>
+                                    <label for="mode-dark" data-i18n="dark">Dark</label>
                                 </div>
                             </div>
                         </div>
                         <div id="dictation-settings" class="mode-settings">
-                            <h3>Dictation</h3>
-                            <label>Max Retry: <input type="number" id="retry" value="3" min="1"></label>
-                            <label>Word(write) : Def(listen)<input type="checkbox" id="dictateMode"></label>
+                            <h3 data-i18n="dictationSettings">Dictation</h3>
+                            <label><span data-i18n="maxRetry">Max Retry</span>: <input type="number" id="retry" value="3" min="1"></label>
+                            <label><span data-i18n="wordWriteDefListen">Word(write) : Def(listen)</span><input type="checkbox" id="dictateMode"></label>
                         </div>
                         <div id="repeater-settings" class="mode-settings">
-                            <h3>Repeater</h3>
-                            <label>Repeat: <input type="number" id="repeat" value="2" min="1"></label>
-                            <label>Interval(ms): <input type="number" id="interval" value="300" min="0" step="100"></label>
+                            <h3 data-i18n="repeaterSettings">Repeater</h3>
+                            <label><span data-i18n="repeat">Repeat</span>: <input type="number" id="repeat" value="2" min="1"></label>
+                            <label><span data-i18n="interval">Interval(ms)</span>: <input type="number" id="interval" value="300" min="0" step="100"></label>
                         </div>
                     </div>
                 </div>
-                <span id="preloadIndicator" style="display:none; margin:10px 0px 5px; font-size: 12px; color:#888;">
-                    <span id="translationProgress"></span>
-                    <span id="audioProgress" style="margin-left: 8px;"></span>
-                </span>
             </div>
         </div>
 
@@ -79,12 +101,13 @@
             <!-- 主页视图 -->
             <div id="homeView" class="mode-view active">
                 <div id="wordSection">
-                    <h3>Word List
-                        <button id="loadBtn" class="btn-load" title="Load translations">Load</button>
-                        <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button>
-                        <button id="updateListBtn" class="btn-update-list" title="Update current list" style="display: none;">Update</button>
+                    <h3><span data-i18n="wordList">Word List</span>
+                        <button id="loadBtn" class="btn-load" data-i18n="load">Load</button>
+                        <button id="saveListBtn" class="btn-save-list" data-i18n="save">Save</button>
+                        <button id="updateListBtn" class="btn-update-list" data-i18n="update" style="display: none;">Update</button>
+
                     </h3>
-                    <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+                    <textarea id="wordInput" wrap="off" data-i18n="wordInputPlaceholder" data-i18n-attr="placeholder" placeholder="Enter words (separated by spaces or newlines)"></textarea>
                 </div>
                 <div id="wordlistContent"></div>
             </div>

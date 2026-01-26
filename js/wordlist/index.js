@@ -8,6 +8,7 @@ import { setActiveMode, setRepeaterState, preloadCache, loadedWordList, clearLoa
 import { updatePreloadProgress } from '../preload.js';
 import { stopAudio } from '../audio.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
+import { t } from '../i18n/index.js';
 
 // 导入子模块
 import { getWordLists, saveWordList, loadWordList, updateWordList, isWordListNameExists } from './storage.js';
@@ -77,16 +78,16 @@ export function initWordListUI() {
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
             const defaultName = `wordlist-${new Date().toISOString().slice(0, 10)}`;
-            const name = await showPrompt("输入单词表名称：", defaultName);
+            const name = await showPrompt(t('promptName'), defaultName);
             if (!name || !name.trim()) return;
 
             const trimmedName = name.trim();
             if (isWordListNameExists(trimmedName)) {
-                await showAlert(`名称 "${trimmedName}" 已存在，请使用其他名称`);
+                await showAlert(t('nameExists', { name: trimmedName }));
                 return;
             }
 
-            if (saveWordList(trimmedName)) {
+            if (await saveWordList(trimmedName)) {
                 clearLoadedWordList();
                 hideUpdateButton();
                 renderWordListCards();
@@ -96,9 +97,9 @@ export function initWordListUI() {
 
     // Update 按钮
     if (updateBtn) {
-        updateBtn.addEventListener('click', () => {
+        updateBtn.addEventListener('click', async () => {
             if (!loadedWordList.name) return;
-            if (updateWordList(loadedWordList.name)) {
+            if (await updateWordList(loadedWordList.name)) {
                 hideUpdateButton();
                 renderWordListCards();
             }

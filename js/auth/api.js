@@ -5,6 +5,7 @@
 
 import { API_BASE } from '../api.js';
 import { getAuthHeader } from './state.js';
+import { t } from '../i18n/index.js';
 
 /**
  * 注册新用户
@@ -22,7 +23,7 @@ export async function register(email, password) {
         return await response.json();
     } catch (e) {
         console.error('Register failed:', e);
-        return { error: '网络错误，请稍后重试' };
+        return { error: t('networkError') };
     }
 }
 
@@ -42,7 +43,7 @@ export async function login(email, password) {
         return await response.json();
     } catch (e) {
         console.error('Login failed:', e);
-        return { error: '网络错误，请稍后重试' };
+        return { error: t('networkError') };
     }
 }
 
@@ -62,7 +63,7 @@ export async function logout() {
         return await response.json();
     } catch (e) {
         console.error('Logout failed:', e);
-        return { error: '网络错误' };
+        return { error: t('networkError') };
     }
 }
 
@@ -82,7 +83,7 @@ export async function getCurrentUser() {
         return await response.json();
     } catch (e) {
         console.error('Get current user failed:', e);
-        return { error: '网络错误' };
+        return { error: t('networkError') };
     }
 }
 
@@ -101,7 +102,7 @@ export async function forgotPassword(email) {
         return await response.json();
     } catch (e) {
         console.error('Forgot password failed:', e);
-        return { error: '网络错误，请稍后重试' };
+        return { error: t('networkError') };
     }
 }
 
@@ -122,6 +123,6 @@ export async function resetPassword(email, code, password) {
         return await response.json();
     } catch (e) {
         console.error('Reset password failed:', e);
-        return { error: '网络错误，请稍后重试' };
+        return { error: t('networkError') };
     }
 }

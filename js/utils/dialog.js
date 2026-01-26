@@ -3,6 +3,8 @@
  * 替代原生 alert/confirm/prompt
  */
 
+import { t } from '../i18n/index.js';
+
 /**
  * 创建弹窗 DOM 结构
  */
@@ -45,7 +47,7 @@ export function showAlert(message) {
     return new Promise((resolve) => {
         const overlay = createDialog({
             message,
-            buttons: [{ text: '确定', action: 'ok' }]
+            buttons: [{ text: t('confirm'), action: 'ok' }]
         });
 
         document.body.appendChild(overlay);
@@ -84,8 +86,8 @@ export function showConfirm(message) {
         const overlay = createDialog({
             message,
             buttons: [
-                { text: '取消', action: 'cancel' },
-                { text: '确定', action: 'ok' }
+                { text: t('cancel'), action: 'cancel' },
+                { text: t('confirm'), action: 'ok' }
             ]
         });
 
@@ -133,8 +135,8 @@ export function showPrompt(message, defaultValue = '') {
             message,
             input: { defaultValue, placeholder: '' },
             buttons: [
-                { text: '取消', action: 'cancel' },
-                { text: '确定', action: 'ok' }
+                { text: t('cancel'), action: 'cancel' },
+                { text: t('confirm'), action: 'ok' }
             ]
         });
 

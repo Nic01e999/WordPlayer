@@ -116,6 +116,17 @@ body.dictation-mode #menu::after {
     width: 3.125rem;
 }
 
+/* 预加载进度指示器 - 显示在设置图标下方 */
+#preloadIndicator {
+    position: absolute;
+    top: 105%;
+    right: 1%;
+    /* margin-top: rem; */
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+}
+
 /* 齿轮图标样式 */
 .gear-icon {
     width: 3.125rem;
@@ -198,8 +209,8 @@ body.dictation-mode #menu::after {
     padding: 1.25rem;
     box-sizing: border-box;
     z-index: 1000;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 
 /* 设置面板显示状态 */
@@ -321,6 +332,45 @@ body.dictation-mode #menu::after {
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 15px var(--shadow-pink-light);
+}
+
+/* 语言选择器 */
+.lang-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.lang-selector > span {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.lang-selector select {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    padding: 0.3125rem 0.5rem;
+    border: 1px solid var(--border-pink-medium);
+    border-radius: 0.5rem;
+    background: var(--bg-input);
+    color: var(--text-label);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 5.5rem;
+}
+
+.lang-selector select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 8px var(--bg-pink-subtle);
+}
+
+.lang-selector select:hover {
+    border-color: var(--accent-primary);
 }
 
 /* 发音选择器 */

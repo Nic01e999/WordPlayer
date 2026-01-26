@@ -106,5 +106,24 @@ def init_db():
             )
         """)
 
+        # 用户设置表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_settings (
+                user_id INTEGER PRIMARY KEY,
+                target_lang TEXT DEFAULT 'en',
+                translation_lang TEXT DEFAULT 'zh',
+                ui_lang TEXT DEFAULT 'zh',
+                theme TEXT DEFAULT 'system',
+                accent TEXT DEFAULT 'us',
+                repeat_count INTEGER DEFAULT 1,
+                retry_count INTEGER DEFAULT 1,
+                interval_ms INTEGER DEFAULT 300,
+                slow_mode BOOLEAN DEFAULT FALSE,
+                shuffle_mode BOOLEAN DEFAULT FALSE,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+
         conn.commit()
         print("数据库初始化完成")

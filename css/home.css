@@ -11,7 +11,7 @@
 }
 
 /* ===== 保存按钮 ===== */
-.btn-save-list {
+.btn-save-list,  .btn-update-list  {
     padding: 0.125rem 0.5rem;
     font-size: 0.75rem;
     border: 1px solid var(--border-pink-medium);
@@ -25,31 +25,12 @@
     white-space: nowrap;
 }
 
-.btn-save-list:hover {
+.btn-save-list:hover,  .btn-update-list:hover{
     background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
     color: var(--text-primary);
     box-shadow: 0 2px 8px var(--shadow-pink-light);
 }
 
-/* ===== Update 按钮 ===== */
-.btn-update-list {
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    border: 1px solid var(--border-pink-medium);
-    border-radius: 0.375rem;
-    background: linear-gradient(135deg, var(--accent-primary-light, #ffd1dc) 0%, var(--accent-primary, #ffb6c1) 100%);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.btn-update-list:hover {
-    background: linear-gradient(135deg, var(--accent-primary, #ffb6c1) 0%, var(--accent-secondary, #ff9faf) 100%);
-    box-shadow: 0 2px 8px var(--shadow-pink-light);
-}
 
 /* ===== 空状态 ===== */
 .wordlist-empty {
@@ -544,53 +525,30 @@
     transform: scale(0.98);
 }
 
-/* 当前选中标记 */
-.color-picker-segment.selected::after {
-    content: '';
+/* 当前选中标记 - 独立元素不受 clip-path 影响 */
+.color-picker-selected-marker {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: white;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-/* 原色标记 - 独立元素不受 clip-path 影响 */
-.color-picker-original-marker {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 10;
 }
 
-.color-picker-original-marker::before {
-    content: '';
+/* 原色标记 - 空心圆环，独立元素不受 clip-path 影响 */
+.color-picker-original-marker {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    transform: translate(-50%, -50%);
-    background: white;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.color-picker-original-marker::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 4px;
-    height: 4px;
     transform: translate(-50%, -50%);
-    background: var(--accent-primary, #ffb6c1);
-    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 9;
 }
 
 /* 中心透明区域 */

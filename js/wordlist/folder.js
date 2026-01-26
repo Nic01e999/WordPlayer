@@ -7,6 +7,7 @@ import { getWordLists, loadWordList, getCardColor } from './storage.js';
 import { getLayout, saveLayout, deleteWordList } from './layout.js';
 import { showConfirm } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
+import { t } from '../i18n/index.js';
 
 // 分页配置
 const CARDS_PER_PAGE = 9;  // 3x3 网格
@@ -188,10 +189,10 @@ export function openFolder(folderName) {
 
     // 文件夹内卡片点击加载
     overlay.querySelectorAll('.wordlist-card').forEach(card => {
-        card.addEventListener('click', (e) => {
+        card.addEventListener('click', async (e) => {
             if (e.target.classList.contains('wordlist-delete')) return;
             overlay.remove();
-            loadWordList(card.dataset.name);
+            await loadWordList(card.dataset.name);
         });
     });
 
@@ -200,9 +201,9 @@ export function openFolder(folderName) {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             const name = btn.dataset.name;
-            const confirmed = await showConfirm(`删除 "${name}"？`);
+            const confirmed = await showConfirm(t('deleteCard', { name }));
             if (confirmed) {
-                deleteWordList(name);
+                await deleteWordList(name);
                 overlay.remove();
                 if (_renderWordListCards) _renderWordListCards();
             }

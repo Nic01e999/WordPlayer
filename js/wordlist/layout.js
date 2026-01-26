@@ -3,7 +3,8 @@
  * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
-import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage } from './storage.js';
+import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors } from './storage.js';
+import { syncLayoutToCloud } from '../auth/sync.js';
 
 const LAYOUT_KEY = 'wordlist_layout';
 const LAYOUT_VERSION = 3;
@@ -127,8 +128,8 @@ function syncLayout(layout) {
 /**
  * 删除单词表（同时更新 storage 和 layout）
  */
-export function deleteWordList(name) {
-    removeWordListFromStorage(name);
+export async function deleteWordList(name) {
+    await removeWordListFromStorage(name);
 
     // 从 layout 中移除
     let layout = getLayout();
@@ -153,15 +154,24 @@ export function isFolderNameExists(folderName) {
 }
 
 /**
+ * 同步布局到服务端（退出编辑模式时调用）
+ */
+export async function syncLayoutToServer() {
+    const layout = getLayout();
+    const cardColors = getCardColors();
+    await syncLayoutToCloud(layout, cardColors);
+}
+
+/**
  * 删除文件夹（同时删除其中的所有单词表）
  */
-export function deleteFolder(folderName) {
+export async function deleteFolder(folderName) {
     const layout = getLayout();
     const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
 
     if (folderItem) {
         // 删除文件夹中的所有单词表
-        removeWordListsFromStorage(folderItem.items);
+        await removeWordListsFromStorage(folderItem.items);
 
         // 从 layout 中移除文件夹
         layout.items = layout.items.filter(item => !(item.type === 'folder' && item.name === folderName));

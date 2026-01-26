@@ -334,7 +334,7 @@ body.dictation-mode #dictationWorkplace::after {
 
 /* 印章效果 - 装饰性 */
 .results-box::after {
-    content: '批阅';
+    content: var(--i18n-stamp, '批阅');
     position: absolute;
     bottom: 1.25rem;
     right: 1.5625rem;

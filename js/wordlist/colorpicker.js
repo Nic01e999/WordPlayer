@@ -133,11 +133,6 @@ export function showColorPicker(cardElement) {
             segment.classList.add('original');
         }
 
-        // 当前选中的颜色添加标记
-        if ((currentColor === colorConfig.id) || (!currentColor && colorConfig.id === 'original')) {
-            segment.classList.add('selected');
-        }
-
         // 点击选择颜色
         segment.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -147,16 +142,34 @@ export function showColorPicker(cardElement) {
         picker.appendChild(segment);
     });
 
-    // 为原色添加独立的标记（不受 clip-path 影响）
-    const originalMarker = document.createElement('div');
-    originalMarker.className = 'color-picker-original-marker';
-    // 计算原色扇形的中心位置（第一个扇形，索引为0）
-    const anglePerSegment = 360 / total;
-    const midAngle = (0 * anglePerSegment + anglePerSegment / 2 - 90) * Math.PI / 180;
-    const markerRadius = 42.5; // (35 + 50) / 2 内外半径的中点
-    originalMarker.style.left = `${50 + markerRadius * Math.cos(midAngle)}%`;
-    originalMarker.style.top = `${50 + markerRadius * Math.sin(midAngle)}%`;
-    picker.appendChild(originalMarker);
+    // 为当前选中颜色添加独立的标记（不受 clip-path 影响）
+    const selectedIndex = CARD_COLORS.findIndex(c =>
+        (currentColor === c.id) || (!currentColor && c.id === 'original')
+    );
+    if (selectedIndex >= 0) {
+        const selectedMarker = document.createElement('div');
+        selectedMarker.className = 'color-picker-selected-marker';
+        // 计算选中扇形的中心位置
+        const anglePerSegment = 360 / total;
+        const midAngle = (selectedIndex * anglePerSegment + anglePerSegment / 2 - 90) * Math.PI / 180;
+        const markerRadius = 42.5; // (35 + 50) / 2 内外半径的中点
+        selectedMarker.style.left = `${50 + markerRadius * Math.cos(midAngle)}%`;
+        selectedMarker.style.top = `${50 + markerRadius * Math.sin(midAngle)}%`;
+        picker.appendChild(selectedMarker);
+    }
+
+    // 为原色扇形添加独立的标记（空心圆环，不受 clip-path 影响）
+    const originalIndex = CARD_COLORS.findIndex(c => c.id === 'original');
+    if (originalIndex >= 0) {
+        const originalMarker = document.createElement('div');
+        originalMarker.className = 'color-picker-original-marker';
+        const anglePerSegment = 360 / total;
+        const midAngle = (originalIndex * anglePerSegment + anglePerSegment / 2 - 90) * Math.PI / 180;
+        const markerRadius = 42.5;
+        originalMarker.style.left = `${50 + markerRadius * Math.cos(midAngle)}%`;
+        originalMarker.style.top = `${50 + markerRadius * Math.sin(midAngle)}%`;
+        picker.appendChild(originalMarker);
+    }
 
     // 中心圆（透明，显示卡片）
     const center = document.createElement('div');

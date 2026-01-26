@@ -6,6 +6,7 @@ import { preloadCache } from '../state.js';
 import { $, logToWorkplace } from '../utils.js';
 import { stopAudio, speakWord, updatePlayPauseBtn } from '../audio.js';
 import { initDrag, clearDragCleanupFns } from './drag.js';
+import { t } from '../i18n/index.js';
 
 // 状态引用（由 index.js 设置）
 let _getState = null;
@@ -30,9 +31,9 @@ export function showPopup() {
     const entry = s.entries[i];
     let writeHint;
     if (entry.definition) {
-        writeHint = s.dictateMode === "listenB_writeA" ? "Write: Word" : "Write: Definition";
+        writeHint = s.dictateMode === "listenB_writeA" ? t('writeWord') : t('writeDefinition');
     } else {
-        writeHint = "Write: Word";
+        writeHint = t('writeWord');
     }
 
     const popup = document.createElement("div");
@@ -40,12 +41,12 @@ export function showPopup() {
     popup.className = "popup";
     popup.innerHTML = `
         <div class="popup-drag-handle" title=""></div>
-        <h3>Word #${i + 1}</h3>
-        <p id="retryInfo">Attempts: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
+        <h3>${t('wordNum', { num: i + 1 })}</h3>
+        <p id="retryInfo">${t('attempts')}: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
         <button onclick="Dictation.play()" class="btn-sound"></button>
         <br><br>
         <button onclick="Dictation.playPause()" id="dictationPlayPauseBtn" class="${s.isPaused ? 'btn-play' : 'btn-pause'}">${s.isPaused ? '>' : '||'}</button>
-        <input type="text" id="dictationInput" placeholder="Type the word" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${s.isPaused ? 'disabled' : ''}>
+        <input type="text" id="dictationInput" placeholder="${t('typeWordPlaceholder')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${s.isPaused ? 'disabled' : ''}>
         <br><br>
     `;
 
@@ -108,7 +109,7 @@ export function submit() {
             s.currentIndex++;
             setTimeout(() => showPopup(), 500);
         } else {
-            $("retryInfo").textContent = `Attempts: ${s.attempts[i].length}/${s.maxRetry}`;
+            $("retryInfo").textContent = `${t('attempts')}: ${s.attempts[i].length}/${s.maxRetry}`;
             input.value = "";
             input.focus();
         }
@@ -188,11 +189,11 @@ export function showResults() {
 
     logToWorkplace(`
         <div class="results-box">
-            <h3>Dictation Complete!</h3>
-            <p><strong>Score: ${score}</strong></p>
-            <p>First try correct: ${correct}</p>
-            <p>Multiple tries: ${warning}</p>
-            <p>Failed: ${failed}</p>
+            <h3>${t('dictationComplete')}</h3>
+            <p><strong>${t('score')}: ${score}</strong></p>
+            <p>${t('firstTryCorrect')}: ${correct}</p>
+            <p>${t('multipleTries')}: ${warning}</p>
+            <p>${t('failed')}: ${failed}</p>
         </div>
     `);
 

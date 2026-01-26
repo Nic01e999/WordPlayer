@@ -3,8 +3,19 @@
  */
 
 import { preloadCache, loadingAudio } from './state.js';
+import { t } from './i18n/index.js';
 import { getTtsUrl } from './api.js';
-import { getAccent } from './utils.js';
+import { getAccent, getTargetLang } from './utils.js';
+import { audioBlobManager, slowAudioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
+
+// Web Speech API 语言代码映射
+const WEB_SPEECH_LANG_CODES = {
+    en: { us: 'en-US', uk: 'en-GB' },
+    ja: 'ja-JP',
+    ko: 'ko-KR',
+    fr: 'fr-FR',
+    zh: 'zh-CN'
+};
 
 // 当前播放的音频对象
 export let currentAudio = null;
@@ -31,19 +42,20 @@ export function isAudioPlaying() {
 }
 
 /**
- * 使用后端 TTS API 朗读单词
+ * 使用后端 TTS API 朗读单词（支持多语言）
  */
 export async function speakWord(word, slow = false) {
     const accent = getAccent();
+    const lang = getTargetLang();
     const cache = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
-    const cacheKey = `${word}:${accent}`;
+    const cacheKey = `${word}:${accent}:${lang}`;
     const cachedUrl = cache[cacheKey];
 
     // 缓存命中，直接播放
     if (cachedUrl) {
         stopAudio();
         currentAudio = new Audio(cachedUrl);
-        currentAudio.onerror = () => console.warn("音频加载失败");
+        currentAudio.onerror = () => console.warn(t('errorAudioLoad'));
         currentAudio.play().catch(() => {});
         return;
     }
@@ -56,21 +68,22 @@ export async function speakWord(word, slow = false) {
 
     // 缓存未命中，fetch 并缓存
     loadingAudio.add(loadingKey);
-    const url = getTtsUrl(word, slow, accent);
+    const url = getTtsUrl(word, slow, accent, lang);
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`TTS请求失败: ${res.status}`);
 
         const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
+        const blobManager = slow ? slowAudioBlobManager : audioBlobManager;
+        const blobUrl = blobManager.create(blob, cacheKey);
         cache[cacheKey] = blobUrl;
 
         stopAudio();
         currentAudio = new Audio(blobUrl);
-        currentAudio.onerror = () => console.warn("音频加载失败");
+        currentAudio.onerror = () => console.warn(t('errorAudioLoad'));
         currentAudio.play().catch(() => {});
     } catch (e) {
-        console.warn("音频请求失败:", e.message);
+        console.warn(t('errorAudioPlay', { error: e.message }));
     } finally {
         loadingAudio.delete(loadingKey);
     }
@@ -84,12 +97,13 @@ export async function speakText(text, slow = false) {
     stopAudio();
 
     const accent = getAccent();
-    const cacheKey = `${text}:${accent}`;
+    const lang = getTargetLang();
+    const cacheKey = `${text}:${accent}:${lang}`;
     const wordCount = text.split(/\s+/).length;
 
     // 长句子(>3词)使用浏览器 Web Speech API
     if (wordCount > 3) {
-        return speakWithWebSpeech(text, accent);
+        return speakWithWebSpeech(text, lang, accent);
     }
 
     // 短文本使用有道TTS
@@ -105,18 +119,18 @@ export async function speakText(text, slow = false) {
         return new Promise((resolve, reject) => {
             currentAudio.onended = resolve;
             currentAudio.onerror = (e) => {
-                console.warn('音频播放失败:', e);
+                console.warn(t('errorAudioPlay', { error: e }));
                 resolve(); // 仍然 resolve 以避免阻塞流程
             };
             currentAudio.play().catch((e) => {
-                console.warn('音频播放失败:', e);
+                console.warn(t('errorAudioPlay', { error: e }));
                 resolve(); // 仍然 resolve 以避免阻塞流程
             });
         });
     }
 
     // 未缓存，fetch 并缓存
-    const url = getTtsUrl(text, slow, accent);
+    const url = getTtsUrl(text, slow, accent, lang);
 
     try {
         const res = await fetch(url);
@@ -124,7 +138,7 @@ export async function speakText(text, slow = false) {
             throw new Error(`TTS请求失败: ${res.status}`);
         }
         const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
+        const blobUrl = sentenceAudioBlobManager.create(blob, cacheKey);
 
         preloadCache.sentenceAudioUrls[cacheKey] = blobUrl;
 
@@ -132,27 +146,30 @@ export async function speakText(text, slow = false) {
         return new Promise((resolve) => {
             currentAudio.onended = resolve;
             currentAudio.onerror = (e) => {
-                console.warn('音频播放失败:', e);
+                console.warn(t('errorAudioPlay', { error: e }));
                 resolve();
             };
             currentAudio.play().catch((e) => {
-                console.warn('音频播放失败:', e);
+                console.warn(t('errorAudioPlay', { error: e }));
                 resolve();
             });
         });
     } catch (e) {
-        console.warn('有道TTS失败，尝试Web Speech:', e.message);
-        return speakWithWebSpeech(text, accent);
+        console.warn(t('warnWebSpeech', { error: e.message }));
+        return speakWithWebSpeech(text, lang, accent);
     }
 }
 
 /**
- * 使用浏览器 Web Speech API 朗读文本
+ * 使用浏览器 Web Speech API 朗读文本（支持多语言）
+ * @param {string} text - 要朗读的文本
+ * @param {string} lang - 语言代码 (en, ja, ko, fr, zh)
+ * @param {string} accent - 口音 (us/uk，仅英语有效)
  */
-function speakWithWebSpeech(text, accent = 'us') {
+function speakWithWebSpeech(text, lang = 'en', accent = 'us') {
     return new Promise((resolve) => {
         if (!window.speechSynthesis) {
-            console.warn('浏览器不支持 Web Speech API');
+            console.warn(t('warnNoWebSpeech'));
             resolve();
             return;
         }
@@ -161,7 +178,16 @@ function speakWithWebSpeech(text, accent = 'us') {
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = accent === 'uk' ? 'en-GB' : 'en-US';
+
+        // 获取语言代码
+        const langCode = WEB_SPEECH_LANG_CODES[lang];
+        if (typeof langCode === 'object') {
+            // 英语有口音选择
+            utterance.lang = langCode[accent] || langCode.us;
+        } else {
+            utterance.lang = langCode || 'en-US';
+        }
+
         utterance.rate = 0.9;
         utterance.onend = resolve;
         utterance.onerror = resolve;

@@ -159,6 +159,34 @@ export function setupSliderListeners() {
             snapToNode(prev);
         }
     });
+
+    // 内容区域左右滑动手势
+    const content = document.getElementById('sliderContent');
+    if (content && !content.dataset.swipeInitialized) {
+        content.dataset.swipeInitialized = 'true';
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        content.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        content.addEventListener('touchend', (e) => {
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+            // 水平滑动距离大于50px且大于垂直距离
+            if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                _pauseIfPlaying?.();
+                if (deltaX < 0) {
+                    sliderRight(); // 左滑 → 下一个
+                } else {
+                    sliderLeft();  // 右滑 → 上一个
+                }
+            }
+        }, { passive: true });
+    }
 }
 
 export function animateContentSwitch(newPosition) {

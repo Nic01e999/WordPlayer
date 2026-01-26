@@ -5,10 +5,14 @@
 
 import * as api from './api.js';
 import * as state from './state.js';
-import { pullFromCloud, pushToCloud, mergeData } from './sync.js';
-import { getWordLists, saveWordListsToStorage, getCardColors } from '../wordlist/storage.js';
+import { pullFromCloud, pushToCloud } from './sync.js';
+import { setWordListsCache, clearWordListsCache, getCardColors } from '../wordlist/storage.js';
+import { t } from '../i18n/index.js';
 import { getLayout, saveLayout } from '../wordlist/layout.js';
 import { renderWordListCards } from '../wordlist/render.js';
+import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
+import { applySettings, clearSettings } from '../sync/settings.js';
+import { clearLocalWordInfo } from '../storage/localCache.js';
 
 let currentDialog = null;
 let currentMode = 'login'; // 'login' | 'register' | 'forgot' | 'reset'
@@ -85,22 +89,22 @@ function getDialogContent() {
             return `
                 <div class="glass-dialog auth-dialog">
                     <div class="auth-dialog-header">
-                        <div class="auth-dialog-title">登录</div>
-                        <div class="auth-dialog-subtitle">登录后可同步数据到云端</div>
+                        <div class="auth-dialog-title">${t('loginTitle')}</div>
+                        <div class="auth-dialog-subtitle">${t('loginSubtitle')}</div>
                     </div>
                     <div class="auth-form">
                         <div class="auth-input-group">
-                            <input type="email" class="auth-input" id="authEmail" placeholder="邮箱" autocomplete="email">
+                            <input type="email" class="auth-input" id="authEmail" placeholder="${t('email')}" autocomplete="email">
                         </div>
                         <div class="auth-input-group">
-                            <input type="password" class="auth-input" id="authPassword" placeholder="密码" autocomplete="current-password">
+                            <input type="password" class="auth-input" id="authPassword" placeholder="${t('password')}" autocomplete="current-password">
                         </div>
                         <div class="auth-error" id="authError"></div>
                         <div class="auth-buttons">
-                            <button class="auth-btn-primary" id="authSubmit">登录</button>
+                            <button class="auth-btn-primary" id="authSubmit">${t('loginTitle')}</button>
                         </div>
-                        <div class="auth-link" id="switchToRegister">没有账号？注册</div>
-                        <div class="auth-link" id="switchToForgot">忘记密码？</div>
+                        <div class="auth-link" id="switchToRegister">${t('noAccount')}</div>
+                        <div class="auth-link" id="switchToForgot">${t('forgotPassword')}</div>
                     </div>
                 </div>
             `;
@@ -109,24 +113,24 @@ function getDialogContent() {
             return `
                 <div class="glass-dialog auth-dialog">
                     <div class="auth-dialog-header">
-                        <div class="auth-dialog-title">注册</div>
-                        <div class="auth-dialog-subtitle">创建账号开始使用</div>
+                        <div class="auth-dialog-title">${t('registerTitle')}</div>
+                        <div class="auth-dialog-subtitle">${t('registerSubtitle')}</div>
                     </div>
                     <div class="auth-form">
                         <div class="auth-input-group">
-                            <input type="email" class="auth-input" id="authEmail" placeholder="邮箱" autocomplete="email">
+                            <input type="email" class="auth-input" id="authEmail" placeholder="${t('email')}" autocomplete="email">
                         </div>
                         <div class="auth-input-group">
-                            <input type="password" class="auth-input" id="authPassword" placeholder="密码（至少6位）" autocomplete="new-password">
+                            <input type="password" class="auth-input" id="authPassword" placeholder="${t('passwordHint')}" autocomplete="new-password">
                         </div>
                         <div class="auth-input-group">
-                            <input type="password" class="auth-input" id="authPasswordConfirm" placeholder="确认密码" autocomplete="new-password">
+                            <input type="password" class="auth-input" id="authPasswordConfirm" placeholder="${t('confirmPassword')}" autocomplete="new-password">
                         </div>
                         <div class="auth-error" id="authError"></div>
                         <div class="auth-buttons">
-                            <button class="auth-btn-primary" id="authSubmit">注册</button>
+                            <button class="auth-btn-primary" id="authSubmit">${t('registerTitle')}</button>
                         </div>
-                        <div class="auth-link" id="switchToLogin">已有账号？登录</div>
+                        <div class="auth-link" id="switchToLogin">${t('hasAccount')}</div>
                     </div>
                 </div>
             `;
@@ -135,18 +139,18 @@ function getDialogContent() {
             return `
                 <div class="glass-dialog auth-dialog">
                     <div class="auth-dialog-header">
-                        <div class="auth-dialog-title">忘记密码</div>
-                        <div class="auth-dialog-subtitle">输入邮箱接收验证码</div>
+                        <div class="auth-dialog-title">${t('forgotTitle')}</div>
+                        <div class="auth-dialog-subtitle">${t('forgotSubtitle')}</div>
                     </div>
                     <div class="auth-form">
                         <div class="auth-input-group">
-                            <input type="email" class="auth-input" id="authEmail" placeholder="邮箱" autocomplete="email">
+                            <input type="email" class="auth-input" id="authEmail" placeholder="${t('email')}" autocomplete="email">
                         </div>
                         <div class="auth-error" id="authError"></div>
                         <div class="auth-buttons">
-                            <button class="auth-btn-primary" id="authSubmit">发送验证码</button>
+                            <button class="auth-btn-primary" id="authSubmit">${t('sendCode')}</button>
                         </div>
-                        <div class="auth-link" id="switchToLogin">返回登录</div>
+                        <div class="auth-link" id="switchToLogin">${t('backToLogin')}</div>
                     </div>
                 </div>
             `;
@@ -155,21 +159,21 @@ function getDialogContent() {
             return `
                 <div class="glass-dialog auth-dialog">
                     <div class="auth-dialog-header">
-                        <div class="auth-dialog-title">重置密码</div>
-                        <div class="auth-dialog-subtitle">验证码已发送到 ${resetEmail}</div>
+                        <div class="auth-dialog-title">${t('resetTitle')}</div>
+                        <div class="auth-dialog-subtitle">${t('resetSubtitle', { email: resetEmail })}</div>
                     </div>
                     <div class="auth-form">
                         <div class="auth-input-group">
-                            <input type="text" class="auth-input auth-code-input" id="authCode" placeholder="验证码" maxlength="6" autocomplete="one-time-code">
+                            <input type="text" class="auth-input auth-code-input" id="authCode" placeholder="${t('verificationCode')}" maxlength="6" autocomplete="one-time-code">
                         </div>
                         <div class="auth-input-group">
-                            <input type="password" class="auth-input" id="authPassword" placeholder="新密码（至少6位）" autocomplete="new-password">
+                            <input type="password" class="auth-input" id="authPassword" placeholder="${t('newPasswordHint')}" autocomplete="new-password">
                         </div>
                         <div class="auth-error" id="authError"></div>
                         <div class="auth-buttons">
-                            <button class="auth-btn-primary" id="authSubmit">重置密码</button>
+                            <button class="auth-btn-primary" id="authSubmit">${t('resetTitle')}</button>
                         </div>
-                        <div class="auth-link" id="switchToForgot">重新发送验证码</div>
+                        <div class="auth-link" id="switchToForgot">${t('resendCode')}</div>
                     </div>
                 </div>
             `;
@@ -209,7 +213,7 @@ function bindEvents(overlay) {
 
         // 禁用按钮
         submitBtn.disabled = true;
-        submitBtn.textContent = '处理中...';
+        submitBtn.textContent = t('processing');
 
         try {
             let result;
@@ -227,7 +231,7 @@ function bindEvents(overlay) {
 
                 case 'register':
                     if (password !== passwordConfirm) {
-                        result = { error: '两次输入的密码不一致' };
+                        result = { error: t('passwordMismatch') };
                     } else {
                         result = await api.register(email, password);
                         if (result.success) {
@@ -265,7 +269,7 @@ function bindEvents(overlay) {
                 errorDiv.classList.add('show');
             }
         } catch (e) {
-            errorDiv.textContent = '操作失败，请稍后重试';
+            errorDiv.textContent = t('operationFailed');
             errorDiv.classList.add('show');
         } finally {
             submitBtn.disabled = false;
@@ -309,22 +313,31 @@ function updateDialogContent() {
 }
 
 /**
- * 获取提交按钮文字
+ * 刷新登录弹窗（语言变更时调用）
  */
-function getSubmitButtonText() {
-    switch (currentMode) {
-        case 'login': return '登录';
-        case 'register': return '注册';
-        case 'forgot': return '发送验证码';
-        case 'reset': return '重置密码';
+export function refreshLoginDialog() {
+    if (currentDialog) {
+        updateDialogContent();
     }
 }
 
 /**
- * 登录后同步数据
+ * 获取提交按钮文字
+ */
+function getSubmitButtonText() {
+    switch (currentMode) {
+        case 'login': return t('loginTitle');
+        case 'register': return t('registerTitle');
+        case 'forgot': return t('sendCode');
+        case 'reset': return t('resetTitle');
+    }
+}
+
+/**
+ * 登录后同步数据（纯服务端存储模式）
  */
 async function syncAfterLogin() {
-    // 拉取云端数据
+    // 从云端拉取数据
     const cloudData = await pullFromCloud();
 
     if (cloudData.error) {
@@ -332,48 +345,58 @@ async function syncAfterLogin() {
         return;
     }
 
-    // 获取本地数据
-    const localWordlists = getWordLists();
+    // 将云端单词表存入内存缓存
+    setWordListsCache(cloudData.wordlists || {});
+
+    // 同步布局配置（云端 -> 本地）
+    if (cloudData.layout) {
+        saveLayout(cloudData.layout);
+    }
+
+    if (cloudData.cardColors && Object.keys(cloudData.cardColors).length > 0) {
+        localStorage.setItem('cardColors', JSON.stringify(cloudData.cardColors));
+    }
+
+    // 应用用户设置（语言、主题、播放设置等）
+    if (cloudData.settings) {
+        applySettings(cloudData.settings);
+    }
+
+    // 如果本地有布局配置但云端没有，推送到云端
     const localLayout = getLayout();
     const localCardColors = getCardColors();
-
-    // 合并数据
-    const merged = mergeData(cloudData, {
-        wordlists: localWordlists,
-        layout: localLayout,
-        cardColors: localCardColors
-    });
-
-    // 保存合并后的数据到本地
-    if (merged.wordlists && Object.keys(merged.wordlists).length > 0) {
-        saveWordListsToStorage(merged.wordlists);
+    if (localLayout && !cloudData.layout) {
+        await pushToCloud({
+            layout: localLayout,
+            cardColors: localCardColors,
+            wordlists: {}
+        });
     }
-
-    if (merged.layout) {
-        saveLayout(merged.layout);
-    }
-
-    if (merged.cardColors && Object.keys(merged.cardColors).length > 0) {
-        localStorage.setItem('cardColors', JSON.stringify(merged.cardColors));
-    }
-
-    // 推送合并后的数据到云端
-    await pushToCloud({
-        wordlists: merged.wordlists || {},
-        layout: merged.layout,
-        cardColors: merged.cardColors || {}
-    });
 
     // 刷新 UI
     renderWordListCards();
+
+    // 初始化 WebSocket 连接（实时同步）
+    initWebSocket();
 }
 
 /**
  * 登出
  */
 export async function doLogout() {
+    // 断开 WebSocket 连接
+    disconnectWebSocket();
+    // 清除用户设置
+    clearSettings();
+    // 清空本地 word info 缓存
+    clearLocalWordInfo();
+
     await api.logout();
     state.clearAuth();
+    // 清空单词表缓存
+    clearWordListsCache();
+    // 刷新 UI
+    renderWordListCards();
 }
 
 /**
@@ -396,11 +419,11 @@ export function updateUserDisplay() {
             <div class="user-dropdown" id="userDropdown">
                 <div class="user-dropdown-item" id="manualSync">
                     <span>🔄</span>
-                    <span>同步数据</span>
+                    <span>${t('syncData')}</span>
                 </div>
                 <div class="user-dropdown-item danger" id="logoutBtn">
                     <span>🚪</span>
-                    <span>退出登录</span>
+                    <span>${t('logout')}</span>
                 </div>
             </div>
         `;
@@ -434,7 +457,7 @@ export function updateUserDisplay() {
 
     } else {
         authSection.innerHTML = `
-            <button class="auth-btn" id="loginBtn">登录</button>
+            <button class="auth-btn" id="loginBtn">${t('loginTitle')}</button>
         `;
 
         authSection.querySelector('#loginBtn').addEventListener('click', showLoginDialog);
@@ -469,6 +492,8 @@ export async function initAuth() {
         } else if (result.user) {
             // 更新用户信息
             state.setUser(result.user);
+            // 页面加载时自动同步（拉取最新数据）
+            await syncAfterLogin();
         }
     }
 

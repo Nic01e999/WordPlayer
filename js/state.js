@@ -2,6 +2,8 @@
  * 全局状态管理模块
  */
 
+import { audioBlobManager, slowAudioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
+
 /**
  * 复读模式的状态对象
  * 为 null 表示复读模式未启动
@@ -16,7 +18,7 @@ export let currentActiveMode = null;
 
 /**
  * 预加载缓存对象
- * 用于后台预加载翻译和音频
+ * 用于后台预加载翻译和音频（仅内存缓存，不再持久化到 localStorage）
  */
 /**
  * 正在加载中的音频追踪（防止重复请求）
@@ -42,37 +44,13 @@ export const preloadCache = {
 };
 
 /**
- * 从 localStorage 恢复 wordInfo 缓存
- */
-export function loadCacheFromStorage() {
-    try {
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('wordinfo:')) {
-                const word = key.slice(9);
-                const data = localStorage.getItem(key);
-                if (data) {
-                    preloadCache.wordInfo[word] = JSON.parse(data);
-                    preloadCache.translations[word] = preloadCache.wordInfo[word].translation;
-                }
-            }
-        }
-    } catch (e) {
-        console.warn('Failed to load cache from localStorage:', e);
-    }
-}
-
-// 模块加载时自动恢复缓存
-loadCacheFromStorage();
-
-/**
  * 清理 Blob URL 缓存（释放内存）
  */
 export function clearAudioCache() {
-    // 释放所有 Blob URL
-    Object.values(preloadCache.audioUrls).forEach(url => URL.revokeObjectURL(url));
-    Object.values(preloadCache.slowAudioUrls).forEach(url => URL.revokeObjectURL(url));
-    Object.values(preloadCache.sentenceAudioUrls).forEach(url => URL.revokeObjectURL(url));
+    // 使用 BlobManager 释放所有 Blob URL
+    audioBlobManager.releaseAll();
+    slowAudioBlobManager.releaseAll();
+    sentenceAudioBlobManager.releaseAll();
 
     // 清空缓存对象
     preloadCache.audioUrls = {};

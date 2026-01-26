@@ -5,6 +5,7 @@
 import { currentRepeaterState, preloadCache } from '../state.js';
 import { $, showView, escapeHtml } from '../utils.js';
 import { currentSliderPosition } from './state.js';
+import { t } from '../i18n/index.js';
 
 // 延迟绑定
 let _setupScrollListener = null;
@@ -60,7 +61,7 @@ export function updateInfo() {
 
     info.innerHTML = `
         ${contentHTML}
-        <div class="play-count">Play ${currentRepeat + 1}/${settings.repeat}</div>
+        <div class="play-count">${t('playCount', { current: currentRepeat + 1, total: settings.repeat })}</div>
     `;
 
     if (!isCustomWord && !isPhrase) {
@@ -100,7 +101,7 @@ export function renderViewContent(position, wordInfo, translation) {
     const word = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
     switch (position) {
         case 0:
-            return renderChinesePosView(wordInfo, translation);
+            return renderNativePosView(wordInfo, translation);
         case 1:
             return renderPosView(wordInfo);
         case 2:
@@ -112,39 +113,64 @@ export function renderViewContent(position, wordInfo, translation) {
     }
 }
 
-function renderChinesePosView(wordInfo, fallbackTranslation) {
-    const chineseDefs = wordInfo?.chineseDefinitions || [];
-    if (chineseDefs.length === 0) {
-        return `<div class="view-translation">${fallbackTranslation ?? '...'}</div>`;
-    }
+/**
+ * Mode 0: 渲染音标 + 词性标签 + 母语翻译
+ */
+function renderNativePosView(wordInfo, fallbackTranslation) {
+    const phonetic = wordInfo?.phonetic || '';
+    const translation = wordInfo?.translation || fallbackTranslation || '...';
+    // 兼容新旧字段: nativeDefinitions (新) / definitions (旧)
+    const nativeDefs = wordInfo?.nativeDefinitions || wordInfo?.definitions || wordInfo?.chineseDefinitions || [];
+
+    // 提取所有词性标签
+    const posTags = [...new Set(nativeDefs.map(d => d.pos).filter(Boolean))];
+
     return `
-        <div class="view-chinese-pos">
-            ${chineseDefs.map(def => `
-                <div class="pos-item">
-                    <span class="pos-tag">${def.pos}</span>
-                    <span class="pos-meaning">${def.meanings.join('')}</span>
-                </div>
-            `).join('')}
+        <div class="view-phonetic-pos">
+            ${phonetic ? `<div class="phonetic">${phonetic}</div>` : ''}
+            ${posTags.length > 0 ? `<div class="pos-tags">${posTags.map(p => `<span class="pos-tag">${p}</span>`).join(' ')}</div>` : ''}
+            <div class="main-translation">${translation}</div>
         </div>
     `;
 }
 
+/**
+ * 高亮例句中的单词（支持Unicode/非英语）
+ */
 function highlightWord(sentence, word) {
     if (!sentence || !word) return sentence;
-    const regex = new RegExp(`\\b(${word})\\b`, 'gi');
-    return sentence.replace(regex, '<span class="word-highlight">$1</span>');
+    // 转义正则特殊字符
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    try {
+        // Unicode-aware: \p{L}=字母, \p{N}=数字
+        // 负向前瞻/后瞻确保单词边界
+        const regex = new RegExp(
+            `(?<![\\p{L}\\p{N}])(${escaped})(?![\\p{L}\\p{N}])`,
+            'giu'
+        );
+        return sentence.replace(regex, '<span class="word-highlight">$1</span>');
+    } catch {
+        // 旧浏览器回退：简单匹配
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        return sentence.replace(regex, '<span class="word-highlight">$1</span>');
+    }
 }
 
+/**
+ * Mode 1: 渲染目标语言词性释义
+ */
 function renderPosView(wordInfo) {
-    if (!wordInfo?.definitions?.length) {
-        return '<div class="view-empty">No definitions available</div>';
+    // 兼容新旧字段: targetDefinitions (新) / definitions (旧)
+    const defs = wordInfo?.targetDefinitions || wordInfo?.definitions || [];
+    if (defs.length === 0) {
+        return `<div class="view-empty">${t('noDefinitions')}</div>`;
     }
     return `
         <div class="view-pos">
-            ${wordInfo.definitions.map(def => `
+            ${defs.map(def => `
                 <div class="pos-item">
                     <span class="pos-tag">${def.pos}</span>
-                    <span class="pos-meaning">${def.meanings.slice(0, 2).join('; ')}</span>
+                    <span class="pos-meaning">${Array.isArray(def.meanings) ? def.meanings.slice(0, 2).join('; ') : def.meanings}</span>
                 </div>
             `).join('')}
         </div>
@@ -159,7 +185,7 @@ function renderExamplesView(wordInfo, word) {
     if (Array.isArray(wordInfo?.examples)) {
         const oldExamples = wordInfo.examples;
         if (oldExamples.length === 0) {
-            return '<div class="view-empty">No examples available</div>';
+            return `<div class="view-empty">${t('noExamples')}</div>`;
         }
         return `
             <div class="view-examples">
@@ -169,7 +195,7 @@ function renderExamplesView(wordInfo, word) {
     }
 
     if (commonExamples.length === 0 && funExamples.length === 0) {
-        return '<div class="view-empty">No examples available</div>';
+        return `<div class="view-empty">${t('noExamples')}</div>`;
     }
 
     return `
@@ -191,7 +217,7 @@ function renderSynonymsView(wordInfo) {
     const antonyms = wordInfo?.antonyms || [];
 
     if (synonyms.length === 0 && antonyms.length === 0) {
-        return '<div class="view-empty">No synonyms/antonyms available</div>';
+        return `<div class="view-empty">${t('noSynonyms')}</div>`;
     }
 
     const renderClickableWords = (words) => words.map(w =>
@@ -202,13 +228,13 @@ function renderSynonymsView(wordInfo) {
         <div class="view-synonyms">
             ${synonyms.length > 0 ? `
                 <div class="syn-group">
-                    <span class="syn-label">Syn:</span>
+                    <span class="syn-label">${t('syn')}:</span>
                     <span class="syn-words">${renderClickableWords(synonyms.slice(0, 5))}</span>
                 </div>
             ` : ''}
             ${antonyms.length > 0 ? `
                 <div class="ant-group">
-                    <span class="ant-label">Ant:</span>
+                    <span class="ant-label">${t('ant')}:</span>
                     <span class="ant-words">${renderClickableWords(antonyms.slice(0, 3))}</span>
                 </div>
             ` : ''}

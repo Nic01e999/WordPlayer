@@ -3,8 +3,27 @@
  */
 
 import { preloadCache, clearAudioCache } from './state.js';
-import { $, loadWordsFromTextarea, debounce, adjustSidebarWidth, updateModeButtonsState } from './utils.js';
-import { API_BASE, getTtsUrl, getHttpErrorMessage, getFetchErrorMessage } from './api.js';
+import { audioBlobManager, slowAudioBlobManager } from './storage/blobManager.js';
+import { t } from './i18n/index.js';
+import {
+    $,
+    loadWordsFromTextarea,
+    debounce,
+    adjustSidebarWidth,
+    updateModeButtonsState,
+    getTargetLang,
+    getTranslationLang,
+    isValidForLanguage
+} from './utils.js';
+import {
+    getTtsUrl,
+    getWordDetailsUrl
+} from './api.js';
+import {
+    filterCachedWords,
+    addWordInfoBatch,
+    clearLocalWordInfo
+} from './storage/localCache.js';
 
 // 追踪上一次的 loading 状态
 let wasLoading = false;
@@ -26,12 +45,12 @@ export function updatePreloadProgress() {
 
         // 翻译进度
         if (transEl) {
-            transEl.textContent = `翻译: ${preloadCache.translationLoaded}/${preloadCache.translationTotal}`;
+            transEl.textContent = `${t('progressTranslation')}: ${preloadCache.translationLoaded}/${preloadCache.translationTotal}`;
         }
 
         // 音频进度
         if (audioEl) {
-            audioEl.textContent = `音频: ${preloadCache.audioLoaded}/${preloadCache.audioTotal}`;
+            audioEl.textContent = `${t('progressAudio')}: ${preloadCache.audioLoaded}/${preloadCache.audioTotal}`;
         }
 
         if (isLoading) {
@@ -83,11 +102,11 @@ export async function startPreload(forceReload = false) {
     // 强制重新加载：清除当前单词的缓存
     if (forceReload) {
         clearAudioCache(); // 释放 Blob URL 内存
+        clearLocalWordInfo(); // 清空 localStorage 缓存
         entries.forEach(({ word, definition }) => {
             if (!definition) {
                 delete preloadCache.wordInfo[word];
                 delete preloadCache.translations[word];
-                localStorage.removeItem(`wordinfo:${word}`);
             }
         });
     }
@@ -115,8 +134,12 @@ export async function startPreload(forceReload = false) {
     preloadCache.audioLoaded = 0;
     preloadCache.audioPartial = {};
 
-    // 验证单词/短语是否有效（只允许英文字母、空格、连字符、撇号）
-    const isValidWord = (w) => /^[a-zA-Z\s\-']+$/.test(w) && w.length <= 100;
+    // 获取当前语言设置
+    const targetLang = getTargetLang();
+    const translationLang = getTranslationLang();
+
+    // 验证单词/短语是否有效（根据目标语言）
+    const isValidWord = (w) => w.length <= 100 && isValidForLanguage(w, targetLang);
 
     // 统计翻译进度（总数 = 所有单词，已加载 = 已缓存 + 自定义）
     let translationTotal = entries.length;
@@ -137,10 +160,12 @@ export async function startPreload(forceReload = false) {
             translationLoaded++;
         } else if (!preloadCache.wordInfo[word] && !isValidWord(word)) {
             // 无效输入
-            preloadCache.translations[word] = "⚠️ 请输入英文";
+            const langName = targetLang === 'en' ? t('langEnglish') : t('langWord');
+            const invalidMsg = t('errorInvalidInput', { lang: langName });
+            preloadCache.translations[word] = invalidMsg;
             preloadCache.wordInfo[word] = {
                 word,
-                translation: "⚠️ 请输入英文",
+                translation: invalidMsg,
                 definitions: [],
                 examples: [],
                 synonyms: [],
@@ -164,32 +189,48 @@ export async function startPreload(forceReload = false) {
     });
     preloadCache.audioTotal = textsToPreload.size;
 
-    // 统计已缓存的音频（4个变体都缓存了才算）
+    // 统计已缓存的音频（所有变体都缓存了才算）
+    // 英语: 4个变体，其他语言: 2个变体
     let audioLoaded = 0;
-    const accentsCheck = ['us', 'uk'];
+    const accentsCheck = targetLang === 'en' ? ['us', 'uk'] : ['us'];
     const speedsCheck = [false, true];
+    const expectedVariants = accentsCheck.length * speedsCheck.length;
     for (const text of textsToPreload) {
         let cachedCount = 0;
         for (const accent of accentsCheck) {
             for (const slow of speedsCheck) {
-                const cacheKey = `${text}:${accent}`;
+                const cacheKey = `${text}:${accent}:${targetLang}`;
                 const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
                 if (cacheObj[cacheKey]) cachedCount++;
             }
         }
-        if (cachedCount === 4) audioLoaded++;
+        if (cachedCount === expectedVariants) audioLoaded++;
     }
     preloadCache.audioLoaded = audioLoaded;
 
     updatePreloadProgress();
 
-    // 收集需要从 API 获取的单词
-    const wordsToFetch = entries
+    // 收集需要获取的单词（排除自定义和已在内存缓存的）
+    const wordsNeedInfo = entries
         .filter(e => !e.definition && !preloadCache.wordInfo[e.word] && isValidWord(e.word))
         .map(e => e.word);
 
-    // 批量获取单词信息（使用 DeepSeek）- 分批处理，每批 5 个
+    // 先检查 localStorage 缓存（传递语言参数）
+    const { cached: localCached, missing: wordsToFetch } = filterCachedWords(wordsNeedInfo, targetLang, translationLang);
+
+    // 将 localStorage 缓存的单词应用到内存
+    for (const [word, info] of Object.entries(localCached)) {
+        preloadCache.wordInfo[word] = info;
+        preloadCache.translations[word] = info.translation || t('noTranslation');
+        preloadCache.translationLoaded++;
+    }
+    if (Object.keys(localCached).length > 0) {
+        updatePreloadProgress();
+    }
+
+    // 从 DeepSeek 获取完整单词信息（音标、翻译、释义、例句等）
     const BATCH_SIZE = 5;
+
     const wordInfoPromise = (async () => {
         if (wordsToFetch.length === 0) return;
         if (myId !== preloadCache.loadId) return;
@@ -199,127 +240,61 @@ export async function startPreload(forceReload = false) {
             if (myId !== preloadCache.loadId) return;
 
             const batch = wordsToFetch.slice(i, i + BATCH_SIZE);
-            console.log('[翻译] 开始请求批次:', batch, 'myId:', myId, 'loadId:', preloadCache.loadId);
+            console.log('[DeepSeek] 开始请求批次:', batch, 'targetLang:', targetLang, 'translationLang:', translationLang);
 
+            // 请求 DeepSeek 获取完整单词信息
+            let deepseekData = null;
             try {
-                const res = await fetch(`${API_BASE}/api/wordinfo/batch`, {
+                const detailsRes = await fetch(getWordDetailsUrl(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ words: batch }),
+                    body: JSON.stringify({
+                        words: batch,
+                        targetLang: targetLang,
+                        nativeLang: translationLang
+                    }),
                     signal
                 });
-
-                if (myId !== preloadCache.loadId) {
-                    console.log('[翻译] myId !== loadId, 中断', myId, preloadCache.loadId);
-                    return;
+                if (detailsRes.ok) {
+                    deepseekData = await detailsRes.json();
                 }
-
-                console.log('[翻译] 收到响应, status:', res.status);
-
-                if (!res.ok) {
-                    const errorMsg = getHttpErrorMessage(res.status);
-                    batch.forEach(word => {
-                        preloadCache.translations[word] = errorMsg;
-                        preloadCache.wordInfo[word] = {
-                            word,
-                            translation: errorMsg,
-                            definitions: [],
-                            examples: [],
-                            synonyms: [],
-                            antonyms: []
-                        };
-                        preloadCache.translationLoaded++;
-                    });
-                    updatePreloadProgress();
-                    continue;
-                }
-
-                let data;
-                try {
-                    data = await res.json();
-                } catch {
-                    batch.forEach(word => {
-                        preloadCache.translations[word] = "加载失败: 响应格式错误";
-                        preloadCache.wordInfo[word] = {
-                            word,
-                            translation: "加载失败",
-                            definitions: [],
-                            examples: [],
-                            synonyms: [],
-                            antonyms: []
-                        };
-                        preloadCache.translationLoaded++;
-                    });
-                    updatePreloadProgress();
-                    continue;
-                }
-
-                if (data.error) {
-                    const errorMsg = `错误: ${data.error}`;
-                    batch.forEach(word => {
-                        preloadCache.translations[word] = errorMsg;
-                        preloadCache.wordInfo[word] = {
-                            word,
-                            translation: errorMsg,
-                            definitions: [],
-                            examples: [],
-                            synonyms: [],
-                            antonyms: []
-                        };
-                        preloadCache.translationLoaded++;
-                    });
-                    updatePreloadProgress();
-                    continue;
-                }
-
-                // 缓存结果到内存和 localStorage
-                console.log('[翻译] 成功获取数据:', Object.keys(data.results || {}));
-                const results = data.results || {};
-                batch.forEach(word => {
-                    const info = results[word];
-                    if (info) {
-                        preloadCache.wordInfo[word] = info;
-                        preloadCache.translations[word] = info.translation || "无翻译";
-                        try {
-                            localStorage.setItem(`wordinfo:${word}`, JSON.stringify(info));
-                        } catch (e) {
-                            // localStorage 满了，忽略
-                        }
-                    } else {
-                        preloadCache.translations[word] = "无数据";
-                        preloadCache.wordInfo[word] = {
-                            word,
-                            translation: "无数据",
-                            definitions: [],
-                            examples: [],
-                            synonyms: [],
-                            antonyms: []
-                        };
-                    }
-                    preloadCache.translationLoaded++;
-                });
-                updatePreloadProgress();
             } catch (e) {
-                console.log('[翻译] 请求出错:', e.name, e.message);
-                if (e.name === 'AbortError') {
-                    console.log('[翻译] AbortError, 退出');
-                    return;
-                }
-                const errorMsg = getFetchErrorMessage(e);
-                batch.forEach(word => {
-                    preloadCache.translations[word] = errorMsg;
-                    preloadCache.wordInfo[word] = {
-                        word,
-                        translation: errorMsg,
-                        definitions: [],
-                        examples: [],
-                        synonyms: [],
-                        antonyms: []
-                    };
-                    preloadCache.translationLoaded++;
-                });
-                updatePreloadProgress();
+                console.log('[DeepSeek] 请求失败:', e.message);
             }
+
+            if (myId !== preloadCache.loadId) return;
+
+            // 处理结果
+            const deepseekResults = deepseekData?.results || {};
+            const newWordInfos = {}; // 用于批量保存到 localStorage
+
+            batch.forEach(word => {
+                const info = deepseekResults[word] || {};
+
+                // 构建完整的单词信息（全部来自 DeepSeek）
+                const wordInfo = {
+                    word,
+                    phonetic: info.phonetic || '',
+                    translation: info.translation || t('noTranslation'),
+                    nativeDefinitions: info.nativeDefinitions || [],
+                    targetDefinitions: info.targetDefinitions || [],
+                    examples: info.examples || { common: [], fun: [] },
+                    synonyms: info.synonyms || [],
+                    antonyms: info.antonyms || []
+                };
+
+                preloadCache.wordInfo[word] = wordInfo;
+                preloadCache.translations[word] = wordInfo.translation;
+                newWordInfos[word] = wordInfo; // 收集用于保存
+
+                preloadCache.translationLoaded++;
+            });
+
+            // 批量保存到 localStorage（传递语言参数）
+            if (Object.keys(newWordInfos).length > 0) {
+                addWordInfoBatch(newWordInfos, targetLang, translationLang);
+            }
+            updatePreloadProgress();
         }
     })();
 
@@ -333,39 +308,49 @@ export async function startPreload(forceReload = false) {
         ]);
     };
 
-    // 加载单个音频的函数，返回 { cached: boolean } 表示是否为缓存命中
-    const loadSingleAudio = async (text, accent, slow) => {
-        const cacheKey = `${text}:${accent}`;
+    // 加载单个音频的函数，返回 { cached, success } 表示状态
+    const loadSingleAudio = async (text, accent, slow, lang) => {
+        const cacheKey = `${text}:${accent}:${lang}`;
         const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
+        const blobManager = slow ? slowAudioBlobManager : audioBlobManager;
 
         if (cacheObj[cacheKey]) {
-            return { cached: true };  // 已缓存
+            return { cached: true, success: true };  // 已缓存
         }
 
         try {
-            const url = getTtsUrl(text, slow, accent);
+            const url = getTtsUrl(text, slow, accent, lang);
             const res = await fetchWithTimeout(url, { signal }, 15000);
+            if (!res.ok) {
+                console.warn(t('errorTts', { status: res.status }) + ` for ${text}`);
+                return { cached: false, success: false };
+            }
             const blob = await res.blob();
 
             if (myId === preloadCache.loadId) {
-                cacheObj[cacheKey] = URL.createObjectURL(blob);
+                // 使用 BlobManager 创建并管理 URL
+                cacheObj[cacheKey] = blobManager.create(blob, cacheKey);
             }
-            return { cached: false };
+            return { cached: false, success: true };
         } catch (e) {
-            return { cached: false };
+            console.warn(t('errorTtsLoad', { error: e.message }) + ` for ${text}`);
+            return { cached: false, success: false };
         }
     };
 
-    // 并行加载所有音频（两种口音 × 两种速度 = 4个）
-    const accents = ['us', 'uk'];
+    // 并行加载所有音频
+    // 英语: 两种口音 × 两种速度 = 4个
+    // 其他语言: 一种口音 × 两种速度 = 2个
+    const accents = targetLang === 'en' ? ['us', 'uk'] : ['us'];  // 非英语只用一种
     const speeds = [false, true];  // normal, slow
+    const audioVariants = accents.length * speeds.length;  // 每个文本的音频数量
 
     // 初始化每个文本的计数器（考虑已缓存的）
     textsToPreload.forEach(text => {
         let cachedCount = 0;
         for (const accent of accents) {
             for (const slow of speeds) {
-                const cacheKey = `${text}:${accent}`;
+                const cacheKey = `${text}:${accent}:${targetLang}`;
                 const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
                 if (cacheObj[cacheKey]) cachedCount++;
             }
@@ -378,13 +363,14 @@ export async function startPreload(forceReload = false) {
         for (const accent of accents) {
             for (const slow of speeds) {
                 audioPromises.push(
-                    loadSingleAudio(text, accent, slow).then((result) => {
+                    loadSingleAudio(text, accent, slow, targetLang).then((result) => {
                         if (myId !== preloadCache.loadId) return;
                         if (result.cached) return;  // 已缓存的不重复计数
+                        if (!result.success) return;  // 加载失败的不计数
 
                         preloadCache.audioPartial[text]++;
-                        // 4个音频全部加载完才计入进度
-                        if (preloadCache.audioPartial[text] === 4) {
+                        // 所有音频变体全部加载完才计入进度
+                        if (preloadCache.audioPartial[text] === audioVariants) {
                             preloadCache.audioLoaded++;
                             updatePreloadProgress();
                         }
@@ -422,8 +408,8 @@ export function initPreloadListeners() {
         loadBtn.addEventListener("click", (e) => {
             const forceReload = e.shiftKey;
             if (forceReload) {
-                loadBtn.textContent = "Reloading...";
-                setTimeout(() => { loadBtn.textContent = "Load"; }, 1500);
+                loadBtn.textContent = t('reloading');
+                setTimeout(() => { loadBtn.textContent = t('load'); }, 1500);
             }
             startPreload(forceReload);
         });

@@ -8,6 +8,7 @@ import { getWordLists, loadWordList, getCardColor } from './storage.js';
 import { getLayout, deleteWordList, deleteFolder } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
+import { t } from '../i18n/index.js';
 
 /**
  * 主题色配置 - 根据当前主题自动获取
@@ -147,8 +148,8 @@ export function renderWordListCards() {
     if (Object.keys(lists).length === 0) {
         content.innerHTML = `
             <div class="wordlist-empty">
-                <p>No saved word lists</p>
-                <p class="hint">Enter words in the sidebar and click Save</p>
+                <p>${t('emptyTitle')}</p>
+                <p class="hint">${t('emptyHint')}</p>
             </div>
         `;
         return;
@@ -240,7 +241,7 @@ function bindCardEvents(workplace) {
     if (!grid || cardEventsInitialized) return;
     cardEventsInitialized = true;
 
-    grid.addEventListener('click', (e) => {
+    grid.addEventListener('click', async (e) => {
         const dragState = _getDragState ? _getDragState() : null;
 
         // 删除按钮
@@ -263,7 +264,7 @@ function bindCardEvents(workplace) {
         if (card) {
             if (dragState?.didDrag) return;
             if (_isEditMode && _isEditMode()) return;
-            loadWordList(card.dataset.name);
+            await loadWordList(card.dataset.name);
             return;
         }
 
@@ -287,9 +288,9 @@ function bindCardEvents(workplace) {
  * 处理删除文件夹（异步弹窗）
  */
 async function handleDeleteFolder(folderName) {
-    const confirmed = await showConfirm(`删除文件夹 "${folderName}" 及其所有内容？`);
+    const confirmed = await showConfirm(t('deleteFolder', { name: folderName }));
     if (confirmed) {
-        deleteFolder(folderName);
+        await deleteFolder(folderName);
         if (_exitEditMode) _exitEditMode();
         renderWordListCards();
     }
@@ -299,9 +300,9 @@ async function handleDeleteFolder(folderName) {
  * 处理删除卡片（异步弹窗）
  */
 async function handleDeleteCard(name) {
-    const confirmed = await showConfirm(`删除 "${name}"？`);
+    const confirmed = await showConfirm(t('deleteCard', { name }));
     if (confirmed) {
-        deleteWordList(name);
+        await deleteWordList(name);
         if (_exitEditMode) _exitEditMode();
         renderWordListCards();
     }

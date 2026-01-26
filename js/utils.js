@@ -10,14 +10,122 @@ import { preloadCache } from './state.js';
 export const $ = id => document.getElementById(id);
 
 /**
- * 检测文本是否包含中文字符
+ * 内部状态：检测到的目标语言
+ */
+let detectedTargetLang = 'en';
+
+/**
+ * 各语言的字符验证正则（允许的字符）
+ */
+const LANG_PATTERNS = {
+    en: /^[a-zA-Z\s\-']+$/,                                           // 英语
+    ja: /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3000-\u303F\s]+$/, // 日语（平假名、片假名、汉字）
+    ko: /^[\uAC00-\uD7AF\u1100-\u11FF\s]+$/,                           // 韩语
+    fr: /^[a-zA-Z\u00C0-\u00FF\s\-']+$/,                               // 法语（含重音字符）
+    zh: /^[\u4e00-\u9fff\s]+$/                                         // 中文
+};
+
+/**
+ * 各语言的无效字符正则（用于过滤）
+ */
+const LANG_INVALID_PATTERNS = {
+    en: /[^a-zA-Z\s\-']/g,
+    ja: /[^\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3000-\u303F\s]/g,
+    ko: /[^\uAC00-\uD7AF\u1100-\u11FF\s]/g,
+    fr: /[^a-zA-Z\u00C0-\u00FF\s\-']/g,
+    zh: /[^\u4e00-\u9fff\s]/g
+};
+
+/**
+ * 语言检测正则（用于自动识别输入语言）
+ * 优先级：韩语 > 日语 > 中文 > 法语 > 英语
+ */
+const DETECTION_PATTERNS = {
+    ko: /[\uAC00-\uD7AF\u1100-\u11FF]/,  // 韩语字符
+    ja: /[\u3040-\u309F\u30A0-\u30FF]/,  // 日语假名
+    zh: /[\u4e00-\u9fff]/,               // 中文汉字
+    fr: /[\u00C0-\u00FF]/                // 法语特殊字符
+};
+
+/**
+ * 检测文本是否对指定语言有效
+ * @param {string} text - 要检测的文本
+ * @param {string} lang - 语言代码 (en, ja, ko, fr, zh)
+ * @returns {boolean}
+ */
+export function isValidForLanguage(text, lang) {
+    const pattern = LANG_PATTERNS[lang];
+    if (!pattern) return true;
+    return pattern.test(text);
+}
+
+/**
+ * 过滤掉文本中对指定语言无效的字符
+ * @param {string} text - 要过滤的文本
+ * @param {string} lang - 语言代码
+ * @returns {string}
+ */
+export function filterInvalidChars(text, lang) {
+    const pattern = LANG_INVALID_PATTERNS[lang];
+    if (!pattern) return text;
+    return text.replace(pattern, '');
+}
+
+/**
+ * 检测单个文本片段的语言
+ * @param {string} text - 要检测的文本
+ * @returns {string|null} 语言代码或 null
+ */
+export function detectLanguage(text) {
+    const cleanText = text.replace(/[\s\d\-':,.!?;()\[\]{}"""'']/g, '');
+    if (!cleanText) return null;
+
+    if (DETECTION_PATTERNS.ko.test(cleanText)) return 'ko';
+    if (DETECTION_PATTERNS.ja.test(cleanText)) return 'ja';
+    if (DETECTION_PATTERNS.zh.test(cleanText)) return 'zh';
+    if (DETECTION_PATTERNS.fr.test(cleanText)) return 'fr';
+    return 'en';
+}
+
+/**
+ * 从 textarea 内容检测语言（检测第一个有效单词）
+ * @param {string} content - textarea 的完整内容
+ * @returns {string|null} 语言代码或 null
+ */
+export function detectLanguageFromInput(content) {
+    const lines = content.split(/\r?\n/);
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        const colonIdx = trimmed.indexOf(':');
+        const wordPart = colonIdx !== -1 ? trimmed.substring(0, colonIdx).trim() : trimmed;
+        if (wordPart) {
+            const detected = detectLanguage(wordPart);
+            if (detected) return detected;
+        }
+    }
+    return null;
+}
+
+/**
+ * 设置目标语言（内部状态）
+ * @param {string} lang - 语言代码
+ */
+export function setTargetLang(lang) {
+    if (['en', 'ja', 'ko', 'fr', 'zh'].includes(lang)) {
+        detectedTargetLang = lang;
+    }
+}
+
+/**
+ * 检测文本是否包含中文字符（向后兼容）
  */
 export function containsChinese(text) {
     return /[\u4e00-\u9fff]/.test(text);
 }
 
 /**
- * 过滤掉文本中的中文字符
+ * 过滤掉文本中的中文字符（向后兼容）
  */
 export function filterChinese(text) {
     return text.replace(/[\u4e00-\u9fff]/g, '');
@@ -33,6 +141,30 @@ export function getAccent() {
 }
 
 /**
+ * 获取目标语言（学习的语言）
+ * @returns {string} 语言代码 (en, ja, ko, fr, zh)
+ */
+export function getTargetLang() {
+    return detectedTargetLang;
+}
+
+/**
+ * 获取翻译语言（单词翻译显示的语言）
+ * @returns {string} 语言代码 (en, ja, ko, fr, zh)
+ */
+export function getTranslationLang() {
+    return $("translationLang")?.value || 'zh';
+}
+
+/**
+ * 获取界面语言（UI语言包）
+ * @returns {string} 语言代码 (en, ja, ko, fr, zh)
+ */
+export function getUiLang() {
+    return $("uiLang")?.value || 'zh';
+}
+
+/**
  * 从设置面板读取用户配置
  */
 export function getSettings() {
@@ -43,7 +175,10 @@ export function getSettings() {
         slow: $("slow")?.checked ?? false,
         shuffle: $("shuffle")?.checked ?? false,
         dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB",
-        accent: getAccent()
+        accent: getAccent(),
+        targetLang: getTargetLang(),
+        translationLang: getTranslationLang(),
+        uiLang: getUiLang()
     };
 }
 
@@ -166,3 +301,71 @@ export function updateModeButtonsState() {
     if (dictationBtn) dictationBtn.disabled = !hasEntries;
     if (repeaterBtn) repeaterBtn.disabled = !hasEntries;
 }
+
+/**
+ * 语言设置的 localStorage key
+ */
+const LANG_STORAGE_KEY = 'dictation-tool-languages';
+
+/**
+ * 保存语言设置到 localStorage
+ */
+export function saveLangSettings() {
+    const settings = {
+        targetLang: getTargetLang(),
+        translationLang: getTranslationLang(),
+        uiLang: getUiLang()
+    };
+    localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify(settings));
+}
+
+/**
+ * 从 localStorage 加载语言设置
+ */
+export function loadLangSettings() {
+    try {
+        const stored = localStorage.getItem(LANG_STORAGE_KEY);
+        if (stored) {
+            const settings = JSON.parse(stored);
+            if (settings.targetLang) {
+                detectedTargetLang = settings.targetLang;
+            }
+            if (settings.translationLang && $("translationLang")) {
+                $("translationLang").value = settings.translationLang;
+            }
+            if (settings.uiLang && $("uiLang")) {
+                $("uiLang").value = settings.uiLang;
+            }
+            // 更新 Accent 选择器可见性
+            updateAccentSelectorVisibility();
+        }
+    } catch (e) {
+        console.warn('加载语言设置失败:', e);
+    }
+}
+
+/**
+ * 更新 Accent 选择器的可见性（仅 Target=en 时显示）
+ */
+export function updateAccentSelectorVisibility() {
+    const accentSelector = $("accentSelector");
+    if (accentSelector) {
+        accentSelector.style.display = getTargetLang() === 'en' ? '' : 'none';
+    }
+}
+
+/**
+ * 支持的语言列表
+ */
+export const SUPPORTED_LANGS = ['en', 'ja', 'ko', 'fr', 'zh'];
+
+/**
+ * 语言名称映射
+ */
+export const LANG_NAMES = {
+    en: 'English',
+    ja: '日本語',
+    ko: '한국어',
+    fr: 'Français',
+    zh: '中文'
+};
