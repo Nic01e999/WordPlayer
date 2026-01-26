@@ -12,6 +12,9 @@ from flask_cors import CORS
 from deepseek import deepseek_bp
 from tts import tts_bp
 from cache import load_cache
+from auth import auth_bp
+from sync import sync_bp
+from db import init_db
 
 
 def _get_lan_ip():
@@ -48,9 +51,12 @@ CORS(app)
 # 注册 API 蓝图
 app.register_blueprint(deepseek_bp)
 app.register_blueprint(tts_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(sync_bp)
 
-# 启动时加载单词缓存
+# 启动时初始化
 load_cache()
+init_db()
 
 
 @app.route("/")

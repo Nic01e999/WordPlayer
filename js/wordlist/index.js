@@ -4,13 +4,13 @@
  */
 
 import { $ } from '../utils.js';
-import { setActiveMode, setRepeaterState, preloadCache } from '../state.js';
+import { setActiveMode, setRepeaterState, preloadCache, loadedWordList, clearLoadedWordList } from '../state.js';
 import { updatePreloadProgress } from '../preload.js';
 import { stopAudio } from '../audio.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
 
 // 导入子模块
-import { getWordLists, saveWordList, loadWordList, isWordListNameExists } from './storage.js';
+import { getWordLists, saveWordList, loadWordList, updateWordList, isWordListNameExists } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, deleteFolder } from './layout.js';
 import { renderWordListCards, setRenderDeps, resetEventFlags } from './render.js';
 import {
@@ -70,6 +70,10 @@ export function goHome() {
  */
 export function initWordListUI() {
     const saveBtn = $("saveListBtn");
+    const updateBtn = $("updateListBtn");
+    const wordInput = $("wordInput");
+
+    // Save 按钮
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
             const defaultName = `wordlist-${new Date().toISOString().slice(0, 10)}`;
@@ -83,18 +87,63 @@ export function initWordListUI() {
             }
 
             if (saveWordList(trimmedName)) {
+                clearLoadedWordList();
+                hideUpdateButton();
                 renderWordListCards();
             }
         });
     }
 
+    // Update 按钮
+    if (updateBtn) {
+        updateBtn.addEventListener('click', () => {
+            if (!loadedWordList.name) return;
+            if (updateWordList(loadedWordList.name)) {
+                hideUpdateButton();
+                renderWordListCards();
+            }
+        });
+    }
+
+    // 监听 textarea 变化
+    if (wordInput) {
+        wordInput.addEventListener('input', checkUpdateButtonVisibility);
+    }
+
     renderWordListCards();
+}
+
+/**
+ * 检查并更新 Update 按钮的可见性
+ */
+function checkUpdateButtonVisibility() {
+    const updateBtn = $("updateListBtn");
+    if (!updateBtn) return;
+
+    const currentContent = $("wordInput")?.value || '';
+
+    if (loadedWordList.name &&
+        loadedWordList.originalContent !== null &&
+        currentContent !== loadedWordList.originalContent) {
+        updateBtn.style.display = 'inline-block';
+    } else {
+        updateBtn.style.display = 'none';
+    }
+}
+
+/**
+ * 隐藏 Update 按钮
+ */
+function hideUpdateButton() {
+    const updateBtn = $("updateListBtn");
+    if (updateBtn) updateBtn.style.display = 'none';
 }
 
 // 导出公共 API
 export {
     getWordLists,
     saveWordList,
+    updateWordList,
     loadWordList,
     deleteWordList,
     renderWordListCards

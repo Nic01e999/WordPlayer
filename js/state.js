@@ -95,3 +95,28 @@ export function setRepeaterState(state) {
 export function setActiveMode(mode) {
     currentActiveMode = mode;
 }
+
+/**
+ * 当前加载的单词表信息
+ * 用于追踪编辑状态和支持 Update 功能
+ */
+export let loadedWordList = {
+    name: null,
+    originalContent: null
+};
+
+/**
+ * 设置当前加载的单词表信息
+ */
+export function setLoadedWordList(name, content) {
+    loadedWordList.name = name;
+    loadedWordList.originalContent = content;
+}
+
+/**
+ * 清除当前加载的单词表信息
+ */
+export function clearLoadedWordList() {
+    loadedWordList.name = null;
+    loadedWordList.originalContent = null;
+}

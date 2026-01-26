@@ -4,8 +4,9 @@
  */
 
 import { $ } from '../utils.js';
-import { preloadCache, loadCacheFromStorage } from '../state.js';
+import { preloadCache, loadCacheFromStorage, setLoadedWordList } from '../state.js';
 import { startPreload } from '../preload.js';
+import { isLoggedIn, saveWordlistToCloud, deleteWordlistFromCloud } from '../auth.js';
 
 const STORAGE_KEY = 'wordlists';
 const CARD_COLORS_KEY = 'cardColors';
@@ -57,7 +58,7 @@ export function saveWordList(name) {
     });
 
     const lists = getWordLists();
-    lists[name] = {
+    const wordlist = {
         name,
         created: lists[name]?.created || new Date().toISOString(),
         updated: new Date().toISOString(),
@@ -65,8 +66,18 @@ export function saveWordList(name) {
         translations,
         wordInfo
     };
+    lists[name] = wordlist;
 
-    return saveWordListsToStorage(lists);
+    const saved = saveWordListsToStorage(lists);
+
+    // 同步到云端（异步，不阻塞）
+    if (saved && isLoggedIn()) {
+        saveWordlistToCloud(name, wordlist).catch(e => {
+            console.error('Cloud sync failed:', e);
+        });
+    }
+
+    return saved;
 }
 
 /**
@@ -75,7 +86,16 @@ export function saveWordList(name) {
 export function removeWordListFromStorage(name) {
     const lists = getWordLists();
     delete lists[name];
-    return saveWordListsToStorage(lists);
+    const saved = saveWordListsToStorage(lists);
+
+    // 同步删除到云端（异步，不阻塞）
+    if (saved && isLoggedIn()) {
+        deleteWordlistFromCloud(name).catch(e => {
+            console.error('Cloud delete failed:', e);
+        });
+    }
+
+    return saved;
 }
 
 /**
@@ -117,8 +137,53 @@ export function loadWordList(name) {
         Object.assign(preloadCache.wordInfo, list.wordInfo);
     }
     $("wordInput").value = list.words;
+    setLoadedWordList(name, list.words);
     startPreload();
     return true;
+}
+
+/**
+ * 更新已存在的单词表（不改变名称）
+ */
+export function updateWordList(name) {
+    const words = $("wordInput").value.trim();
+    if (!words || !name) return false;
+
+    const lists = getWordLists();
+    if (!lists[name]) return false;
+
+    const translations = {};
+    const wordInfo = {};
+
+    preloadCache.entries.forEach(entry => {
+        const word = entry.word;
+        if (preloadCache.translations[word]) {
+            translations[word] = preloadCache.translations[word];
+        }
+        if (preloadCache.wordInfo[word]) {
+            wordInfo[word] = preloadCache.wordInfo[word];
+        }
+    });
+
+    const wordlist = {
+        name,
+        created: lists[name].created,
+        updated: new Date().toISOString(),
+        words,
+        translations,
+        wordInfo
+    };
+    lists[name] = wordlist;
+
+    const saved = saveWordListsToStorage(lists);
+    if (saved && isLoggedIn()) {
+        saveWordlistToCloud(name, wordlist).catch(e => console.error('Cloud sync failed:', e));
+    }
+
+    if (saved) {
+        setLoadedWordList(name, words);
+    }
+    return saved;
 }
 
 /**

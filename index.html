@@ -14,7 +14,8 @@
                 <button id="dictation-btn" onclick="Dictation.switchToDictation()">Dictation</button>
                 <button id="repeater-btn" onclick="Repeater.switchToRepeater()">Repeater</button>
             </div>
-            <div>
+            <div style="display: flex; align-items: center;">
+                <div class="auth-section"></div>
                 <div class="settings-trigger">
                     <span class="gear-icon">⚙️</span>
                     <!-- 右侧：设置边栏 -->
@@ -81,6 +82,7 @@
                     <h3>Word List
                         <button id="loadBtn" class="btn-load" title="Load translations">Load</button>
                         <button id="saveListBtn" class="btn-save-list" title="Save to library">Save</button>
+                        <button id="updateListBtn" class="btn-update-list" title="Update current list" style="display: none;">Update</button>
                     </h3>
                     <textarea id="wordInput" wrap="off" placeholder="Enter words (separated by spaces or newlines)"></textarea>
                 </div>

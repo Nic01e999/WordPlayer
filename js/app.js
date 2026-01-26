@@ -9,6 +9,7 @@ import { Dictation, setRepeaterRef } from './dictation/index.js';
 import { $, containsChinese, filterChinese } from './utils.js';
 import { initWordListUI, goHome, renderWordListCards } from './wordlist/index.js';
 import { initTheme, applyTheme, getStoredTheme, setThemeChangeCallback } from './theme.js';
+import { initAuth, showLoginDialog } from './auth.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -21,6 +22,7 @@ setRepeaterRef(Repeater);
 window.Repeater = Repeater;
 window.Dictation = Dictation;
 window.goHome = goHome;
+window.showLoginDialog = showLoginDialog;
 
 // 暴露当前模式到全局（供模块内部检测使用）
 Object.defineProperty(window, 'currentActiveMode', {
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initPreloadListeners();
     initChineseFilter();
     initWordListUI();
+    initAuth();
 
     // 主题切换时重新渲染卡片（更新原色卡片）
     setThemeChangeCallback(() => {

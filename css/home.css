@@ -31,6 +31,26 @@
     box-shadow: 0 2px 8px var(--shadow-pink-light);
 }
 
+/* ===== Update 按钮 ===== */
+.btn-update-list {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    border: 1px solid var(--border-pink-medium);
+    border-radius: 0.375rem;
+    background: linear-gradient(135deg, var(--accent-primary-light, #ffd1dc) 0%, var(--accent-primary, #ffb6c1) 100%);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.btn-update-list:hover {
+    background: linear-gradient(135deg, var(--accent-primary, #ffb6c1) 0%, var(--accent-secondary, #ff9faf) 100%);
+    box-shadow: 0 2px 8px var(--shadow-pink-light);
+}
+
 /* ===== 空状态 ===== */
 .wordlist-empty {
     text-align: center;
