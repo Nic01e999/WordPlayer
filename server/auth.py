@@ -8,28 +8,14 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, g
 
 from config import Config
-from db import get_db
 from middleware import require_auth
 from email_service import send_reset_code
 from utils import build_auth_response
 from validators import validate_email, validate_password, validate_code
 from security import hash_password, verify_password, generate_session_token, generate_reset_code, calculate_expiry
+from repositories import UserRepository, SessionRepository, ResetCodeRepository
 
 auth_bp = Blueprint('auth', __name__)
-
-
-def _create_session(conn, user_id: int) -> str:
-    """创建会话，返回 token"""
-    token = generate_session_token()
-    expires_at = calculate_expiry(days=Config.TOKEN_EXPIRE_DAYS)
-
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO sessions (user_id, token, expires_at)
-        VALUES (?, ?, ?)
-    """, (user_id, token, expires_at.isoformat()))
-
-    return token
 
 
 @auth_bp.route("/api/auth/register", methods=["POST"])
@@ -51,26 +37,20 @@ def register():
     if not validate_password(password, Config.PASSWORD_MIN_LENGTH):
         return jsonify({'error': f'密码至少需要 {Config.PASSWORD_MIN_LENGTH} 位'}), 400
 
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # 检查邮箱是否已注册
+    if UserRepository.exists_by_email(email):
+        return jsonify({'error': '该邮箱已注册'}), 400
 
-        # 检查邮箱是否已注册
-        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-        if cursor.fetchone():
-            return jsonify({'error': '该邮箱已注册'}), 400
+    # 创建用户
+    password_hash = hash_password(password)
+    user_id = UserRepository.create(email, password_hash)
 
-        # 创建用户
-        password_hash = hash_password(password)
-        cursor.execute("""
-            INSERT INTO users (email, password_hash)
-            VALUES (?, ?)
-        """, (email, password_hash))
-        user_id = cursor.lastrowid
+    # 创建会话
+    token = generate_session_token()
+    expires_at = calculate_expiry(days=Config.TOKEN_EXPIRE_DAYS)
+    SessionRepository.create(user_id, token, expires_at)
 
-        # 创建会话
-        token = _create_session(conn, user_id)
-
-        return jsonify(build_auth_response({'id': user_id, 'email': email}, token))
+    return jsonify(build_auth_response({'id': user_id, 'email': email}, token))
 
 
 @auth_bp.route("/api/auth/login", methods=["POST"])
@@ -87,30 +67,24 @@ def login():
     if not email or not password:
         return jsonify({'error': '请输入邮箱和密码'}), 400
 
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # 查找用户
+    user = UserRepository.get_by_email(email)
+    if not user:
+        return jsonify({'error': '邮箱或密码错误'}), 401
 
-        # 查找用户
-        cursor.execute("SELECT id, email, password_hash FROM users WHERE email = ?", (email,))
-        user = cursor.fetchone()
+    # 验证密码
+    if not verify_password(password, user['password_hash']):
+        return jsonify({'error': '邮箱或密码错误'}), 401
 
-        if not user:
-            return jsonify({'error': '邮箱或密码错误'}), 401
+    # 更新最后登录时间
+    UserRepository.update_last_login(user['id'])
 
-        # 验证密码
-        if not verify_password(password, user['password_hash']):
-            return jsonify({'error': '邮箱或密码错误'}), 401
+    # 创建会话
+    token = generate_session_token()
+    expires_at = calculate_expiry(days=Config.TOKEN_EXPIRE_DAYS)
+    SessionRepository.create(user['id'], token, expires_at)
 
-        # 更新最后登录时间
-        cursor.execute(
-            "UPDATE users SET last_login_at = ? WHERE id = ?",
-            (datetime.now().isoformat(), user['id'])
-        )
-
-        # 创建会话
-        token = _create_session(conn, user['id'])
-
-        return jsonify(build_auth_response(user, token))
+    return jsonify(build_auth_response(user, token))
 
 
 @auth_bp.route("/api/auth/logout", methods=["POST"])
@@ -121,10 +95,7 @@ def logout():
     请求头: Authorization: Bearer <token>
     响应: { "success": true }
     """
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM sessions WHERE token = ?", (g.token,))
-
+    SessionRepository.delete_by_token(g.token)
     return jsonify({'success': True})
 
 
@@ -154,39 +125,26 @@ def forgot_password():
     if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
 
-    with get_db() as conn:
-        cursor = conn.cursor()
-
-        # 检查用户是否存在
-        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-        if not cursor.fetchone():
-            # 为了安全，即使用户不存在也返回成功
-            return jsonify({'success': True})
-
-        # 检查是否在冷却时间内
-        cooldown_time = datetime.now() - timedelta(seconds=Config.CODE_RESEND_SECONDS)
-        cursor.execute("""
-            SELECT id FROM reset_codes
-            WHERE email = ? AND created_at > ? AND used = FALSE
-        """, (email, cooldown_time.isoformat()))
-
-        if cursor.fetchone():
-            return jsonify({'error': f'请 {Config.CODE_RESEND_SECONDS} 秒后再试'}), 429
-
-        # 生成验证码
-        code = generate_reset_code()
-        expires_at = calculate_expiry(minutes=Config.CODE_EXPIRE_MINUTES)
-
-        cursor.execute("""
-            INSERT INTO reset_codes (email, code, expires_at)
-            VALUES (?, ?, ?)
-        """, (email, code, expires_at.isoformat()))
-
-        # 发送邮件
-        if not send_reset_code(email, code):
-            return jsonify({'error': '发送验证码失败，请稍后重试'}), 500
-
+    # 检查用户是否存在
+    if not UserRepository.exists_by_email(email):
+        # 为了安全，即使用户不存在也返回成功
         return jsonify({'success': True})
+
+    # 检查是否在冷却时间内
+    cooldown_time = datetime.now() - timedelta(seconds=Config.CODE_RESEND_SECONDS)
+    if ResetCodeRepository.has_recent_code(email, cooldown_time):
+        return jsonify({'error': f'请 {Config.CODE_RESEND_SECONDS} 秒后再试'}), 429
+
+    # 生成验证码
+    code = generate_reset_code()
+    expires_at = calculate_expiry(minutes=Config.CODE_EXPIRE_MINUTES)
+    ResetCodeRepository.create(email, code, expires_at)
+
+    # 发送邮件
+    if not send_reset_code(email, code):
+        return jsonify({'error': '发送验证码失败，请稍后重试'}), 500
+
+    return jsonify({'success': True})
 
 
 @auth_bp.route("/api/auth/reset-password", methods=["POST"])
@@ -210,36 +168,27 @@ def reset_password():
     if not validate_password(password, Config.PASSWORD_MIN_LENGTH):
         return jsonify({'error': f'密码至少需要 {Config.PASSWORD_MIN_LENGTH} 位'}), 400
 
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # 查找有效的验证码
+    reset_code = ResetCodeRepository.get_valid_code(email, code)
+    if not reset_code:
+        return jsonify({'error': '验证码无效或已过期'}), 400
 
-        # 查找有效的验证码
-        cursor.execute("""
-            SELECT id FROM reset_codes
-            WHERE email = ? AND code = ? AND used = FALSE AND expires_at > ?
-            ORDER BY created_at DESC
-            LIMIT 1
-        """, (email, code, datetime.now().isoformat()))
+    # 标记验证码为已使用
+    ResetCodeRepository.mark_as_used(reset_code['id'])
 
-        reset_code = cursor.fetchone()
-        if not reset_code:
-            return jsonify({'error': '验证码无效或已过期'}), 400
+    # 更新密码
+    password_hash = hash_password(password)
+    UserRepository.update_password(email, password_hash)
 
-        # 标记验证码为已使用
-        cursor.execute("UPDATE reset_codes SET used = TRUE WHERE id = ?", (reset_code['id'],))
+    # 获取用户信息
+    user = UserRepository.get_by_email(email)
 
-        # 更新密码
-        password_hash = hash_password(password)
-        cursor.execute("UPDATE users SET password_hash = ? WHERE email = ?", (password_hash, email))
+    # 删除该用户的所有会话（强制重新登录）
+    SessionRepository.delete_by_user_id(user['id'])
 
-        # 获取用户信息
-        cursor.execute("SELECT id, email FROM users WHERE email = ?", (email,))
-        user = cursor.fetchone()
+    # 创建新会话
+    token = generate_session_token()
+    expires_at = calculate_expiry(days=Config.TOKEN_EXPIRE_DAYS)
+    SessionRepository.create(user['id'], token, expires_at)
 
-        # 删除该用户的所有会话（强制重新登录）
-        cursor.execute("DELETE FROM sessions WHERE user_id = ?", (user['id'],))
-
-        # 创建新会话
-        token = _create_session(conn, user['id'])
-
-        return jsonify(build_auth_response(user, token))
+    return jsonify(build_auth_response(user, token))

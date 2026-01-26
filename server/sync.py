@@ -3,14 +3,13 @@
 提供单词表和布局配置的云同步功能
 """
 
-import json
 from datetime import datetime
 
 from flask import Blueprint, request, jsonify, g
 
-from db import get_db
 from middleware import require_auth
 from settings import get_user_settings
+from repositories import WordlistRepository, LayoutRepository
 
 sync_bp = Blueprint('sync', __name__)
 
@@ -25,45 +24,21 @@ def pull_data():
     """
     user_id = g.user['id']
 
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # 获取所有单词表
+    wordlists = WordlistRepository.get_all_by_user(user_id)
 
-        # 获取所有单词表（只返回单词文本）
-        cursor.execute("""
-            SELECT name, words, created_at, updated_at
-            FROM wordlists
-            WHERE user_id = ?
-        """, (user_id,))
+    # 获取布局配置
+    layout, card_colors = LayoutRepository.get_by_user(user_id)
 
-        wordlists = {}
-        for row in cursor.fetchall():
-            wordlists[row['name']] = {
-                'name': row['name'],
-                'words': row['words'],
-                'created': row['created_at'],
-                'updated': row['updated_at']
-            }
+    # 获取用户设置
+    settings = get_user_settings(user_id)
 
-        # 获取布局配置
-        cursor.execute("""
-            SELECT layout, card_colors, updated_at
-            FROM user_layout
-            WHERE user_id = ?
-        """, (user_id,))
-
-        layout_row = cursor.fetchone()
-        layout = json.loads(layout_row['layout']) if layout_row else None
-        card_colors = json.loads(layout_row['card_colors']) if layout_row and layout_row['card_colors'] else {}
-
-        # 获取用户设置
-        settings = get_user_settings(user_id)
-
-        return jsonify({
-            'wordlists': wordlists,
-            'layout': layout,
-            'cardColors': card_colors,
-            'settings': settings
-        })
+    return jsonify({
+        'wordlists': wordlists,
+        'layout': layout,
+        'cardColors': card_colors,
+        'settings': settings
+    })
 
 
 @sync_bp.route("/api/sync/push", methods=["POST"])
@@ -82,37 +57,16 @@ def push_data():
     layout = data.get('layout')
     card_colors = data.get('cardColors', {})
 
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # 同步单词表
+    for name, wl in wordlists.items():
+        created = wl.get('created', datetime.now().isoformat())
+        WordlistRepository.save(user_id, name, wl.get('words', ''), created)
 
-        # 同步单词表（只存储单词文本）
-        for name, wl in wordlists.items():
-            created = wl.get('created', datetime.now().isoformat())
-            updated = datetime.now().isoformat()
+    # 同步布局配置
+    if layout is not None:
+        LayoutRepository.save(user_id, layout, card_colors)
 
-            cursor.execute("""
-                INSERT INTO wordlists (user_id, name, words, translations, word_info, created_at, updated_at)
-                VALUES (?, ?, ?, '{}', '{}', ?, ?)
-                ON CONFLICT(user_id, name) DO UPDATE SET
-                    words = excluded.words,
-                    updated_at = excluded.updated_at
-            """, (user_id, name, wl.get('words', ''), created, updated))
-
-        # 同步布局配置
-        if layout is not None:
-            layout_json = json.dumps(layout, ensure_ascii=False)
-            card_colors_json = json.dumps(card_colors, ensure_ascii=False)
-
-            cursor.execute("""
-                INSERT INTO user_layout (user_id, layout, card_colors, updated_at)
-                VALUES (?, ?, ?, ?)
-                ON CONFLICT(user_id) DO UPDATE SET
-                    layout = excluded.layout,
-                    card_colors = excluded.card_colors,
-                    updated_at = excluded.updated_at
-            """, (user_id, layout_json, card_colors_json, datetime.now().isoformat()))
-
-        return jsonify({'success': True})
+    return jsonify({'success': True})
 
 
 @sync_bp.route("/api/sync/wordlist/<name>", methods=["GET"])
@@ -125,24 +79,11 @@ def get_wordlist(name):
     """
     user_id = g.user['id']
 
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT name, words, created_at, updated_at
-            FROM wordlists
-            WHERE user_id = ? AND name = ?
-        """, (user_id, name))
+    wordlist = WordlistRepository.get_by_name(user_id, name)
+    if not wordlist:
+        return jsonify({'error': '单词表不存在'}), 404
 
-        row = cursor.fetchone()
-        if not row:
-            return jsonify({'error': '单词表不存在'}), 404
-
-        return jsonify({
-            'name': row['name'],
-            'words': row['words'],
-            'created': row['created_at'],
-            'updated': row['updated_at']
-        })
+    return jsonify(wordlist)
 
 
 @sync_bp.route("/api/sync/wordlist/<name>", methods=["DELETE"])
@@ -154,11 +95,7 @@ def delete_wordlist(name):
     响应: { success: true }
     """
     user_id = g.user['id']
-
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM wordlists WHERE user_id = ? AND name = ?", (user_id, name))
-
+    WordlistRepository.delete(user_id, name)
     return jsonify({'success': True})
 
 
@@ -180,16 +117,7 @@ def save_single_wordlist():
 
     words = data.get('words', '')
     created = data.get('created', datetime.now().isoformat())
-    updated = datetime.now().isoformat()
 
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO wordlists (user_id, name, words, translations, word_info, created_at, updated_at)
-            VALUES (?, ?, ?, '{}', '{}', ?, ?)
-            ON CONFLICT(user_id, name) DO UPDATE SET
-                words = excluded.words,
-                updated_at = excluded.updated_at
-        """, (user_id, name, words, created, updated))
+    WordlistRepository.save(user_id, name, words, created)
 
     return jsonify({'success': True})
