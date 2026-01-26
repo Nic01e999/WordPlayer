@@ -1,0 +1,57 @@
+# Python 编译文件
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv
+
+# 数据库文件
+*.db
+*.db-journal
+data/*.db
+data/*.db-journal
+
+# 数据库备份（保留在服务器上，不提交到仓库）
+data/backups/
+
+# 缓存目录
+cache/
+tts_cache/
+*.cache
+
+# 环境变量配置（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+
+# 测试覆盖率
+.coverage
+htmlcov/
+.pytest_cache/
+
+# 打包文件
+*.egg-info/
+dist/
+build/
