@@ -3,54 +3,25 @@
 提供注册、登录、登出、忘记密码等功能
 """
 
-import re
-import secrets
-import random
 from datetime import datetime, timedelta
 
 from flask import Blueprint, request, jsonify, g
-import bcrypt
 
 from config import Config
 from db import get_db
 from middleware import require_auth
 from email_service import send_reset_code
+from utils import build_auth_response
+from validators import validate_email, validate_password, validate_code
+from security import hash_password, verify_password, generate_session_token, generate_reset_code, calculate_expiry
 
 auth_bp = Blueprint('auth', __name__)
-
-# 邮箱格式验证
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-
-
-def _validate_email(email: str) -> bool:
-    """验证邮箱格式"""
-    return bool(EMAIL_REGEX.match(email))
-
-
-def _generate_token() -> str:
-    """生成安全的随机 token"""
-    return secrets.token_urlsafe(32)
-
-
-def _generate_code() -> str:
-    """生成6位数字验证码"""
-    return ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-
-def _hash_password(password: str) -> str:
-    """哈希密码"""
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(Config.BCRYPT_ROUNDS)).decode('utf-8')
-
-
-def _verify_password(password: str, password_hash: str) -> bool:
-    """验证密码"""
-    return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
 
 
 def _create_session(conn, user_id: int) -> str:
     """创建会话，返回 token"""
-    token = _generate_token()
-    expires_at = datetime.now() + timedelta(days=Config.TOKEN_EXPIRE_DAYS)
+    token = generate_session_token()
+    expires_at = calculate_expiry(days=Config.TOKEN_EXPIRE_DAYS)
 
     cursor = conn.cursor()
     cursor.execute("""
@@ -73,11 +44,11 @@ def register():
     password = data.get('password', '')
 
     # 验证邮箱格式
-    if not _validate_email(email):
+    if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
 
     # 验证密码长度
-    if len(password) < Config.PASSWORD_MIN_LENGTH:
+    if not validate_password(password, Config.PASSWORD_MIN_LENGTH):
         return jsonify({'error': f'密码至少需要 {Config.PASSWORD_MIN_LENGTH} 位'}), 400
 
     with get_db() as conn:
@@ -89,7 +60,7 @@ def register():
             return jsonify({'error': '该邮箱已注册'}), 400
 
         # 创建用户
-        password_hash = _hash_password(password)
+        password_hash = hash_password(password)
         cursor.execute("""
             INSERT INTO users (email, password_hash)
             VALUES (?, ?)
@@ -99,14 +70,7 @@ def register():
         # 创建会话
         token = _create_session(conn, user_id)
 
-        return jsonify({
-            'success': True,
-            'token': token,
-            'user': {
-                'id': user_id,
-                'email': email
-            }
-        })
+        return jsonify(build_auth_response({'id': user_id, 'email': email}, token))
 
 
 @auth_bp.route("/api/auth/login", methods=["POST"])
@@ -134,7 +98,7 @@ def login():
             return jsonify({'error': '邮箱或密码错误'}), 401
 
         # 验证密码
-        if not _verify_password(password, user['password_hash']):
+        if not verify_password(password, user['password_hash']):
             return jsonify({'error': '邮箱或密码错误'}), 401
 
         # 更新最后登录时间
@@ -146,14 +110,7 @@ def login():
         # 创建会话
         token = _create_session(conn, user['id'])
 
-        return jsonify({
-            'success': True,
-            'token': token,
-            'user': {
-                'id': user['id'],
-                'email': user['email']
-            }
-        })
+        return jsonify(build_auth_response(user, token))
 
 
 @auth_bp.route("/api/auth/logout", methods=["POST"])
@@ -194,7 +151,7 @@ def forgot_password():
     data = request.get_json() or {}
     email = data.get('email', '').strip().lower()
 
-    if not _validate_email(email):
+    if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
 
     with get_db() as conn:
@@ -217,8 +174,8 @@ def forgot_password():
             return jsonify({'error': f'请 {Config.CODE_RESEND_SECONDS} 秒后再试'}), 429
 
         # 生成验证码
-        code = _generate_code()
-        expires_at = datetime.now() + timedelta(minutes=Config.CODE_EXPIRE_MINUTES)
+        code = generate_reset_code()
+        expires_at = calculate_expiry(minutes=Config.CODE_EXPIRE_MINUTES)
 
         cursor.execute("""
             INSERT INTO reset_codes (email, code, expires_at)
@@ -244,13 +201,13 @@ def reset_password():
     code = data.get('code', '').strip()
     password = data.get('password', '')
 
-    if not _validate_email(email):
+    if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
 
-    if not code or len(code) != 6:
+    if not validate_code(code, 6):
         return jsonify({'error': '验证码格式不正确'}), 400
 
-    if len(password) < Config.PASSWORD_MIN_LENGTH:
+    if not validate_password(password, Config.PASSWORD_MIN_LENGTH):
         return jsonify({'error': f'密码至少需要 {Config.PASSWORD_MIN_LENGTH} 位'}), 400
 
     with get_db() as conn:
@@ -272,7 +229,7 @@ def reset_password():
         cursor.execute("UPDATE reset_codes SET used = TRUE WHERE id = ?", (reset_code['id'],))
 
         # 更新密码
-        password_hash = _hash_password(password)
+        password_hash = hash_password(password)
         cursor.execute("UPDATE users SET password_hash = ? WHERE email = ?", (password_hash, email))
 
         # 获取用户信息
@@ -285,11 +242,4 @@ def reset_password():
         # 创建新会话
         token = _create_session(conn, user['id'])
 
-        return jsonify({
-            'success': True,
-            'token': token,
-            'user': {
-                'id': user['id'],
-                'email': user['email']
-            }
-        })
+        return jsonify(build_auth_response(user, token))

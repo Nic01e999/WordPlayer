@@ -6,17 +6,33 @@
 import io
 import requests
 from flask import Blueprint, request, jsonify, send_file
+from constants import DICTVOICE_LANG_CODES, API_TIMEOUT_TTS
 
 tts_bp = Blueprint('tts', __name__)
 
-# 有道 dictvoice API 的语言代码映射
-DICTVOICE_LANG_CODES = {
-    'en': None,   # 英语不需要 le 参数，使用 type 参数区分口音
-    'ja': 'jap',
-    'ko': 'ko',
-    'fr': 'fr',
-    'zh': 'zh'
-}
+
+def _make_tts_request(url: str, timeout: int = API_TIMEOUT_TTS, error_prefix: str = "有道 TTS") -> bytes:
+    """
+    统一的 TTS 请求处理函数
+
+    Args:
+        url: 请求 URL
+        timeout: 超时时间（秒）
+        error_prefix: 错误消息前缀
+
+    Returns:
+        音频数据（bytes）
+
+    Raises:
+        Exception: 请求失败时抛出异常
+    """
+    try:
+        response = requests.get(url, timeout=timeout)
+        if response.ok:
+            return response.content
+        raise Exception(f"{error_prefix}请求失败: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"{error_prefix}网络错误: {str(e)}")
 
 
 def get_youdao_tts(text: str, slow: bool = False, accent: str = "us") -> bytes:
@@ -24,14 +40,7 @@ def get_youdao_tts(text: str, slow: bool = False, accent: str = "us") -> bytes:
     # type=1 美式发音, type=2 英式发音
     voice_type = 2 if accent == "uk" else 1
     url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type={voice_type}"
-
-    try:
-        response = requests.get(url, timeout=10)
-        if response.ok:
-            return response.content
-        raise Exception(f"有道 TTS 请求失败: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"有道 TTS 网络错误: {str(e)}")
+    return _make_tts_request(url, timeout=API_TIMEOUT_TTS, error_prefix="有道 TTS")
 
 
 def get_youdao_multilang_tts(text: str, lang: str) -> bytes:
@@ -42,14 +51,7 @@ def get_youdao_multilang_tts(text: str, lang: str) -> bytes:
     else:
         # 默认英语
         url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type=1"
-
-    try:
-        response = requests.get(url, timeout=15)
-        if response.ok:
-            return response.content
-        raise Exception(f"有道多语言 TTS 请求失败: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"有道多语言 TTS 网络错误: {str(e)}")
+    return _make_tts_request(url, timeout=API_TIMEOUT_TTS, error_prefix="有道多语言 TTS")
 
 
 def get_youdao_sentence_tts(text: str, lang: str = "en") -> bytes:
@@ -60,14 +62,7 @@ def get_youdao_sentence_tts(text: str, lang: str = "en") -> bytes:
     else:
         # 英语句子
         url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type=1"
-
-    try:
-        response = requests.get(url, timeout=15)
-        if response.ok:
-            return response.content
-        raise Exception(f"有道句子 TTS 请求失败: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"有道句子 TTS 网络错误: {str(e)}")
+    return _make_tts_request(url, timeout=API_TIMEOUT_TTS, error_prefix="有道句子 TTS")
 
 
 @tts_bp.route("/api/tts", methods=["GET"])

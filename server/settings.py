@@ -5,51 +5,10 @@
 from flask import Blueprint, request, jsonify, g
 from db import get_db
 from middleware import require_auth
+from constants import DEFAULT_SETTINGS, ALLOWED_SETTING_KEYS
+from validators import validate_setting
 
 settings_bp = Blueprint('settings', __name__)
-
-# 默认设置值
-DEFAULT_SETTINGS = {
-    'target_lang': 'en',
-    'translation_lang': 'zh',
-    'ui_lang': 'zh',
-    'theme': 'system',
-    'accent': 'us',
-    'repeat_count': 1,
-    'retry_count': 1,
-    'interval_ms': 300,
-    'slow_mode': False,
-    'shuffle_mode': False
-}
-
-# 允许的设置键
-ALLOWED_KEYS = set(DEFAULT_SETTINGS.keys())
-
-# 支持的语言
-SUPPORTED_LANGS = {'en', 'ja', 'ko', 'fr', 'zh'}
-
-# 支持的主题
-SUPPORTED_THEMES = {'system', 'light', 'dark'}
-
-# 支持的口音
-SUPPORTED_ACCENTS = {'us', 'uk'}
-
-
-def validate_setting(key, value):
-    """验证设置值"""
-    if key in ('target_lang', 'translation_lang', 'ui_lang'):
-        return value in SUPPORTED_LANGS
-    elif key == 'theme':
-        return value in SUPPORTED_THEMES
-    elif key == 'accent':
-        return value in SUPPORTED_ACCENTS
-    elif key in ('repeat_count', 'retry_count'):
-        return isinstance(value, int) and 1 <= value <= 10
-    elif key == 'interval_ms':
-        return isinstance(value, int) and 100 <= value <= 5000
-    elif key in ('slow_mode', 'shuffle_mode'):
-        return isinstance(value, bool)
-    return False
 
 
 def get_user_settings(user_id):
@@ -126,7 +85,7 @@ def update_settings():
         key = data['key']
         value = data['value']
 
-        if key not in ALLOWED_KEYS:
+        if key not in ALLOWED_SETTING_KEYS:
             return jsonify({'error': f'不支持的设置项: {key}'}), 400
 
         if not validate_setting(key, value):
@@ -137,7 +96,7 @@ def update_settings():
     # 格式2：多个设置
     elif 'settings' in data:
         for key, value in data['settings'].items():
-            if key not in ALLOWED_KEYS:
+            if key not in ALLOWED_SETTING_KEYS:
                 continue  # 忽略不支持的设置项
 
             if validate_setting(key, value):

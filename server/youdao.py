@@ -5,40 +5,10 @@
 
 import requests
 from flask import Blueprint, request, jsonify
+from constants import DICT_FIELDS, YOUDAO_LANG_CODES, SUPPORTED_LANGS
+from validators import validate_language_pair
 
 youdao_bp = Blueprint('youdao', __name__)
-
-# 有道词典字段映射 (source_lang, target_lang) -> dict_field
-# 有道API返回的词典字段名
-DICT_FIELDS = {
-    # X -> 中文
-    ('en', 'zh'): 'ec',   # 英中
-    ('ja', 'zh'): 'jc',   # 日中 (或 newjc)
-    ('ko', 'zh'): 'kc',   # 韩中
-    ('fr', 'zh'): 'fc',   # 法中
-    # 中文 -> X
-    ('zh', 'en'): 'ce',   # 中英
-    ('zh', 'ja'): 'cj',   # 中日
-    ('zh', 'ko'): 'ck',   # 中韩
-    ('zh', 'fr'): 'cf',   # 中法
-    # 英语 -> 其他 (通过中文中转或直接查)
-    ('en', 'ja'): 'ej',   # 英日
-    ('en', 'ko'): 'ek',   # 英韩
-    ('en', 'fr'): 'ef',   # 英法
-    # 其他 -> 英语
-    ('ja', 'en'): 'je',   # 日英
-    ('ko', 'en'): 'ke',   # 韩英
-    ('fr', 'en'): 'fe',   # 法英
-}
-
-# 有道API语言代码映射
-YOUDAO_LANG_CODES = {
-    'en': 'eng',
-    'ja': 'jap',
-    'ko': 'ko',
-    'fr': 'fr',
-    'zh': 'zh-CHS'
-}
 
 
 def _parse_definitions(dict_data):
@@ -240,12 +210,9 @@ def translate():
         return jsonify({"error": "缺少 word 参数"}), 400
 
     # 验证语言代码
-    supported_langs = {'en', 'ja', 'ko', 'fr', 'zh'}
-    if from_lang not in supported_langs or to_lang not in supported_langs:
-        return jsonify({"error": f"不支持的语言: {from_lang} -> {to_lang}"}), 400
-
-    if from_lang == to_lang:
-        return jsonify({"error": "源语言和目标语言不能相同"}), 400
+    is_valid, error_msg = validate_language_pair(from_lang, to_lang)
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
 
     result = _fetch_youdao_dict(word, from_lang, to_lang)
 
@@ -275,9 +242,9 @@ def translate_batch():
         return jsonify({"error": "缺少 words 参数"}), 400
 
     # 验证语言代码
-    supported_langs = {'en', 'ja', 'ko', 'fr', 'zh'}
-    if from_lang not in supported_langs or to_lang not in supported_langs:
-        return jsonify({"error": f"不支持的语言: {from_lang} -> {to_lang}"}), 400
+    is_valid, error_msg = validate_language_pair(from_lang, to_lang)
+    if not is_valid:
+        return jsonify({"error": error_msg}), 400
 
     results = {}
     for word in words:
