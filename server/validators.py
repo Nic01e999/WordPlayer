@@ -4,6 +4,7 @@
 """
 
 import re
+from typing import Tuple
 from constants import (
     LANG_PATTERNS,
     MAX_WORD_LENGTH,
@@ -93,7 +94,7 @@ def validate_language(lang: str) -> bool:
     return lang in SUPPORTED_LANGS
 
 
-def validate_language_pair(from_lang: str, to_lang: str) -> tuple[bool, str]:
+def validate_language_pair(from_lang: str, to_lang: str) -> Tuple[bool, str]:
     """
     验证语言对是否有效
 

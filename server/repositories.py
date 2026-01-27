@@ -5,7 +5,7 @@
 
 import json
 from datetime import datetime
-from typing import Optional, Dict, List, Any
+from typing import Optional, Dict, List, Any, Tuple
 from db import get_db
 
 
@@ -225,7 +225,7 @@ class LayoutRepository:
     """布局配置数据访问"""
 
     @staticmethod
-    def get_by_user(user_id: int) -> tuple[Optional[Dict], Dict]:
+    def get_by_user(user_id: int) -> Tuple[Optional[Dict], Dict]:
         """获取用户的布局配置，返回 (layout, card_colors)"""
         with get_db() as conn:
             cursor = conn.cursor()
