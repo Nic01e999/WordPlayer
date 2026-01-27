@@ -14,8 +14,14 @@ import {
     updateModeButtonsState,
     getTargetLang,
     getTranslationLang,
-    isValidForLanguage
+    isValidForLanguage,
+    detectLanguageFromInput,
+    setTargetLang,
+    updateAccentSelectorVisibility,
+    checkLanguageConsistency,
+    showToast
 } from './utils.js';
+import { updateHighlight, clearHighlight } from './app.js';
 import {
     getTtsUrl,
     getWordDetailsUrl
@@ -36,10 +42,22 @@ export function updatePreloadProgress() {
     const indicator = $("preloadIndicator");
     const transEl = $("translationProgress");
     const audioEl = $("audioProgress");
+    const loadBtn = $("loadBtn");
     if (!indicator) return;
 
     const isLoading = preloadCache.loading;
     const hasWords = preloadCache.entries.length > 0;
+
+    // 控制 loadBtn 的 loading 状态
+    if (loadBtn) {
+        if (isLoading) {
+            loadBtn.classList.add('loading');
+            loadBtn.textContent = 'Loading...';
+        } else {
+            loadBtn.classList.remove('loading');
+            loadBtn.textContent = t('load');
+        }
+    }
 
     if (isLoading || hasWords) {
         indicator.style.display = "block";
@@ -75,6 +93,38 @@ export function updatePreloadProgress() {
 export async function startPreload(forceReload = false) {
     console.log('[startPreload] called, loadId:', preloadCache.loadId, 'loading:', preloadCache.loading);
     console.trace('[startPreload] call stack');
+
+    // 获取输入内容并执行统一检测
+    const wordInput = $("wordInput");
+    const inputText = wordInput ? wordInput.value.trim() : '';
+
+    if (inputText) {
+        // 1. 自动检测语言并切换目标语言选择器
+        const detected = detectLanguageFromInput(inputText);
+        if (detected) {
+            setTargetLang(detected);
+            updateAccentSelectorVisibility();
+        }
+
+        const targetLang = getTargetLang();
+
+        // 2. 检测语言一致性
+        const { consistent, detectedLangs } = checkLanguageConsistency(inputText);
+        if (!consistent && detectedLangs.length > 1) {
+            showToast(t('mixedLanguageWarning'));
+            return; // 阻止加载
+        }
+
+        // 3. 检测无效字符并高亮显示
+        const hasInvalid = updateHighlight(targetLang);
+
+        if (hasInvalid) {
+            return; // 阻止加载
+        }
+    }
+
+    // 清除高亮（如果没有无效字符）
+    clearHighlight();
 
     const entries = loadWordsFromTextarea();
     if (!entries.length) {
@@ -417,11 +467,7 @@ export function initPreloadListeners() {
     }
 
     // 侧边栏宽度自动调整（不涉及 API 调用）
-    if (wordInput) {
-        wordInput.addEventListener("input", debouncedAdjustSidebar);
-        wordInput.addEventListener("paste", () => setTimeout(adjustSidebarWidth, 0));
-    }
-
+    // 实时监测已移除，仅在页面加载时调整一次
     adjustSidebarWidth();
     updateModeButtonsState();
 }

@@ -43,10 +43,9 @@ export function showPopup() {
         <div class="popup-drag-handle" title=""></div>
         <h3>${t('wordNum', { num: i + 1 })}</h3>
         <p id="retryInfo">${t('attempts')}: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
-        <button onclick="Dictation.play()" class="btn-sound"></button>
         <br><br>
-        <button onclick="Dictation.playPause()" id="dictationPlayPauseBtn" class="${s.isPaused ? 'btn-play' : 'btn-pause'}">${s.isPaused ? '>' : '||'}</button>
-        <input type="text" id="dictationInput" placeholder="${t('typeWordPlaceholder')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${s.isPaused ? 'disabled' : ''}>
+        <button onclick="Dictation.play()" class="btn-sound"></button>
+        <input type="text" id="dictationInput" placeholder="${t('typeWordPlaceholder')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <br><br>
     `;
 

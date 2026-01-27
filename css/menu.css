@@ -23,14 +23,14 @@ body.dictation-mode #menu::after {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -1.875rem;
-    height: 3.125rem;
-    margin: 0 3%;
-    background: url('../assets/images/iron.PNG') repeat-x center top;
+    bottom: -2rem;
+    height: 3.8rem;
+    margin: 0 2rem;
+    background: url('../assets/images/iron.PNG') repeat-x center bottom;
     background-size: auto 100%;
     z-index: 101;
-    pointer-events: none;
-    filter: sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
+    /* pointer-events: none; */
+    filter: sepia(30%) saturate(var(--filter-saturate)) hue-rotate(var(--filter-hue));
 }
 
 /* Home 按钮样式（标题按钮） */
@@ -65,6 +65,7 @@ body.dictation-mode #menu::after {
     gap: 1.25rem;
     justify-content: center;
 }
+
 /* 菜单栏按钮样式 */
 #mode-btn button {
     font-family: 'Cinzel', 'Georgia', serif;
@@ -99,7 +100,7 @@ body.dictation-mode #menu::after {
 
 /* 模式按钮禁用状态 */
 #mode-btn button:disabled {
-    opacity: 0.5;
+    opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -116,16 +117,6 @@ body.dictation-mode #menu::after {
     width: 3.125rem;
 }
 
-/* 预加载进度指示器 - 显示在设置图标下方 */
-#preloadIndicator {
-    position: absolute;
-    top: 105%;
-    right: 1%;
-    /* margin-top: rem; */
-    font-size: 13px;
-    color: #888;
-    white-space: nowrap;
-}
 
 /* 齿轮图标样式 */
 .gear-icon {
@@ -138,25 +129,6 @@ body.dictation-mode #menu::after {
     color: transparent;
 }
 
-/* 背景十字线（不转动） */
-.gear-icon::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 120%;
-    height: 120%;
-    background-color: var(--text-secondary);
-    -webkit-mask-image: url('../assets/images/setBackground_icon.PNG');
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-size: contain;
-    mask-image: url('../assets/images/setBackground_icon.PNG');
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-size: contain;
-    z-index: 1;
-}
 
 /* 齿轮图案（转动） */
 .gear-icon::after {
@@ -176,7 +148,7 @@ body.dictation-mode #menu::after {
     mask-position: center center;
     mask-size: contain;
     z-index: 2;
-    transition: transform 0.7s ease-out;
+    transition: transform 0.5s ease-out;
 }
 
 /* 齿轮图标悬停动画 */
@@ -288,51 +260,6 @@ body.dictation-mode #menu::after {
     margin-top: 0.9375rem;
     padding-top: 0.3125rem;
 }
-/* 单词输入区域 - 主页左侧 */
-#wordSection {
-    width: clamp(14rem, 22vw, 17.5rem);
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-}
-
-#wordSection h3 {
-    font-family: 'Cinzel', 'Georgia', serif;
-    color: var(--text-accent);
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 0.9375rem 0;
-    padding-bottom: 0.625rem;
-    border-bottom: 1px solid var(--border-pink-light);
-    text-transform: uppercase;
-    letter-spacing: 0.0625rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-}
-
-#wordSection textarea {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    flex: 1;
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-pink-light);
-    border-radius: 0.75rem;
-    background: var(--bg-container);
-    color: var(--text-label);
-    font-size: 0.875rem;
-    resize: none;
-    box-sizing: border-box;
-    transition: all 0.2s;
-}
-
-#wordSection textarea:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 15px var(--shadow-pink-light);
-}
 
 /* 语言选择器 */
 .lang-selector {
@@ -391,7 +318,7 @@ body.dictation-mode #menu::after {
 /* 分段控制按钮 */
 .segmented-control {
     display: inline-flex;
-    background: var(--bg-tertiary, rgba(0,0,0,0.05));
+    background: var(--segmented-bg);
     border-radius: 0.5rem;
     padding: 0.1875rem;
 }

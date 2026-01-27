@@ -6,6 +6,7 @@
 /* ===== 登录按钮区域 ===== */
 
 .auth-section {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -36,13 +37,13 @@
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
     border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--card-user-bg);
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
 .user-info:hover {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--card-user-hover);
 }
 
 .user-avatar {
@@ -97,7 +98,7 @@
 .auth-dialog-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--dialog-text-title);
     margin-bottom: 0.25rem;
 }
 
@@ -131,10 +132,10 @@
     font-size: 1rem;
     border: none;
     border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--input-bg-light);
     box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.08) inset,
-        0 2px 4px rgba(0, 0, 0, 0.04) inset;
+        0 0 0 1px var(--input-shadow-outer) inset,
+        0 2px 4px var(--input-shadow-inner) inset;
     outline: none;
     transition: box-shadow 0.2s ease;
     box-sizing: border-box;
@@ -156,7 +157,7 @@
     color: var(--status-error);
     text-align: center;
     padding: 0.5rem;
-    background: rgba(200, 80, 80, 0.1);
+    background: var(--bg-error-light);
     border-radius: 0.5rem;
     display: none;
 }
@@ -190,7 +191,7 @@
 .auth-divider-line {
     flex: 1;
     height: 1px;
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--divider-line);
 }
 
 .auth-divider-text {
@@ -239,12 +240,12 @@
     border-radius: 0.75rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--button-secondary-bg);
     color: var(--text-primary);
 }
 
 .auth-btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--button-secondary-hover);
 }
 
 /* 验证码输入 */
@@ -266,10 +267,9 @@
 .user-dropdown {
     position: absolute;
     top: 100%;
-    right: 0;
     margin-top: 0.5rem;
     min-width: 160px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    background: linear-gradient(135deg, var(--dropdown-bg-start) 0%, var(--dropdown-bg-end) 100%);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 0.75rem;
@@ -302,7 +302,7 @@
 }
 
 .user-dropdown-item:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--dropdown-item-hover);
 }
 
 .user-dropdown-item.danger {
@@ -310,19 +310,19 @@
 }
 
 .user-dropdown-item.danger:hover {
-    background: rgba(200, 80, 80, 0.1);
+    background: var(--bg-error-light);
 }
 
 /* ===== 深色主题适配 ===== */
 
 [data-theme-mode="dark"] .auth-dialog-title {
-    color: #fff;
+    color: var(--dialog-text-title);
 }
 
 [data-theme-mode="dark"] .auth-input {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    background: var(--input-bg-light);
+    color: var(--dialog-text-title);
+    box-shadow: 0 0 0 1px var(--input-shadow-outer) inset;
 }
 
 [data-theme-mode="dark"] .auth-input:focus {
@@ -332,28 +332,28 @@
 }
 
 [data-theme-mode="dark"] .auth-btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--button-secondary-bg);
     color: var(--text-primary);
 }
 
 [data-theme-mode="dark"] .auth-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--button-secondary-hover);
 }
 
 [data-theme-mode="dark"] .user-info {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--card-user-bg);
 }
 
 [data-theme-mode="dark"] .user-info:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--card-user-hover);
 }
 
 [data-theme-mode="dark"] .user-dropdown {
-    background: linear-gradient(135deg, rgba(40, 40, 45, 0.95) 0%, rgba(30, 30, 35, 0.9) 100%);
+    background: linear-gradient(135deg, var(--dropdown-bg-start) 0%, var(--dropdown-bg-end) 100%);
 }
 
 [data-theme-mode="dark"] .user-dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--dropdown-item-hover);
 }
 
 /* ===== 响应式 ===== */

@@ -454,3 +454,62 @@ export function bindSettingControls(bindings) {
         bindSettingControl(elementId, settingKey, options);
     });
 }
+
+/**
+ * 检测输入文本中的所有单词是否属于同一种语言
+ * @param {string} content - 输入文本
+ * @returns {Object} { consistent: boolean, detectedLangs: string[] }
+ */
+export function checkLanguageConsistency(content) {
+    const lines = content.split(/\r?\n/);
+    const detectedLangs = new Set();
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        const colonIdx = trimmed.indexOf(':');
+        const wordPart = colonIdx !== -1 ? trimmed.substring(0, colonIdx).trim() : trimmed;
+
+        if (wordPart) {
+            const lang = detectLanguage(wordPart);
+            if (lang) {
+                detectedLangs.add(lang);
+            }
+        }
+    }
+
+    return {
+        consistent: detectedLangs.size <= 1,
+        detectedLangs: Array.from(detectedLangs)
+    };
+}
+
+/**
+ * 显示 Toast 提示消息
+ * @param {string} message - 提示消息
+ * @param {number} duration - 显示时长（毫秒），默认 3000
+ */
+export function showToast(message, duration = 3000) {
+    // 移除已存在的 toast
+    const existingToast = document.getElementById('toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // 创建 toast 元素
+    const toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // 触发显示动画
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // 自动隐藏
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}

@@ -136,14 +136,7 @@ body.dictation-mode #dictationWorkplace::after {
     left: 0.625rem;
     right: 0.625rem;
     height: 0.5rem;
-    background: repeating-linear-gradient(90deg,
-        transparent 0px,
-        transparent 8px,
-        var(--bg-popup-start) 8px,
-        var(--bg-popup-start) 10px,
-        transparent 10px,
-        transparent 12px
-    );
+    background: var(--bg-popup-start);
     filter: drop-shadow(0 1px 1px var(--shadow-soft));
     clip-path: polygon(0 0, 42% 0, 42% 100%, 58% 100%, 58% 0, 100% 0, 100% 100%, 0 100%);
 }

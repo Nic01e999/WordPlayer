@@ -53,75 +53,106 @@ Object.defineProperty(window, 'currentActiveMode', {
 });
 
 /**
- * 初始化多语言输入过滤
+ * 初始化高亮层
  */
-function initInputFilter() {
+function initHighlightLayer() {
     const wordInput = $("wordInput");
     if (!wordInput) return;
 
-    let warningTimer = null;
+    // 检查是否已存在高亮层
+    let highlightLayer = $("wordInputHighlight");
+    if (highlightLayer) return;
 
-    wordInput.addEventListener("input", (e) => {
-        const text = e.target.value;
+    // 创建高亮层容器
+    const wrapper = document.createElement("div");
+    wrapper.className = "textarea-wrapper";
 
-        // 自动检测语言
-        const detected = detectLanguageFromInput(text);
-        if (detected) {
-            setTargetLang(detected);
-            updateAccentSelectorVisibility();
+    // 创建高亮层
+    highlightLayer = document.createElement("div");
+    highlightLayer.id = "wordInputHighlight";
+    highlightLayer.className = "textarea-highlight";
+
+    // 将 textarea 包裹在容器中
+    wordInput.parentNode.insertBefore(wrapper, wordInput);
+    wrapper.appendChild(highlightLayer);
+    wrapper.appendChild(wordInput);
+}
+
+/**
+ * 更新高亮层，标红无效字符
+ * @param {string} targetLang - 目标语言
+ */
+export function updateHighlight(targetLang) {
+    const wordInput = $("wordInput");
+    const highlightLayer = $("wordInputHighlight");
+
+    if (!wordInput || !highlightLayer) return;
+
+    const content = wordInput.value;
+    const lines = content.split('\n');
+    let hasInvalid = false;
+
+    // 处理每一行，标红无效字符
+    const highlightedLines = lines.map(line => {
+        const colonIdx = line.indexOf(':');
+        const wordPart = colonIdx !== -1 ? line.substring(0, colonIdx) : line;
+        const restPart = colonIdx !== -1 ? line.substring(colonIdx) : '';
+
+        if (wordPart.trim() && !isValidForLanguage(wordPart, targetLang)) {
+            hasInvalid = true;
+            // 标红整个单词部分
+            return `<span class="invalid-text">${escapeHtml(wordPart)}</span>${escapeHtml(restPart)}`;
         }
 
-        const targetLang = getTargetLang();
-
-        // 检查每一行是否有效（跳过 word:definition 格式的定义部分）
-        const lines = text.split('\n');
-        let hasInvalid = false;
-
-        for (const line of lines) {
-            const colonIdx = line.indexOf(':');
-            const wordPart = colonIdx !== -1 ? line.substring(0, colonIdx) : line;
-            if (wordPart.trim() && !isValidForLanguage(wordPart, targetLang)) {
-                hasInvalid = true;
-                break;
-            }
-        }
-
-        if (hasInvalid) {
-            // 过滤无效字符（仅过滤单词部分，保留定义部分）
-            const cursorPos = e.target.selectionStart;
-            const filtered = lines.map(line => {
-                const colonIdx = line.indexOf(':');
-                if (colonIdx !== -1) {
-                    const wordPart = line.substring(0, colonIdx);
-                    const defPart = line.substring(colonIdx);
-                    return filterInvalidChars(wordPart, targetLang) + defPart;
-                }
-                return filterInvalidChars(line, targetLang);
-            }).join('\n');
-
-            const charsRemoved = text.length - filtered.length;
-            e.target.value = filtered;
-            e.target.selectionStart = e.target.selectionEnd = Math.max(0, cursorPos - charsRemoved);
-
-            showInputWarning(targetLang);
-        }
+        return escapeHtml(line);
     });
 
-    function showInputWarning(lang) {
-        let warning = $("inputWarning");
-        if (!warning) {
-            warning = document.createElement("div");
-            warning.id = "inputWarning";
-            warning.className = "input-warning";
-            wordInput.parentNode.insertBefore(warning, wordInput.nextSibling);
-        }
-        warning.textContent = t('warningInvalidLang', { lang: LANG_NAMES[lang] || lang });
-        warning.style.display = "block";
+    highlightLayer.innerHTML = highlightedLines.join('\n');
+    return hasInvalid;
+}
 
-        clearTimeout(warningTimer);
-        warningTimer = setTimeout(() => {
-            warning.style.display = "none";
-        }, 2000);
+/**
+ * 清除高亮层
+ */
+export function clearHighlight() {
+    const highlightLayer = $("wordInputHighlight");
+    if (highlightLayer) {
+        highlightLayer.innerHTML = '';
+    }
+}
+
+/**
+ * HTML 转义函数
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * 初始化多语言输入过滤
+ */
+function initInputFilter() {
+    // 初始化高亮层
+    initHighlightLayer();
+
+    // 添加 input 事件监听器，实时更新高亮
+    const wordInput = $("wordInput");
+    if (wordInput) {
+        wordInput.addEventListener("input", () => {
+            const targetLang = getTargetLang();
+            updateHighlight(targetLang);
+        });
+
+        // 添加 scroll 事件同步
+        wordInput.addEventListener("scroll", () => {
+            const highlightLayer = $("wordInputHighlight");
+            if (highlightLayer) {
+                highlightLayer.scrollTop = wordInput.scrollTop;
+                highlightLayer.scrollLeft = wordInput.scrollLeft;
+            }
+        });
     }
 }
 

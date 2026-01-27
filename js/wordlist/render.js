@@ -35,19 +35,19 @@ export function getCurrentThemeColors() {
  */
 export const CARD_COLORS = [
     { id: 'original', label: '原色', colors: null, isOriginal: true },
-    { id: 'red', label: '红橙', colors: ['#FF6B6B', '#FF8E53'] },
-    { id: 'cyan', label: '青绿', colors: ['#4ECDC4', '#44A08D'] },
-    { id: 'purple', label: '紫蓝', colors: ['#667EEA', '#764BA2'] },
-    { id: 'pink', label: '粉红', colors: ['#F093FB', '#F5576C'] },
-    { id: 'blue', label: '蓝青', colors: ['#4FACFE', '#00F2FE'] },
-    { id: 'green', label: '绿青', colors: ['#43E97B', '#38F9D7'] },
+    { id: 'pastel2', label: '淡粉', colors: ['#fb7eac', '#f3acdc'] },
     { id: 'gold', label: '粉黄', colors: ['#FA709A', '#FEE140'] },
-    { id: 'pastel1', label: '淡青粉', colors: ['#A8EDEA', '#FED6E3'] },
-    { id: 'pastel2', label: '淡粉', colors: ['#FF9A9E', '#FECFEF'] },
-    { id: 'pastel3', label: '淡紫粉', colors: ['#A18CD1', '#FBC2EB'] },
-    { id: 'navy', label: '金蓝', colors: ['#FFD89B', '#19547B'] },
-    { id: 'lime', label: '绿黄', colors: ['#96FBC4', '#F9F586'] },
-    { id: 'slate', label: '灰蓝', colors: ['#667db6', '#0082c8'] },
+    { id: 'red', label: '红橙', colors: ['#FF6B6B', '#7cebff'] },
+    { id: 'pink', label: '粉红', colors: ['#F093FB', '#F5576C'] },
+    { id: 'pastel3', label: '淡紫粉', colors: ['#c8b0ff', '#ff48b0a7'] },
+     { id: 'blue', label: '蓝青', colors: ['#b268cb78', '#ffb5ed'] },
+     { id: 'purple', label: '紫蓝', colors: ['#9daced', '#d561e4'] },
+      { id: 'slate', label: '灰蓝', colors: ['#434ff2', '#71cdff'] },
+     { id: 'pastel1', label: '淡青粉', colors: ['#A8EDEA', '#FED6E3'] },
+    { id: 'lime', label: '绿黄', colors: ['#80e2ac', '#f2f461'] },
+ { id: 'cyan', label: '青绿', colors: ['#8aeee7', '#a055e1'] },
+     { id: 'green', label: '绿青', colors: ['#81ffc2', '#26d5d5'] },
+ { id: 'navy', label: '金蓝', colors: ['#FFD89B', '#79c9fe'] },
 ];
 
 /**

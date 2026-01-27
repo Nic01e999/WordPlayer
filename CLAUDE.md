@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Communication Language
 
-**IMPORTANT**: Always communicate with the user in Chinese (中文) when reporting progress, explaining changes, or discussing implementation details, and also use white background. 当和用户探讨计划的时候，不懂的多次询问一起确定方案，写log的时候服务器和网页控制台都发一份
+**IMPORTANT**: Always communicate with the user in Chinese (中文) when reporting progress, explaining changes, or discussing implementation details, and also use white background. 当和用户探讨计划的时候，不懂的多次询问一起确定方案细节，写log的时候服务器和网页控制台都发一份
 
 ## Design Style
 

@@ -140,6 +140,7 @@ export default {
     warnWebSpeech: 'Échec de Youdao TTS, essai de Web Speech: {error}',
     warnNoWebSpeech: 'Le navigateur ne supporte pas Web Speech API',
     warningInvalidLang: '⚠️ Seul {lang} est autorisé',
+    mixedLanguageWarning: 'Veuillez saisir des mots dans la même langue',
 
     // Noms des langues
     langEnglish: 'anglais',

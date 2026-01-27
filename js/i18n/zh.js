@@ -5,13 +5,13 @@ export default {
     // 标题和导航
     appTitle: '单词播放器',
     homeBtn: '单词听写',
-    dictation: '听写',
-    repeater: '复读',
+    dictation: '听 写',
+    repeater: '复 读',
 
     // 通用设置
     general: '通用',
-    shuffle: '随机',
-    slow: '慢速',
+    shuffle: '单词随机',
+    slow: '慢速阅读',
     target: '目标语言',
     translation: '翻译',
     interface: '界面',
@@ -140,6 +140,7 @@ export default {
     warnWebSpeech: '有道TTS失败，尝试Web Speech: {error}',
     warnNoWebSpeech: '浏览器不支持 Web Speech API',
     warningInvalidLang: '⚠️ 只允许输入{lang}',
+    mixedLanguageWarning: '请输入同一种语言',
 
     // 语言名称
     langEnglish: '英文',

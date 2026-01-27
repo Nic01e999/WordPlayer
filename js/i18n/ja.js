@@ -140,6 +140,7 @@ export default {
     warnWebSpeech: 'Youdao TTS失敗、Web Speechを試行: {error}',
     warnNoWebSpeech: 'ブラウザはWeb Speech APIをサポートしていません',
     warningInvalidLang: '⚠️ {lang}のみ入力可能です',
+    mixedLanguageWarning: '同じ言語で入力してください',
 
     // 言語名
     langEnglish: '英語',

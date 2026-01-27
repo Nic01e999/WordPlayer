@@ -73,6 +73,7 @@
 
 /* 当前播放的单词项（激活状态） */
 .word-item.active {
+    font-size: 300px;
     background: linear-gradient(90deg,
         transparent 0%,
         var(--bg-pink-overlay-light) 20%,
@@ -80,17 +81,19 @@
         transparent 100%);
     color: var(--text-active);
 }
+/* @todo: 这里要改色 */
 
 /* 单词文本样式（英文单词） */
 .word-item strong {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-size: clamp(1.15rem, 3vw, 1.4rem);
     font-weight: 600;
     transition: all 0.3s;
 }
 
 /* 激活状态下的单词文本 */
 .word-item.active strong {
+    font-size: clamp(2.5rem, 4vw, 2.75rem);
     color: var(--text-accent);
 }
 
@@ -126,7 +129,7 @@
 .current-word {
     font-family: 'Cinzel', 'Georgia', serif;
     font-size: clamp(1.5rem, 3.5vw + 0.5rem, 3rem);
-    font-weight: 600;
+    font-weight: 6000;
     color: var(--text-accent);
 }
 
@@ -580,7 +583,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 4rem;
+    font-size: 7rem;
     color: var(--accent-brown);
     pointer-events: none;
     opacity: 0;

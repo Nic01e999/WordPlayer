@@ -582,5 +582,563 @@
         }
       ]
     }
+  },
+  "sdf": {
+    "phonetic": "/ˌes.diːˈef/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "A meaningless string of characters, often produced by random keystrokes, used as a placeholder or test data.",
+          "In computing, often refers to temporary or nonsensical data."
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "When testing the form, just enter 'sdf' in the username field.",
+        "The file was filled with 'sdf' as dummy content."
+      ],
+      "fun": [
+        "His password was so secure it looked like pure 'sdf' to anyone glancing over his shoulder.",
+        "The cat walked across the keyboard and authored a novel titled 'sdf sdf sdf'."
+      ]
+    },
+    "synonyms": [
+      "placeholder",
+      "nonsense",
+      "gibberish",
+      "junk data",
+      "foo"
+    ],
+    "antonyms": [
+      "meaningful text",
+      "structured data",
+      "coherent content"
+    ],
+    "translations": {
+      "zh": "无意义字符串（常用占位符）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "指随意敲击键盘产生的无意义字符串，常用作占位文本或测试数据",
+            "在计算机领域，常指代临时、无具体含义的数据"
+          ]
+        }
+      ]
+    }
+  },
+  "kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj": {
+    "phonetic": "/ˈnɒn.wɜːd/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "A meaningless string of random letters, not a valid word in the English language.",
+          "Often used for testing or to represent gibberish."
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The system flagged 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj' as an invalid input.",
+        "He accidentally typed a long sequence of j's and k's, creating a nonsense word."
+      ],
+      "fun": [
+        "The cat walked across the keyboard and produced a masterpiece titled 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj'.",
+        "In their secret code, 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj' meant 'the cookies are in the jar'."
+      ]
+    },
+    "synonyms": [
+      "gibberish",
+      "nonsense",
+      "jumble",
+      "mumbo jumbo",
+      "gobbledygook"
+    ],
+    "antonyms": [
+      "word",
+      "term",
+      "lexeme"
+    ],
+    "translations": {
+      "zh": "非单词，无意义字符串"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "一个由随机字母组成的无意义字符串，不是英语中的有效单词。",
+            "通常用于测试或表示胡言乱语。"
+          ]
+        }
+      ]
+    }
+  },
+  "kljlkjlkjklkmjmlkjlk": {
+    "phonetic": "/ˈnɒn.sɛns/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "A meaningless combination of letters that does not represent any known English word.",
+          "Commonly used as a placeholder or example."
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Please do not use placeholder text like 'kljlkjlkjklkmjmlkjlk' in the final document.",
+        "The toddler babbled a string of sounds that sounded like 'kljlkjlkjklkmjmlkjlk'."
+      ],
+      "fun": [
+        "The alien's greeting, translated loosely, was 'kljlkjlkjklkmjmlkjlk', which filled the humans with both wonder and confusion.",
+        "His password was so secure it looked like 'kljlkjlkjklkmjmlkjlk', and he immediately forgot it."
+      ]
+    },
+    "synonyms": [
+      "gibberish",
+      "nonsense word",
+      "pseudoword",
+      "babble",
+      "drivel"
+    ],
+    "antonyms": [
+      "word",
+      "vocabulary",
+      "dictionary entry"
+    ],
+    "translations": {
+      "zh": "胡言乱语，无意义词"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "一个无意义的字母组合，不代表任何已知的英语单词。",
+            "常被用作占位符或示例。"
+          ]
+        }
+      ]
+    }
+  },
+  "a": {
+    "phonetic": "/ə/ (indefinite article)",
+    "targetDefinitions": [
+      {
+        "pos": "art.",
+        "meanings": [
+          "used before a singular noun that is countable when it is mentioned for the first time and does not represent a particular person or thing",
+          "used before a singular noun that represents any member of a class or group",
+          "used to express a rate, ratio, or quantity"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I saw a dog in the park.",
+        "She earns $50 an hour."
+      ],
+      "fun": [
+        "A wizard is never late, nor is he early; he arrives precisely when he means to.",
+        "It was a dark and stormy night, and a lone figure walked down a deserted street."
+      ]
+    },
+    "synonyms": [
+      "an",
+      "one",
+      "any",
+      "each",
+      "per"
+    ],
+    "antonyms": [],
+    "translations": {
+      "zh": "一个（不定冠词）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "art.",
+          "meanings": [
+            "（用于可数名词或单数名词前，表示未曾提到的）一（个）",
+            "（表示非特指的任何）一个",
+            "（用于表示数量）每一（个）"
+          ]
+        }
+      ]
+    }
+  },
+  "apple": {
+    "phonetic": "/ˈæp.əl/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a round fruit with firm, white flesh and red, green, or yellow skin",
+          "the tree that produces this fruit"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She packed an apple in her lunchbox.",
+        "The recipe calls for one large, red apple."
+      ],
+      "fun": [
+        "My new phone is so shiny, I'm afraid to drop it—it's the apple of my eye.",
+        "He claimed his idea was completely original, but everyone knew it didn't fall far from the corporate apple tree."
+      ]
+    },
+    "synonyms": [
+      "fruit",
+      "pome",
+      "pippin"
+    ],
+    "antonyms": [],
+    "translations": {
+      "zh": "苹果",
+      "en": "apple"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "苹果（水果）",
+            "苹果树",
+            "类似苹果的果实"
+          ]
+        }
+      ],
+      "en": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "the round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh",
+            "the tree which bears this fruit"
+          ]
+        }
+      ]
+    }
+  },
+  "alternative": {
+    "phonetic": "/ɔːlˈtɜː.nə.tɪv/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "one of two or more available possibilities",
+          "a choice limited to one of two or more possibilities"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "(of one or more things) available as another possibility or choice",
+          "relating to activities that depart from or challenge traditional norms"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "We need to consider an alternative plan in case it rains.",
+        "She chose the healthier alternative for lunch."
+      ],
+      "fun": [
+        "His alternative to a boring Friday night was learning to juggle flaming torches.",
+        "The cat presented an alternative interpretation of the 'no pets on the furniture' rule."
+      ]
+    },
+    "synonyms": [
+      "option",
+      "choice",
+      "substitute",
+      "replacement",
+      "backup"
+    ],
+    "antonyms": [
+      "necessity",
+      "requirement",
+      "obligation"
+    ],
+    "translations": {
+      "zh": "可供选择的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "可供选择的事物，替代方案",
+            "非主流的选择（如另类摇滚）"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "可供替代的，供选择的",
+            "非传统的，另类的"
+          ]
+        }
+      ]
+    }
+  },
+  "ambitious": {
+    "phonetic": "/æmˈbɪʃ.əs/",
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "having or showing a strong desire and determination to succeed",
+          "(of a plan or piece of work) intended to satisfy high aspirations and therefore difficult to achieve"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She is an ambitious young lawyer aiming for a partnership.",
+        "The company announced an ambitious plan to expand into three new countries."
+      ],
+      "fun": [
+        "His most ambitious project yet was teaching his goldfish to play fetch.",
+        "The squirrel set an ambitious goal of storing exactly one acorn in every backyard on the block."
+      ]
+    },
+    "synonyms": [
+      "aspiring",
+      "driven",
+      "determined",
+      "enterprising",
+      "goal-oriented"
+    ],
+    "antonyms": [
+      "unambitious",
+      "lazy",
+      "apathetic"
+    ],
+    "translations": {
+      "zh": "有雄心的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "有雄心的，有抱负的",
+            "耗资巨大的，艰巨的"
+          ]
+        }
+      ]
+    }
+  },
+  "applevcbhghufguvugvgv": {
+    "phonetic": "/ˌæp.əlˌviː.siːˌbiːˌeɪtʃˌdʒiːˌeɪtʃˌjuːˌɛfˌdʒiːˌjuːˌviːˌjuːˌdʒiːˌviːˌdʒiːˌviː/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "This is not a standard English word. It appears to be a misspelling, a nonce word, a product code, or a random string of characters."
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The string 'applevcbhghufguvugvgv' was found in the data log.",
+        "I received an error message containing 'applevcbhghufguvugvgv'."
+      ],
+      "fun": [
+        "My cat walked across the keyboard and typed 'applevcbhghufguvugvgv'.",
+        "The secret password in the sci-fi novel was 'applevcbhghufguvugvgv'."
+      ]
+    },
+    "synonyms": [
+      "nonsense",
+      "gibberish",
+      "jumble",
+      "code",
+      "string"
+    ],
+    "antonyms": [
+      "word",
+      "term",
+      "lexeme"
+    ],
+    "translations": {
+      "zh": "无标准翻译（疑似随机字符串）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "这不是一个标准的英语单词。它可能是一个拼写错误、一个虚构词、一个产品代码或一串随机字符。"
+          ]
+        }
+      ]
+    }
+  },
+  "cat": {
+    "phonetic": "/kæt/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws",
+          "any member of the family Felidae, including lions, tigers, etc.",
+          "a malicious or spiteful woman (archaic/slang)"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The black cat sat on the windowsill, watching the birds.",
+        "She decided to adopt a rescue cat from the shelter."
+      ],
+      "fun": [
+        "My cat, Sir Whiskers, believes he is the true ruler of our household.",
+        "In a shocking turn of events, the cat learned to open the fridge, prioritizing tuna over world domination."
+      ]
+    },
+    "synonyms": [
+      "feline",
+      "kitten",
+      "tomcat",
+      "pussycat",
+      "mouser"
+    ],
+    "antonyms": [
+      "dog"
+    ],
+    "translations": {
+      "zh": "猫"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "猫，猫科动物",
+            "（尤指家养的）猫",
+            "猫皮",
+            "（对女人恶毒的）泼妇"
+          ]
+        }
+      ]
+    }
+  },
+  "dog": {
+    "phonetic": "/dɔːɡ/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a domesticated carnivorous mammal with four legs, a tail, and a keen sense of smell",
+          "a contemptible or worthless man"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "to follow (someone) closely and persistently",
+          "to cause persistent trouble or distress to"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The dog barked loudly at the mail carrier.",
+        "She takes her dog for a walk every evening."
+      ],
+      "fun": [
+        "My dog believes he's a tiny, furry philosopher pondering the meaning of the squeaky toy.",
+        "The detective doggedly pursued the suspect through the crowded market."
+      ]
+    },
+    "synonyms": [
+      "canine",
+      "hound",
+      "pooch",
+      "mutt",
+      "pup"
+    ],
+    "antonyms": [
+      "cat"
+    ],
+    "translations": {
+      "zh": "狗"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "狗，犬",
+            "卑鄙小人，无赖"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "跟踪，尾随",
+            "困扰，纠缠"
+          ]
+        }
+      ]
+    }
+  },
+  "friend": {
+    "phonetic": "/frend/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a person whom one knows, likes, and trusts",
+          "a person who supports or favors something",
+          "an acquaintance"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She is my closest friend and confidante.",
+        "He made many friends during his time at university."
+      ],
+      "fun": [
+        "My phone is my best friend; it knows all my secrets and never leaves my side.",
+        "The old tree in the garden was a silent friend, witnessing generations of family stories."
+      ]
+    },
+    "synonyms": [
+      "companion",
+      "pal",
+      "buddy",
+      "mate",
+      "confidant"
+    ],
+    "antonyms": [
+      "enemy",
+      "foe",
+      "rival"
+    ],
+    "translations": {
+      "zh": "朋友"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "朋友，友人",
+            "支持者，赞助人",
+            "相识的人"
+          ]
+        }
+      ]
+    }
   }
 }
