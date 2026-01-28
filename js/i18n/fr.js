@@ -132,6 +132,7 @@ export default {
     errorParse: "Échec de la traduction: Erreur d'analyse de la réponse",
     errorUnknown: 'Échec de la traduction: {message}',
     errorInvalidInput: '⚠️ Veuillez entrer un {lang} valide',
+    errorWordNotFoundInYoudao: 'Mot introuvable dans le dictionnaire Youdao',
     noTranslation: 'Pas de traduction',
     errorAudioLoad: "Échec du chargement de l'audio",
     errorAudioPlay: "Échec de la lecture audio: {error}",

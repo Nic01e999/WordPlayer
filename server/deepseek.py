@@ -4,11 +4,13 @@ DeepSeek 单词信息 API
 
 import os
 import json
+import sys
 import requests
 from flask import Blueprint, request, jsonify
 
 from cache import get_cached_words, update_cache, get_cache_stats, get_cached_word_base, add_translation
 from utils import strip_markdown_code_blocks, parse_deepseek_response
+from youdao import validate_words_batch
 from constants import (
     LANG_PATTERNS,
     LANG_NAMES,
@@ -269,6 +271,45 @@ def wordinfo_details():
 
     print(f"[Cache] 命中: {list(cached_results.keys()) or '无'}, 需完整查询: {words_need_full}, 需翻译: {words_need_translation}")
 
+    # 初始化 API 结果字典
+    api_results = {}
+
+    # 有道验证：在调用 DeepSeek API 前验证单词是否存在
+    words_to_validate = words_need_full + words_need_translation
+    if words_to_validate:
+        print(f"[有道验证] 开始验证 {len(words_to_validate)} 个单词")
+        try:
+            validation_result = validate_words_batch(words_to_validate, target_lang, native_lang)
+            valid_words = set(validation_result['valid'])
+            invalid_words = validation_result['invalid']
+
+            # 过滤出验证通过的单词
+            words_need_full = [w for w in words_need_full if w in valid_words]
+            words_need_translation = [w for w in words_need_translation if w in valid_words]
+
+            # 对验证失败的单词返回错误标记
+            if invalid_words:
+                print(f"[有道验证] {len(invalid_words)} 个单词验证失败: {invalid_words}")
+                for word in invalid_words:
+                    api_results[word] = {
+                        "error": "word_not_found",
+                        "word": word
+                    }
+
+            print(f"[有道验证] 验证通过: {len(valid_words)} 个, 失败: {len(invalid_words)} 个")
+        except Exception as e:
+            print(f"[有道验证] 验证过程出错: {e}")
+            import traceback
+            traceback.print_exc()
+
+    # 如果所有单词都验证失败，直接返回
+    if not words_need_full and not words_need_translation:
+        if api_results:  # 有验证失败的单词
+            all_results = {**cached_results, **api_results}
+            return jsonify({"results": all_results})
+        # 否则全部命中缓存
+        return jsonify({"results": cached_results})
+
     # 检查 API 配置
     if not DEEPSEEK_API_KEY:
         return jsonify({"error": "未配置 DEEPSEEK_API_KEY"}), 500
@@ -276,8 +317,6 @@ def wordinfo_details():
     target_lang_name = LANG_NAMES.get(target_lang, 'English')
     native_lang_name = LANG_NAMES.get(native_lang, 'Chinese')
     phonetic_format = LANG_PHONETIC_FORMAT.get(target_lang, LANG_PHONETIC_FORMAT['en'])
-
-    api_results = {}
 
     try:
         # 1. 完整查询（没缓存的单词）

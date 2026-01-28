@@ -43,7 +43,8 @@ export function updatePreloadProgress() {
     const transEl = $("translationProgress");
     const audioEl = $("audioProgress");
     const loadBtn = $("loadBtn");
-    if (!indicator) return;
+    const container = loadBtn?.parentElement; // load-btn-container
+    if (!indicator || !container) return;
 
     const isLoading = preloadCache.loading;
     const hasWords = preloadCache.entries.length > 0;
@@ -59,32 +60,38 @@ export function updatePreloadProgress() {
         }
     }
 
-    if (isLoading || hasWords) {
+    // 控制容器状态类
+    if (isLoading) {
+        container.classList.add('loading');
+        container.classList.remove('ready');
+        indicator.style.display = "block";
+        wasLoading = true;
+    } else if (hasWords) {
+        container.classList.remove('loading');
+        container.classList.add('ready');
         indicator.style.display = "block";
 
-        // 翻译进度
-        if (transEl) {
-            transEl.textContent = `${t('progressTranslation')}: ${preloadCache.translationLoaded}/${preloadCache.translationTotal}`;
+        // 从 loading 变成 ready 时，更新 Repeater 显示
+        if (wasLoading && window.Repeater?.renderContent) {
+            window.Repeater.renderContent();
         }
-
-        // 音频进度
-        if (audioEl) {
-            audioEl.textContent = `${t('progressAudio')}: ${preloadCache.audioLoaded}/${preloadCache.audioTotal}`;
-        }
-
-        if (isLoading) {
-            wasLoading = true;
-        } else {
-            // 从 loading 变成 ready 时，更新 Repeater 显示
-            if (wasLoading && window.Repeater?.renderContent) {
-                window.Repeater.renderContent();
-            }
-            wasLoading = false;
-        }
+        wasLoading = false;
     } else {
+        container.classList.remove('loading', 'ready');
         indicator.style.display = "none";
         wasLoading = false;
     }
+
+    // 更新进度文本
+    if (transEl) {
+        transEl.textContent = `${t('progressTranslation')}: ${preloadCache.translationLoaded}/${preloadCache.translationTotal}`;
+    }
+    if (audioEl) {
+        audioEl.textContent = `${t('progressAudio')}: ${preloadCache.audioLoaded}/${preloadCache.audioTotal}`;
+    }
+
+    // 日志输出
+    console.log(`[Preload] 状态更新: loading=${isLoading}, hasWords=${hasWords}, container类=${container.className}`);
 }
 
 /**
@@ -318,28 +325,57 @@ export async function startPreload(forceReload = false) {
             // 处理结果
             const deepseekResults = deepseekData?.results || {};
             const newWordInfos = {}; // 用于批量保存到 localStorage
+            const invalidWords = []; // 收集验证失败的单词
 
             batch.forEach(word => {
                 const info = deepseekResults[word] || {};
 
-                // 构建完整的单词信息（全部来自 DeepSeek）
-                const wordInfo = {
-                    word,
-                    phonetic: info.phonetic || '',
-                    translation: info.translation || t('noTranslation'),
-                    nativeDefinitions: info.nativeDefinitions || [],
-                    targetDefinitions: info.targetDefinitions || [],
-                    examples: info.examples || { common: [], fun: [] },
-                    synonyms: info.synonyms || [],
-                    antonyms: info.antonyms || []
-                };
+                // 检查是否为有道验证失败的单词
+                if (info.error === 'word_not_found') {
+                    const errorMsg = t('errorWordNotFoundInYoudao');
+                    const wordInfo = {
+                        word,
+                        phonetic: '',
+                        translation: errorMsg,
+                        nativeDefinitions: [],
+                        targetDefinitions: [],
+                        examples: { common: [], fun: [] },
+                        synonyms: [],
+                        antonyms: []
+                    };
+                    preloadCache.wordInfo[word] = wordInfo;
+                    preloadCache.translations[word] = errorMsg;
+                    invalidWords.push(word);
+                    console.log(`[有道验证] 单词 "${word}" 验证失败`);
+                    console.warn(`[有道验证] 单词 "${word}" 验证失败`);
+                } else {
+                    // 构建完整的单词信息（全部来自 DeepSeek）
+                    const wordInfo = {
+                        word,
+                        phonetic: info.phonetic || '',
+                        translation: info.translation || t('noTranslation'),
+                        nativeDefinitions: info.nativeDefinitions || [],
+                        targetDefinitions: info.targetDefinitions || [],
+                        examples: info.examples || { common: [], fun: [] },
+                        synonyms: info.synonyms || [],
+                        antonyms: info.antonyms || []
+                    };
 
-                preloadCache.wordInfo[word] = wordInfo;
-                preloadCache.translations[word] = wordInfo.translation;
-                newWordInfos[word] = wordInfo; // 收集用于保存
+                    preloadCache.wordInfo[word] = wordInfo;
+                    preloadCache.translations[word] = wordInfo.translation;
+                    newWordInfos[word] = wordInfo; // 收集用于保存
+                }
 
                 preloadCache.translationLoaded++;
             });
+
+            // 显示验证失败的提示
+            if (invalidWords.length > 0) {
+                const message = `${invalidWords.length} 个单词验证失败: ${invalidWords.join(', ')}`;
+                showToast(message, 'error');
+                console.log(`[验证] ${message}`);
+                console.warn(`[验证] ${message}`);
+            }
 
             // 批量保存到 localStorage（传递语言参数）
             if (Object.keys(newWordInfos).length > 0) {
@@ -452,6 +488,7 @@ const debouncedAdjustSidebar = debounce(adjustSidebarWidth, 300);
 export function initPreloadListeners() {
     const wordInput = $("wordInput");
     const loadBtn = $("loadBtn");
+    const container = loadBtn?.parentElement;
 
     // Load 按钮点击触发预加载（手动控制，省 token）
     // Shift+Click 强制重新加载（清除缓存后重新获取）
@@ -463,6 +500,32 @@ export function initPreloadListeners() {
                 setTimeout(() => { loadBtn.textContent = t('load'); }, 1500);
             }
             startPreload(forceReload);
+        });
+    }
+
+    // 延迟隐藏逻辑：鼠标移开后 1 秒隐藏
+    let hideTimer = null;
+    if (container) {
+        container.addEventListener('mouseleave', () => {
+            if (container.classList.contains('ready')) {
+                hideTimer = setTimeout(() => {
+                    const indicator = $("preloadIndicator");
+                    if (indicator && !preloadCache.loading) {
+                        indicator.style.opacity = '0';
+                    }
+                }, 300);
+            }
+        });
+
+        container.addEventListener('mouseenter', () => {
+            if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimer = null;
+            }
+            const indicator = $("preloadIndicator");
+            if (indicator && container.classList.contains('ready')) {
+                indicator.style.opacity = '1';
+            }
         });
     }
 

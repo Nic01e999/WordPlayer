@@ -488,19 +488,31 @@ export function checkLanguageConsistency(content) {
 /**
  * 显示 Toast 提示消息
  * @param {string} message - 提示消息
- * @param {number} duration - 显示时长（毫秒），默认 3000
+ * @param {string|number} typeOrDuration - 类型（'error', 'success', 'info'）或显示时长（毫秒）
  */
-export function showToast(message, duration = 3000) {
+export function showToast(message, typeOrDuration = 3000) {
     // 移除已存在的 toast
     const existingToast = document.getElementById('toast');
     if (existingToast) {
         existingToast.remove();
     }
 
+    // 确定显示时长和类型
+    let duration = 3000;
+    let type = 'info';
+
+    if (typeof typeOrDuration === 'string') {
+        type = typeOrDuration;
+        // 错误消息显示更长时间
+        duration = type === 'error' ? 5000 : 3000;
+    } else if (typeof typeOrDuration === 'number') {
+        duration = typeOrDuration;
+    }
+
     // 创建 toast 元素
     const toast = document.createElement('div');
     toast.id = 'toast';
-    toast.className = 'toast';
+    toast.className = `toast toast-${type}`;
     toast.textContent = message;
     document.body.appendChild(toast);
 

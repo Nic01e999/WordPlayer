@@ -135,10 +135,10 @@ body.dictation-mode #dictationWorkplace::after {
     top: -0.5rem;
     left: 0.625rem;
     right: 0.625rem;
-    height: 0.5rem;
+    height: 1rem;
     background: var(--bg-popup-start);
     filter: drop-shadow(0 1px 1px var(--shadow-soft));
-    clip-path: polygon(0 0, 42% 0, 42% 100%, 58% 100%, 58% 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: polygon(0 0, 40% 0, 40% 100%, 60% 100%, 60% 0, 100% 0, 100% 100%, 0 100%);
 }
 
 /* 弹窗拖拽手柄 - 顶部区域（大头钉图片） */

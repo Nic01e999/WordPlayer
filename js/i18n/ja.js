@@ -132,6 +132,7 @@ export default {
     errorParse: '翻訳失敗: レスポンス解析エラー',
     errorUnknown: '翻訳失敗: {message}',
     errorInvalidInput: '⚠️ 有効な{lang}を入力してください',
+    errorWordNotFoundInYoudao: '有道辞書に単語が見つかりません',
     noTranslation: '翻訳なし',
     errorAudioLoad: 'オーディオ読み込み失敗',
     errorAudioPlay: 'オーディオ再生失敗: {error}',

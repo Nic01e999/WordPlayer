@@ -132,6 +132,7 @@ export default {
     errorParse: 'Translation failed: Response parse error',
     errorUnknown: 'Translation failed: {message}',
     errorInvalidInput: '⚠️ Please enter valid {lang}',
+    errorWordNotFoundInYoudao: 'Word not found in Youdao dictionary',
     noTranslation: 'No translation',
     errorAudioLoad: 'Audio load failed',
     errorAudioPlay: 'Audio playback failed: {error}',

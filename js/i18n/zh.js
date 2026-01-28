@@ -132,6 +132,7 @@ export default {
     errorParse: '翻译失败: 响应解析错误',
     errorUnknown: '翻译失败: {message}',
     errorInvalidInput: '⚠️ 请输入有效的{lang}',
+    errorWordNotFoundInYoudao: '单词未通过有道验证',
     noTranslation: '无翻译',
     errorAudioLoad: '音频加载失败',
     errorAudioPlay: '音频播放失败: {error}',

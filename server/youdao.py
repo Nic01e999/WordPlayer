@@ -255,3 +255,36 @@ def translate_batch():
                 results[word] = result
 
     return jsonify({"results": results})
+
+
+def validate_words_batch(words, from_lang, to_lang):
+    """
+    批量验证单词是否存在于有道词典中
+
+    Args:
+        words: 单词列表
+        from_lang: 源语言
+        to_lang: 目标语言
+
+    Returns:
+        {"valid": [有效单词列表], "invalid": [无效单词列表]}
+    """
+    valid = []
+    invalid = []
+
+    for word in words:
+        try:
+            result = _fetch_youdao_dict(word, from_lang, to_lang)
+            # 更严格的判断标准：必须有词典数据（definitions 或 phonetic），不能只有网络翻译
+            if result and (result.get('definitions') or result.get('phonetic')):
+                valid.append(word)
+                print(f"[有道验证] 单词 '{word}' 验证通过")
+            else:
+                invalid.append(word)
+                print(f"[有道验证] 单词 '{word}' 验证失败：未找到词典数据")
+        except Exception as e:
+            invalid.append(word)
+            print(f"[有道验证] 单词 '{word}' 验证失败：{str(e)}")
+
+    print(f"[有道验证] 批量验证完成 - 有效: {len(valid)}, 无效: {len(invalid)}")
+    return {"valid": valid, "invalid": invalid}

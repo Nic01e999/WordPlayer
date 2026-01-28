@@ -817,6 +817,22 @@
     animation: slideDown 0.2s ease-out;
 }
 
+/* 加载完成状态：默认隐藏，hover 时显示 */
+.load-btn-container.ready .preload-indicator-popup {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out;
+}
+
+.load-btn-container.ready:hover .preload-indicator-popup {
+    opacity: 1;
+}
+
+/* 加载中状态：始终显示 */
+.load-btn-container.loading .preload-indicator-popup {
+    opacity: 1;
+}
+
 @keyframes slideDown {
     from {
         opacity: 0;

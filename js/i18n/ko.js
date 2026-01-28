@@ -132,6 +132,7 @@ export default {
     errorParse: '번역 실패: 응답 구문 분석 오류',
     errorUnknown: '번역 실패: {message}',
     errorInvalidInput: '⚠️ 유효한 {lang}을(를) 입력하세요',
+    errorWordNotFoundInYoudao: '유도 사전에서 단어를 찾을 수 없습니다',
     noTranslation: '번역 없음',
     errorAudioLoad: '오디오 로드 실패',
     errorAudioPlay: '오디오 재생 실패: {error}',
