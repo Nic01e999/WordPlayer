@@ -1,773 +1,45 @@
 {
-  "ambiguous": {
-    "phonetic": "/æmˈbɪɡ.ju.əs/",
-    "targetDefinitions": [
-      {
-        "pos": "adj.",
-        "meanings": [
-          "open to more than one interpretation; having a double meaning",
-          "not clear or decided"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The lawyer's ambiguous statement left the jury confused.",
-        "The instructions were ambiguous, so I wasn't sure what to do."
-      ],
-      "fun": [
-        "His answer was as ambiguous as a politician's promise.",
-        "The fortune cookie's message was delightfully ambiguous, promising both great wealth and sudden change."
-      ]
-    },
-    "synonyms": [
-      "vague",
-      "unclear",
-      "equivocal",
-      "cryptic",
-      "enigmatic"
-    ],
-    "antonyms": [
-      "clear",
-      "unambiguous",
-      "definite"
-    ],
-    "translations": {
-      "en": "open to more than one interpretation; unclear or inexact",
-      "zh": "模棱两可的"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "open to more than one interpretation; having a double meaning",
-            "not clear or decided"
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "意义不明确的",
-            "有多种解释的"
-          ]
-        }
-      ]
-    }
-  },
-  "exaggerate": {
-    "phonetic": "/ɪɡˈzædʒ.ə.reɪt/",
-    "targetDefinitions": [
-      {
-        "pos": "v.",
-        "meanings": [
-          "to represent (something) as being larger, greater, better, or worse than it is"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "Fishermen often exaggerate the size of the fish they caught.",
-        "Don't exaggerate the difficulties; the task is manageable."
-      ],
-      "fun": [
-        "He didn't just stretch the truth, he exaggerated it into a yoga pose.",
-        "My hunger wasn't just a rumble; I exaggerated it to a lion's roar."
-      ]
-    },
-    "synonyms": [
-      "overstate",
-      "overemphasize",
-      "magnify",
-      "embellish",
-      "hyperbolize"
-    ],
-    "antonyms": [
-      "understate",
-      "minimize",
-      "downplay"
-    ],
-    "translations": {
-      "en": "to represent something as being larger, better, or worse than it really is",
-      "zh": "夸张"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "to represent (something) as being larger, greater, better, or worse than it is"
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "夸大",
-            "言过其实"
-          ]
-        }
-      ]
-    }
-  },
-  "hypothesis": {
-    "phonetic": "/haɪˈpɒθ.ə.sɪs/",
+  "sdfsd": {
+    "phonetic": "/ˌes.diː.ef.ˈes.ˈdiː/",
     "targetDefinitions": [
       {
         "pos": "n.",
         "meanings": [
-          "a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation",
-          "a proposition assumed as a premise in an argument"
+          "A meaningless sequence of letters, often used as a placeholder or test data"
         ]
       }
     ],
     "examples": {
       "common": [
-        "The scientist's hypothesis was that the plant would grow faster with more light.",
-        "We are testing the hypothesis that social media use affects sleep patterns."
+        "The developer typed 'sdfsd' as a placeholder before writing the actual code.",
+        "The test form was filled with random strings like 'sdfsd'."
       ],
       "fun": [
-        "My hypothesis is that the missing cookies were taken by a crumb-loving ghost.",
-        "The detective's wild hypothesis turned out to be correct, much to everyone's astonishment."
-      ]
-    },
-    "synonyms": [
-      "theory",
-      "thesis",
-      "supposition",
-      "premise",
-      "proposition"
-    ],
-    "antonyms": [
-      "fact",
-      "proof",
-      "certainty"
-    ],
-    "translations": {
-      "en": "a proposed explanation made on the basis of limited evidence, a starting point for investigation",
-      "zh": "假设"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation",
-            "a proposition assumed as a premise in an argument"
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "假说",
-            "前提"
-          ]
-        }
-      ]
-    }
-  },
-  "inevitable": {
-    "phonetic": "/ɪˈnev.ɪ.tə.bəl/",
-    "targetDefinitions": [
-      {
-        "pos": "adj.",
-        "meanings": [
-          "certain to happen; unavoidable"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "After the scandal, his resignation seemed inevitable.",
-        "With their star player injured, defeat was inevitable."
-      ],
-      "fun": [
-        "The inevitable result of teaching a parrot to swear is a very embarrassing dinner party.",
-        "As soon as I washed the car, the inevitable rain began to fall."
-      ]
-    },
-    "synonyms": [
-      "unavoidable",
-      "inescapable",
-      "certain",
-      "predestined",
-      "assured"
-    ],
-    "antonyms": [
-      "avoidable",
-      "uncertain",
-      "evitable"
-    ],
-    "translations": {
-      "en": "certain to happen; unavoidable",
-      "zh": "不可避免的"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "certain to happen; unavoidable"
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "必然发生的",
-            "无法避免的"
-          ]
-        }
-      ]
-    }
-  },
-  "juxtapose": {
-    "phonetic": "/ˈdʒʌk.stə.pəʊz/",
-    "targetDefinitions": [
-      {
-        "pos": "v.",
-        "meanings": [
-          "to place or deal with (close together or side by side), especially for comparison or contrast"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The exhibition juxtaposes Picasso's early drawings with his later paintings.",
-        "The film juxtaposes scenes of wealth with scenes of poverty."
-      ],
-      "fun": [
-        "The chef loved to juxtapose unexpected flavors, like chocolate and chili.",
-        "Juxtaposing his tiny kitten with a giant St. Bernard made for a hilarious photo."
-      ]
-    },
-    "synonyms": [
-      "contrast",
-      "compare",
-      "set side by side",
-      "collocate",
-      "place together"
-    ],
-    "antonyms": [],
-    "translations": {
-      "en": "to place or deal with close together for contrasting effect",
-      "zh": "并列"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "to place or deal with (close together or side by side), especially for comparison or contrast"
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "将...并置",
-            "把...放在一起对比"
-          ]
-        }
-      ]
-    }
-  },
-  "metaphor": {
-    "phonetic": "/ˈmɛt.ə.fɔːr/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "a figure of speech in which a word or phrase is applied to an object or action to which it is not literally applicable, to suggest a resemblance.",
-          "a thing regarded as representative or symbolic of something else, especially something abstract."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The poet used the metaphor of a stormy sea to describe her inner turmoil.",
-        "'Time is a thief' is a common metaphor for how quickly life passes."
-      ],
-      "fun": [
-        "His explanation was so confusing it felt less like a metaphor and more like a secret code.",
-        "My cat's relationship with the laser pointer is a perfect metaphor for the futility of desire."
-      ]
-    },
-    "synonyms": [
-      "analogy",
-      "symbol",
-      "image",
-      "figure of speech",
-      "conceit"
-    ],
-    "antonyms": [
-      "literal statement"
-    ],
-    "translations": {
-      "en": "a figure of speech",
-      "zh": "隐喻"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "a figure of speech in which a word or phrase is applied to an object or action to which it is not literally applicable, to suggest a resemblance.",
-            "a thing regarded as representative or symbolic of something else, especially something abstract."
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "一种修辞手法，用一事物暗示另一事物",
-            "比喻的说法"
-          ]
-        }
-      ]
-    }
-  },
-  "paradox": {
-    "phonetic": "/ˈpær.ə.dɒks/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "a seemingly absurd or self-contradictory statement or proposition that when investigated or explained may prove to be well founded or true.",
-          "a situation, person, or thing that combines contradictory features or qualities."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The statement 'less is more' is a classic paradox.",
-        "It is a paradox that standing is more tiring than walking."
-      ],
-      "fun": [
-        "The paradox of my diet is that I think about food more now than I ever did before.",
-        "He embodied the paradox of being a fiercely private celebrity."
-      ]
-    },
-    "synonyms": [
-      "contradiction",
-      "dilemma",
-      "puzzle",
-      "anomaly",
-      "incongruity"
-    ],
-    "antonyms": [
-      "certainty",
-      "explanation",
-      "truism"
-    ],
-    "translations": {
-      "en": "a self-contradictory statement",
-      "zh": "悖论"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "a seemingly absurd or self-contradictory statement or proposition that when investigated or explained may prove to be well founded or true.",
-            "a situation, person, or thing that combines contradictory features or qualities."
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "看似矛盾但可能正确的说法",
-            "自相矛盾的情况或人"
-          ]
-        }
-      ]
-    }
-  },
-  "resilient": {
-    "phonetic": "/rɪˈzɪl.i.ənt/",
-    "targetDefinitions": [
-      {
-        "pos": "adj.",
-        "meanings": [
-          "able to withstand or recover quickly from difficult conditions.",
-          "(of a substance or object) able to recoil or spring back into shape after bending, stretching, or being compressed."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "Children are often remarkably resilient in the face of adversity.",
-        "This type of plastic is highly resilient and won't crack easily."
-      ],
-      "fun": [
-        "My phone is surprisingly resilient, surviving multiple drops onto concrete.",
-        "She had the resilient optimism of a weed growing through a crack in the pavement."
-      ]
-    },
-    "synonyms": [
-      "tough",
-      "durable",
-      "strong",
-      "flexible",
-      "hardy"
-    ],
-    "antonyms": [
-      "fragile",
-      "vulnerable",
-      "weak"
-    ],
-    "translations": {
-      "en": "able to recover quickly",
-      "zh": "有韧性的"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "able to withstand or recover quickly from difficult conditions.",
-            "(of a substance or object) able to recoil or spring back into shape after bending, stretching, or being compressed."
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "能迅速从困难中恢复的",
-            "有弹性的，适应力强的"
-          ]
-        }
-      ]
-    }
-  },
-  "scrutinize": {
-    "phonetic": "/ˈskruː.tɪ.naɪz/",
-    "targetDefinitions": [
-      {
-        "pos": "v.",
-        "meanings": [
-          "to examine or inspect closely and thoroughly."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The committee will scrutinize the budget proposal for any irregularities.",
-        "He scrutinized the document, looking for any hidden clauses."
-      ],
-      "fun": [
-        "My dog scrutinized the new piece of furniture as if it were an alien artifact.",
-        "I had to scrutinize the menu for ten minutes before I realized I was holding it upside down."
-      ]
-    },
-    "synonyms": [
-      "examine",
-      "inspect",
-      "analyze",
-      "study",
-      "peruse"
-    ],
-    "antonyms": [
-      "glance at",
-      "ignore",
-      "overlook"
-    ],
-    "translations": {
-      "en": "to examine closely",
-      "zh": "仔细检查"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "to examine or inspect closely and thoroughly."
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "仔细或批判性地检查",
-            "审视"
-          ]
-        }
-      ]
-    }
-  },
-  "transient": {
-    "phonetic": "/ˈtræn.zi.ənt/",
-    "targetDefinitions": [
-      {
-        "pos": "adj.",
-        "meanings": [
-          "lasting only for a short time; impermanent.",
-          "(of a person) staying or working in a place for only a short time."
-        ]
-      },
-      {
-        "pos": "n.",
-        "meanings": [
-          "a person who is staying or working in a place for only a short time."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The feeling of sadness was only transient and soon passed.",
-        "The city has a large population of transient workers during the summer."
-      ],
-      "fun": [
-        "My interest in learning the accordion was charmingly transient.",
-        "The cat treated us not as owners, but as transient staff in her royal palace."
-      ]
-    },
-    "synonyms": [
-      "temporary",
-      "fleeting",
-      "brief",
-      "short-term",
-      "ephemeral"
-    ],
-    "antonyms": [
-      "permanent",
-      "lasting",
-      "enduring"
-    ],
-    "translations": {
-      "en": "temporary or short-lived",
-      "zh": "短暂的"
-    },
-    "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "lasting only for a short time; impermanent.",
-            "(of a person) staying or working in a place for only a short time."
-          ]
-        },
-        {
-          "pos": "n.",
-          "meanings": [
-            "a person who is staying or working in a place for only a short time."
-          ]
-        }
-      ],
-      "zh": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "持续很短时间的",
-            "转瞬即逝的"
-          ]
-        },
-        {
-          "pos": "n.",
-          "meanings": [
-            "短暂停留的人"
-          ]
-        }
-      ]
-    }
-  },
-  "sdf": {
-    "phonetic": "/ˌes.diːˈef/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "A meaningless string of characters, often produced by random keystrokes, used as a placeholder or test data.",
-          "In computing, often refers to temporary or nonsensical data."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "When testing the form, just enter 'sdf' in the username field.",
-        "The file was filled with 'sdf' as dummy content."
-      ],
-      "fun": [
-        "His password was so secure it looked like pure 'sdf' to anyone glancing over his shoulder.",
-        "The cat walked across the keyboard and authored a novel titled 'sdf sdf sdf'."
+        "His password was so secure it looked like 'sdfsd' followed by a cat walking on the keyboard.",
+        "The alien message, once decoded, simply read 'sdfsd', leaving the scientists both relieved and disappointed."
       ]
     },
     "synonyms": [
       "placeholder",
       "nonsense",
       "gibberish",
-      "junk data",
-      "foo"
-    ],
-    "antonyms": [
-      "meaningful text",
-      "structured data",
-      "coherent content"
-    ],
-    "translations": {
-      "zh": "无意义字符串（常用占位符）"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "指随意敲击键盘产生的无意义字符串，常用作占位文本或测试数据",
-            "在计算机领域，常指代临时、无具体含义的数据"
-          ]
-        }
-      ]
-    }
-  },
-  "kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj": {
-    "phonetic": "/ˈnɒn.wɜːd/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "A meaningless string of random letters, not a valid word in the English language.",
-          "Often used for testing or to represent gibberish."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The system flagged 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj' as an invalid input.",
-        "He accidentally typed a long sequence of j's and k's, creating a nonsense word."
-      ],
-      "fun": [
-        "The cat walked across the keyboard and produced a masterpiece titled 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj'.",
-        "In their secret code, 'kljlklkjlkjlkjlkjkljlkjlkjkljlkkjjjjjjjjjjjjjjjjjjjj' meant 'the cookies are in the jar'."
-      ]
-    },
-    "synonyms": [
-      "gibberish",
-      "nonsense",
       "jumble",
-      "mumbo jumbo",
-      "gobbledygook"
+      "garbage"
     ],
     "antonyms": [
       "word",
-      "term",
-      "lexeme"
+      "meaning",
+      "sense"
     ],
     "translations": {
-      "zh": "非单词，无意义字符串"
+      "zh": "无意义字符串"
     },
     "nativeDefinitions": {
       "zh": [
         {
           "pos": "n.",
           "meanings": [
-            "一个由随机字母组成的无意义字符串，不是英语中的有效单词。",
-            "通常用于测试或表示胡言乱语。"
-          ]
-        }
-      ]
-    }
-  },
-  "kljlkjlkjklkmjmlkjlk": {
-    "phonetic": "/ˈnɒn.sɛns/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "A meaningless combination of letters that does not represent any known English word.",
-          "Commonly used as a placeholder or example."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "Please do not use placeholder text like 'kljlkjlkjklkmjmlkjlk' in the final document.",
-        "The toddler babbled a string of sounds that sounded like 'kljlkjlkjklkmjmlkjlk'."
-      ],
-      "fun": [
-        "The alien's greeting, translated loosely, was 'kljlkjlkjklkmjmlkjlk', which filled the humans with both wonder and confusion.",
-        "His password was so secure it looked like 'kljlkjlkjklkmjmlkjlk', and he immediately forgot it."
-      ]
-    },
-    "synonyms": [
-      "gibberish",
-      "nonsense word",
-      "pseudoword",
-      "babble",
-      "drivel"
-    ],
-    "antonyms": [
-      "word",
-      "vocabulary",
-      "dictionary entry"
-    ],
-    "translations": {
-      "zh": "胡言乱语，无意义词"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "一个无意义的字母组合，不代表任何已知的英语单词。",
-            "常被用作占位符或示例。"
-          ]
-        }
-      ]
-    }
-  },
-  "a": {
-    "phonetic": "/ə/ (indefinite article)",
-    "targetDefinitions": [
-      {
-        "pos": "art.",
-        "meanings": [
-          "used before a singular noun that is countable when it is mentioned for the first time and does not represent a particular person or thing",
-          "used before a singular noun that represents any member of a class or group",
-          "used to express a rate, ratio, or quantity"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "I saw a dog in the park.",
-        "She earns $50 an hour."
-      ],
-      "fun": [
-        "A wizard is never late, nor is he early; he arrives precisely when he means to.",
-        "It was a dark and stormy night, and a lone figure walked down a deserted street."
-      ]
-    },
-    "synonyms": [
-      "an",
-      "one",
-      "any",
-      "each",
-      "per"
-    ],
-    "antonyms": [],
-    "translations": {
-      "zh": "一个（不定冠词）"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "art.",
-          "meanings": [
-            "（用于可数名词或单数名词前，表示未曾提到的）一（个）",
-            "（表示非特指的任何）一个",
-            "（用于表示数量）每一（个）"
+            "一个无意义的字母序列，常被用作占位符或测试数据"
           ]
         }
       ]
@@ -780,29 +52,31 @@
         "pos": "n.",
         "meanings": [
           "a round fruit with firm, white flesh and red, green, or yellow skin",
-          "the tree that produces this fruit"
+          "the tree which bears this fruit",
+          "a large company that produces computers, phones, and other electronics (Apple Inc.)"
         ]
       }
     ],
     "examples": {
       "common": [
-        "She packed an apple in her lunchbox.",
-        "The recipe calls for one large, red apple."
+        "She ate a crisp, red apple for her afternoon snack.",
+        "Apple pie is a traditional dessert in many American households."
       ],
       "fun": [
-        "My new phone is so shiny, I'm afraid to drop it—it's the apple of my eye.",
-        "He claimed his idea was completely original, but everyone knew it didn't fall far from the corporate apple tree."
+        "My phone is so old, it might as well be a rotten apple compared to the latest model.",
+        "He was the apple of his grandmother's eye, always receiving extra cookies."
       ]
     },
     "synonyms": [
-      "fruit",
       "pome",
-      "pippin"
+      "fruit",
+      "pippin",
+      "crabapple",
+      "Malus domestica"
     ],
     "antonyms": [],
     "translations": {
-      "zh": "苹果",
-      "en": "apple"
+      "zh": "苹果"
     },
     "nativeDefinitions": {
       "zh": [
@@ -811,172 +85,7 @@
           "meanings": [
             "苹果（水果）",
             "苹果树",
-            "类似苹果的果实"
-          ]
-        }
-      ],
-      "en": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "the round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh",
-            "the tree which bears this fruit"
-          ]
-        }
-      ]
-    }
-  },
-  "alternative": {
-    "phonetic": "/ɔːlˈtɜː.nə.tɪv/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "one of two or more available possibilities",
-          "a choice limited to one of two or more possibilities"
-        ]
-      },
-      {
-        "pos": "adj.",
-        "meanings": [
-          "(of one or more things) available as another possibility or choice",
-          "relating to activities that depart from or challenge traditional norms"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "We need to consider an alternative plan in case it rains.",
-        "She chose the healthier alternative for lunch."
-      ],
-      "fun": [
-        "His alternative to a boring Friday night was learning to juggle flaming torches.",
-        "The cat presented an alternative interpretation of the 'no pets on the furniture' rule."
-      ]
-    },
-    "synonyms": [
-      "option",
-      "choice",
-      "substitute",
-      "replacement",
-      "backup"
-    ],
-    "antonyms": [
-      "necessity",
-      "requirement",
-      "obligation"
-    ],
-    "translations": {
-      "zh": "可供选择的"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "可供选择的事物，替代方案",
-            "非主流的选择（如另类摇滚）"
-          ]
-        },
-        {
-          "pos": "adj.",
-          "meanings": [
-            "可供替代的，供选择的",
-            "非传统的，另类的"
-          ]
-        }
-      ]
-    }
-  },
-  "ambitious": {
-    "phonetic": "/æmˈbɪʃ.əs/",
-    "targetDefinitions": [
-      {
-        "pos": "adj.",
-        "meanings": [
-          "having or showing a strong desire and determination to succeed",
-          "(of a plan or piece of work) intended to satisfy high aspirations and therefore difficult to achieve"
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "She is an ambitious young lawyer aiming for a partnership.",
-        "The company announced an ambitious plan to expand into three new countries."
-      ],
-      "fun": [
-        "His most ambitious project yet was teaching his goldfish to play fetch.",
-        "The squirrel set an ambitious goal of storing exactly one acorn in every backyard on the block."
-      ]
-    },
-    "synonyms": [
-      "aspiring",
-      "driven",
-      "determined",
-      "enterprising",
-      "goal-oriented"
-    ],
-    "antonyms": [
-      "unambitious",
-      "lazy",
-      "apathetic"
-    ],
-    "translations": {
-      "zh": "有雄心的"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "adj.",
-          "meanings": [
-            "有雄心的，有抱负的",
-            "耗资巨大的，艰巨的"
-          ]
-        }
-      ]
-    }
-  },
-  "applevcbhghufguvugvgv": {
-    "phonetic": "/ˌæp.əlˌviː.siːˌbiːˌeɪtʃˌdʒiːˌeɪtʃˌjuːˌɛfˌdʒiːˌjuːˌviːˌjuːˌdʒiːˌviːˌdʒiːˌviː/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "This is not a standard English word. It appears to be a misspelling, a nonce word, a product code, or a random string of characters."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The string 'applevcbhghufguvugvgv' was found in the data log.",
-        "I received an error message containing 'applevcbhghufguvugvgv'."
-      ],
-      "fun": [
-        "My cat walked across the keyboard and typed 'applevcbhghufguvugvgv'.",
-        "The secret password in the sci-fi novel was 'applevcbhghufguvugvgv'."
-      ]
-    },
-    "synonyms": [
-      "nonsense",
-      "gibberish",
-      "jumble",
-      "code",
-      "string"
-    ],
-    "antonyms": [
-      "word",
-      "term",
-      "lexeme"
-    ],
-    "translations": {
-      "zh": "无标准翻译（疑似随机字符串）"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "这不是一个标准的英语单词。它可能是一个拼写错误、一个虚构词、一个产品代码或一串随机字符。"
+            "苹果公司（品牌）"
           ]
         }
       ]
@@ -990,26 +99,26 @@
         "meanings": [
           "a small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws",
           "any member of the family Felidae, including lions, tigers, etc.",
-          "a malicious or spiteful woman (archaic/slang)"
+          "(informal) a spiteful or malicious woman"
         ]
       }
     ],
     "examples": {
       "common": [
-        "The black cat sat on the windowsill, watching the birds.",
-        "She decided to adopt a rescue cat from the shelter."
+        "The cat curled up on the sofa and fell asleep.",
+        "She has two cats, one black and one white."
       ],
       "fun": [
-        "My cat, Sir Whiskers, believes he is the true ruler of our household.",
-        "In a shocking turn of events, the cat learned to open the fridge, prioritizing tuna over world domination."
+        "My cat seems convinced that the red dot from the laser pointer is a creature from another dimension.",
+        "In ancient Egypt, a cat was more than a pet; it was a sacred guardian of the home."
       ]
     },
     "synonyms": [
       "feline",
       "kitten",
       "tomcat",
-      "pussycat",
-      "mouser"
+      "mouser",
+      "pussycat"
     ],
     "antonyms": [
       "dog"
@@ -1024,118 +133,141 @@
           "meanings": [
             "猫，猫科动物",
             "（尤指家养的）猫",
-            "猫皮",
-            "（对女人恶毒的）泼妇"
+            "（用于某些短语）恶毒的女人"
           ]
         }
       ]
     }
   },
-  "dog": {
-    "phonetic": "/dɔːɡ/",
+  "aaaaaa": {
+    "phonetic": "/ˈæ.eɪ.eɪ.eɪ.eɪ.eɪ/",
     "targetDefinitions": [
       {
         "pos": "n.",
         "meanings": [
-          "a domesticated carnivorous mammal with four legs, a tail, and a keen sense of smell",
-          "a contemptible or worthless man"
-        ]
-      },
-      {
-        "pos": "v.",
-        "meanings": [
-          "to follow (someone) closely and persistently",
-          "to cause persistent trouble or distress to"
+          "A string consisting of six consecutive letter 'a's, often used as a placeholder, test data, or to represent an extremely prolonged exclamation.",
+          "In informal contexts, can represent a drawn-out scream or sigh."
         ]
       }
     ],
     "examples": {
       "common": [
-        "The dog barked loudly at the mail carrier.",
-        "She takes her dog for a walk every evening."
+        "The test field was filled with 'aaaaaa' to check the character limit.",
+        "Her password was simply 'aaaaaa', which is very insecure."
       ],
       "fun": [
-        "My dog believes he's a tiny, furry philosopher pondering the meaning of the squeaky toy.",
-        "The detective doggedly pursued the suspect through the crowded market."
+        "Upon seeing the spider, she let out a terrified 'aaaaaa' that echoed through the house.",
+        "The toddler typed 'aaaaaa' across the entire document, thinking it was a masterpiece."
       ]
     },
     "synonyms": [
-      "canine",
-      "hound",
-      "pooch",
-      "mutt",
-      "pup"
+      "string",
+      "placeholder",
+      "nonsense word",
+      "gibberish",
+      "exclamation"
     ],
-    "antonyms": [
-      "cat"
-    ],
+    "antonyms": [],
     "translations": {
-      "zh": "狗"
+      "zh": "无（非标准单词）"
     },
     "nativeDefinitions": {
       "zh": [
         {
           "pos": "n.",
           "meanings": [
-            "狗，犬",
-            "卑鄙小人，无赖"
-          ]
-        },
-        {
-          "pos": "v.",
-          "meanings": [
-            "跟踪，尾随",
-            "困扰，纠缠"
+            "一个由六个字母‘a’组成的字符串，通常用作占位符、测试数据或表示极长的感叹。",
+            "在非正式语境中，可表示拖长的尖叫声或叹息声。"
           ]
         }
       ]
     }
   },
-  "friend": {
-    "phonetic": "/frend/",
+  "sadfsedfsdfdfas": {
+    "phonetic": "This is not a standard English word; therefore, it has no standard IPA transcription.",
     "targetDefinitions": [
       {
         "pos": "n.",
         "meanings": [
-          "a person whom one knows, likes, and trusts",
-          "a person who supports or favors something",
-          "an acquaintance"
+          "A nonsensical string of characters, not a recognized English word."
         ]
       }
     ],
     "examples": {
       "common": [
-        "She is my closest friend and confidante.",
-        "He made many friends during his time at university."
+        "The text appeared to contain a typo like 'sadfsedfsdfdfas'.",
+        "I accidentally pressed random keys and typed 'sadfsedfsdfdfas'."
       ],
       "fun": [
-        "My phone is my best friend; it knows all my secrets and never leaves my side.",
-        "The old tree in the garden was a silent friend, witnessing generations of family stories."
+        "The cat walked across the keyboard, contributing 'sadfsedfsdfdfas' to my important document.",
+        "Our secret code word is 'sadfsedfsdfdfas', but good luck remembering it!"
       ]
     },
     "synonyms": [
-      "companion",
-      "pal",
-      "buddy",
-      "mate",
-      "confidant"
+      "nonsense",
+      "gibberish",
+      "jumble",
+      "mumbo jumbo"
     ],
     "antonyms": [
-      "enemy",
-      "foe",
-      "rival"
+      "word",
+      "term",
+      "vocabulary"
     ],
     "translations": {
-      "zh": "朋友"
+      "zh": "非标准英语单词"
     },
     "nativeDefinitions": {
       "zh": [
         {
           "pos": "n.",
           "meanings": [
-            "朋友，友人",
-            "支持者，赞助人",
-            "相识的人"
+            "一个无意义的、由随机字母组成的字符串"
+          ]
+        }
+      ]
+    }
+  },
+  "asdf": {
+    "phonetic": "/ˈæz.dɪf/",
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "A meaningless string of characters, often typed randomly on a keyboard; a placeholder or dummy text used in testing."
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "When testing the form, just type 'asdf' in all the fields.",
+        "The username 'asdf' is commonly used as a placeholder in examples."
+      ],
+      "fun": [
+        "His password was so secure, it looked like a triumphant 'asdf' followed by a celebratory 'jkl;'.",
+        "The cat walked across the keyboard, leaving a document full of poetic 'asdf' and 'qwerty'."
+      ]
+    },
+    "synonyms": [
+      "placeholder",
+      "dummy text",
+      "nonsense",
+      "gibberish",
+      "test data"
+    ],
+    "antonyms": [
+      "meaningful text",
+      "coherent word"
+    ],
+    "translations": {
+      "zh": "无意义字符串"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "（在键盘上随意敲击产生的）无意义字符串，占位符，测试用文本"
           ]
         }
       ]

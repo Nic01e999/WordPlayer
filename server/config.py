@@ -4,6 +4,10 @@
 """
 
 import os
+from dotenv import load_dotenv
+
+# 加载 .env 文件
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env'))
 
 class Config:
     # 数据库配置

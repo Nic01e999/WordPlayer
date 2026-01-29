@@ -496,20 +496,27 @@ export async function initAuth() {
     // 尝试恢复登录状态
     if (state.restoreAuth()) {
         console.log('[Auth] 检测到已登录状态，开始验证 token...');
+        console.log('[Auth] 当前 token:', state.authToken?.substring(0, 10) + '...');
+
         // 验证 token 是否有效
         const result = await api.getCurrentUser();
-        if (result.error === 'unauthorized') {
+        if (result.error === 'unauthorized' || result.error) {
             // token 无效，清除登录状态
-            console.log('[Auth] Token 已失效，清除登录状态');
+            console.log('[Auth] Token 已失效或验证失败，清除登录状态');
+            console.log('[Auth] 错误信息:', result.error);
             state.clearAuth();
+            console.log('[Auth] 本地认证状态已清除，请重新登录');
         } else if (result.user) {
             // 更新用户信息
             state.setUser(result.user);
-            console.log('[Auth] Token 验证成功，开始自动同步数据...');
+            console.log('[Auth] Token 验证成功，用户:', result.user.email);
+            console.log('[Auth] 开始自动同步数据...');
             // 页面加载时自动同步（拉取最新数据）
             await syncAfterLogin();
             console.log('[Auth] 自动同步完成');
         }
+    } else {
+        console.log('[Auth] 未检测到登录状态');
     }
 
     // 更新 UI

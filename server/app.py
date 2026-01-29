@@ -54,7 +54,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 静态文件安全配置
 ALLOWED_DIRS = {'js', 'css', 'assets'}
-ALLOWED_EXTENSIONS = {'.js', '.css', '.html', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf'}
+ALLOWED_EXTENSIONS = {'.js', '.css', '.html', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.ico'}
 
 app = Flask(__name__)
 

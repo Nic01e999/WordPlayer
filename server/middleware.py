@@ -22,9 +22,11 @@ def require_auth(f):
         auth_header = request.headers.get('Authorization', '')
 
         if not auth_header.startswith('Bearer '):
+            print(f"[Auth] 认证失败: 缺少 Authorization 头或格式错误")
             return jsonify({'error': '未登录'}), 401
 
         token = auth_header[7:]  # 去掉 'Bearer ' 前缀
+        print(f"[Auth] 验证 token: {token[:10]}...")
 
         with get_db() as conn:
             cursor = conn.cursor()
@@ -39,11 +41,13 @@ def require_auth(f):
             session = cursor.fetchone()
 
             if not session:
+                print(f"[Auth] 认证失败: token 在数据库中不存在")
                 return jsonify({'error': '无效的登录状态'}), 401
 
             # 检查是否过期
             expires_at = datetime.fromisoformat(session['expires_at'])
             if datetime.now() > expires_at:
+                print(f"[Auth] 认证失败: token 已过期 (过期时间: {expires_at})")
                 # 删除过期的会话
                 cursor.execute("DELETE FROM sessions WHERE token = ?", (token,))
                 return jsonify({'error': '登录已过期，请重新登录'}), 401
@@ -54,6 +58,7 @@ def require_auth(f):
                 'email': session['email']
             }
             g.token = token
+            print(f"[Auth] 认证成功: 用户 {session['email']}")
 
         return f(*args, **kwargs)
 
