@@ -21,14 +21,25 @@ def send_reset_code(email: str, code: str) -> bool:
     Returns:
         bool: 发送成功返回 True，失败返回 False
     """
+    import sys
+
+    print(f"\n[Email] 开始发送验证码到 {email}", flush=True)
+    print(f"[Email] SMTP_USER 配置: {'已配置' if Config.SMTP_USER else '未配置'}", flush=True)
+    print(f"[Email] SMTP_PASSWORD 配置: {'已配置' if Config.SMTP_PASSWORD else '未配置'}", flush=True)
+
     if not Config.SMTP_USER or not Config.SMTP_PASSWORD:
         # 开发环境：打印验证码到控制台
-        print(f"[Email] SMTP 未配置，验证码: {code}")
+        print("\n" + "="*60, flush=True)
+        print(f"📧 验证码邮件（控制台模式）", flush=True)
+        print(f"收件人: {email}", flush=True)
+        print(f"验证码: {code}", flush=True)
+        print(f"有效期: {Config.CODE_EXPIRE_MINUTES} 分钟", flush=True)
+        print("="*60 + "\n", flush=True)
+        sys.stdout.flush()
         # 生产环境应该返回 False，这里为了开发方便返回 True
-        # 部署时建议检查环境变量 FLASK_ENV，如果是 production 则返回 False
         import os
         if os.environ.get('FLASK_ENV') == 'production':
-            print(f"[Email] 生产环境必须配置 SMTP")
+            print(f"[Email] 生产环境必须配置 SMTP", flush=True)
             return False
         return True
 
@@ -72,8 +83,20 @@ def send_reset_code(email: str, code: str) -> bool:
         server.login(Config.SMTP_USER, Config.SMTP_PASSWORD)
         server.sendmail(Config.SMTP_SENDER, [email], msg.as_string())
         server.quit()
-        print(f"[Email] 验证码已发送到 {email}")
+        print(f"[Email] 验证码已发送到 {email}", flush=True)
         return True
     except Exception as e:
-        print(f"[Email] 发送失败: {e}")
+        print(f"[Email] 发送失败: {e}", flush=True)
+        # 邮件发送失败时，打印验证码到控制台（开发环境）
+        import os
+        import sys
+        if os.environ.get('FLASK_ENV') != 'production':
+            print("\n" + "="*60, flush=True)
+            print(f"📧 验证码邮件（控制台模式 - 邮件发送失败）", flush=True)
+            print(f"收件人: {email}", flush=True)
+            print(f"验证码: {code}", flush=True)
+            print(f"有效期: {Config.CODE_EXPIRE_MINUTES} 分钟", flush=True)
+            print("="*60 + "\n", flush=True)
+            sys.stdout.flush()
+            return True  # 返回 True，允许用户使用控制台验证码
         return False

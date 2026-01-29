@@ -70,11 +70,12 @@ def login():
     # 查找用户
     user = UserRepository.get_by_email(email)
     if not user:
-        return jsonify({'error': '邮箱或密码错误'}), 401
+        # 返回特殊错误码，前端引导用户注册
+        return jsonify({'error': '该邮箱未注册，请先注册', 'code': 'USER_NOT_FOUND'}), 404
 
     # 验证密码
     if not verify_password(password, user['password_hash']):
-        return jsonify({'error': '邮箱或密码错误'}), 401
+        return jsonify({'error': '密码错误'}), 401
 
     # 更新最后登录时间
     UserRepository.update_last_login(user['id'])
@@ -125,10 +126,8 @@ def forgot_password():
     if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
 
-    # 检查用户是否存在
-    if not UserRepository.exists_by_email(email):
-        # 为了安全，即使用户不存在也返回成功
-        return jsonify({'success': True})
+    # 注意：为了支持注册流程，无论用户是否存在都发送验证码
+    # 这样新用户可以通过验证码注册，老用户可以重置密码
 
     # 检查是否在冷却时间内
     cooldown_time = datetime.now() - timedelta(seconds=Config.CODE_RESEND_SECONDS)
@@ -150,7 +149,7 @@ def forgot_password():
 @auth_bp.route("/api/auth/reset-password", methods=["POST"])
 def reset_password():
     """
-    使用验证码重置密码
+    使用验证码重置密码或创建新账户
     请求: { "email": "...", "code": "...", "password": "..." }
     响应: { "success": true, "token": "...", "user": {...} }
     """
@@ -176,15 +175,19 @@ def reset_password():
     # 标记验证码为已使用
     ResetCodeRepository.mark_as_used(reset_code['id'])
 
-    # 更新密码
-    password_hash = hash_password(password)
-    UserRepository.update_password(email, password_hash)
-
-    # 获取用户信息
+    # 检查用户是否存在
     user = UserRepository.get_by_email(email)
+    password_hash = hash_password(password)
 
-    # 删除该用户的所有会话（强制重新登录）
-    SessionRepository.delete_by_user_id(user['id'])
+    if not user:
+        # 用户不存在，创建新用户（注册）
+        user_id = UserRepository.create(email, password_hash)
+        user = {'id': user_id, 'email': email}
+    else:
+        # 用户存在，更新密码（重置密码）
+        UserRepository.update_password(email, password_hash)
+        # 删除该用户的所有会话（强制重新登录）
+        SessionRepository.delete_by_user_id(user['id'])
 
     # 创建新会话
     token = generate_session_token()

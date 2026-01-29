@@ -21,7 +21,8 @@
                 <div class="settings-trigger">
                     <span class="gear-icon">⚙️</span>
                     <!-- 右侧：设置边栏 -->
-                    <div class="sidebar">
+                    <div class="setting-container">
+                        <div class="sidebar">
                         <div id="settings">
                             <h3 data-i18n="general">General</h3>
                             <label><span data-i18n="shuffle">Shuffle</span>: <input type="checkbox" id="shuffle"></label>
@@ -86,7 +87,8 @@
                         <div id="repeater-settings" class="mode-settings">
                             <h3 data-i18n="repeaterSettings">Repeater</h3>
                             <label><span data-i18n="repeat">Repeat</span>: <input type="number" id="repeat" value="2" min="1"></label>
-                            <label><span data-i18n="interval">Interval(ms)</span>: <input type="number" id="interval" value="300" min="0" step="100"></label>
+                            <label><span data-i18n="interval">Interval(ms)</span>: <input type="number" id="interval" value="1000" min="0" step="100" max="10000"></label>
+                        </div>
                         </div>
                     </div>
                 </div>

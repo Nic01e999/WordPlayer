@@ -130,7 +130,7 @@ export function updateWorkplace() {
             let symbol, cls;
 
             if (a.isCorrect) {
-                symbol = "O";
+                symbol = "";
                 cls = "correct";
             } else if (isLast && result?.status === "failed") {
                 symbol = "X";

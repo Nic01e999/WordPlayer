@@ -5,7 +5,11 @@
 
 import { t } from '../i18n/index.js';
 
-const API_BASE = window.location.origin;
+// 智能检测 API 基础 URL
+// - 如果直接访问 5001 端口或通过 Cloudflare tunnel，使用相对路径
+// - 否则显式指定 5001 端口
+const isDirectAccess = location.port === "5001" || location.hostname.includes("trycloudflare.com");
+const API_BASE = isDirectAccess ? "" : `http://${location.hostname}:5001`;
 
 /**
  * 获取认证请求头

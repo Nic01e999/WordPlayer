@@ -10,7 +10,6 @@ import {
     $,
     loadWordsFromTextarea,
     debounce,
-    adjustSidebarWidth,
     updateModeButtonsState,
     getTargetLang,
     getTranslationLang,
@@ -480,7 +479,6 @@ export async function startPreload(forceReload = false) {
 export const debouncedPreload = debounce(startPreload, 500);
 
 // 防抖版本的侧边栏宽度调整
-const debouncedAdjustSidebar = debounce(adjustSidebarWidth, 300);
 
 /**
  * 初始化预加载监听器
@@ -529,8 +527,6 @@ export function initPreloadListeners() {
         });
     }
 
-    // 侧边栏宽度自动调整（不涉及 API 调用）
     // 实时监测已移除，仅在页面加载时调整一次
-    adjustSidebarWidth();
     updateModeButtonsState();
 }

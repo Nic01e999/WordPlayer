@@ -18,6 +18,7 @@ import {
     detectLanguageFromInput,
     setTargetLang,
     loadLangSettings,
+    initSettingsToggle,
     LANG_NAMES
 } from './utils.js';
 import { initWordListUI, goHome, renderWordListCards } from './wordlist/index.js';
@@ -347,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initPreloadListeners();
     initInputFilter();
     initWordListUI();
+    initSettingsToggle();  // 初始化设置面板点击切换功能
 
     // 从 localStorage 恢复语言设置（未登录用户使用，已登录用户会被服务端设置覆盖）
     loadLangSettings();

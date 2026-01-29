@@ -1,80 +1,223 @@
 {
-  "sdfsd": {
-    "phonetic": "/ˌes.diː.ef.ˈes.ˈdiː/",
+  "happy": {
+    "phonetic": {
+      "us": "ˈhæpi",
+      "uk": "ˈhæpi"
+    },
     "targetDefinitions": [
       {
-        "pos": "n.",
+        "pos": "adj.",
         "meanings": [
-          "A meaningless sequence of letters, often used as a placeholder or test data"
+          "快乐的；幸福的，使人高兴的；满意的；乐意的；幸运的；合适的"
+        ]
+      },
+      {
+        "pos": "comb.",
+        "meanings": [
+          "<非正式>滥用……的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Happy）（英、瑞典、喀）哈皮（人名）"
         ]
       }
     ],
     "examples": {
       "common": [
-        "The developer typed 'sdfsd' as a placeholder before writing the actual code.",
-        "The test form was filled with random strings like 'sdfsd'."
+        "Happy birthday, sweetheart. | 生日快乐，亲爱的。",
+        "\"Happy Easter,\" he yelled. | “复活节快乐，”他喊道。"
       ],
-      "fun": [
-        "His password was so secure it looked like 'sdfsd' followed by a cat walking on the keyboard.",
-        "The alien message, once decoded, simply read 'sdfsd', leaving the scientists both relieved and disappointed."
-      ]
+      "fun": []
     },
     "synonyms": [
-      "placeholder",
-      "nonsense",
-      "gibberish",
-      "jumble",
-      "garbage"
+      "pleased",
+      "glad",
+      "blessed",
+      "smart"
     ],
-    "antonyms": [
-      "word",
-      "meaning",
-      "sense"
-    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "happier",
+      "最高级": "happiest"
+    },
     "translations": {
-      "zh": "无意义字符串"
+      "zh": "快乐的；幸福的，使人高兴的；满意的；乐意的；幸运的；合适的"
     },
     "nativeDefinitions": {
       "zh": [
         {
+          "pos": "adj.",
+          "meanings": [
+            "快乐的；幸福的，使人高兴的；满意的；乐意的；幸运的；合适的"
+          ]
+        },
+        {
+          "pos": "comb.",
+          "meanings": [
+            "<非正式>滥用……的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Happy）（英、瑞典、喀）哈皮（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "run": {
+    "phonetic": {
+      "us": "rʌn",
+      "uk": "rʌn"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "跑，奔跑；参加（赛跑），举行（比赛）；跑垒，持球跑动进攻；奔忙，赶快去；管理，经营，使用（车辆）；（使）运转，操作；刊登，播放；（使）行驶；（使）移动，揉擦；闯红灯；（使）流动，流淌；掉色，渗色；变成，变得；达到（一定数量或比率）；（对……）进行（测试或检验）；参加竞选；（连裤袜、长统袜）抽丝，脱线；（使）延伸；（感觉或想法）掠过，迅速传遍；包含（某种词语、内容等）；持续，延续；偷运，走私；印刷；（特征）共有，世代相传（run in）；<美>（物品，行动）花费（某人）（特定数额的钱）"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "跑步，赛跑；旅程，航程；一系列（成功或失败）；连续上演（或放映）；尝试，努力；额定产量；抛售（美元、英镑等）；争购，挤兑；滑道，路径；（板球或棒球中的）得分；使用自由，出入自由（the run of）；竞选；普通人，普通事物；饲养场；急奏，走句；顺子；<非正式>腹泻（the runs）；<美>（长统袜或连裤袜的）抽丝；（油漆或类似物刷得过厚引起的）挂流，小溪；（航海）船尾端部"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Run）（塞）鲁恩（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "'Run!' he shouted. | “跑！”他大喊一声。",
+        "I can run fast. | 我能跑得快。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "go",
+      "fare",
+      "conduct",
+      "direct",
+      "control"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "runs",
+      "第三人称单数": "runs",
+      "现在分词": "running",
+      "过去式": "ran",
+      "过去分词": "run"
+    },
+    "translations": {
+      "zh": "跑，奔跑；参加（赛跑），举行（比赛）；跑垒，持球跑动进攻；奔忙，赶快去；管理，经营，使用（车辆）；（使）运转，操作；刊登，播放；（使）行驶；（使）移动，揉擦；闯红灯；（使）流动，流淌；掉色，渗色；变成，变得；达到（一定数量或比率）；（对……）进行（测试或检验）；参加竞选；（连裤袜、长统袜）抽丝，脱线；（使）延伸；（感觉或想法）掠过，迅速传遍；包含（某种词语、内容等）；持续，延续；偷运，走私；印刷；（特征）共有，世代相传（run in）；<美>（物品，行动）花费（某人）（特定数额的钱）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "跑，奔跑；参加（赛跑），举行（比赛）；跑垒，持球跑动进攻；奔忙，赶快去；管理，经营，使用（车辆）；（使）运转，操作；刊登，播放；（使）行驶；（使）移动，揉擦；闯红灯；（使）流动，流淌；掉色，渗色；变成，变得；达到（一定数量或比率）；（对……）进行（测试或检验）；参加竞选；（连裤袜、长统袜）抽丝，脱线；（使）延伸；（感觉或想法）掠过，迅速传遍；包含（某种词语、内容等）；持续，延续；偷运，走私；印刷；（特征）共有，世代相传（run in）；<美>（物品，行动）花费（某人）（特定数额的钱）"
+          ]
+        },
+        {
           "pos": "n.",
           "meanings": [
-            "一个无意义的字母序列，常被用作占位符或测试数据"
+            "跑步，赛跑；旅程，航程；一系列（成功或失败）；连续上演（或放映）；尝试，努力；额定产量；抛售（美元、英镑等）；争购，挤兑；滑道，路径；（板球或棒球中的）得分；使用自由，出入自由（the run of）；竞选；普通人，普通事物；饲养场；急奏，走句；顺子；<非正式>腹泻（the runs）；<美>（长统袜或连裤袜的）抽丝；（油漆或类似物刷得过厚引起的）挂流，小溪；（航海）船尾端部"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Run）（塞）鲁恩（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "write": {
+    "phonetic": {
+      "us": "raɪt",
+      "uk": "raɪt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "写作，编写；写道；写信；书写，写字；谱写（音乐作品）；编写（计算机程序）；将（计算机中的）数据写入（磁盘或其他储存媒体）；填写（表格、支票等），拟定；（笔）能写字；拼写；<加，南非>参加（笔试）；书写，手写（与铅印相对）；以写作为生；承保（保险单）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Write me while you're away. | 你外出期间给我写信。",
+        "He can't read or write. | 他不会读，不会写。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "compose",
+      "drive the quill",
+      "pen"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "第三人称单数": "writes",
+      "现在分词": "writing",
+      "过去式": "wrote",
+      "过去分词": "written或writ或wrote"
+    },
+    "translations": {
+      "zh": "写作，编写；写道；写信；书写，写字；谱写（音乐作品）；编写（计算机程序）；将（计算机中的）数据写入（磁盘或其他储存媒体）；填写（表格、支票等），拟定；（笔）能写字；拼写；<加，南非>参加（笔试）；书写，手写（与铅印相对）；以写作为生；承保（保险单）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "写作，编写；写道；写信；书写，写字；谱写（音乐作品）；编写（计算机程序）；将（计算机中的）数据写入（磁盘或其他储存媒体）；填写（表格、支票等），拟定；（笔）能写字；拼写；<加，南非>参加（笔试）；书写，手写（与铅印相对）；以写作为生；承保（保险单）"
           ]
         }
       ]
     }
   },
   "apple": {
-    "phonetic": "/ˈæp.əl/",
+    "phonetic": {
+      "us": "ˈæp(ə)l",
+      "uk": "ˈæp(ə)l"
+    },
     "targetDefinitions": [
       {
         "pos": "n.",
         "meanings": [
-          "a round fruit with firm, white flesh and red, green, or yellow skin",
-          "the tree which bears this fruit",
-          "a large company that produces computers, phones, and other electronics (Apple Inc.)"
+          "苹果"
         ]
       }
     ],
     "examples": {
       "common": [
-        "She ate a crisp, red apple for her afternoon snack.",
-        "Apple pie is a traditional dessert in many American households."
+        "She crunched her apple noisily. | 她吃苹果发出嘎嚓嘎嚓的声音。",
+        "He took another bite of apple. | 他又咬了一口苹果。"
       ],
-      "fun": [
-        "My phone is so old, it might as well be a rotten apple compared to the latest model.",
-        "He was the apple of his grandmother's eye, always receiving extra cookies."
-      ]
+      "fun": []
     },
     "synonyms": [
-      "pome",
-      "fruit",
-      "pippin",
-      "crabapple",
-      "Malus domestica"
+      "customer",
+      "fellow",
+      "egg",
+      "guy",
+      "bird"
     ],
     "antonyms": [],
+    "wordForms": {
+      "复数": "apples"
+    },
     "translations": {
       "zh": "苹果"
     },
@@ -83,191 +226,2523 @@
         {
           "pos": "n.",
           "meanings": [
-            "苹果（水果）",
-            "苹果树",
-            "苹果公司（品牌）"
+            "苹果"
           ]
         }
       ]
     }
   },
-  "cat": {
-    "phonetic": "/kæt/",
+  "sad": {
+    "phonetic": {
+      "us": "sæd",
+      "uk": "sæd"
+    },
     "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "伤心的，难过的；令人伤心的，让人难过的；糟糕的，不能令人接受的；不幸的，可怜的；（歌曲或音乐）显露悲伤的，伤感的；状况不佳的；<非正式>（人）可悲的，不受人尊敬的；<非正式> 老土的，过时的；（面团）发得不好的"
+        ]
+      },
       {
         "pos": "n.",
         "meanings": [
-          "a small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws",
-          "any member of the family Felidae, including lions, tigers, etc.",
-          "(informal) a spiteful or malicious woman"
+          "季节性情感障碍（SAD）"
         ]
       }
     ],
     "examples": {
       "common": [
-        "The cat curled up on the sofa and fell asleep.",
-        "She has two cats, one black and one white."
+        "We were all sad at her going. | 我们对她的离去都很难过。",
+        "I overreact to anything sad. | 我对任何悲伤的事情都反应过激。"
       ],
-      "fun": [
-        "My cat seems convinced that the red dot from the laser pointer is a creature from another dimension.",
-        "In ancient Egypt, a cat was more than a pet; it was a sacred guardian of the home."
-      ]
+      "fun": []
     },
     "synonyms": [
-      "feline",
-      "kitten",
-      "tomcat",
-      "mouser",
-      "pussycat"
-    ],
-    "antonyms": [
-      "dog"
-    ],
-    "translations": {
-      "zh": "猫"
-    },
-    "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "n.",
-          "meanings": [
-            "猫，猫科动物",
-            "（尤指家养的）猫",
-            "（用于某些短语）恶毒的女人"
-          ]
-        }
-      ]
-    }
-  },
-  "aaaaaa": {
-    "phonetic": "/ˈæ.eɪ.eɪ.eɪ.eɪ.eɪ/",
-    "targetDefinitions": [
-      {
-        "pos": "n.",
-        "meanings": [
-          "A string consisting of six consecutive letter 'a's, often used as a placeholder, test data, or to represent an extremely prolonged exclamation.",
-          "In informal contexts, can represent a drawn-out scream or sigh."
-        ]
-      }
-    ],
-    "examples": {
-      "common": [
-        "The test field was filled with 'aaaaaa' to check the character limit.",
-        "Her password was simply 'aaaaaa', which is very insecure."
-      ],
-      "fun": [
-        "Upon seeing the spider, she let out a terrified 'aaaaaa' that echoed through the house.",
-        "The toddler typed 'aaaaaa' across the entire document, thinking it was a masterpiece."
-      ]
-    },
-    "synonyms": [
-      "string",
-      "placeholder",
-      "nonsense word",
-      "gibberish",
-      "exclamation"
+      "gray",
+      "gloomy"
     ],
     "antonyms": [],
+    "wordForms": {
+      "比较级": "sadder或more sad",
+      "最高级": "saddest或most sad"
+    },
     "translations": {
-      "zh": "无（非标准单词）"
+      "zh": "伤心的，难过的；令人伤心的，让人难过的；糟糕的，不能令人接受的；不幸的，可怜的；（歌曲或音乐）显露悲伤的，伤感的；状况不佳的；<非正式>（人）可悲的，不受人尊敬的；<非正式> 老土的，过时的；（面团）发得不好的"
     },
     "nativeDefinitions": {
       "zh": [
         {
+          "pos": "adj.",
+          "meanings": [
+            "伤心的，难过的；令人伤心的，让人难过的；糟糕的，不能令人接受的；不幸的，可怜的；（歌曲或音乐）显露悲伤的，伤感的；状况不佳的；<非正式>（人）可悲的，不受人尊敬的；<非正式> 老土的，过时的；（面团）发得不好的"
+          ]
+        },
+        {
           "pos": "n.",
           "meanings": [
-            "一个由六个字母‘a’组成的字符串，通常用作占位符、测试数据或表示极长的感叹。",
-            "在非正式语境中，可表示拖长的尖叫声或叹息声。"
+            "季节性情感障碍（SAD）"
           ]
         }
       ]
     }
   },
-  "sadfsedfsdfdfas": {
-    "phonetic": "This is not a standard English word; therefore, it has no standard IPA transcription.",
+  "walk": {
+    "phonetic": {
+      "us": "wɔːk",
+      "uk": "wɔːk"
+    },
     "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "走，步行；徒步旅行，散步；陪（某人）走，护送（某人）；带（宠物）散步，遛；把（某物）移走，使（某物）移动；<非正式>消失，被偷；轻易做成（某事）；<非正式>放弃，突然退出；出现，显灵；（使）上一垒；被无罪释放，未获刑罚；（击球手不等裁判指示）离开球场；<古>生活"
+        ]
+      },
       {
         "pos": "n.",
         "meanings": [
-          "A nonsensical string of characters, not a recognized English word."
+          "步行，散步；徒步旅行；散步的小路，步行的路径；步态；步行的距离（或时间）；步行速度；（棒球）自由上垒；<英>（护林人的）管辖林区；斗鸡场；<英>小猎犬驯养场；<英>（邮递员的）投递路线；<罕>一群沙锥"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Walk）（美）沃克（人名）"
         ]
       }
     ],
     "examples": {
       "common": [
-        "The text appeared to contain a typo like 'sadfsedfsdfdfas'.",
-        "I accidentally pressed random keys and typed 'sadfsedfsdfdfas'."
+        "I recognized him by his walk. | 我根据他走路的样子认出了他。",
+        "She slowed to a steady walk. | 她慢下来，稳步行走。"
       ],
-      "fun": [
-        "The cat walked across the keyboard, contributing 'sadfsedfsdfdfas' to my important document.",
-        "Our secret code word is 'sadfsedfsdfdfas', but good luck remembering it!"
-      ]
+      "fun": []
     },
     "synonyms": [
-      "nonsense",
-      "gibberish",
-      "jumble",
-      "mumbo jumbo"
+      "pedestrism",
+      "ambulation",
+      "step by",
+      "roam around",
+      "go"
     ],
-    "antonyms": [
-      "word",
-      "term",
-      "vocabulary"
-    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "walks",
+      "第三人称单数": "walks",
+      "现在分词": "walking",
+      "过去式": "walked",
+      "过去分词": "walked"
+    },
     "translations": {
-      "zh": "非标准英语单词"
+      "zh": "走，步行；徒步旅行，散步；陪（某人）走，护送（某人）；带（宠物）散步，遛；把（某物）移走，使（某物）移动；<非正式>消失，被偷；轻易做成（某事）；<非正式>放弃，突然退出；出现，显灵；（使）上一垒；被无罪释放，未获刑罚；（击球手不等裁判指示）离开球场；<古>生活"
     },
     "nativeDefinitions": {
       "zh": [
         {
+          "pos": "v.",
+          "meanings": [
+            "走，步行；徒步旅行，散步；陪（某人）走，护送（某人）；带（宠物）散步，遛；把（某物）移走，使（某物）移动；<非正式>消失，被偷；轻易做成（某事）；<非正式>放弃，突然退出；出现，显灵；（使）上一垒；被无罪释放，未获刑罚；（击球手不等裁判指示）离开球场；<古>生活"
+          ]
+        },
+        {
           "pos": "n.",
           "meanings": [
-            "一个无意义的、由随机字母组成的字符串"
+            "步行，散步；徒步旅行；散步的小路，步行的路径；步态；步行的距离（或时间）；步行速度；（棒球）自由上垒；<英>（护林人的）管辖林区；斗鸡场；<英>小猎犬驯养场；<英>（邮递员的）投递路线；<罕>一群沙锥"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Walk）（美）沃克（人名）"
           ]
         }
       ]
     }
   },
-  "asdf": {
-    "phonetic": "/ˈæz.dɪf/",
+  "eat": {
+    "phonetic": {
+      "us": "iːt",
+      "uk": "iːt"
+    },
     "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "吃，吃饭；侵蚀，损耗；烦扰（be eating）"
+        ]
+      },
       {
         "pos": "n.",
         "meanings": [
-          "A meaningless string of characters, often typed randomly on a keyboard; a placeholder or dummy text used in testing."
+          "少量食物，点心"
         ]
       }
     ],
     "examples": {
       "common": [
-        "When testing the form, just type 'asdf' in all the fields.",
-        "The username 'asdf' is commonly used as a placeholder in examples."
+        "They'll eat almost anything. | 他们几乎什么都吃。",
+        "Where shall we eat tonight? | 我们今晚在哪儿吃饭？"
       ],
-      "fun": [
-        "His password was so secure, it looked like a triumphant 'asdf' followed by a celebratory 'jkl;'.",
-        "The cat walked across the keyboard, leaving a document full of poetic 'asdf' and 'qwerty'."
-      ]
+      "fun": []
     },
     "synonyms": [
-      "placeholder",
-      "dummy text",
-      "nonsense",
-      "gibberish",
-      "test data"
+      "drink",
+      "take",
+      "burden",
+      "attack",
+      "to erode"
     ],
-    "antonyms": [
-      "meaningful text",
-      "coherent word"
-    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "eats",
+      "第三人称单数": "eats",
+      "现在分词": "eating",
+      "过去式": "ate",
+      "过去分词": "eaten"
+    },
     "translations": {
-      "zh": "无意义字符串"
+      "zh": "吃，吃饭；侵蚀，损耗；烦扰（be eating）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "吃，吃饭；侵蚀，损耗；烦扰（be eating）"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "少量食物，点心"
+          ]
+        }
+      ]
+    }
+  },
+  "banana": {
+    "phonetic": {
+      "us": "bəˈnænə",
+      "uk": "bəˈnɑːnə"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "香蕉；香蕉树"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "愚蠢的，发狂的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "（Banana）巴纳纳（姓氏）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "These companies are determined to keep a stranglehold on the banana industry. | 这些公司决定对香蕉业进行压制。",
+        "He slipped on a banana skin. | 他踩在香蕉皮上滑倒了。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "pisang",
+      "comedian"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "bananas"
+    },
+    "translations": {
+      "zh": "香蕉；香蕉树"
     },
     "nativeDefinitions": {
       "zh": [
         {
           "pos": "n.",
           "meanings": [
-            "（在键盘上随意敲击产生的）无意义字符串，占位符，测试用文本"
+            "香蕉；香蕉树"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "愚蠢的，发狂的"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "（Banana）巴纳纳（姓氏）"
+          ]
+        }
+      ]
+    }
+  },
+  "orange": {
+    "phonetic": {
+      "us": "ˈɔrɪndʒ",
+      "uk": "ˈɒrɪndʒ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "橙，柑橘；橙汁，橘汁饮料；橙树，橘树；橙色，橘黄色；橙黄色蝴蝶"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "橙红色的，橘黄色的；奥兰治党或社团的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "（Orange）（美、法、俄、英）奥林奇（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I plucked an orange from the tree. | 我从树上摘了一个橙子。",
+        "Orange is the big colour this year. | 橘黄色是今年的流行色。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "aurantia",
+      "aurantium"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "oranges"
+    },
+    "translations": {
+      "zh": "橙，柑橘；橙汁，橘汁饮料；橙树，橘树；橙色，橘黄色；橙黄色蝴蝶"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "橙，柑橘；橙汁，橘汁饮料；橙树，橘树；橙色，橘黄色；橙黄色蝴蝶"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "橙红色的，橘黄色的；奥兰治党或社团的"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "（Orange）（美、法、俄、英）奥林奇（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "grape": {
+    "phonetic": {
+      "us": "ɡreɪp",
+      "uk": "ɡreɪp"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "葡萄；葡萄酒（the grape）；霰弹，葡萄弹（grapeshot 的简称）；葡萄树；葡萄色"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Grape）（法）格拉普，（德、瑞典）格拉佩（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The colouring pigments from the skins are not allowed to bleed into the grape juice. | 这些果皮的色素不允许掺混进葡萄汁中。",
+        "Is it a grape or a plum? | 这是葡萄还是李子？"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "wine",
+      "Vitis vinifera"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "葡萄；葡萄酒（the grape）；霰弹，葡萄弹（grapeshot 的简称）；葡萄树；葡萄色"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "葡萄；葡萄酒（the grape）；霰弹，葡萄弹（grapeshot 的简称）；葡萄树；葡萄色"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Grape）（法）格拉普，（德、瑞典）格拉佩（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "watermelon": {
+    "phonetic": {
+      "us": "ˈwɔːtərmelən",
+      "uk": "ˈwɔːtəmelən"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "西瓜"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Watermelon contains vitamins and also potassium. | 西瓜含有维生素也有钾。",
+        "They planted some watermelon. | 他们种了些西瓜。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "sandia"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "watermelons"
+    },
+    "translations": {
+      "zh": "西瓜"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "西瓜"
+          ]
+        }
+      ]
+    }
+  },
+  "angry": {
+    "phonetic": {
+      "us": "ˈæŋɡri",
+      "uk": "ˈæŋɡri"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "愤怒的，生气的；狂风暴雨的，波涛汹涌的；红肿的，感染的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He never stays angry for long. | 他生气时间从来不会长。",
+        "Roberta felt frustrated and angry. | 罗伯塔感到又懊丧又生气。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "riley",
+      "vexed"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "angrier或more angry",
+      "最高级": "angriest或most angry"
+    },
+    "translations": {
+      "zh": "愤怒的，生气的；狂风暴雨的，波涛汹涌的；红肿的，感染的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "愤怒的，生气的；狂风暴雨的，波涛汹涌的；红肿的，感染的"
+          ]
+        }
+      ]
+    }
+  },
+  "excited": {
+    "phonetic": {
+      "us": "ɪkˈsaɪtɪd",
+      "uk": "ɪkˈsaɪtɪd"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "激动的，兴奋的；忧虑的，气愤的；已激发的，受激的；性兴奋的"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "使兴奋，使激动；激发，引起（excite 过去式和过去分词形式）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "His eyes were bright and excited. | 他目光发亮，兴奋不已。",
+        "Right now I'm feeling very excited. | 此刻我感到非常激动。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "active",
+      "living",
+      "hot"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "more excited",
+      "最高级": "most excited"
+    },
+    "translations": {
+      "zh": "激动的，兴奋的；忧虑的，气愤的；已激发的，受激的；性兴奋的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "激动的，兴奋的；忧虑的，气愤的；已激发的，受激的；性兴奋的"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "使兴奋，使激动；激发，引起（excite 过去式和过去分词形式）"
+          ]
+        }
+      ]
+    }
+  },
+  "nervous": {
+    "phonetic": {
+      "us": "ˈnɜːrvəs",
+      "uk": "ˈnɜːvəs"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "神经紧张的，担忧的；神经质的，神经过敏的；神经的，神经系统的；（疾病）由精神紧张引起的，由精神压力造成的；易激动的，易兴奋的；强健有力的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She flicked him a nervous glance. | 她紧张不安地瞟了他一眼。",
+        "She was of a nervous disposition. | 她生性容易紧张。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "neural",
+      "jittery"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "more nervous",
+      "最高级": "most nervous"
+    },
+    "translations": {
+      "zh": "神经紧张的，担忧的；神经质的，神经过敏的；神经的，神经系统的；（疾病）由精神紧张引起的，由精神压力造成的；易激动的，易兴奋的；强健有力的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "神经紧张的，担忧的；神经质的，神经过敏的；神经的，神经系统的；（疾病）由精神紧张引起的，由精神压力造成的；易激动的，易兴奋的；强健有力的"
+          ]
+        }
+      ]
+    }
+  },
+  "jump": {
+    "phonetic": {
+      "us": "dʒʌmp",
+      "uk": "dʒʌmp"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "跳，跃；跨越；快速（突然）移动；猛地一动；激增，暴涨；突然转换；略过；突然袭击（某人）；欢跃，雀跃；逃离，逃避；插（队）；<非正式>马上照办；跳吃（对方的棋子）；<非正式>与……性交；<美> 侵占（他人开采权或土地）；（桥牌）跳叫；<美>跨接起动（汽车）； <美>跨接起动（汽车）"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "跳，跃；惊跳；障碍物；激增；巨变；<非正式>心神不安；（桥牌）跳叫；<美，粗>性交"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Jump）（美）江普（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The horse fell at the last jump. | 那匹马在跨越最后一个障碍物时跌倒了。",
+        "'Quick, jump!' he shouted. | “赶快，跳！”他大声叫道。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "spring",
+      "leaps and bounds",
+      "bound",
+      "clear",
+      "dance"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "jumps",
+      "第三人称单数": "jumps",
+      "现在分词": "jumping",
+      "过去式": "jumped",
+      "过去分词": "jumped"
+    },
+    "translations": {
+      "zh": "跳，跃；跨越；快速（突然）移动；猛地一动；激增，暴涨；突然转换；略过；突然袭击（某人）；欢跃，雀跃；逃离，逃避；插（队）；<非正式>马上照办；跳吃（对方的棋子）；<非正式>与……性交；<美> 侵占（他人开采权或土地）；（桥牌）跳叫；<美>跨接起动（汽车）； <美>跨接起动（汽车）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "跳，跃；跨越；快速（突然）移动；猛地一动；激增，暴涨；突然转换；略过；突然袭击（某人）；欢跃，雀跃；逃离，逃避；插（队）；<非正式>马上照办；跳吃（对方的棋子）；<非正式>与……性交；<美> 侵占（他人开采权或土地）；（桥牌）跳叫；<美>跨接起动（汽车）； <美>跨接起动（汽车）"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "跳，跃；惊跳；障碍物；激增；巨变；<非正式>心神不安；（桥牌）跳叫；<美，粗>性交"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Jump）（美）江普（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "swim": {
+    "phonetic": {
+      "us": "swɪm",
+      "uk": "swɪm"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "游泳；横渡；游（某一泳姿）；（鱼、禽等）游过，游动；浸，泡；漂浮；使漂浮，使渡过；（物体）仿佛旋转；眩晕"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "游泳；（河流中）适合钓鱼的静止深水处，深潭；漂浮；眩晕"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "游泳时穿戴的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "How many widths can you swim? | 你在游泳池里横向能游几个来回？",
+        "I managed to swim to safety. | 我设法游到安全处。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "ride",
+      "float off",
+      "buoy up",
+      "natation",
+      "flotage"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "swims",
+      "第三人称单数": "swims",
+      "现在分词": "swimming",
+      "过去式": "swam",
+      "过去分词": "swum"
+    },
+    "translations": {
+      "zh": "游泳；横渡；游（某一泳姿）；（鱼、禽等）游过，游动；浸，泡；漂浮；使漂浮，使渡过；（物体）仿佛旋转；眩晕"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "游泳；横渡；游（某一泳姿）；（鱼、禽等）游过，游动；浸，泡；漂浮；使漂浮，使渡过；（物体）仿佛旋转；眩晕"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "游泳；（河流中）适合钓鱼的静止深水处，深潭；漂浮；眩晕"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "游泳时穿戴的"
+          ]
+        }
+      ]
+    }
+  },
+  "fly": {
+    "phonetic": {
+      "us": "flaɪ",
+      "uk": "flaɪ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "v.",
+        "meanings": [
+          "飞，飞行；乘飞机，搭乘（某公司航班）；驾驶（飞机）；空运；飞越；疾驰，快速移动；放飞（风筝）；飞舞，飘荡；悬挂，飘扬；（使）逃离，匆忙离开；成功；飞逝；击腾空球；流传，四处传播；（指责，谩骂）往来激烈；被认可，被接受"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "苍蝇，假蝇；裤门襟；腾空球，高飞球；<澳，非正式>努力，尝试；（帐篷的）篷顶；（剧院）吊景区，悬吊布景的空间；<英，史>单马出租马车"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "<非正式>时髦漂亮的；<英>机灵的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Fly）（英）弗莱，（法）弗利（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She is licensed to fly solo. | 她已获准单飞。",
+        "She brushed the fly away. | 她挥手赶走了苍蝇。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "flow",
+      "stream",
+      "dance",
+      "overfly",
+      "flight"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "flies",
+      "第三人称单数": "flies",
+      "现在分词": "flying",
+      "过去式": "flew或flied",
+      "过去分词": "flown或flied",
+      "比较级": "flyer",
+      "最高级": "flyest"
+    },
+    "translations": {
+      "zh": "飞，飞行；乘飞机，搭乘（某公司航班）；驾驶（飞机）；空运；飞越；疾驰，快速移动；放飞（风筝）；飞舞，飘荡；悬挂，飘扬；（使）逃离，匆忙离开；成功；飞逝；击腾空球；流传，四处传播；（指责，谩骂）往来激烈；被认可，被接受"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "v.",
+          "meanings": [
+            "飞，飞行；乘飞机，搭乘（某公司航班）；驾驶（飞机）；空运；飞越；疾驰，快速移动；放飞（风筝）；飞舞，飘荡；悬挂，飘扬；（使）逃离，匆忙离开；成功；飞逝；击腾空球；流传，四处传播；（指责，谩骂）往来激烈；被认可，被接受"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "苍蝇，假蝇；裤门襟；腾空球，高飞球；<澳，非正式>努力，尝试；（帐篷的）篷顶；（剧院）吊景区，悬吊布景的空间；<英，史>单马出租马车"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "<非正式>时髦漂亮的；<英>机灵的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Fly）（英）弗莱，（法）弗利（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "book": {
+    "phonetic": {
+      "us": "bʊk",
+      "uk": "bʊk"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "书，书籍；本子，簿册；（长篇作品的）篇，卷，部；装订成册之物；赌局，打赌；账册，账簿"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "预订，预约；（警方）将……记录在案；（裁判）记名警告"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Book）（英）布克，（瑞典）博克，（朝）北（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Shoot! I've forgotten my book! | 倒霉！我忘了带书！",
+        "I'm just finishing my book. | 眼下我正在完成我的一本书。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "volume",
+      "roll",
+      "register",
+      "make reservation"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "books",
+      "第三人称单数": "books",
+      "现在分词": "booking",
+      "过去式": "booked",
+      "过去分词": "booked"
+    },
+    "translations": {
+      "zh": "书，书籍；本子，簿册；（长篇作品的）篇，卷，部；装订成册之物；赌局，打赌；账册，账簿"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "书，书籍；本子，簿册；（长篇作品的）篇，卷，部；装订成册之物；赌局，打赌；账册，账簿"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "预订，预约；（警方）将……记录在案；（裁判）记名警告"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Book）（英）布克，（瑞典）博克，（朝）北（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "pen": {
+    "phonetic": {
+      "us": "pen",
+      "uk": "pen"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "笔，钢笔；（圈养动物用的）围栏，圈；（计算机上使用的）电子笔；<美>监狱；<英，非正式>处罚，（尤指足球的）点球；墨水；雌天鹅；（动）（枪乌贼的）羽状壳；（西印度群岛）农庄，大农场；（潜艇等战舰的）隐蔽坞，掩藏坞；国际笔会（国际诗人，剧作家，编辑，散文家和小说家协会）（PEN）；秘鲁新索尔（PEN）"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "写，撰写；（把……）关起来，圈起来"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Pen）（法）庞，（俄、塞、英、意）佩恩，（柬）宾（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "This dratted pen won't work. | 这该死的笔写不出字来。",
+        "Where's that goddamned pen? | 那该死的笔哪去了？"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "writer",
+      "author",
+      "rail",
+      "write on"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "pens",
+      "第三人称单数": "pens",
+      "现在分词": "penning",
+      "过去式": "penned或pent",
+      "过去分词": "penned或pent"
+    },
+    "translations": {
+      "zh": "笔，钢笔；（圈养动物用的）围栏，圈；（计算机上使用的）电子笔；<美>监狱；<英，非正式>处罚，（尤指足球的）点球；墨水；雌天鹅；（动）（枪乌贼的）羽状壳；（西印度群岛）农庄，大农场；（潜艇等战舰的）隐蔽坞，掩藏坞；国际笔会（国际诗人，剧作家，编辑，散文家和小说家协会）（PEN）；秘鲁新索尔（PEN）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "笔，钢笔；（圈养动物用的）围栏，圈；（计算机上使用的）电子笔；<美>监狱；<英，非正式>处罚，（尤指足球的）点球；墨水；雌天鹅；（动）（枪乌贼的）羽状壳；（西印度群岛）农庄，大农场；（潜艇等战舰的）隐蔽坞，掩藏坞；国际笔会（国际诗人，剧作家，编辑，散文家和小说家协会）（PEN）；秘鲁新索尔（PEN）"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "写，撰写；（把……）关起来，圈起来"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Pen）（法）庞，（俄、塞、英、意）佩恩，（柬）宾（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "paper": {
+    "phonetic": {
+      "us": "ˈpeɪpər",
+      "uk": "ˈpeɪpə(r)"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "纸；报纸；（工作、学习或个人的）资料，文件（papers）；证明，证件（如护照、身份证等）（papers）；政府报告，官方政策文件；<英>考试，答卷；（研究）论文，（学术）讲话；<美>（学校课程的）学期论文；墙纸，壁纸；有价证券；手纸，卫生纸；<俚>（剧院等娱乐场所的）免费入场券"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "用墙纸裱糊（墙壁）；用墙纸覆盖（洞，污点）（paper sth. over）；掩盖（尴尬问题）（paper sth. over）；<俚>发免费入场券使（剧院）满座"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "纸做的，纸质的；书面的，印刷的；纸上的，有名无实的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Paper）（俄）帕佩尔（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He folded the paper carefully. | 他小心地把那张纸折起来。",
+        "The review is in today's paper. | 这篇评论刊登在今天的报纸上。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "thesis",
+      "dissertation",
+      "newspaper",
+      "document",
+      "file"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "papers",
+      "第三人称单数": "papers",
+      "现在分词": "papering",
+      "过去式": "papered",
+      "过去分词": "papered"
+    },
+    "translations": {
+      "zh": "纸；报纸；（工作、学习或个人的）资料，文件（papers）；证明，证件（如护照、身份证等）（papers）；政府报告，官方政策文件；<英>考试，答卷；（研究）论文，（学术）讲话；<美>（学校课程的）学期论文；墙纸，壁纸；有价证券；手纸，卫生纸；<俚>（剧院等娱乐场所的）免费入场券"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "纸；报纸；（工作、学习或个人的）资料，文件（papers）；证明，证件（如护照、身份证等）（papers）；政府报告，官方政策文件；<英>考试，答卷；（研究）论文，（学术）讲话；<美>（学校课程的）学期论文；墙纸，壁纸；有价证券；手纸，卫生纸；<俚>（剧院等娱乐场所的）免费入场券"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "用墙纸裱糊（墙壁）；用墙纸覆盖（洞，污点）（paper sth. over）；掩盖（尴尬问题）（paper sth. over）；<俚>发免费入场券使（剧院）满座"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "纸做的，纸质的；书面的，印刷的；纸上的，有名无实的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Paper）（俄）帕佩尔（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "desk": {
+    "phonetic": {
+      "us": "desk",
+      "uk": "desk"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "书桌，办公桌，写字台；服务台，问询台；（办理某项业务的）部门；乐谱架，演奏者席；<美>（报社）编辑部"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "书桌的，桌上适合用的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The desk looked undisturbed. | 那张书桌子看上去没有被动过。",
+        "A phone trilled on the desk. | 办公桌上的电话丁零零地响了。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "bureau",
+      "Information Counter"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "desks"
+    },
+    "translations": {
+      "zh": "书桌，办公桌，写字台；服务台，问询台；（办理某项业务的）部门；乐谱架，演奏者席；<美>（报社）编辑部"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "书桌，办公桌，写字台；服务台，问询台；（办理某项业务的）部门；乐谱架，演奏者席；<美>（报社）编辑部"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "书桌的，桌上适合用的"
+          ]
+        }
+      ]
+    }
+  },
+  "chair": {
+    "phonetic": {
+      "us": "tʃer",
+      "uk": "tʃeə(r)"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "椅子；主席，委员长；电椅；大学教授的职位"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "主席，主持；用椅子把某人高高抬起；使……入座；使就任要职"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Chair）（法）谢尔 （人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She jumped down off the chair. | 她跳下椅子。",
+        "Emily edged her chair forward. | 埃米莉把椅子慢慢地向前挪动。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "cathedra"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "chairs",
+      "第三人称单数": "chairs",
+      "现在分词": "chairing",
+      "过去式": "chaired",
+      "过去分词": "chaired"
+    },
+    "translations": {
+      "zh": "椅子；主席，委员长；电椅；大学教授的职位"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "椅子；主席，委员长；电椅；大学教授的职位"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "主席，主持；用椅子把某人高高抬起；使……入座；使就任要职"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Chair）（法）谢尔 （人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "test": {
+    "phonetic": {
+      "us": "test",
+      "uk": "test"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（书面或口头的）测验，考试；（医疗上的）检查，化验，检验；（对机器或武器等的）试验，检验；（对水、土壤、空气等的）检测，检验；（衡量能力或技能等的）测试，考验；医疗检查设备；化验结果；（常指板球、橄榄球的）国际锦标赛（Test）；准则，标准；（冶）烤钵，灰皿；（一些无脊椎动物和原生动物的）甲壳"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "试验，测试；测验，考查（熟练程度，知识）；检测，检验（质量或含量）；检查（身体），（用试剂）化验；考验；尝，（触）试"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He failed his driving test. | 他驾驶执照考试不及格。",
+        "She took her driving test yesterday. | 她昨天参加了驾照考试。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "monitoring",
+      "experiment",
+      "proof",
+      "try",
+      "try out"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "tests",
+      "第三人称单数": "tests",
+      "现在分词": "testing",
+      "过去式": "tested",
+      "过去分词": "tested"
+    },
+    "translations": {
+      "zh": "（书面或口头的）测验，考试；（医疗上的）检查，化验，检验；（对机器或武器等的）试验，检验；（对水、土壤、空气等的）检测，检验；（衡量能力或技能等的）测试，考验；医疗检查设备；化验结果；（常指板球、橄榄球的）国际锦标赛（Test）；准则，标准；（冶）烤钵，灰皿；（一些无脊椎动物和原生动物的）甲壳"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "（书面或口头的）测验，考试；（医疗上的）检查，化验，检验；（对机器或武器等的）试验，检验；（对水、土壤、空气等的）检测，检验；（衡量能力或技能等的）测试，考验；医疗检查设备；化验结果；（常指板球、橄榄球的）国际锦标赛（Test）；准则，标准；（冶）烤钵，灰皿；（一些无脊椎动物和原生动物的）甲壳"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "试验，测试；测验，考查（熟练程度，知识）；检测，检验（质量或含量）；检查（身体），（用试剂）化验；考验；尝，（触）试"
+          ]
+        }
+      ]
+    }
+  },
+  "cache": {
+    "phonetic": {
+      "us": "kæʃ",
+      "uk": "kæʃ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "隐藏处，秘窖；贮藏物，隐藏物（尤指武器）；高速缓冲存储器"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "匿藏，隐藏（尤指武器）；把（数据）存入高速缓冲存储器；给（硬件）装备高速缓存"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "In your Web browser's cache are the most recent Web files that you have downloaded. | 在你的网络浏览器的高速缓冲存储器里是你最新下载的网络文档。",
+        "You may need to clear your DNS cache. | 你可能需要清理你的DNS缓存。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "covert",
+      "lock",
+      "pocket",
+      "conceal",
+      "harbor"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "caches",
+      "第三人称单数": "caches",
+      "现在分词": "cacheing或caching",
+      "过去式": "cached",
+      "过去分词": "cached"
+    },
+    "translations": {
+      "zh": "隐藏处，秘窖；贮藏物，隐藏物（尤指武器）；高速缓冲存储器"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "隐藏处，秘窖；贮藏物，隐藏物（尤指武器）；高速缓冲存储器"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "匿藏，隐藏（尤指武器）；把（数据）存入高速缓冲存储器；给（硬件）装备高速缓存"
+          ]
+        }
+      ]
+    }
+  },
+  "speed": {
+    "phonetic": {
+      "us": "spiːd",
+      "uk": "spiːd"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "（运动）速度；（某事发生或进行的）速度；快，迅速；排挡，变速器；快门速度；感光度；照片曝光的时间；<非正式>安非他明；<古>成功，繁荣"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "快速移动；快速运送；超速驾驶；（使）加速，促进；<古>使兴旺发达，帮助成功；<非正式>用（脱氧麻黄碱之类的）兴奋剂成瘾"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Speed）斯皮德（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The car was gathering speed. | 汽车逐渐加速。",
+        "Speed had always exhilarated him. | 速度总是使他感到兴奋。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "quicken up",
+      "to accelerate",
+      "velocity",
+      "prosperity",
+      "up"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "speeds",
+      "第三人称单数": "speeds",
+      "现在分词": "speeding",
+      "过去式": "sped或speeded",
+      "过去分词": "sped或speeded"
+    },
+    "translations": {
+      "zh": "（运动）速度；（某事发生或进行的）速度；快，迅速；排挡，变速器；快门速度；感光度；照片曝光的时间；<非正式>安非他明；<古>成功，繁荣"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "（运动）速度；（某事发生或进行的）速度；快，迅速；排挡，变速器；快门速度；感光度；照片曝光的时间；<非正式>安非他明；<古>成功，繁荣"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "快速移动；快速运送；超速驾驶；（使）加速，促进；<古>使兴旺发达，帮助成功；<非正式>用（脱氧麻黄碱之类的）兴奋剂成瘾"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Speed）斯皮德（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "fast": {
+    "phonetic": {
+      "us": "fæst",
+      "uk": "fɑːst"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "快的，迅速的；系牢的，紧缚的；寻欢作乐的；不褪色的；忠实的，可靠的"
+        ]
+      },
+      {
+        "pos": "adv.",
+        "meanings": [
+          "快速地；坚定地，牢固地"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "斋戒，禁食"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "斋戒，斋戒期"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Fast）（英、德、俄、芬、捷、瑞典）法斯特（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "News travels fast these days. | 如今消息传播得很快。",
+        "They work terrifically fast. | 他们工作极快。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "rapid",
+      "sudden",
+      "tight",
+      "forward",
+      "ready"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "fasts",
+      "第三人称单数": "fasts",
+      "现在分词": "fasting",
+      "过去式": "fasted",
+      "过去分词": "fasted",
+      "比较级": "faster",
+      "最高级": "fastest"
+    },
+    "translations": {
+      "zh": "快的，迅速的；系牢的，紧缚的；寻欢作乐的；不褪色的；忠实的，可靠的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "快的，迅速的；系牢的，紧缚的；寻欢作乐的；不褪色的；忠实的，可靠的"
+          ]
+        },
+        {
+          "pos": "adv.",
+          "meanings": [
+            "快速地；坚定地，牢固地"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "斋戒，禁食"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "斋戒，斋戒期"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Fast）（英、德、俄、芬、捷、瑞典）法斯特（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "slow": {
+    "phonetic": {
+      "us": "sloʊ",
+      "uk": "sləʊ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "（移动，运行）低速的，缓慢的；慢速的，低速的；耗时的，太慢的；迟缓的，慢吞吞的；（钟表）慢的；迟钝的，愚笨的；（胶片）曝光慢的；（镜头）小孔径的；（生意）清淡的，不景气的；不曲折的，乏味的，无趣的；（火，烤箱）小火的，弱火的；（球场或地面）软的，阻球的，奔跑困难的"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "（使）放慢速度，（使）减速；（使）降低，（使）减少；（生活，工作）放松"
+        ]
+      },
+      {
+        "pos": "adv.",
+        "meanings": [
+          "低速地，缓慢地"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Slow）（英）斯洛（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Progress is maddeningly slow. | 进展慢得令人心烦。",
+        "The process was needlessly slow. | 进程过于缓慢了。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "dull",
+      "moderative",
+      "stagnate",
+      "impede",
+      "block up"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "第三人称单数": "slows",
+      "现在分词": "slowing",
+      "过去式": "slowed",
+      "过去分词": "slowed",
+      "比较级": "slower或more slow",
+      "最高级": "slowest或most slow"
+    },
+    "translations": {
+      "zh": "（移动，运行）低速的，缓慢的；慢速的，低速的；耗时的，太慢的；迟缓的，慢吞吞的；（钟表）慢的；迟钝的，愚笨的；（胶片）曝光慢的；（镜头）小孔径的；（生意）清淡的，不景气的；不曲折的，乏味的，无趣的；（火，烤箱）小火的，弱火的；（球场或地面）软的，阻球的，奔跑困难的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "（移动，运行）低速的，缓慢的；慢速的，低速的；耗时的，太慢的；迟缓的，慢吞吞的；（钟表）慢的；迟钝的，愚笨的；（胶片）曝光慢的；（镜头）小孔径的；（生意）清淡的，不景气的；不曲折的，乏味的，无趣的；（火，烤箱）小火的，弱火的；（球场或地面）软的，阻球的，奔跑困难的"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "（使）放慢速度，（使）减速；（使）降低，（使）减少；（生活，工作）放松"
+          ]
+        },
+        {
+          "pos": "adv.",
+          "meanings": [
+            "低速地，缓慢地"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Slow）（英）斯洛（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "abundant": {
+    "phonetic": {
+      "us": "əˈbʌndənt",
+      "uk": "əˈbʌndənt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "大量的，丰富的，充足的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "There is an abundant supply of cheap labour. | 有丰富的廉价劳动力供应。",
+        "I have ever had abundant love experiences. | 我曾经有过丰富的感情经历。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "full",
+      "ample",
+      "plentiful",
+      "luxurious"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "大量的，丰富的，充足的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "大量的，丰富的，充足的"
+          ]
+        }
+      ]
+    }
+  },
+  "brilliant": {
+    "phonetic": {
+      "us": "ˈbrɪliənt",
+      "uk": "ˈbrɪliənt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "巧妙的，使人印象深的；成功的，辉煌的；聪颖的，技艺高超的；明亮的，鲜艳的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The sky was a brilliant blue. | 天空一片蔚蓝。",
+        "He was a brilliant musician. | 他曾是一位出色的音乐家。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "excellent",
+      "prominent",
+      "outstanding",
+      "splendid",
+      "gorgeous"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "brilliants",
+      "比较级": "more brilliant",
+      "最高级": "most brilliant"
+    },
+    "translations": {
+      "zh": "巧妙的，使人印象深的；成功的，辉煌的；聪颖的，技艺高超的；明亮的，鲜艳的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "巧妙的，使人印象深的；成功的，辉煌的；聪颖的，技艺高超的；明亮的，鲜艳的"
+          ]
+        }
+      ]
+    }
+  },
+  "cautious": {
+    "phonetic": {
+      "us": "ˈjɑːtɪŋ",
+      "uk": "ˈjɒtɪŋ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "",
+        "meanings": [
+          "缪尔"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Here's a biography of John Muir. | 这是约翰·缪尔的传记。",
+        "In the book, we meet John Muir as a youth fearlessly climbing the roof of his house. | 在这本书中，我们看到约翰·缪尔作为一个年轻人无畏地爬上了他家的屋顶。"
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "游艇；帆船运动；快艇"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "游艇；帆船运动；快艇"
+          ]
+        },
+        {
+          "pos": "adj.",
+          "meanings": [
+            "驾游艇的；爱好帆船运动的"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "驾快艇（yacht 的 ing 形式）"
+          ]
+        }
+      ]
+    }
+  },
+  "diverse": {
+    "phonetic": {
+      "us": "daɪˈvɜːrs",
+      "uk": "daɪˈvɜːs"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "不同的，各式各样的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Cuba is a composite of diverse traditions and people. | 古巴是一个不同传统和民族的融合体。",
+        "The company owns a very diverse library of Arabic music. | 公司收藏有多种多样的阿拉伯音乐。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "different",
+      "unlike",
+      "varying",
+      "another",
+      "dissimilar"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "不同的，各式各样的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "不同的，各式各样的"
+          ]
+        }
+      ]
+    }
+  },
+  "eager": {
+    "phonetic": {
+      "us": "ˈiːɡər",
+      "uk": "ˈiːɡə(r)"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "热切的，渴望的，渴求的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Eager）（英）伊格（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He was eager to get into politics. | 他渴望从政。",
+        "Robert was eager to talk about life in the Army. | 罗伯特渴望谈论军旅生活。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "hungry",
+      "desired",
+      "anxious",
+      "sick",
+      "keen"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "热切的，渴望的，渴求的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "热切的，渴望的，渴求的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Eager）（英）伊格（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "fortunate": {
+    "phonetic": {
+      "us": "ˈfɔːrtʃənət",
+      "uk": "ˈfɔːtʃənət"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "幸运的；带来幸运的，吉利的；富足的；侥幸的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "In this respect we are very fortunate. | 在这方面，我们是很幸运的。",
+        "I often think about those less fortunate than me. | 我经常想到那些不如我幸运的人。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "lucky",
+      "providential"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "fortunates",
+      "比较级": "more fortunate",
+      "最高级": "most fortunate"
+    },
+    "translations": {
+      "zh": "幸运的；带来幸运的，吉利的；富足的；侥幸的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "幸运的；带来幸运的，吉利的；富足的；侥幸的"
+          ]
+        }
+      ]
+    }
+  },
+  "graceful": {
+    "phonetic": {
+      "us": "ˈɡreɪsf(ə)l",
+      "uk": "ˈɡreɪsf(ə)l"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "优美的，优雅的；得体的，有风度的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "His walk was lithe and graceful. | 他的步态柔韧而优雅。",
+        "He gave a graceful bow to the audience. | 他优雅地向观众鞠了一躬。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "elegant",
+      "pretty",
+      "exquisite"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "优美的，优雅的；得体的，有风度的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "优美的，优雅的；得体的，有风度的"
+          ]
+        }
+      ]
+    }
+  },
+  "honest": {
+    "phonetic": {
+      "us": "ˈɑːnɪst",
+      "uk": "ˈɒnɪst"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "诚实的，正直的；坦诚的，直率的；真诚的，显示诚意的；正当获得的；纯正的，不花哨的；无意（伤害别人）的"
+        ]
+      },
+      {
+        "pos": "adv.",
+        "meanings": [
+          "真的，确实"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I'm disappointed, to be honest. | 我很失望，说实在的。",
+        "He was refreshingly honest. | 他诚实得让人耳目一新。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "responsible",
+      "effective",
+      "transparent",
+      "reliable",
+      "tried"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "诚实的，正直的；坦诚的，直率的；真诚的，显示诚意的；正当获得的；纯正的，不花哨的；无意（伤害别人）的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "诚实的，正直的；坦诚的，直率的；真诚的，显示诚意的；正当获得的；纯正的，不花哨的；无意（伤害别人）的"
+          ]
+        },
+        {
+          "pos": "adv.",
+          "meanings": [
+            "真的，确实"
+          ]
+        }
+      ]
+    }
+  },
+  "ingenious": {
+    "phonetic": {
+      "us": "ɪnˈdʒiːniəs",
+      "uk": "ɪnˈdʒiːniəs"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "灵巧的，有独创性的；精巧的，巧妙的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "You must have managed to escape, you clever, ingenious, intelligent Toad! | 你一定是设法逃出来的，你这聪明机灵的癞蛤蟆！",
+        "His smartness of the morning had seemed to Tom a good joke before, and very ingenious. | 汤姆之前觉得他早上耍的小聪明是个很好的笑话，而且很有独创性。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "prepared",
+      "clever"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "灵巧的，有独创性的；精巧的，巧妙的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "灵巧的，有独创性的；精巧的，巧妙的"
+          ]
+        }
+      ]
+    }
+  },
+  "joyful": {
+    "phonetic": {
+      "us": "ˈdʒɔɪfl",
+      "uk": "ˈdʒɔɪfl"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "高兴的，令人愉快的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "It was a joyful meeting. | 这是一次令人高兴的见面。",
+        "A wedding is a joyful celebration of love. | 婚礼是令人喜悦的爱情庆典。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "glad",
+      "fulfilling"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "高兴的，令人愉快的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "高兴的，令人愉快的"
+          ]
+        }
+      ]
+    }
+  },
+  "keen": {
+    "phonetic": {
+      "us": "ˌɪnɪˈfɪʃ(ə)nt",
+      "uk": "ˌɪnɪˈfɪʃ(ə)nt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "流氓，无赖；不诚实的人"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "下贱的，卑鄙的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "（Rascal）（美）瓦史撒乐（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He was a rascal from his birth. | 他生来就是个流氓。",
+        "Come here, you little rascal! | 过来，你这个小坏蛋！"
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "rascals"
+    },
+    "translations": {
+      "zh": "效率低的，能力差的，浪费的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "效率低的，能力差的，浪费的"
+          ]
+        }
+      ]
+    }
+  },
+  "loyal": {
+    "phonetic": {
+      "us": "ˈfɑːsfərəs",
+      "uk": "ˈfɒsfərəs"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "vi.",
+        "meanings": [
+          "向上生长，向上跳跃"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "发展；跃起，向上弹"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {
+      "第三人称单数": "upsprings",
+      "现在分词": "upspringing",
+      "过去式": "upsprang或upsprung",
+      "过去分词": "upsprung"
+    },
+    "translations": {
+      "zh": "福斯福洛斯（希腊神话中的一个提坦，启明星之神）"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "福斯福洛斯（希腊神话中的一个提坦，启明星之神）"
+          ]
+        }
+      ]
+    }
+  },
+  "modest": {
+    "phonetic": {
+      "us": "ˈmɑːdɪst",
+      "uk": "ˈmɒdɪst"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "不太多的，适中的；谦虚的，谦逊的；保守的，端庄的；不错的；（服装）不显身材的；羞怯的，腼腆的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Modest）（罗）莫代斯特，（德）莫德斯特，（俄）莫杰斯特（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She's very modest about her success. | 她对自己的成功非常谦虚。",
+        "You're too modest! | 你太谦虚了！"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "odest",
+      "inobtrusive"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "more modest",
+      "最高级": "most modest"
+    },
+    "translations": {
+      "zh": "不太多的，适中的；谦虚的，谦逊的；保守的，端庄的；不错的；（服装）不显身材的；羞怯的，腼腆的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "不太多的，适中的；谦虚的，谦逊的；保守的，端庄的；不错的；（服装）不显身材的；羞怯的，腼腆的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Modest）（罗）莫代斯特，（德）莫德斯特，（俄）莫杰斯特（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "noble": {
+    "phonetic": {
+      "us": "ˈnoʊb(ə)l",
+      "uk": "ˈnəʊb(ə)l"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "（noble）贵族的，高贵的；（品质）高尚的；宏伟的，壮丽的；惰性的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "（noble）贵族；（于1351年首次发行的）英国金币"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "（美、加、英）诺布尔（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He died for a noble cause. | 他为了高尚的事业而牺牲。",
+        "He was an upright and noble man who was always willing to help in any way he could. | 他是一个正直、高尚的人，总是愿意尽其所能来帮忙。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "magnificent",
+      "grand",
+      "prince",
+      "nobility",
+      "aristocrat"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "（noble）贵族的，高贵的；（品质）高尚的；宏伟的，壮丽的；惰性的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "（noble）贵族的，高贵的；（品质）高尚的；宏伟的，壮丽的；惰性的"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "（noble）贵族；（于1351年首次发行的）英国金币"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "（美、加、英）诺布尔（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "optimistic": {
+    "phonetic": {
+      "us": "ˌɑːptɪˈmɪstɪk",
+      "uk": "ˌɒptɪˈmɪstɪk"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "乐观的，乐观主义的；（估计）过于乐观的，高估的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I'm cautiously optimistic. | 我持谨慎的乐观态度。",
+        "He has an optimistic view of life. | 他乐观地看待人生。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "rose-colored",
+      "rosy"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "乐观的，乐观主义的；（估计）过于乐观的，高估的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "乐观的，乐观主义的；（估计）过于乐观的，高估的"
+          ]
+        }
+      ]
+    }
+  },
+  "patient": {
+    "phonetic": {
+      "us": "ˈpeɪʃ(ə)nt",
+      "uk": "ˈpeɪʃ(ə)nt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "能忍耐的，有耐心的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "病人，患者；（语言学）受动者，承受者"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Patient）帕迪恩特（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The patient is terminally ill. | 这个病人病入膏肓。",
+        "The patient is still in denial. | 病人仍然拒不接受事实。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "indefatigable",
+      "sick",
+      "sufferer"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "patients",
+      "比较级": "more patient",
+      "最高级": "most patient"
+    },
+    "translations": {
+      "zh": "能忍耐的，有耐心的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "能忍耐的，有耐心的"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "病人，患者；（语言学）受动者，承受者"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Patient）帕迪恩特（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "prudent": {
+    "phonetic": {
+      "us": "ˈpruːd(ə)nt",
+      "uk": "ˈpruːd(ə)nt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "谨慎的，慎重的；节俭的"
+        ]
+      },
+      {
+        "pos": "",
+        "meanings": [
+          "【名】 （Prudent）（法）普吕当（人名）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "The president of the republic oscillated between a certain audacity and a prudent realism. | 该共和国总统施政时而大胆，时而谨慎务实。",
+        "Be modest and prudent, never lag behind! | 谦虚谨慎，永不落后！"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "cautious",
+      "wary",
+      "provident"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "more prudent",
+      "最高级": "most prudent"
+    },
+    "translations": {
+      "zh": "谨慎的，慎重的；节俭的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "谨慎的，慎重的；节俭的"
+          ]
+        },
+        {
+          "pos": "",
+          "meanings": [
+            "【名】 （Prudent）（法）普吕当（人名）"
+          ]
+        }
+      ]
+    }
+  },
+  "radiant": {
+    "phonetic": {
+      "us": "ˈreɪdiənt",
+      "uk": "ˈreɪdiənt"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "容光焕发的，喜悦的；明亮的，灿烂的；（热、能量）辐射的；（情感、品质）强烈的，显著的"
+        ]
+      },
+      {
+        "pos": "n.",
+        "meanings": [
+          "辐射源（尤指电热器或气热器的产热部分）；（天文）辐射点"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "She was radiant with health. | 她身体健康，容光焕发。",
+        "On her wedding day the bride looked truly radiant. | 在她婚礼那天，新娘看起来真的是容光焕发。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "roseate",
+      "pearlescent",
+      "bright spot",
+      "luminescent spot"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "more radiant",
+      "最高级": "most radiant"
+    },
+    "translations": {
+      "zh": "容光焕发的，喜悦的；明亮的，灿烂的；（热、能量）辐射的；（情感、品质）强烈的，显著的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "容光焕发的，喜悦的；明亮的，灿烂的；（热、能量）辐射的；（情感、品质）强烈的，显著的"
+          ]
+        },
+        {
+          "pos": "n.",
+          "meanings": [
+            "辐射源（尤指电热器或气热器的产热部分）；（天文）辐射点"
+          ]
+        }
+      ]
+    }
+  },
+  "sincere": {
+    "phonetic": {
+      "us": "sɪnˈsɪr",
+      "uk": "sɪnˈsɪə(r)"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "衷心的，诚挚的；（人）真诚的，诚恳的"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "He seemed sincere enough when he said he wanted to help. | 他表示愿意帮忙，样子很真诚。",
+        "He had a way of sounding so sincere. It made me warm and tingly. | 他的话听起来如此真诚。这让我觉得温暖而舒心。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "actual",
+      "positive",
+      "true",
+      "real",
+      "genuine"
+    ],
+    "antonyms": [],
+    "wordForms": {
+      "比较级": "sincerer或more sincere",
+      "最高级": "sincerest或most sincere"
+    },
+    "translations": {
+      "zh": "衷心的，诚挚的；（人）真诚的，诚恳的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "衷心的，诚挚的；（人）真诚的，诚恳的"
+          ]
+        }
+      ]
+    }
+  },
+  "thriving": {
+    "phonetic": {
+      "us": "ˈθraɪvɪŋ",
+      "uk": "ˈθraɪvɪŋ"
+    },
+    "targetDefinitions": [
+      {
+        "pos": "adj.",
+        "meanings": [
+          "欣欣向荣的，繁华的，兴旺的"
+        ]
+      },
+      {
+        "pos": "v.",
+        "meanings": [
+          "茁壮成长，兴旺，繁荣；（尤指在别人觉得困难的时候）以……为乐，可以出色应对（thrive 的现在分词）"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "Every trade is thriving. | 各行各业都欣欣向荣。",
+        "He appears to be thriving. | 他看起来兴旺发达蒸蒸日上。"
+      ],
+      "fun": []
+    },
+    "synonyms": [
+      "prosperous",
+      "flourishing",
+      "booming"
+    ],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "欣欣向荣的，繁华的，兴旺的"
+    },
+    "nativeDefinitions": {
+      "zh": [
+        {
+          "pos": "adj.",
+          "meanings": [
+            "欣欣向荣的，繁华的，兴旺的"
+          ]
+        },
+        {
+          "pos": "v.",
+          "meanings": [
+            "茁壮成长，兴旺，繁荣；（尤指在别人觉得困难的时候）以……为乐，可以出色应对（thrive 的现在分词）"
           ]
         }
       ]

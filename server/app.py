@@ -115,7 +115,7 @@ if HAS_SOCKETIO:
                 # 使用 disconnect 而不是返回 False，避免 WSGI 错误
                 from flask_socketio import disconnect
                 disconnect()
-                return False
+                return  # 直接返回，不返回 False
 
             user_id = user['id']
             connected_users[request.sid] = user_id

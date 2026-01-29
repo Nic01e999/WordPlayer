@@ -248,12 +248,46 @@
     background: var(--button-secondary-hover);
 }
 
-/* 验证码输入 */
+/* 验证码输入组 */
+.auth-code-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* 验证码输入框 */
 .auth-code-input {
-    letter-spacing: 0.5rem;
+    flex: 1;
+    letter-spacing: 0.3rem;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
+}
+
+/* 发送验证码按钮 */
+.auth-btn-code {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: var(--accent-primary);
+    color: white;
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.auth-btn-code:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+}
+
+.auth-btn-code:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* 倒计时 */

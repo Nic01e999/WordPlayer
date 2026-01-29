@@ -117,7 +117,8 @@ def get_cached_words(words: List[str], target_lang: str, native_lang: str) -> Tu
                         "targetDefinitions": info.get("targetDefinitions", []),
                         "examples": info.get("examples", {}),
                         "synonyms": info.get("synonyms", []),
-                        "antonyms": info.get("antonyms", [])
+                        "antonyms": info.get("antonyms", []),
+                        "wordForms": info.get("wordForms", {})
                     }
                     # 更新 LRU 顺序（deque 优化：先检查再移除）
                     try:
@@ -148,7 +149,7 @@ def update_cache(results: Dict[str, Any], target_lang: str, native_lang: str):
     """
     更新缓存（合并新数据 + LRU 淘汰）
 
-    results: { word: { phonetic, translation, nativeDefinitions, targetDefinitions, examples, synonyms, antonyms }, ... }
+    results: { word: { phonetic, translation, nativeDefinitions, targetDefinitions, examples, synonyms, antonyms, wordForms }, ... }
     """
     with _lock:
         cache = _get_or_load_cache(target_lang)
@@ -182,6 +183,8 @@ def update_cache(results: Dict[str, Any], target_lang: str, native_lang: str):
                     existing["synonyms"] = info["synonyms"]
                 if info.get("antonyms"):
                     existing["antonyms"] = info["antonyms"]
+                if info.get("wordForms"):
+                    existing["wordForms"] = info["wordForms"]
             else:
                 # 新单词，创建缓存条目
                 cache[key] = {
@@ -190,6 +193,7 @@ def update_cache(results: Dict[str, Any], target_lang: str, native_lang: str):
                     "examples": info.get("examples", {}),
                     "synonyms": info.get("synonyms", []),
                     "antonyms": info.get("antonyms", []),
+                    "wordForms": info.get("wordForms", {}),
                     "translations": {
                         native_lang: info.get("translation", "")
                     },

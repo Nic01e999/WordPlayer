@@ -126,6 +126,10 @@ function getDialogContent() {
                         <div class="auth-input-group">
                             <input type="password" class="auth-input" id="authPasswordConfirm" placeholder="${t('confirmPassword')}" autocomplete="new-password">
                         </div>
+                        <div class="auth-input-group auth-code-group">
+                            <input type="text" class="auth-input auth-code-input" id="authCode" placeholder="${t('verificationCode')}" maxlength="6" autocomplete="one-time-code">
+                            <button class="auth-btn-code" id="sendCodeBtn">${t('sendCode')}</button>
+                        </div>
                         <div class="auth-error" id="authError"></div>
                         <div class="auth-buttons">
                             <button class="auth-btn-primary" id="authSubmit">${t('registerTitle')}</button>
@@ -232,8 +236,11 @@ function bindEvents(overlay) {
                 case 'register':
                     if (password !== passwordConfirm) {
                         result = { error: t('passwordMismatch') };
+                    } else if (!code) {
+                        result = { error: t('codeRequired') || '请输入验证码' };
                     } else {
-                        result = await api.register(email, password);
+                        // 使用验证码创建账户（复用 resetPassword API）
+                        result = await api.resetPassword(email, code, password);
                         if (result.success) {
                             state.setToken(result.token);
                             state.setUser(result.user);
@@ -276,6 +283,54 @@ function bindEvents(overlay) {
             submitBtn.textContent = getSubmitButtonText();
         }
     });
+
+    // 发送验证码按钮（仅注册模式）
+    const sendCodeBtn = overlay.querySelector('#sendCodeBtn');
+    if (sendCodeBtn) {
+        let countdown = 0;
+
+        sendCodeBtn.addEventListener('click', async () => {
+            if (countdown > 0) return;
+
+            const email = emailInput?.value.trim();
+            if (!email) {
+                errorDiv.textContent = t('emailRequired') || '请输入邮箱';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.textContent = t('sending') || '发送中...';
+
+            try {
+                // 调用发送验证码 API
+                const result = await api.forgotPassword(email);
+                if (result.success) {
+                    // 开始倒计时
+                    countdown = 60;
+                    const timer = setInterval(() => {
+                        countdown--;
+                        sendCodeBtn.textContent = `${countdown}秒后重发`;
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            sendCodeBtn.disabled = false;
+                            sendCodeBtn.textContent = t('sendCode') || '发送验证码';
+                        }
+                    }, 1000);
+                } else {
+                    errorDiv.textContent = result.error || '发送失败';
+                    errorDiv.classList.add('show');
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.textContent = t('sendCode') || '发送验证码';
+                }
+            } catch (e) {
+                errorDiv.textContent = t('operationFailed') || '发送失败';
+                errorDiv.classList.add('show');
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = t('sendCode') || '发送验证码';
+            }
+        });
+    }
 
     // 切换模式
     overlay.querySelector('#switchToRegister')?.addEventListener('click', () => {
@@ -429,11 +484,11 @@ export function updateUserDisplay() {
             </div>
             <div class="user-dropdown" id="userDropdown">
                 <div class="user-dropdown-item" id="manualSync">
-                    <span>🔄</span>
+                    <span></span>
                     <span>${t('syncData')}</span>
                 </div>
                 <div class="user-dropdown-item danger" id="logoutBtn">
-                    <span>🚪</span>
+                    <span></span>
                     <span>${t('logout')}</span>
                 </div>
             </div>

@@ -76,7 +76,27 @@
     font-size: 200%;
     background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-end) 100%);
     border: 1px solid transparent;
+    position: relative;  /* 为伪元素定位做准备 */
+
 }
+
+.btn-sound::after {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;  /* 图标大小 */
+    height: 150%;
+    background-image: url('/assets/images/headphone.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;  /* 保持图标比例 */
+    pointer-events: none;  /* 允许点击穿透到底层按钮 */
+    filter: drop-shadow(0 2px 3px var(--shadow-brown)) sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
+
+}
+
 
 /* 声音按钮悬停状态 */
 .btn-sound:hover, .btn-pause:hover {

@@ -1,246 +1,1048 @@
 {
-  "二": {
-    "phonetic": "èr",
-    "targetDefinitions": [
-      {
-        "pos": "数词",
-        "meanings": [
-          "数字一加一的和",
-          "第二"
-        ]
-      },
-      {
-        "pos": "形容词",
-        "meanings": [
-          "两样的；别的（用于特定成语）"
-        ]
-      }
-    ],
+  "生活": {
+    "phonetic": null,
+    "targetDefinitions": [],
     "examples": {
       "common": [
-        "我家有两只猫。",
-        "今天是二月二日。"
+        "他觉得乡村<b>生活</b>比都市<b>生活</b>称心得多。 | He finds country life infinitely preferable to living in the city.",
+        "罗伯特渴望谈论军旅<b>生活</b>。 | Robert was eager to talk about life in the Army."
       ],
-      "fun": [
-        "他做事总是三心二意。",
-        "这道题一加一等于二，太简单了！"
-      ]
+      "fun": []
     },
-    "synonyms": [
-      "两",
-      "双",
-      "贰"
-    ],
-    "antonyms": [
-      "一",
-      "单"
-    ],
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
     "translations": {
-      "en": "two"
+      "zh": "Life"
     },
     "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "num.",
-          "meanings": [
-            "the number 2",
-            "second"
-          ]
-        },
-        {
-          "pos": "adj.",
-          "meanings": [
-            "different; not the same (used in some idioms)"
-          ]
-        }
-      ]
+      "zh": []
     }
   },
-  "一": {
-    "phonetic": "yī",
-    "targetDefinitions": [
-      {
-        "pos": "数词",
-        "meanings": [
-          "最小的正整数",
-          "单个；单独"
-        ]
-      },
-      {
-        "pos": "形容词",
-        "meanings": [
-          "同一；整个的"
-        ]
-      },
-      {
-        "pos": "副词",
-        "meanings": [
-          "表示一次或短暂的动作；表示两件事时间上前后紧接"
-        ]
-      }
-    ],
+  "理想": {
+    "phonetic": null,
+    "targetDefinitions": [],
     "examples": {
       "common": [
-        "我买了一个苹果。",
-        "我们一起回家吧。"
+        "沃尔特·迪斯尼坚持他的<b>理想</b>。 | Walt Disney stayed true to his ideals.",
+        "按<b>理想</b>来说，她想要再次怀孕。 | Ideally, she would love to become pregnant again."
       ],
-      "fun": [
-        "他一听到音乐就忍不住跳舞。",
-        "万里长征第一步最难。"
-      ]
+      "fun": []
     },
-    "synonyms": [
-      "壹",
-      "单",
-      "独"
-    ],
-    "antonyms": [
-      "多",
-      "众"
-    ],
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
     "translations": {
-      "en": "one"
+      "zh": "ideal"
     },
     "nativeDefinitions": {
-      "en": [
-        {
-          "pos": "num.",
-          "meanings": [
-            "the number 1",
-            "single; alone"
-          ]
-        },
-        {
-          "pos": "adj.",
-          "meanings": [
-            "same; whole"
-          ]
-        },
-        {
-          "pos": "adv.",
-          "meanings": [
-            "once; as soon as"
-          ]
-        }
-      ]
+      "zh": []
     }
   },
-  "拜拜": {
-    "phonetic": "bài bài",
-    "targetDefinitions": [
-      {
-        "pos": "v.",
-        "meanings": [
-          "告别，说再见",
-          "（口语）结束关系或联系"
-        ]
-      },
-      {
-        "pos": "int.",
-        "meanings": [
-          "用于道别时的口语词"
-        ]
-      }
-    ],
+  "温暖": {
+    "phonetic": null,
+    "targetDefinitions": [],
     "examples": {
       "common": [
-        "时间不早了，我跟大家说声拜拜。",
-        "他挥了挥手，说了句“拜拜”就转身离开了。"
+        "这些植物喜欢<b>温暖</b>潮湿的空气。 | These plants love warm, humid atmospheres.",
+        "<b>温暖</b>潮湿的空气招来了大量蚊子。 | The warm damp air attracts a lot of mosquitoes."
       ],
-      "fun": [
-        "跟我的拖延症说拜拜，明天开始我要做行动派！",
-        "手机没电了，我只好跟游戏世界暂时拜拜。"
-      ]
+      "fun": []
     },
-    "synonyms": [
-      "再见",
-      "再会",
-      "告辞",
-      "道别",
-      "告别"
-    ],
-    "antonyms": [
-      "你好",
-      "见面",
-      "相聚"
-    ],
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
     "translations": {
-      "zh": "再见"
+      "zh": "Warm"
     },
     "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "v.",
-          "meanings": [
-            "告别，说再见",
-            "（口语）结束关系或联系"
-          ]
-        },
-        {
-          "pos": "int.",
-          "meanings": [
-            "用于道别时的口语词"
-          ]
-        }
-      ]
+      "zh": []
     }
   },
-  "你好": {
-    "phonetic": "nǐ hǎo",
+  "时光": {
+    "phonetic": null,
     "targetDefinitions": [
-      {
-        "pos": "int.",
-        "meanings": [
-          "最常见的问候语，用于见面时打招呼"
-        ]
-      },
       {
         "pos": "n.",
         "meanings": [
-          "表示问候的行为或话语"
+          "r",
+          "e",
+          "p",
+          "o",
+          "s",
+          "i",
+          "t",
+          "o",
+          "r",
+          "y",
+          " ",
+          "i",
+          "n",
+          " ",
+          "a",
+          " ",
+          "p",
+          "u",
+          "b",
+          "l",
+          "i",
+          "c",
+          " ",
+          "b",
+          "u",
+          "i",
+          "l",
+          "d",
+          "i",
+          "n",
+          "g",
+          " ",
+          "w",
+          "h",
+          "e",
+          "r",
+          "e",
+          " ",
+          "l",
+          "o",
+          "s",
+          "t",
+          " ",
+          "a",
+          "r",
+          "t",
+          "i",
+          "c",
+          "l",
+          "e",
+          "s",
+          " ",
+          "c",
+          "a",
+          "n",
+          " ",
+          "b",
+          "e",
+          " ",
+          "k",
+          "e",
+          "p",
+          "t",
+          " ",
+          "u",
+          "n",
+          "t",
+          "i",
+          "l",
+          " ",
+          "t",
+          "h",
+          "e",
+          "i",
+          "r",
+          " ",
+          "o",
+          "w",
+          "n",
+          "e",
+          "r",
+          "s",
+          " ",
+          "r",
+          "e",
+          "c",
+          "l",
+          "a",
+          "i",
+          "m",
+          " ",
+          "t",
+          "h",
+          "e",
+          "m"
         ]
       }
     ],
     "examples": {
       "common": [
-        "你好，请问图书馆怎么走？",
-        "见到新同学，我主动上前说了声“你好”。"
+        "Let's go to the Lost and Found office. | 我们去失物招领处吧。",
+        "Excuse me, I wonder if there is a lost and found office. | 打扰一下，我想知道这里是否有失物招领处。"
       ],
-      "fun": [
-        "对着镜子练习了一百遍“你好”，结果见到真人还是忘了说。",
-        "外星人降落地球，开口第一句话竟然是字正腔圆的“你好”。"
-      ]
+      "fun": []
     },
-    "synonyms": [
-      "您好",
-      "你们好",
-      "嗨",
-      "哈喽",
-      "问候"
-    ],
-    "antonyms": [
-      "再见",
-      "拜拜",
-      "告辞"
-    ],
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
     "translations": {
-      "zh": "hello"
+      "zh": "肯尼·基"
     },
     "nativeDefinitions": {
-      "zh": [
-        {
-          "pos": "int.",
-          "meanings": [
-            "最常见的问候语，用于见面时打招呼"
-          ]
-        },
-        {
-          "pos": "n.",
-          "meanings": [
-            "表示问候的行为或话语"
-          ]
-        }
-      ]
+      "zh": []
+    }
+  },
+  "努力": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "我们正在<b>努力</b>扩展业务。 | We are trying to grow the business.",
+        "政府<b>努力</b>维持治安。 | The govern we are pirates, these data are stolen from youdao  struggled to maintain law and order."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "effort"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "风景": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "我们爬得越高，<b>风景</b>越是令人惊叹。 | The higher we climbed, the more awe-inspiring the scenery became.",
+        "花儿绚丽多彩，<b>风景</b>美丽动人。 | The flowers were colourful and the scenery magnificent."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "scenery"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "平安": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "我们祈求上苍保佑他们<b>平安</b>归来。 | We offered up our prayers for the men's safe return.",
+        "他们能<b>平安</b>返家真是幸运。 | They were lucky to get home in one piece."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "well"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "快乐": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "她珍惜那些<b>快乐</b>时光的记忆。 | She treasures her memories of those joyous days.",
+        "“复活节<b>快乐</b>，”他喊道。 | \"Happy Easter,\" he yelled."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Happy"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "成长": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "这些孩子处于不同的<b>成长</b>阶段。 | The children are at different stages of development.",
+        "她不想让子女在众人瞩目中<b>成长</b>。 | She doesn't want her children growing up in the public eye."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Growth"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "陪伴": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "罗斯一直都很享受女人的<b>陪伴</b>。 | Ross had always enjoyed the company of women.",
+        "他那时一直<b>陪伴</b>在他妻子身边。 | He was constantly at his wife's side."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "accompany"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "坚持": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "他们勉强<b>坚持</b>到救援到来。 | They managed to hold on until help arrived.",
+        "我们<b>坚持</b>要求全额退款。 | We insisted on a refund of the full amount."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "adhere to"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "希望": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "她<b>希望</b>今晚丰采迷人。 | She's hoping to pull tonight.",
+        "他们<b>希望</b>实现和解。 | They hope to effect a reconciliation."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Hope"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "温柔": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "他开始用异乎寻常的<b>温柔</b>安慰我。 | He began to comfort me with such unaccustomed gentleness.",
+        "怀特先生<b>温柔</b>地拥抱了妻子。 | Mr. White tenderly embraced his wife."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Tender"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "勇敢": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "她想<b>勇敢</b>，但却鼓不起勇气。 | She tried to be brave, but her courage failed her.",
+        "他<b>勇敢</b>顽强地与疾病作斗争。 | He fought the illness with courage and determination."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Brave"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "自由": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "他们为言论<b>自由</b>和集会<b>自由</b>而斗争。 | They were fighting for freedom of speech and freedom of assembly.",
+        "他走出法庭，重获<b>自由</b>。 | He walked from the court house a free man."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "liberty"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "热爱": {
+    "phonetic": null,
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "t",
+          "h",
+          "e",
+          " ",
+          "b",
+          "a",
+          "s",
+          "i",
+          "c",
+          " ",
+          "u",
+          "n",
+          "i",
+          "t",
+          " ",
+          "o",
+          "f",
+          " ",
+          "t",
+          "h",
+          "e",
+          "r",
+          "m",
+          "o",
+          "d",
+          "y",
+          "n",
+          "a",
+          "m",
+          "i",
+          "c",
+          " ",
+          "t",
+          "e",
+          "m",
+          "p",
+          "e",
+          "r",
+          "a",
+          "t",
+          "u",
+          "r",
+          "e",
+          " ",
+          "a",
+          "d",
+          "o",
+          "p",
+          "t",
+          "e",
+          "d",
+          " ",
+          "u",
+          "n",
+          "d",
+          "e",
+          "r",
+          " ",
+          "t",
+          "h",
+          "e",
+          " ",
+          "S",
+          "y",
+          "s",
+          "t",
+          "e",
+          "m",
+          "e",
+          " ",
+          "I",
+          "n",
+          "t",
+          "e",
+          "r",
+          "n",
+          "a",
+          "t",
+          "i",
+          "o",
+          "n",
+          "a",
+          "l",
+          " ",
+          "d",
+          "'",
+          "U",
+          "n",
+          "i",
+          "t",
+          "e",
+          "s",
+          "a",
+          " ",
+          "l",
+          "i",
+          "g",
+          "h",
+          "t",
+          " ",
+          "s",
+          "o",
+          "f",
+          "t",
+          " ",
+          "s",
+          "i",
+          "l",
+          "v",
+          "e",
+          "r",
+          "-",
+          "w",
+          "h",
+          "i",
+          "t",
+          "e",
+          " ",
+          "m",
+          "e",
+          "t",
+          "a",
+          "l",
+          "l",
+          "i",
+          "c",
+          " ",
+          "e",
+          "l",
+          "e",
+          "m",
+          "e",
+          "n",
+          "t",
+          " ",
+          "o",
+          "f",
+          " ",
+          "t",
+          "h",
+          "e",
+          " ",
+          "a",
+          "l",
+          "k",
+          "a",
+          "l",
+          "i",
+          " ",
+          "m",
+          "e",
+          "t",
+          "a",
+          "l",
+          " ",
+          "g",
+          "r",
+          "o",
+          "u",
+          "p",
+          ";",
+          " ",
+          "o",
+          "x",
+          "i",
+          "d",
+          "i",
+          "z",
+          "e",
+          "s",
+          " ",
+          "r",
+          "a",
+          "p",
+          "i",
+          "d",
+          "l",
+          "y",
+          " ",
+          "i",
+          "n",
+          " ",
+          "a",
+          "i",
+          "r",
+          " ",
+          "a",
+          "n",
+          "d",
+          " ",
+          "r",
+          "e",
+          "a",
+          "c",
+          "t",
+          "s",
+          " ",
+          "v",
+          "i",
+          "o",
+          "l",
+          "e",
+          "n",
+          "t",
+          "l",
+          "y",
+          " ",
+          "w",
+          "i",
+          "t",
+          "h",
+          " ",
+          "w",
+          "a",
+          "t",
+          "e",
+          "r",
+          ";",
+          " ",
+          "i",
+          "s",
+          " ",
+          "a",
+          "b",
+          "u",
+          "n",
+          "d",
+          "a",
+          "n",
+          "t",
+          " ",
+          "i",
+          "n",
+          " ",
+          "n",
+          "a",
+          "t",
+          "u",
+          "r",
+          "e",
+          " ",
+          "i",
+          "n",
+          " ",
+          "c",
+          "o",
+          "m",
+          "b",
+          "i",
+          "n",
+          "e",
+          "d",
+          " ",
+          "f",
+          "o",
+          "r",
+          "m",
+          "s",
+          " ",
+          "o",
+          "c",
+          "c",
+          "u",
+          "r",
+          "r",
+          "i",
+          "n",
+          "g",
+          " ",
+          "i",
+          "n",
+          " ",
+          "s",
+          "e",
+          "a",
+          " ",
+          "w",
+          "a",
+          "t",
+          "e",
+          "r",
+          " ",
+          "a",
+          "n",
+          "d",
+          " ",
+          "i",
+          "n",
+          " ",
+          "c",
+          "a",
+          "r",
+          "n",
+          "a",
+          "l",
+          "l",
+          "i",
+          "t",
+          "e",
+          " ",
+          "a",
+          "n",
+          "d",
+          " ",
+          "k",
+          "a",
+          "i",
+          "n",
+          "i",
+          "t",
+          "e",
+          " ",
+          "a",
+          "n",
+          "d",
+          " ",
+          "s",
+          "y",
+          "l",
+          "v",
+          "i",
+          "t",
+          "e",
+          "t",
+          "h",
+          "e",
+          " ",
+          "c",
+          "a",
+          "r",
+          "d",
+          "i",
+          "n",
+          "a",
+          "l",
+          " ",
+          "n",
+          "u",
+          "m",
+          "b",
+          "e",
+          "r",
+          " ",
+          "t",
+          "h",
+          "a",
+          "t",
+          " ",
+          "i",
+          "s",
+          " ",
+          "t",
+          "h",
+          "e",
+          " ",
+          "p",
+          "r",
+          "o",
+          "d",
+          "u",
+          "c",
+          "t",
+          " ",
+          "o",
+          "f",
+          " ",
+          "1",
+          "0",
+          " ",
+          "a",
+          "n",
+          "d",
+          " ",
+          "1",
+          "0",
+          "0",
+          "a",
+          " ",
+          "u",
+          "n",
+          "i",
+          "t",
+          " ",
+          "o",
+          "f",
+          " ",
+          "i",
+          "n",
+          "f",
+          "o",
+          "r",
+          "m",
+          "a",
+          "t",
+          "i",
+          "o",
+          "n",
+          " ",
+          "e",
+          "q",
+          "u",
+          "a",
+          "l",
+          " ",
+          "t",
+          "o",
+          " ",
+          "o",
+          "n",
+          "e",
+          " ",
+          "t",
+          "h",
+          "o",
+          "u",
+          "s",
+          "a",
+          "n",
+          "d",
+          " ",
+          "(",
+          "1",
+          "0",
+          "2",
+          "4",
+          ")",
+          " ",
+          "b",
+          "y",
+          "t",
+          "e",
+          "s",
+          "s",
+          "t",
+          "r",
+          "e",
+          "e",
+          "t",
+          " ",
+          "n",
+          "a",
+          "m",
+          "e",
+          "s",
+          " ",
+          "f",
+          "o",
+          "r",
+          " ",
+          "k",
+          "e",
+          "t",
+          "a",
+          "m",
+          "i",
+          "n",
+          "e"
+        ]
+      },
+      {
+        "pos": "adj.",
+        "meanings": [
+          "d",
+          "e",
+          "n",
+          "o",
+          "t",
+          "i",
+          "n",
+          "g",
+          " ",
+          "a",
+          " ",
+          "q",
+          "u",
+          "a",
+          "n",
+          "t",
+          "i",
+          "t",
+          "y",
+          " ",
+          "c",
+          "o",
+          "n",
+          "s",
+          "i",
+          "s",
+          "t",
+          "i",
+          "n",
+          "g",
+          " ",
+          "o",
+          "f",
+          " ",
+          "1",
+          ",",
+          "0",
+          "0",
+          "0",
+          " ",
+          "i",
+          "t",
+          "e",
+          "m",
+          "s",
+          " ",
+          "o",
+          "r",
+          " ",
+          "u",
+          "n",
+          "i",
+          "t",
+          "s"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [
+        "I thought her name was Catherine, but it's Kathryn spelt with a 'K'. | 我原以为她叫Catherine，其实是Kathryn，以K开头。",
+        "Vitamin K is routinely given in the first week of life to prevent bleeding. | 维生素K要在婴儿出生的第一周内常规性地补充以防出血。"
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "k's或ks"
+    },
+    "translations": {
+      "zh": "Musou Orochi"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "真诚": {
+    "phonetic": null,
+    "targetDefinitions": [
+      {
+        "pos": "n.",
+        "meanings": [
+          "a",
+          " ",
+          "w",
+          "o",
+          "m",
+          "a",
+          "n",
+          " ",
+          "e",
+          "x",
+          "e",
+          "c",
+          "u",
+          "t",
+          "o",
+          "r"
+        ]
+      }
+    ],
+    "examples": {
+      "common": [],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {
+      "复数": "executrices或executrixes"
+    },
+    "translations": {
+      "zh": "BGata HKei"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "梦想": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "她走遍天下，追寻她的<b>梦想</b>。 | She travelled the world in pursuit of her dreams.",
+        "她<b>梦想</b>达到超级巨星的地位。 | She dreamed of reaching the dizzy heights of stardom."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Dream"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "幸福": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "<b>幸福</b>的家长造就<b>幸福</b>的孩子。 | A happy parent makes for a happy child.",
+        "我们都渴望健康和<b>幸福</b>。 | We all desire health and happiness."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Happiness"
+    },
+    "nativeDefinitions": {
+      "zh": []
+    }
+  },
+  "平凡": {
+    "phonetic": null,
+    "targetDefinitions": [],
+    "examples": {
+      "common": [
+        "幻想之后，等待他的是<b>平凡</b>的现世。 | Enough of fantasy, the workaday world awaited him.",
+        "他也不过是个十分疼爱自己狗儿的<b>平凡</b>人。 | He's just a regular guy who loves his dog."
+      ],
+      "fun": []
+    },
+    "synonyms": [],
+    "antonyms": [],
+    "wordForms": {},
+    "translations": {
+      "zh": "Ordinary"
+    },
+    "nativeDefinitions": {
+      "zh": []
     }
   }
 }

@@ -269,30 +269,6 @@ export function escapeHtml(text) {
     return div.innerHTML;
 }
 
-/**
- * 根据最长行自动调整侧边栏宽度
- */
-export function adjustSidebarWidth() {
-    const wordInput = $("wordInput");
-    const sidebar = document.querySelector(".settings-trigger .sidebar");
-    if (!wordInput || !sidebar) return;
-
-    const style = getComputedStyle(wordInput);
-    const font = `${style.fontSize} ${style.fontFamily}`;
-
-    const lines = wordInput.value.split(/\n/).filter(l => l.trim());
-    const maxTextWidth = lines.reduce((max, l) => Math.max(max, measureTextWidth(l, font)), 0);
-
-    const baseWidth = 240;
-    const extraSpace = 85;
-    const neededWidth = maxTextWidth + extraSpace;
-
-    sidebar.style.minWidth = Math.max(baseWidth, neededWidth) + "px";
-}
-
-/**
- * 根据预加载状态更新模式按钮的可用性
- */
 export function updateModeButtonsState() {
     const dictationBtn = document.getElementById("dictation-btn");
     const repeaterBtn = document.getElementById("repeater-btn");
@@ -524,4 +500,47 @@ export function showToast(message, typeOrDuration = 3000) {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
     }, duration);
+}
+
+/**
+ * 设置面板点击切换功能
+ * 支持点击齿轮图标切换显示/隐藏，点击外部区域关闭，ESC 键关闭
+ */
+export function initSettingsToggle() {
+    const settingsTrigger = document.querySelector('.settings-trigger');
+    const gearIcon = document.querySelector('.gear-icon');
+
+    if (!settingsTrigger || !gearIcon) {
+        console.warn('设置面板元素未找到，跳过点击切换功能初始化');
+        return;
+    }
+
+    // 点击齿轮图标切换显示/隐藏
+    gearIcon.addEventListener('click', (e) => {
+        e.stopPropagation();  // 阻止事件冒泡
+        settingsTrigger.classList.toggle('active');
+        console.log('设置面板切换:', settingsTrigger.classList.contains('active') ? '显示' : '隐藏');
+    });
+
+    // 点击 sidebar 外部区域关闭
+    document.addEventListener('click', (e) => {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar || !settingsTrigger.classList.contains('active')) return;
+
+        // 如果点击的不是 sidebar 内部，则关闭
+        if (!sidebar.contains(e.target) && !gearIcon.contains(e.target)) {
+            settingsTrigger.classList.remove('active');
+            console.log('点击外部区域，关闭设置面板');
+        }
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && settingsTrigger.classList.contains('active')) {
+            settingsTrigger.classList.remove('active');
+            console.log('按下 ESC 键，关闭设置面板');
+        }
+    });
+
+    console.log('设置面板点击切换功能已初始化');
 }

@@ -17,6 +17,7 @@
     z-index: 100;
 }
 
+
 /* 铁线圈装订效果 - 只在听写模式显示 */
 body.dictation-mode #menu::after {
     content: '';
@@ -112,6 +113,7 @@ body.dictation-mode #menu::after {
 
 /* 设置触发器容器 */
 .settings-trigger {
+    position: relative;
     text-align: center;
     flex-shrink: 0;
     width: 3.125rem;
@@ -156,16 +158,37 @@ body.dictation-mode #menu::after {
     transform: rotate(180deg);
 }
 
+
+
+/* 设置面板容器 - 全高布局 */
+.setting-container {
+    position: fixed;           /* 改为 fixed，相对于视口定位 */
+    top: 0;                    /* 从顶部开始 */
+    bottom: 0;                 /* 到底部结束，实现全高 */
+    right: 0;                  /* 靠右对齐 */
+    width: auto;               /* 宽度自适应 */
+    overflow-y: auto;          /* container 可滚动 */
+    overflow-x: hidden;        /* 隐藏横向滚动 */
+    z-index: 1001;             /* 提高层级，盖住 menu (z-index: 100) */
+    pointer-events: none;      /* 默认点击穿透 */
+    padding-top: 4rem;         /* 为 menu 留出空间 */
+    padding-right: 3.125rem;   /* 为齿轮按钮留出空间 */
+}
 /* 设置面板样式 */
-.settings-trigger .sidebar {
-    position: absolute;
-    right: 3.125rem;
-    top: 100%;
+.setting-container .sidebar {
     margin-top: 0.9375rem;
-    padding-bottom: 20%;
-    width: clamp(12rem, 20vw, 15rem);
-    max-height: 80vh;
-    overflow-y: auto;
+    margin-bottom: 3rem;
+    padding: 1.5rem 1.25rem;
+
+    /* 宽度由内容决定（设置项的宽度） */
+    width: fit-content;        /* 根据内容自适应 */
+    min-width: 12rem;          /* 最小宽度 192px */
+    max-width: 20rem;          /* 最大宽度 320px */
+
+    /* 高度自适应内容，不设置 max-height */
+    height: auto;
+
+    /* 保持液态玻璃风格 */
     background: linear-gradient(135deg,
         var(--white-medium) 0%,
         var(--white-soft) 50%,
@@ -175,22 +198,32 @@ body.dictation-mode #menu::after {
     box-shadow:
         0 8px 32px var(--shadow-pink-light),
         0 0 0 1px var(--border-white) inset;
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+
+    /* 显示/隐藏动画 */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-30px) scale(0.9);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 1.25rem;
+
     box-sizing: border-box;
     z-index: 1000;
-    backdrop-filter: blur(10px) saturate(180%);
-    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    pointer-events: auto;      /* sidebar 可点击 */
 }
 
-/* 设置面板显示状态 */
+/* 设置面板显示状态 - 悬停显示（不放大，避免超出屏幕） */
 .settings-trigger:hover .sidebar {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) scale(1.1);
+    transform: translateY(0) scale(1);  /* 改为 scale(1)，不放大 */
+}
+
+/* 设置面板显示状态 - 点击显示（添加 active 类） */
+.settings-trigger.active .sidebar {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 /* 设置面板标题样式 */

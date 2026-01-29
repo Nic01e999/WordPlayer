@@ -10,7 +10,7 @@ from flask import Blueprint, request, jsonify
 
 from cache import get_cached_words, update_cache, get_cache_stats, get_cached_word_base, add_translation
 from utils import strip_markdown_code_blocks, parse_deepseek_response
-from youdao import validate_words_batch
+from youdao import get_word_complete_info
 from constants import (
     LANG_PATTERNS,
     LANG_NAMES,
@@ -218,10 +218,10 @@ Respond ONLY with valid JSON, no markdown.'''
 @deepseek_bp.route("/api/wordinfo/details", methods=["POST"])
 def wordinfo_details():
     """
-    获取单词完整信息（音标、翻译、释义、例句、同义词、反义词）- 全功能API
+    获取单词完整信息（音标、翻译、释义、例句、同义词、反义词）- 使用有道 API
     POST /api/wordinfo/details
     Body: { "words": ["apple", "happy"], "targetLang": "en", "nativeLang": "zh" }
-    返回: { "results": { "apple": { phonetic, translation, nativeDefinitions, targetDefinitions, examples, synonyms, antonyms }, ... } }
+    返回: { "results": { "apple": { phonetic, translation, nativeDefinitions, targetDefinitions, examples, synonyms, antonyms, wordForms }, ... } }
 
     缓存逻辑：
     - 按目标语言分文件存储 (cache/wordinfo/en.json 等)
@@ -274,164 +274,82 @@ def wordinfo_details():
     # 初始化 API 结果字典
     api_results = {}
 
-    # 有道验证：在调用 DeepSeek API 前验证单词是否存在
-    words_to_validate = words_need_full + words_need_translation
-    if words_to_validate:
-        print(f"[有道验证] 开始验证 {len(words_to_validate)} 个单词")
-        try:
-            validation_result = validate_words_batch(words_to_validate, target_lang, native_lang)
-            valid_words = set(validation_result['valid'])
-            invalid_words = validation_result['invalid']
+    try:
+        # 1. 完整查询（没缓存的单词）- 使用有道 API
+        if words_need_full:
+            print(f"[有道API] 开始查询 {len(words_need_full)} 个单词的完整信息")
+            for word in words_need_full:
+                try:
+                    result = get_word_complete_info(word, target_lang, native_lang)
 
-            # 过滤出验证通过的单词
-            words_need_full = [w for w in words_need_full if w in valid_words]
-            words_need_translation = [w for w in words_need_translation if w in valid_words]
+                    # 检查是否有错误
+                    if "error" in result:
+                        print(f"[有道API] 单词 '{word}' 查询失败")
+                        api_results[word] = {
+                            "error": "word_not_found",
+                            "word": word
+                        }
+                    else:
+                        api_results[word] = result
+                        print(f"[有道API] 单词 '{word}' 查询成功")
 
-            # 对验证失败的单词返回错误标记
-            if invalid_words:
-                print(f"[有道验证] {len(invalid_words)} 个单词验证失败: {invalid_words}")
-                for word in invalid_words:
+                except Exception as e:
+                    print(f"[有道API] 查询单词 '{word}' 时出错: {str(e)}")
                     api_results[word] = {
                         "error": "word_not_found",
                         "word": word
                     }
 
-            print(f"[有道验证] 验证通过: {len(valid_words)} 个, 失败: {len(invalid_words)} 个")
-        except Exception as e:
-            print(f"[有道验证] 验证过程出错: {e}")
-            import traceback
-            traceback.print_exc()
+            # 更新缓存（只缓存成功的结果）
+            successful_results = {k: v for k, v in api_results.items() if "error" not in v}
+            if successful_results:
+                update_cache(successful_results, target_lang, native_lang)
+                print(f"[Cache] 已缓存 {len(successful_results)} 个单词")
 
-    # 如果所有单词都验证失败，直接返回
-    if not words_need_full and not words_need_translation:
-        if api_results:  # 有验证失败的单词
-            all_results = {**cached_results, **api_results}
-            return jsonify({"results": all_results})
-        # 否则全部命中缓存
-        return jsonify({"results": cached_results})
-
-    # 检查 API 配置
-    if not DEEPSEEK_API_KEY:
-        return jsonify({"error": "未配置 DEEPSEEK_API_KEY"}), 500
-
-    target_lang_name = LANG_NAMES.get(target_lang, 'English')
-    native_lang_name = LANG_NAMES.get(native_lang, 'Chinese')
-    phonetic_format = LANG_PHONETIC_FORMAT.get(target_lang, LANG_PHONETIC_FORMAT['en'])
-
-    try:
-        # 1. 完整查询（没缓存的单词）
-        if words_need_full:
-            words_list = ", ".join(f'"{w}"' for w in words_need_full)
-            prompt = f'''For these {target_lang_name} words: [{words_list}]
-
-Provide complete information for EACH word in this JSON format:
-{{
-  "word1": {{
-    "phonetic": "IPA phonetic transcription",
-    "translation": "main translation in {native_lang_name}",
-    "nativeDefinitions": [
-      {{"pos": "n.", "meanings": ["meaning1 in {native_lang_name}", "meaning2"]}}
-    ],
-    "targetDefinitions": [
-      {{"pos": "n.", "meanings": ["meaning1 in {target_lang_name}", "meaning2"]}}
-    ],
-    "examples": {{
-      "common": ["common sentence 1", "common sentence 2"],
-      "fun": ["fun/interesting sentence 1", "fun/interesting sentence 2"]
-    }},
-    "synonyms": ["syn1", "syn2", "syn3"],
-    "antonyms": ["ant1", "ant2"]
-  }},
-  "word2": {{ ... }}
-}}
-
-Rules for each word:
-- phonetic: {phonetic_format}
-- translation: Most common translation in {native_lang_name}
-- nativeDefinitions: Group by part of speech (n./v./adj./adv./etc.), meanings in {native_lang_name}
-- targetDefinitions: Group by part of speech, meanings in {target_lang_name}
-- examples.common: 2 common/typical usage sentences in {target_lang_name} (must contain the word)
-- examples.fun: 2 interesting/creative sentences in {target_lang_name} (must contain the word)
-- synonyms: Up to 5 {target_lang_name} words with similar meaning
-- antonyms: Up to 3 {target_lang_name} words with opposite meaning (empty array if none)
-
-Respond ONLY with valid JSON, no markdown.'''
-
-            success, content, error = _call_deepseek_api(prompt)
-            if not success:
-                print(f"DeepSeek API error: {error}")
-                return jsonify({"error": error}), 500
-
-            # 提取 JSON
-            content = strip_markdown_code_blocks(content)
-            raw_results = json.loads(content)
-
-            # 处理 API 结果
-            api_results.update(_process_api_results(raw_results, words_need_full, include_phonetic=True))
-
-            # 更新缓存
-            update_cache(api_results, target_lang, native_lang)
-
-        # 2. 仅翻译查询（有基础信息但缺翻译的单词）
+        # 2. 仅翻译查询（有基础信息但缺翻译的单词）- 使用有道 API
         if words_need_translation:
-            words_list = ", ".join(f'"{w}"' for w in words_need_translation)
-            prompt = f'''Translate these {target_lang_name} words to {native_lang_name}:
-[{words_list}]
+            print(f"[有道API] 开始查询 {len(words_need_translation)} 个单词的翻译")
+            for word in words_need_translation:
+                try:
+                    result = get_word_complete_info(word, target_lang, native_lang)
 
-Respond in this JSON format:
-{{
-  "word1": {{
-    "translation": "main translation",
-    "nativeDefinitions": [
-      {{"pos": "n.", "meanings": ["meaning1", "meaning2"]}}
-    ]
-  }},
-  "word2": {{ ... }}
-}}
+                    if "error" not in result:
+                        # 从缓存获取基础信息
+                        base_info = get_cached_word_base(word, target_lang)
+                        if base_info:
+                            # 合并基础信息和新翻译
+                            api_results[word] = {
+                                "word": word,
+                                "phonetic": base_info.get("phonetic", result.get("phonetic", "")),
+                                "translation": result.get("translation", ""),
+                                "nativeDefinitions": result.get("nativeDefinitions", []),
+                                "targetDefinitions": base_info.get("targetDefinitions", result.get("targetDefinitions", [])),
+                                "examples": base_info.get("examples", result.get("examples", {})),
+                                "synonyms": base_info.get("synonyms", result.get("synonyms", [])),
+                                "antonyms": base_info.get("antonyms", result.get("antonyms", [])),
+                                "wordForms": base_info.get("wordForms", result.get("wordForms", {}))
+                            }
 
-Rules:
-- translation: Most common translation in {native_lang_name}
-- nativeDefinitions: Group by part of speech, meanings in {native_lang_name}
+                            # 添加翻译到缓存
+                            add_translation(word, target_lang, native_lang,
+                                          result.get("translation", ""),
+                                          result.get("nativeDefinitions", []))
+                            print(f"[有道API] 单词 '{word}' 翻译查询成功")
+                        else:
+                            # 如果基础信息丢失，使用完整结果
+                            api_results[word] = result
 
-Respond ONLY with valid JSON, no markdown.'''
-
-            success, content, error = _call_deepseek_api(prompt, temperature=1.0, timeout=API_TIMEOUT_TRANSLATION)
-            if success:
-                content = strip_markdown_code_blocks(content)
-                trans_results = json.loads(content)
-                trans_lower = {k.lower(): v for k, v in trans_results.items()}
-
-                for word in words_need_translation:
-                    trans_info = trans_results.get(word) or trans_lower.get(word.lower(), {})
-                    translation = trans_info.get("translation", "")
-                    native_defs = trans_info.get("nativeDefinitions", [])
-
-                    # 添加翻译到缓存
-                    add_translation(word, target_lang, native_lang, translation, native_defs)
-
-                    # 从缓存获取完整信息
-                    base_info = get_cached_word_base(word, target_lang)
-                    if base_info:
-                        api_results[word] = {
-                            "word": word,
-                            "phonetic": base_info.get("phonetic", ""),
-                            "translation": translation,
-                            "nativeDefinitions": native_defs,
-                            "targetDefinitions": base_info.get("targetDefinitions", []),
-                            "examples": base_info.get("examples", {}),
-                            "synonyms": base_info.get("synonyms", []),
-                            "antonyms": base_info.get("antonyms", [])
-                        }
+                except Exception as e:
+                    print(f"[有道API] 查询单词 '{word}' 翻译时出错: {str(e)}")
 
         # 合并所有结果
         all_results = {**cached_results, **api_results}
         return jsonify({"results": all_results})
 
-    except json.JSONDecodeError as e:
-        print(f"JSON parse error: {e}")
-        return jsonify({"error": "解析响应失败"}), 500
     except Exception as e:
         print(f"WordInfo details error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 

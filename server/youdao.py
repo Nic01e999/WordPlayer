@@ -123,6 +123,128 @@ def _get_phonetic(dict_data):
     return None
 
 
+def _extract_examples(data, max_count=2):
+    """
+    从有道 API 提取例句
+    优先级：blng_sents_part > auth_sents_part > media_sents_part
+
+    返回格式：
+    {
+        "common": ["例句1 | 翻译1", "例句2 | 翻译2"],
+        "fun": []  # 有道没有 fun 类型，保持空数组兼容
+    }
+    """
+    examples = {"common": [], "fun": []}
+
+    try:
+        # 定义优先级顺序
+        priority_keys = ['blng_sents_part', 'auth_sents_part', 'media_sents_part']
+
+        for key in priority_keys:
+            if key in data and 'sentence-pair' in data[key]:
+                sentence_pairs = data[key]['sentence-pair']
+
+                for pair in sentence_pairs:
+                    if len(examples["common"]) >= max_count:
+                        break
+
+                    # 提取例句和翻译
+                    sentence = pair.get('sentence', '').strip()
+                    translation = pair.get('sentence-translation', '').strip()
+
+                    if sentence and translation:
+                        # 格式化为 "sentence | translation"
+                        example = f"{sentence} | {translation}"
+                        examples["common"].append(example)
+
+                # 如果已经收集到足够的例句，停止
+                if len(examples["common"]) >= max_count:
+                    break
+
+        print(f"[有道API] 提取到 {len(examples['common'])} 条例句")
+
+    except Exception as e:
+        print(f"[有道API] 提取例句时出错: {str(e)}")
+
+    return examples
+
+
+def _extract_synonyms(data, max_count=5):
+    """
+    从有道 API 提取同义词
+
+    返回格式：["word1", "word2", ...]（最多5个）
+    """
+    synonyms = []
+
+    try:
+        # 从 syno.synos[] 提取同义词
+        if 'syno' in data and 'synos' in data['syno']:
+            synos = data['syno']['synos']
+
+            for syno_group in synos:
+                if len(synonyms) >= max_count:
+                    break
+
+                # 提取 ws[] 数组中的单词
+                if 'ws' in syno_group:
+                    words = syno_group['ws']
+                    for word in words:
+                        if len(synonyms) >= max_count:
+                            break
+                        if word and word not in synonyms:
+                            synonyms.append(word)
+
+        print(f"[有道API] 提取到 {len(synonyms)} 个同义词")
+
+    except Exception as e:
+        print(f"[有道API] 提取同义词时出错: {str(e)}")
+
+    return synonyms
+
+
+def _extract_word_forms(data):
+    """
+    从有道 API 提取词形变化（时态）
+
+    返回格式：
+    {
+        "第三人称单数": "goes",
+        "现在分词": "going",
+        "过去式": "went",
+        "过去分词": "gone"
+    }
+    """
+    word_forms = {}
+
+    try:
+        # 从 ec.word[0].wfs[] 提取
+        if 'ec' in data and 'word' in data['ec']:
+            words = data['ec']['word']
+
+            # words 可能是 list 或 dict
+            if isinstance(words, list):
+                word_data = words[0] if words else {}
+            else:
+                word_data = words
+
+            # 提取 wfs 数组
+            if 'wfs' in word_data:
+                wfs = word_data['wfs']
+                for wf in wfs:
+                    name = wf.get('wf', {}).get('name', '')
+                    value = wf.get('wf', {}).get('value', '')
+                    if name and value:
+                        word_forms[name] = value
+
+        print(f"[有道API] 提取到 {len(word_forms)} 个词形变化")
+
+    except Exception as e:
+        print(f"[有道API] 提取词形变化时出错: {str(e)}")
+
+    return word_forms
+
+
 def _fetch_youdao_dict(word, from_lang, to_lang):
     """
     调用有道词典 API 获取翻译
@@ -288,3 +410,87 @@ def validate_words_batch(words, from_lang, to_lang):
 
     print(f"[有道验证] 批量验证完成 - 有效: {len(valid)}, 无效: {len(invalid)}")
     return {"valid": valid, "invalid": invalid}
+
+
+def get_word_complete_info(word, from_lang, to_lang):
+    """
+    获取单词的完整信息（替代 DeepSeek）
+
+    返回格式：
+    {
+        "word": "happy",
+        "phonetic": "ˈhæpi",
+        "translation": "快乐的",
+        "nativeDefinitions": [{"pos": "adj.", "meanings": ["快乐的"]}],
+        "targetDefinitions": [{"pos": "adj.", "meanings": ["happy"]}],
+        "examples": {"common": ["例句1", "例句2"], "fun": []},
+        "synonyms": ["glad", "pleased"],
+        "antonyms": [],  # 始终为空
+        "wordForms": {"比较级": "happier", "最高级": "happiest"}
+    }
+    """
+    print(f"[有道API] 获取单词完整信息: {word} ({from_lang} -> {to_lang})")
+
+    try:
+        # 1. 调用有道 API 获取完整 JSON
+        le_code = YOUDAO_LANG_CODES.get(from_lang, from_lang)
+        url = f"http://dict.youdao.com/jsonapi_s?doctype=json&jsonversion=4&le={le_code}&q={requests.utils.quote(word)}"
+
+        response = requests.get(url, timeout=10)
+        if not response.ok:
+            print(f"[有道API] 请求失败: HTTP {response.status_code}")
+            return {"error": "word_not_found"}
+
+        data = response.json()
+
+        # 2. 使用 _fetch_youdao_dict 获取基本信息（翻译、释义、音标）
+        basic_info = _fetch_youdao_dict(word, from_lang, to_lang)
+
+        if not basic_info:
+            print(f"[有道API] 单词 '{word}' 未找到基本信息")
+            return {"error": "word_not_found"}
+
+        # 3. 提取音标、翻译、释义
+        phonetic = basic_info.get('phonetic')
+        translation = basic_info.get('translation')
+        native_definitions = basic_info.get('definitions', [])
+
+        # 4. 提取目标语言释义（英文释义）
+        target_definitions = []
+        if 'ee' in data:
+            target_definitions = _parse_definitions(data['ee'])
+
+        # 5. 调用新函数提取例句、同义词、词形变化
+        examples = _extract_examples(data)
+        synonyms = _extract_synonyms(data)
+        word_forms = _extract_word_forms(data)
+
+        # 6. 检查是否有有效数据
+        has_data = (phonetic or translation or native_definitions or
+                   target_definitions or examples["common"] or synonyms or word_forms)
+
+        if not has_data:
+            print(f"[有道API] 单词 '{word}' 未找到有效数据")
+            return {"error": "word_not_found"}
+
+        # 7. 构建返回结果
+        result = {
+            "word": word,
+            "phonetic": phonetic,
+            "translation": translation,
+            "nativeDefinitions": native_definitions,
+            "targetDefinitions": target_definitions,
+            "examples": examples,
+            "synonyms": synonyms,
+            "antonyms": [],  # 有道 API 没有反义词，固定返回空数组
+            "wordForms": word_forms
+        }
+
+        print(f"[有道API] 成功获取单词 '{word}' 的完整信息")
+        return result
+
+    except Exception as e:
+        print(f"[有道API] 获取单词 '{word}' 完整信息时出错: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {"error": "word_not_found"}

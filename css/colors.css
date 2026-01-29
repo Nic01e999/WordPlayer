@@ -111,13 +111,13 @@
     /* {{{ 状态颜色 (status-) */
 
     /* 成功/正确答案 | .result-attempts .correct span */
-    --status-success: #4a8f4a;
+    --status-success: #7f82d1;
 
     /* 正确(批改红) | .correct */
-    --status-correct: #d45555;
+    --status-correct: #74b093;
 
     /* 错误 | .failed */
-    --status-error: #c55555;
+    --status-error: #c06565;
 
     /* 警告 | .warning */
     --status-warning: #cc7a22;
@@ -608,8 +608,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #6ab88a;
-    --status-correct: #ff8fa0;
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #ff8fa0;
@@ -853,16 +851,14 @@
     /* }}} */
 
     /* {{{ 强调色 (accent-) */
-    --accent-primary: #50c878;
-    --accent-secondary: #a8e8b8;
-    --accent-brown: #8bc48b;
-    --accent-line: rgb(100, 180, 120);
-    --glow-pink: rgba(80, 200, 120, 0.6);
+    --accent-primary: #97bb91;
+    --accent-secondary: #ade3ba;
+    --accent-brown: #b5c5b5;
+    --accent-line: rgb(135, 182, 146);
+    --glow-pink: rgba(173, 222, 175, 0.6);
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #4a8f4a;
-    --status-correct: #50c878;
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #50c878;
@@ -1100,8 +1096,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #6ab88a;
-    --status-correct: #50c878;
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #50c878;
@@ -1322,7 +1316,7 @@
     --text-label: #6f7f8b;
     --text-button: #4f5f6b;
     --text-menu-btn: #7090b0;
-    --text-accent: #4da6ff;
+    --text-accent: #537fac;
     --text-stat: #5a6a7a;
     --text-count: #a5c5e5;
     --text-placeholder: #b8c8d8;
@@ -1346,7 +1340,7 @@
     /* }}} */
 
     /* {{{ 强调色 (accent-) */
-    --accent-primary: #4da6ff;
+    --accent-primary: #83b0e2;
     --accent-secondary: #a8d8f8;
     --accent-brown: #8bb4d4;
     --accent-line: rgb(100, 160, 220);
@@ -1354,8 +1348,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #4a8f4a;
-    --status-correct: #4da6ff;
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #4da6ff;
@@ -1593,8 +1585,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #6ab88a;
-    --status-correct: #4da6ff;
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #4da6ff;
@@ -1838,7 +1828,7 @@
     /* }}} */
 
     /* {{{ 强调色 (accent-) */
-    --accent-primary: #a855f7;
+    --accent-primary: #c598d6;
     --accent-secondary: #d8a8f8;
     --accent-brown: #b48bd4;
     --accent-line: rgb(160, 100, 220);
@@ -1846,8 +1836,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #4a8f4a;
-    --status-correct: #a855f7;
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #a855f7;
@@ -2085,8 +2073,6 @@
     /* }}} */
 
     /* {{{ 状态颜色 (status-) */
-    --status-success: #6ab88a;
-    --status-correct: #a855f7;
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #a855f7;
