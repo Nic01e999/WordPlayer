@@ -219,10 +219,19 @@
       "复数": "apples"
     },
     "translations": {
-      "zh": "苹果"
+      "zh": "苹果",
+      "en": "苹果"
     },
     "nativeDefinitions": {
       "zh": [
+        {
+          "pos": "n.",
+          "meanings": [
+            "苹果"
+          ]
+        }
+      ],
+      "en": [
         {
           "pos": "n.",
           "meanings": [

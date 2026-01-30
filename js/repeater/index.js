@@ -6,6 +6,7 @@
 import { currentRepeaterState, setRepeaterState, setActiveMode, preloadCache } from '../state.js';
 import { $, getSettings, loadWordsFromTextarea, shuffleArray, showView } from '../utils.js';
 import { stopAudio } from '../audio.js';
+import { checkFirstTime } from '../guide.js';
 
 // 导入子模块
 import { setScrollListenersInitialized, setDictationRef, getDictation } from './state.js';
@@ -72,6 +73,9 @@ export class Repeater {
         setActiveMode("repeater");
         document.body.classList.remove('dictation-mode');
         document.body.classList.add('repeater-mode');
+
+        // 检查是否首次进入复读模式
+        checkFirstTime('repeater');
 
         const entries = loadWordsFromTextarea();
         if (!entries.length) {

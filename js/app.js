@@ -34,6 +34,7 @@ import {
 } from './sync/settings.js';
 import { initWebSocket, disconnectWebSocket } from './sync/websocket.js';
 import { clearLocalWordInfo } from './storage/localCache.js';
+import { checkFirstTime } from './guide.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -358,6 +359,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 初始化国际化（使用默认语言，登录后会根据用户设置更新）
     initI18n(getUiLang());
+
+    // 检查是否首次进入 home 模式，显示用户指引
+    checkFirstTime('home');
 
     // 主题切换时重新渲染卡片（更新原色卡片）
     setThemeChangeCallback(() => {

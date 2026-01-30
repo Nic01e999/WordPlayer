@@ -7,6 +7,7 @@ import { currentRepeaterState, setActiveMode, preloadCache } from '../state.js';
 import { incrementPlayId } from '../repeater/state.js';
 import { $, getSettings, loadWordsFromTextarea, shuffleArray, showView, logToWorkplace } from '../utils.js';
 import { stopAudio } from '../audio.js';
+import { checkFirstTime } from '../guide.js';
 
 // 导入子模块
 import { clearDragCleanupFns } from './drag.js';
@@ -58,6 +59,9 @@ export class Dictation {
         setActiveMode("dictation");
         document.body.classList.remove('repeater-mode');
         document.body.classList.add('dictation-mode');
+
+        // 检查是否首次进入听写模式
+        checkFirstTime('dictation');
 
         showView('dictationView');
         $("dictationWorkplace").innerHTML = "";

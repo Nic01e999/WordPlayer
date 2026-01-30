@@ -4,8 +4,10 @@
         <meta charset="UTF-8">
         <title>Word player</title>
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/guide.css">
         <!-- Socket.IO 客户端（用于实时同步） -->
         <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <script type="module" src="js/guide.js"></script>
         <script type="module" src="js/app.js"></script>
 
     </head>
@@ -24,7 +26,10 @@
                     <div class="setting-container">
                         <div class="sidebar">
                         <div id="settings">
-                            <h3 data-i18n="general">General</h3>
+                            <h3>
+                                <span data-i18n="general">General</span>
+                                <button class="guide-btn-trigger" onclick="showGuide('home')" title="用户指引">❓</button>
+                            </h3>
                             <label><span data-i18n="shuffle">Shuffle</span>: <input type="checkbox" id="shuffle"></label>
                             <label><span data-i18n="slow">Slow</span>: <input type="checkbox" id="slow"></label>
                             <div class="lang-selector">

@@ -1,0 +1,275 @@
+/**
+ * 用户指引样式 - 液态玻璃风格
+ */
+
+/* 触发按钮 */
+.guide-btn-trigger {
+    display: inline-flex !important;  /* 强制显示 */
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);  /* 添加明显背景 */
+    border: 1px solid rgba(255, 255, 255, 0.2);  /* 添加边框 */
+    font-size: 18px;  /* 增大字体 */
+    cursor: pointer;
+    padding: 6px 10px;  /* 增加内边距 */
+    margin-left: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    opacity: 0.9;  /* 提高不透明度 */
+    vertical-align: middle;
+    flex-shrink: 0;  /* 防止被压缩 */
+}
+
+.guide-btn-trigger:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.25);  /* 悬停时更明显 */
+    transform: scale(1.15);  /* 增大缩放效果 */
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* 全屏遮罩层 */
+.guide-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 图片查看器容器 */
+.guide-viewer {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    padding: 32px;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 暗色模式适配 */
+body.dark-mode .guide-viewer {
+    background: rgba(30, 30, 40, 0.95);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* 图片容器 */
+.guide-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    max-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .guide-image-container {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* 图片 */
+.guide-image {
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    border-radius: 12px;
+    animation: imageSlide 0.4s ease;
+}
+
+@keyframes imageSlide {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 导航栏 */
+.guide-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* 进度指示器 */
+.guide-progress {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.6);
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    min-width: 60px;
+    text-align: center;
+}
+
+body.dark-mode .guide-progress {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 按钮通用样式 */
+.guide-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guide-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.guide-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.guide-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+body.dark-mode .guide-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+body.dark-mode .guide-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* 上一步按钮 */
+.guide-btn-prev {
+    composes: guide-btn;
+}
+
+/* 下一步按钮 */
+.guide-btn-next {
+    composes: guide-btn;
+    background: var(--primary-color, rgba(255, 105, 180, 0.8));
+    color: white;
+}
+
+.guide-btn-next:hover {
+    background: var(--primary-color-hover, rgba(255, 105, 180, 1));
+}
+
+body.dark-mode .guide-btn-next {
+    background: var(--primary-color, rgba(255, 105, 180, 0.9));
+}
+
+/* 关闭按钮 */
+.guide-btn-close {
+    composes: guide-btn;
+    background: rgba(255, 59, 48, 0.1);
+    color: rgba(255, 59, 48, 0.9);
+}
+
+.guide-btn-close:hover {
+    background: rgba(255, 59, 48, 0.15);
+    color: rgba(255, 59, 48, 1);
+}
+
+body.dark-mode .guide-btn-close {
+    background: rgba(255, 69, 58, 0.2);
+    color: rgba(255, 69, 58, 1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .guide-viewer {
+        padding: 20px;
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    .guide-image-container {
+        max-height: 50vh;
+    }
+
+    .guide-image {
+        max-height: 50vh;
+    }
+
+    .guide-nav {
+        gap: 12px;
+    }
+
+    .guide-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* 确保 h3 内的按钮正确显示 */
+.settings-trigger .sidebar h3 .guide-btn-trigger {
+    flex-shrink: 0;  /* 防止按钮被压缩 */
+    margin-left: auto;  /* 推到右侧 */
+    min-width: 32px;  /* 最小宽度 */
+    min-height: 32px;  /* 最小高度 */
+}
+
+/* 暗色模式下的按钮样式 */
+body.dark-mode .guide-btn-trigger {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .guide-btn-trigger:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}

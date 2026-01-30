@@ -12,7 +12,7 @@
     flex-wrap: wrap;
     background: linear-gradient(180deg, var(--bg-menu-start) 0%, var(--bg-menu-end) 100%);
     border-bottom: 1px solid var(--border-menu);
-    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 1.25rem;
+    padding: 0.2rem clamp(1rem, 3vw, 1.875rem) 0.6rem;
     box-shadow: 0 3px 12px var(--shadow-pink-medium);
     z-index: 100;
 }
