@@ -65,3 +65,25 @@ body::before {
     color: var(--text-muted);
     margin-top: 0.625rem;
 }
+
+/* ===== Menu隐藏功能 ===== */
+
+/* 默认状态：在听写和复读模式下上移2rem */
+body.dictation-mode #menu,
+body.repeater-mode #menu,
+body.dictation-mode .container,
+body.repeater-mode .container {
+    /* margin-top: -5rem; */
+    transform: translateY(-5rem);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* 当hover到menu时，恢复原位 */
+body.dictation-mode #menu:hover,
+body.repeater-mode #menu:hover,
+body.dictation-mode #menu:hover + .container,
+body.repeater-mode #menu:hover + .container {
+    transform: translateY(0);
+    /* margin-top: 0rem; */
+}

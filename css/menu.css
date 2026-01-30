@@ -9,9 +9,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     background: linear-gradient(180deg, var(--bg-menu-start) 0%, var(--bg-menu-end) 100%);
-    border-bottom: 1px solid var(--border-menu);
+    border-radius: 0 0 5% 5%;
+    border-bottom: 3px solid var(--border-menu);
     padding: 0.2rem clamp(1rem, 3vw, 1.875rem) 0.6rem;
     box-shadow: 0 3px 12px var(--shadow-pink-medium);
     z-index: 100;
@@ -43,7 +44,7 @@ body.dictation-mode #menu::after {
     letter-spacing: 0.25rem;
     font-size: clamp(1.25rem, 2.5vw + 0.5rem, 2.25rem);
     text-shadow: 0 1px 2px var(--white-soft);
-    white-space: nowrap;
+    white-space: normal;
     background: transparent;
     border: none;
     padding: 0.5rem 1rem;
@@ -115,6 +116,7 @@ body.dictation-mode #menu::after {
 .settings-trigger {
     position: relative;
     text-align: center;
+    overflow:visible;
     flex-shrink: 0;
     width: 3.125rem;
 }
@@ -168,7 +170,7 @@ body.dictation-mode #menu::after {
     right: 0;                  /* 靠右对齐 */
     width: auto;               /* 宽度自适应 */
     overflow-y: auto;          /* container 可滚动 */
-    overflow-x: hidden;        /* 隐藏横向滚动 */
+    overflow-x: visible;        /* 隐藏横向滚动 */
     z-index: 1001;             /* 提高层级，盖住 menu (z-index: 100) */
     pointer-events: none;      /* 默认点击穿透 */
     padding-top: 4rem;         /* 为 menu 留出空间 */
