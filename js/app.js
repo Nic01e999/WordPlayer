@@ -464,3 +464,91 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// ===== 移动端Menu折叠功能 =====
+(function initMobileMenuCollapse() {
+    // 检测是否为移动端
+    function isMobile() {
+        return window.innerWidth <= 700;
+    }
+
+    // 只在移动端启用
+    if (!isMobile()) {
+        window.addEventListener('resize', () => {
+            if (isMobile()) {
+                initMobileMenuCollapse();
+            }
+        });
+        return;
+    }
+
+    let autoCollapseTimer = null;
+    const menu = document.querySelector('#menu');
+
+    if (!menu) return;
+
+    // 默认展开状态
+    document.body.classList.add('menu-expanded');
+    console.log('[移动端Menu] 默认展开状态');
+
+    // 展开menu（重置计时）
+    function expandMenu() {
+        document.body.classList.add('menu-expanded');
+
+        // 清除之前的定时器
+        if (autoCollapseTimer) {
+            clearTimeout(autoCollapseTimer);
+        }
+
+        // 3秒后自动折叠
+        autoCollapseTimer = setTimeout(() => {
+            collapseMenu();
+        }, 3000);
+
+        console.log('[移动端Menu] 已展开，3秒后自动折叠');
+    }
+
+    // 折叠menu
+    function collapseMenu() {
+        document.body.classList.remove('menu-expanded');
+
+        if (autoCollapseTimer) {
+            clearTimeout(autoCollapseTimer);
+            autoCollapseTimer = null;
+        }
+
+        console.log('[移动端Menu] 已折叠');
+    }
+
+    // 点击menu内的按钮时，重置3秒计时
+    menu.addEventListener('click', (e) => {
+        if (document.body.classList.contains('menu-expanded')) {
+            // 重置定时器
+            if (autoCollapseTimer) {
+                clearTimeout(autoCollapseTimer);
+            }
+            autoCollapseTimer = setTimeout(() => {
+                collapseMenu();
+            }, 3000);
+
+            console.log('[移动端Menu] 重置3秒计时');
+        } else {
+            // 如果已折叠，点击menu展开
+            expandMenu();
+        }
+    });
+
+    // 点击页面其他区域时折叠menu
+    document.addEventListener('click', (e) => {
+        if (document.body.classList.contains('menu-expanded')) {
+            if (!menu.contains(e.target)) {
+                collapseMenu();
+            }
+        }
+    });
+
+    // 初始化时启动3秒计时
+    expandMenu();
+
+    console.log('[移动端Menu] 折叠功能已初始化');
+})();

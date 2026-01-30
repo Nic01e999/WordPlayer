@@ -5,9 +5,10 @@
 /* ===== 模式视图容器 ===== */
 .mode-view {
     display: none;
+    flex-direction: column;
     flex: 1;
     min-height: 0;
-    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 1.875rem;
+    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 0.5rem;
     background: transparent;
     overflow-y: auto;
     overflow-x: hidden;
@@ -16,12 +17,19 @@
 }
 
 .mode-view.active {
-    display: block;
+    display: flex;
 }
 
 /* 主页视图 - flex row 布局 */
 #homeView.active {
     display: flex;
+}
+
+/* Dictation 模式视图 - 折叠状态下增加高度 */
+body.dictation-mode #dictationView {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 4.5rem); /* 从 6.25rem 改为 4.5rem，更接近实际菜单高度 */
 }
 
 #wordlistContent {
