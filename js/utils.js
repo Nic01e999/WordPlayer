@@ -515,29 +515,76 @@ export function initSettingsToggle() {
         return;
     }
 
+    // Hover状态管理变量
+    let hoverTimeout = null;
+
     // 点击齿轮图标切换显示/隐藏
     gearIcon.addEventListener('click', (e) => {
         e.stopPropagation();  // 阻止事件冒泡
-        settingsTrigger.classList.toggle('active');
-        console.log('设置面板切换:', settingsTrigger.classList.contains('active') ? '显示' : '隐藏');
+
+        // 清除hover状态和延迟
+        if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+        }
+        document.body.classList.remove('settings-hover');
+
+        // 切换点击激活状态
+        document.body.classList.toggle('settings-active');
+        console.log('设置面板切换:', document.body.classList.contains('settings-active') ? '显示' : '隐藏');
     });
+
+    // Hover显示功能
+    function showOnHover() {
+        if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+        }
+        // 只在非点击激活状态下添加hover类
+        if (!document.body.classList.contains('settings-active')) {
+            document.body.classList.add('settings-hover');
+            console.log('Hover显示设置面板');
+        }
+    }
+
+    function hideOnLeave() {
+        // 延迟隐藏，给用户时间移动到面板上
+        hoverTimeout = setTimeout(() => {
+            // 只移除hover类，不影响点击激活状态
+            if (document.body.classList.contains('settings-hover')) {
+                document.body.classList.remove('settings-hover');
+                console.log('Hover隐藏设置面板');
+            }
+        }, 100);  // 100ms延迟
+    }
+
+    // 监听齿轮图标hover
+    settingsTrigger.addEventListener('mouseenter', showOnHover);
+    settingsTrigger.addEventListener('mouseleave', hideOnLeave);
+
+    // 监听设置面板hover（保持显示）
+    const settingContainer = document.querySelector('.setting-container');
+    if (settingContainer) {
+        settingContainer.addEventListener('mouseenter', showOnHover);
+        settingContainer.addEventListener('mouseleave', hideOnLeave);
+    }
 
     // 点击 sidebar 外部区域关闭
     document.addEventListener('click', (e) => {
         const sidebar = document.querySelector('.sidebar');
-        if (!sidebar || !settingsTrigger.classList.contains('active')) return;
+        if (!sidebar || !document.body.classList.contains('settings-active')) return;
 
         // 如果点击的不是 sidebar 内部，则关闭
         if (!sidebar.contains(e.target) && !gearIcon.contains(e.target)) {
-            settingsTrigger.classList.remove('active');
+            document.body.classList.remove('settings-active');
             console.log('点击外部区域，关闭设置面板');
         }
     });
 
     // ESC 键关闭
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && settingsTrigger.classList.contains('active')) {
-            settingsTrigger.classList.remove('active');
+        if (e.key === 'Escape' && document.body.classList.contains('settings-active')) {
+            document.body.classList.remove('settings-active');
             console.log('按下 ESC 键，关闭设置面板');
         }
     });

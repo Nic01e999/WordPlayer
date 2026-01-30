@@ -10,8 +10,6 @@
     }
 }
 
-/* 中等屏幕 (900px - 1199px) - 无需特殊调整，clamp() 已处理 */
-
 /* 小屏幕 / 平板 (600px - 899px) */
 @media (min-width: 600px) and (max-width: 899px) {
     #menu {
@@ -51,8 +49,8 @@
     }
 }
 
-/* 手机屏幕 (<600px) */
-@media (max-width: 599px) {
+/* 手机屏幕 */
+@media (max-width: 700px) {
     #menu {
         flex-direction: column;
         padding: 0.625rem;
