@@ -53,110 +53,6 @@ Object.defineProperty(window, 'currentActiveMode', {
     get: () => currentActiveMode
 });
 
-/**
- * 初始化高亮层
- */
-function initHighlightLayer() {
-    const wordInput = $("wordInput");
-    if (!wordInput) return;
-
-    // 检查是否已存在高亮层
-    let highlightLayer = $("wordInputHighlight");
-    if (highlightLayer) return;
-
-    // 创建高亮层容器
-    const wrapper = document.createElement("div");
-    wrapper.className = "textarea-wrapper";
-
-    // 创建高亮层
-    highlightLayer = document.createElement("div");
-    highlightLayer.id = "wordInputHighlight";
-    highlightLayer.className = "textarea-highlight";
-
-    // 将 textarea 包裹在容器中
-    wordInput.parentNode.insertBefore(wrapper, wordInput);
-    wrapper.appendChild(highlightLayer);
-    wrapper.appendChild(wordInput);
-}
-
-/**
- * 更新高亮层，标红无效字符
- * @param {string} targetLang - 目标语言
- */
-export function updateHighlight(targetLang) {
-    const wordInput = $("wordInput");
-    const highlightLayer = $("wordInputHighlight");
-
-    if (!wordInput || !highlightLayer) return;
-
-    const content = wordInput.value;
-    const lines = content.split('\n');
-    let hasInvalid = false;
-
-    // 处理每一行，标红无效字符
-    const highlightedLines = lines.map(line => {
-        const colonIdx = line.indexOf(':');
-        const wordPart = colonIdx !== -1 ? line.substring(0, colonIdx) : line;
-        const restPart = colonIdx !== -1 ? line.substring(colonIdx) : '';
-
-        if (wordPart.trim() && !isValidForLanguage(wordPart, targetLang)) {
-            hasInvalid = true;
-            // 标红整个单词部分
-            return `<span class="invalid-text">${escapeHtml(wordPart)}</span>${escapeHtml(restPart)}`;
-        }
-
-        return escapeHtml(line);
-    });
-
-    highlightLayer.innerHTML = highlightedLines.join('\n');
-    return hasInvalid;
-}
-
-/**
- * 清除高亮层
- */
-export function clearHighlight() {
-    const highlightLayer = $("wordInputHighlight");
-    if (highlightLayer) {
-        highlightLayer.innerHTML = '';
-    }
-}
-
-/**
- * HTML 转义函数
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-/**
- * 初始化多语言输入过滤
- */
-function initInputFilter() {
-    // 初始化高亮层
-    initHighlightLayer();
-
-    // 添加 input 事件监听器，实时更新高亮
-    const wordInput = $("wordInput");
-    if (wordInput) {
-        wordInput.addEventListener("input", () => {
-            const targetLang = getTargetLang();
-            updateHighlight(targetLang);
-        });
-
-        // 添加 scroll 事件同步
-        wordInput.addEventListener("scroll", () => {
-            const highlightLayer = $("wordInputHighlight");
-            if (highlightLayer) {
-                highlightLayer.scrollTop = wordInput.scrollTop;
-                highlightLayer.scrollLeft = wordInput.scrollLeft;
-            }
-        });
-    }
-}
-
 // 防抖定时器
 let refreshModeTimer = null;
 
@@ -332,7 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initLangSelectors();
     initSettingsListeners();
     initPreloadListeners();
-    initInputFilter();
     initWordListUI();
     initSettingsToggle();  // 初始化设置面板点击切换功能
 

@@ -99,52 +99,6 @@
     color: var(--text-placeholder);
 }
 
-/* ===== Textarea 高亮层 ===== */
-.textarea-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    
-}
-
-.textarea-highlight {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 8px;
-    border: 1px solid transparent;
-    font-family: monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    pointer-events: none;
-    color: transparent;
-    z-index: 1;
-    overflow: hidden;
-}
-
-/* .textarea-wrapper textarea {
-    position: relative;
-    z-index: 2;
-    background: transparent;
-} */
-
-.invalid-text {
-    color: var(--invalid-text-color);
-    text-decoration: underline wavy var(--invalid-text-color);
-    text-underline-offset: 2px;
-}
-
-/* 深色主题适配 */
-[data-theme-mode="dark"] .invalid-text {
-    color: var(--invalid-text-color);
-    text-decoration: underline wavy var(--invalid-text-color);
-}
-
 /* ===== Toast 提示消息 ===== */
 .toast {
     position: fixed;

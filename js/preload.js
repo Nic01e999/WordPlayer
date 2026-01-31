@@ -20,7 +20,6 @@ import {
     checkLanguageConsistency,
     showToast
 } from './utils.js';
-import { updateHighlight, clearHighlight } from './app.js';
 import {
     getTtsUrl,
     getDictBatchUrl
@@ -112,17 +111,7 @@ export async function startPreload(forceReload = false) {
             showToast(t('mixedLanguageWarning'));
             return; // 阻止加载
         }
-
-        // 3. 检测无效字符并高亮显示
-        const hasInvalid = updateHighlight(targetLang);
-
-        if (hasInvalid) {
-            return; // 阻止加载
-        }
     }
-
-    // 清除高亮（如果没有无效字符）
-    clearHighlight();
 
     const entries = loadWordsFromTextarea();
     if (!entries.length) {

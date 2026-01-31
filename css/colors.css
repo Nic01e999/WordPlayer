@@ -550,9 +550,6 @@
 
     /* {{{ 无效文本组 (invalid-) */
 
-    /* 无效文本颜色 | components.css .invalid-text */
-    --invalid-text-color: #ff3b30;
-
     /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
@@ -791,9 +788,6 @@
     --dialog-text-message: rgba(255, 255, 255, 0.85);
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff6b60;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -1042,9 +1036,6 @@
     --dialog-text-message: #333;
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff3b30;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -1279,9 +1270,6 @@
     --dialog-text-message: rgba(255, 255, 255, 0.85);
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff6b60;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -1531,9 +1519,6 @@
     --dialog-text-message: #333;
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff3b30;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -1768,9 +1753,6 @@
     --dialog-text-message: rgba(255, 255, 255, 0.85);
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff6b60;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -2019,9 +2001,6 @@
     --dialog-text-message: #333;
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff3b30;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -2256,9 +2235,6 @@
     --dialog-text-message: rgba(255, 255, 255, 0.85);
     /* }}} */
 
-    /* {{{ 无效文本组 (invalid-) */
-    --invalid-text-color: #ff6b60;
-    /* }}} */
 
     /* {{{ 分隔线组 (divider-) */
     --divider-line: rgba(0, 0, 0, 0.1);
@@ -2651,10 +2627,6 @@
  *
  * --dialog-text-message: 对话框消息文字
  *   引用：components.css (.glass-dialog-message)
- *
- * 【无效文本组 (invalid-)】
- * --invalid-text-color: 无效文本颜色
- *   引用：components.css (.invalid-text)
  *
  * 【分隔线组 (divider-)】
  * --divider-line: 分隔线颜色
