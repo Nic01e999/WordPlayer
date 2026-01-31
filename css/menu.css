@@ -13,7 +13,7 @@
     background: linear-gradient(180deg, var(--bg-menu-start) 0%, var(--bg-menu-end) 100%);
     border-radius: 0 0 5% 5%;
     border-bottom: 3px solid var(--border-menu);
-    padding: 0.2rem clamp(1rem, 3vw, 1.875rem) 0.6rem;
+    padding: 0.2rem clamp(1rem, 3vw, 1.875rem) 1rem;
     box-shadow: 0 3px 12px var(--shadow-pink-medium);
     z-index: 100;
 }
@@ -25,8 +25,8 @@ body.dictation-mode #menu::after {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -2rem;
-    height: 3.8rem;
+    bottom: -2.5rem;
+    height: 3.825rem;
     margin: 0 2rem;
     background: url('../assets/images/iron.png') repeat-x center bottom;
     background-size: auto 100%;
@@ -190,6 +190,12 @@ body.dictation-mode #menu::after {
 
     /* 高度自适应内容，不设置 max-height */
     height: auto;
+
+    /* 添加滚动支持 */
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 
     /* 保持液态玻璃风格 */
     background: linear-gradient(135deg,

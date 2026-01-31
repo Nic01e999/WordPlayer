@@ -124,21 +124,36 @@ body::before {
 
 /* =============================== Menu隐藏功能 ============================ */
 
-/* 默认状态：在听写和复读模式下上移2rem */
-body.dictation-mode #menu,
-body.repeater-mode #menu,
-body.dictation-mode .container,
-body.repeater-mode .container {
-    transform: translateY(-5rem);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+/* 桌面端：在听写和复读模式下上移5rem，hover时恢复 */
+@media (min-width: 701px) {
+    body.dictation-mode #menu,
+    body.repeater-mode #menu,
+    body.dictation-mode .container,
+    body.repeater-mode .container {
+        transform: translateY(-5rem);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.dictation-mode #menu:hover,
+    body.repeater-mode #menu:hover,
+    body.dictation-mode #menu:hover + .container,
+    body.repeater-mode #menu:hover + .container {
+        transform: translateY(0);
+    }
 }
 
+/* 移动端：所有页面默认上移8rem */
+@media (max-width: 700px) {
+    #menu,
+    .container {
+        transform: translateY(-13.5rem);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-/* 当hover到menu时，恢复原位 */
-body.dictation-mode #menu:hover,
-body.repeater-mode #menu:hover,
-body.dictation-mode #menu:hover + .container,
-body.repeater-mode #menu:hover + .container {
-    transform: translateY(0);
-    /* margin-top: 0rem; */
+    /* 展开状态 */
+    body.menu-expanded #menu,
+    body.menu-expanded .container {
+        transform: translateY(0);
+    }
 }
+

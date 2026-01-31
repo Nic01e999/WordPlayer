@@ -575,16 +575,16 @@
 }
 
 @keyframes playPauseFlash {
-    0%   { opacity: 0; transform: scale(0.5); }
-    15%  { opacity: 1; transform: scale(1.1); }
-    30%  { transform: scale(1.0); }
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    30%  { transform: translate(-50%, -50%) scale(1.0); }
     60%  { opacity: 1; }
-    100% { opacity: 0; transform: scale(1.0); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.0); }
 }
 
 /* ===== 重复模式自适应布局 ===== */
 body.repeater-mode #repeaterView {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 11.25rem);
+    height: calc(100vh - 4.5rem); /* 从 6.25rem 改为 4.5rem */
 }
