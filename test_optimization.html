@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频优化测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .log-success {
+            color: #22c55e;
+        }
+        .log-error {
+            color: #ef4444;
+        }
+        .log-info {
+            color: #3b82f6;
+        }
+        select, input[type="radio"] {
+            margin: 5px;
+        }
+        label {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 音频加载优化测试</h1>
+
+        <div class="test-section">
+            <h3>测试 1: playbackRate 慢速播放</h3>
+            <p>测试使用 playbackRate 实现慢速播放（不预加载慢速音频）</p>
+            <button onclick="testPlaybackRate('hello', false)">播放正常速度 (hello)</button>
+            <button onclick="testPlaybackRate('hello', true)">播放慢速 0.75x (hello)</button>
+        </div>
+
+        <div class="test-section">
+            <h3>测试 2: 口音切换（仅英语）</h3>
+            <p>测试只预加载当前选择的口音</p>
+            <label><input type="radio" name="accent" value="us" checked> US</label>
+            <label><input type="radio" name="accent" value="uk"> UK</label>
+            <br>
+            <button onclick="testAccent('world')">播放 world（当前口音）</button>
+        </div>
+
+        <div class="test-section">
+            <h3>测试 3: 多语言测试</h3>
+            <p>测试其他语言只加载一个音频</p>
+            <button onclick="testMultiLang('こんにちは', 'ja')">日语: こんにちは</button>
+            <button onclick="testMultiLang('안녕하세요', 'ko')">韩语: 안녕하세요</button>
+            <button onclick="testMultiLang('你好', 'zh')">中文: 你好</button>
+        </div>
+
+        <div class="test-section">
+            <h3>测试 4: 服务器缓存</h3>
+            <p>第二次请求应该从缓存返回（查看服务器日志）</p>
+            <button onclick="testCache('apple')">第一次请求 apple</button>
+            <button onclick="testCache('apple')">第二次请求 apple（应该命中缓存）</button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        const API_BASE = 'http://127.0.0.1:5001';
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function testPlaybackRate(word, slow) {
+            try {
+                log(`测试 playbackRate: ${word}, slow=${slow}`, 'info');
+
+                const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&accent=us&lang=en`;
+                log(`请求 URL: ${url}`, 'info');
+
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
+
+                currentAudio = new Audio(blobUrl);
+                currentAudio.playbackRate = slow ? 0.75 : 1.0;
+
+                log(`✓ 播放速度设置为: ${currentAudio.playbackRate}x`, 'success');
+
+                await currentAudio.play();
+                log(`✓ 开始播放`, 'success');
+
+            } catch (e) {
+                log(`✗ 错误: ${e.message}`, 'error');
+            }
+        }
+
+        async function testAccent(word) {
+            try {
+                const accent = document.querySelector('input[name="accent"]:checked').value;
+                log(`测试口音: ${word}, accent=${accent}`, 'info');
+
+                const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&accent=${accent}&lang=en`;
+                log(`请求 URL: ${url}`, 'info');
+
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
+
+                currentAudio = new Audio(blobUrl);
+                await currentAudio.play();
+
+                log(`✓ 播放成功 (${accent} 口音)`, 'success');
+
+            } catch (e) {
+                log(`✗ 错误: ${e.message}`, 'error');
+            }
+        }
+
+        async function testMultiLang(word, lang) {
+            try {
+                log(`测试多语言: ${word}, lang=${lang}`, 'info');
+
+                const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&accent=us&lang=${lang}`;
+                log(`请求 URL: ${url}`, 'info');
+
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
+
+                currentAudio = new Audio(blobUrl);
+                await currentAudio.play();
+
+                log(`✓ 播放成功 (${lang})`, 'success');
+
+            } catch (e) {
+                log(`✗ 错误: ${e.message}`, 'error');
+            }
+        }
+
+        async function testCache(word) {
+            try {
+                const startTime = Date.now();
+                log(`测试缓存: ${word}`, 'info');
+
+                const url = `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&accent=us&lang=en`;
+
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const blob = await res.blob();
+                const duration = Date.now() - startTime;
+
+                log(`✓ 请求完成，耗时: ${duration}ms (查看服务器日志确认是否命中缓存)`, 'success');
+
+                const blobUrl = URL.createObjectURL(blob);
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
+                currentAudio = new Audio(blobUrl);
+                await currentAudio.play();
+
+            } catch (e) {
+                log(`✗ 错误: ${e.message}`, 'error');
+            }
+        }
+
+        log('测试页面已加载，准备开始测试', 'success');
+    </script>
+</body>
+</html>

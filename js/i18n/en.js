@@ -37,6 +37,10 @@ export default {
     dictationSettings: 'Dictation',
     maxRetry: 'Max Retry',
     wordWriteDefListen: 'Word(write):Def(listen)',
+    dictateProvide: 'Provide',
+    dictateWrite: 'Write',
+    optionWord: 'Word',
+    optionDef: 'Definition',
 
     // Repeater settings
     repeaterSettings: 'Repeater',

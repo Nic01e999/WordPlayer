@@ -6,7 +6,7 @@ import { preloadCache, loadingAudio } from './state.js';
 import { t } from './i18n/index.js';
 import { getTtsUrl } from './api.js';
 import { getAccent, getTargetLang } from './utils.js';
-import { audioBlobManager, slowAudioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
+import { audioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
 
 // Web Speech API 语言代码映射
 const WEB_SPEECH_LANG_CODES = {
@@ -47,7 +47,7 @@ export function isAudioPlaying() {
 export async function speakWord(word, slow = false) {
     const accent = getAccent();
     const lang = getTargetLang();
-    const cache = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
+    const cache = preloadCache.audioUrls; // 只使用正常速度缓存
     const cacheKey = `${word}:${accent}:${lang}`;
     const cachedUrl = cache[cacheKey];
 
@@ -55,24 +55,25 @@ export async function speakWord(word, slow = false) {
     if (cachedUrl) {
         stopAudio();
         currentAudio = new Audio(cachedUrl);
+        currentAudio.playbackRate = slow ? 0.75 : 1.0; // 使用 playbackRate 实现慢速
         currentAudio.onerror = () => console.warn(t('errorAudioLoad'));
         currentAudio.play().catch(() => {});
         return;
     }
 
     // 正在加载中，跳过（不停止当前播放）
-    const loadingKey = `${cacheKey}:${slow}`;
+    const loadingKey = cacheKey; // 移除 slow 参数
     if (loadingAudio.has(loadingKey)) {
         return;
     }
 
     // 缓存未命中，fetch 并缓存
     loadingAudio.add(loadingKey);
-    const url = getTtsUrl(word, slow, accent, lang);
+    const url = getTtsUrl(word, false, accent, lang); // slow 固定为 false
     try {
         const res = await fetch(url);
         if (!res.ok) {
-            console.error(`TTS请求失败: ${res.status}`, { word, lang, accent, slow });
+            console.error(`TTS请求失败: ${res.status}`, { word, lang, accent });
             if (res.status === 500) {
                 console.warn('可能的原因：accent 和 lang 参数不兼容');
             }
@@ -80,7 +81,7 @@ export async function speakWord(word, slow = false) {
         }
 
         const blob = await res.blob();
-        const blobManager = slow ? slowAudioBlobManager : audioBlobManager;
+        const blobManager = audioBlobManager; // 只使用正常速度 BlobManager
 
         // 检查是否已经有缓存（避免重复创建 Blob URL）
         if (!cache[cacheKey]) {
@@ -90,6 +91,7 @@ export async function speakWord(word, slow = false) {
 
         stopAudio();
         currentAudio = new Audio(cache[cacheKey]);
+        currentAudio.playbackRate = slow ? 0.75 : 1.0; // 使用 playbackRate 实现慢速
         currentAudio.onerror = () => console.warn(t('errorAudioLoad'));
         currentAudio.play().catch(() => {});
     } catch (e) {
@@ -117,15 +119,15 @@ export async function speakText(text, slow = false) {
     }
 
     // 短文本使用有道TTS
-    // 检查缓存
+    // 检查缓存（只使用正常速度缓存）
     let cachedUrl = preloadCache.sentenceAudioUrls[cacheKey];
     if (!cachedUrl) {
-        const wordCache = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
-        cachedUrl = wordCache[cacheKey];
+        cachedUrl = preloadCache.audioUrls[cacheKey];
     }
 
     if (cachedUrl) {
         currentAudio = new Audio(cachedUrl);
+        currentAudio.playbackRate = slow ? 0.75 : 1.0; // 使用 playbackRate 实现慢速
         return new Promise((resolve, reject) => {
             currentAudio.onended = resolve;
             currentAudio.onerror = (e) => {
@@ -139,13 +141,13 @@ export async function speakText(text, slow = false) {
         });
     }
 
-    // 未缓存，fetch 并缓存
-    const url = getTtsUrl(text, slow, accent, lang);
+    // 未缓存，fetch 并缓存（只获取正常速度）
+    const url = getTtsUrl(text, false, accent, lang); // slow 固定为 false
 
     try {
         const res = await fetch(url);
         if (!res.ok) {
-            console.error(`TTS请求失败: ${res.status}`, { text, lang, accent, slow });
+            console.error(`TTS请求失败: ${res.status}`, { text, lang, accent });
             if (res.status === 500) {
                 console.warn('可能的原因：accent 和 lang 参数不兼容');
             }
@@ -157,6 +159,7 @@ export async function speakText(text, slow = false) {
         preloadCache.sentenceAudioUrls[cacheKey] = blobUrl;
 
         currentAudio = new Audio(blobUrl);
+        currentAudio.playbackRate = slow ? 0.75 : 1.0; // 使用 playbackRate 实现慢速
         return new Promise((resolve) => {
             currentAudio.onended = resolve;
             currentAudio.onerror = (e) => {

@@ -37,6 +37,10 @@ export default {
     dictationSettings: '听写',
     maxRetry: '最大重试',
     wordWriteDefListen: '单词(写):释义(听)',
+    dictateProvide: '提供',
+    dictateWrite: '书写',
+    optionWord: '单词',
+    optionDef: '释义',
 
     // 复读设置
     repeaterSettings: '复读',

@@ -181,15 +181,49 @@ function initSettingsListeners() {
         });
     });
 
-    // dictateMode 听写模式切换
-    const dictateModeCheckbox = $("dictateMode");
-    if (dictateModeCheckbox) {
-        dictateModeCheckbox.addEventListener("change", async () => {
-            const value = dictateModeCheckbox.checked;
-            await saveSettingToServer('dictate_mode', value);
+    // dictateProvide 和 dictateWrite 听写模式配置
+    const dictateProvideRadios = document.querySelectorAll('input[name="dictate-provide"]');
+    const dictateWriteRadios = document.querySelectorAll('input[name="dictate-write"]');
 
-            // 立即刷新当前模式
-            refreshCurrentMode();
+    if (dictateProvideRadios.length > 0 && dictateWriteRadios.length > 0) {
+        // 监听 provide 变化
+        dictateProvideRadios.forEach(radio => {
+            radio.addEventListener("change", async () => {
+                const provideValue = document.querySelector('input[name="dictate-provide"]:checked')?.value;
+
+                // provide=B 时，write 只能选 A
+                if (provideValue === 'B') {
+                    document.getElementById('write-word').checked = true;
+                    document.getElementById('write-def').disabled = true;
+                } else {
+                    document.getElementById('write-def').disabled = false;
+                }
+
+                await saveSettingToServer('dictate_provide', provideValue);
+
+                // 立即刷新当前模式
+                refreshCurrentMode();
+            });
+        });
+
+        // 监听 write 变化
+        dictateWriteRadios.forEach(radio => {
+            radio.addEventListener("change", async () => {
+                const writeValue = document.querySelector('input[name="dictate-write"]:checked')?.value;
+
+                // write=B 时，provide 只能选 A
+                if (writeValue === 'B') {
+                    document.getElementById('provide-word').checked = true;
+                    document.getElementById('provide-def').disabled = true;
+                } else {
+                    document.getElementById('provide-def').disabled = false;
+                }
+
+                await saveSettingToServer('dictate_write', writeValue);
+
+                // 立即刷新当前模式
+                refreshCurrentMode();
+            });
         });
     }
 }
@@ -198,11 +232,11 @@ function initSettingsListeners() {
  * 初始化语言选择器事件
  */
 function initLangSelectors() {
-    const uiLangSelect = $("uiLang");
-
     // 界面语言变更 - 只影响UI，不影响翻译
-    if (uiLangSelect) {
-        uiLangSelect.addEventListener("change", async () => {
+    const uiLangRadios = document.querySelectorAll('input[name="ui-lang"]');
+
+    uiLangRadios.forEach(radio => {
+        radio.addEventListener("change", async () => {
             const uiLang = getUiLang();
 
             // 更新界面语言
@@ -219,7 +253,7 @@ function initLangSelectors() {
             // 同步到服务端
             await saveSettingToServer('ui_lang', uiLang);
         });
-    }
+    });
 }
 
 // 页面加载完成后初始化
@@ -284,13 +318,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-        if (settings.ui_lang && $("uiLang")) {
-            $("uiLang").value = settings.ui_lang;
-            updatePageTexts();
-            updateUserDisplay();
-            refreshLoginDialog();
-            if (!window.currentActiveMode) {
-                renderWordListCards();
+        if (settings.ui_lang) {
+            const uiLangRadio = document.querySelector(`input[name="ui-lang"][value="${settings.ui_lang}"]`);
+            if (uiLangRadio) {
+                uiLangRadio.checked = true;
+                updatePageTexts();
+                updateUserDisplay();
+                refreshLoginDialog();
+                if (!window.currentActiveMode) {
+                    renderWordListCards();
+                }
             }
         }
 
@@ -310,8 +347,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (settings.retry_count !== undefined && $("retry")) {
             $("retry").value = settings.retry_count;
         }
-        if (settings.dictate_mode !== undefined && $("dictateMode")) {
-            $("dictateMode").checked = settings.dictate_mode;
+        if (settings.dictate_provide !== undefined) {
+            const provideRadio = document.querySelector(`input[name="dictate-provide"][value="${settings.dictate_provide}"]`);
+            if (provideRadio) provideRadio.checked = true;
+        }
+        if (settings.dictate_write !== undefined) {
+            const writeRadio = document.querySelector(`input[name="dictate-write"][value="${settings.dictate_write}"]`);
+            if (writeRadio) writeRadio.checked = true;
         }
         if (settings.accent) {
             const accentRadio = document.querySelector(`input[name="accent"][value="${settings.accent}"]`);
@@ -330,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 检查是否有影响播放行为的设置变更
         const playbackSettings = [
             'shuffle_mode', 'slow_mode', 'repeat_count',
-            'interval_ms', 'retry_count', 'dictate_mode', 'accent'
+            'interval_ms', 'retry_count', 'dictate_provide', 'dictate_write', 'accent'
         ];
 
         const hasPlaybackChange = playbackSettings.some(key => settings[key] !== undefined);

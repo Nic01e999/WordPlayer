@@ -37,6 +37,10 @@ export default {
     dictationSettings: 'ディクテーション',
     maxRetry: '最大リトライ',
     wordWriteDefListen: '単語(書く):意味(聞く)',
+    dictateProvide: '提供',
+    dictateWrite: '書く',
+    optionWord: '単語',
+    optionDef: '定義',
 
     // リピーター設定
     repeaterSettings: 'リピーター',

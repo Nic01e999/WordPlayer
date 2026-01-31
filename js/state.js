@@ -2,7 +2,7 @@
  * 全局状态管理模块
  */
 
-import { audioBlobManager, slowAudioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
+import { audioBlobManager, sentenceAudioBlobManager } from './storage/blobManager.js';
 
 /**
  * 复读模式的状态对象
@@ -29,16 +29,15 @@ export const preloadCache = {
     entries: [],            // 已缓存的单词条目列表 { word, definition }
     translations: {},       // { word: translation } - 如果有 definition 则直接使用
     wordInfo: {},           // 词典 API 完整信息（中文本地数据库 + 英文有道 API）
-    audioUrls: {},          // { `${text}:${accent}`: Blob URL } (正常速度) - 支持双口音
-    slowAudioUrls: {},      // { `${text}:${accent}`: Blob URL } (慢速) - 支持双口音
-    sentenceAudioUrls: {},  // { `${sentence}:${accent}`: Blob URL } - 例句音频缓存
+    audioUrls: {},          // { `${text}:${accent}:${lang}`: Blob URL } (正常速度) - 支持双口音
+    sentenceAudioUrls: {},  // { `${sentence}:${accent}:${lang}`: Blob URL } - 例句音频缓存
     loading: false,         // 是否正在加载
     loadId: 0,              // 加载 ID，用于取消旧的加载
     abortController: null,  // AbortController 用于取消 fetch 请求
     // 分开计数
     translationLoaded: 0,   // 翻译已加载数
     translationTotal: 0,    // 翻译总数
-    audioLoaded: 0,         // 音频已加载数（单词数，4个音频=1）
+    audioLoaded: 0,         // 音频已加载数（单词数，每个单词1个音频）
     audioTotal: 0,          // 音频总数（单词数）
     audioPartial: {}        // { text: count } 追踪每个单词已加载的音频数
 };
@@ -49,12 +48,10 @@ export const preloadCache = {
 export function clearAudioCache() {
     // 使用 BlobManager 释放所有 Blob URL
     audioBlobManager.releaseAll();
-    slowAudioBlobManager.releaseAll();
     sentenceAudioBlobManager.releaseAll();
 
     // 清空缓存对象
     preloadCache.audioUrls = {};
-    preloadCache.slowAudioUrls = {};
     preloadCache.sentenceAudioUrls = {};
     preloadCache.audioLoaded = 0;
     preloadCache.audioPartial = {};

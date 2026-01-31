@@ -173,20 +173,41 @@ export function getTranslationLang() {
  * @returns {string} 语言代码 (en, ja, ko, fr, zh)
  */
 export function getUiLang() {
-    return $("uiLang")?.value || 'zh';
+    const radio = document.querySelector('input[name="ui-lang"]:checked');
+    return radio?.value || 'zh';
 }
 
 /**
  * 从设置面板读取用户配置
  */
 export function getSettings() {
+    // 处理旧配置迁移
+    const oldDictateMode = localStorage.getItem('dictateMode');
+    if (oldDictateMode !== null) {
+        // 迁移旧配置到新格式
+        const isChecked = oldDictateMode === 'true';
+        if (isChecked) {
+            // listenB_writeA -> provide=B, write=A
+            localStorage.setItem('dictateProvide', 'B');
+            localStorage.setItem('dictateWrite', 'A');
+        } else {
+            // listenA_writeB -> provide=A, write=B
+            localStorage.setItem('dictateProvide', 'A');
+            localStorage.setItem('dictateWrite', 'B');
+        }
+        // 删除旧配置
+        localStorage.removeItem('dictateMode');
+        console.log('[配置迁移] 已将旧的 dictateMode 迁移到新格式');
+    }
+
     return {
         repeat: parseInt($("repeat")?.value) || 1,
         retry: parseInt($("retry")?.value) || 1,
         interval: parseInt($("interval")?.value) || 300,
         slow: $("slow")?.checked ?? false,
         shuffle: $("shuffle")?.checked ?? false,
-        dictateMode: $("dictateMode")?.checked ? "listenB_writeA" : "listenA_writeB",
+        dictateProvide: document.querySelector('input[name="dictate-provide"]:checked')?.value || "A",
+        dictateWrite: document.querySelector('input[name="dictate-write"]:checked')?.value || "A",
         accent: getAccent(),
         targetLang: getTargetLang(),
         translationLang: getTranslationLang(),

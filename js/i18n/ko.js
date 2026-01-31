@@ -37,6 +37,10 @@ export default {
     dictationSettings: '받아쓰기',
     maxRetry: '최대 재시도',
     wordWriteDefListen: '단어(쓰기):뜻(듣기)',
+    dictateProvide: '제공',
+    dictateWrite: '쓰기',
+    optionWord: '단어',
+    optionDef: '정의',
 
     // 반복 설정
     repeaterSettings: '반복',

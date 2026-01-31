@@ -102,8 +102,5 @@ class BlobManager {
 // 音频 Blob 管理器实例（最多 200 个）
 export const audioBlobManager = new BlobManager(200);
 
-// 慢速音频 Blob 管理器实例
-export const slowAudioBlobManager = new BlobManager(200);
-
 // 例句音频 Blob 管理器实例
 export const sentenceAudioBlobManager = new BlobManager(100);

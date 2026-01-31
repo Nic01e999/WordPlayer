@@ -32,11 +32,19 @@ export function showPopup() {
     const retries = s.attempts[i].length;
 
     const entry = s.entries[i];
-    let writeHint;
-    if (entry.definition) {
-        writeHint = s.dictateMode === "listenB_writeA" ? t('writeWord') : t('writeDefinition');
+    const writeHint = s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition');
+
+    const { dictateProvide, dictateWrite, provideTexts } = s;
+    const provideText = provideTexts[i];
+
+    // 决定是否显示 provide
+    let titleHtml;
+    if (dictateProvide !== dictateWrite) {
+        // provide != write，显示 provide 内容
+        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
     } else {
-        writeHint = t('writeWord');
+        // provide == write，不显示 provide
+        titleHtml = t('wordNum', { num: i + 1 });
     }
 
     const popup = document.createElement("div");
@@ -44,7 +52,7 @@ export function showPopup() {
     popup.className = "popup";
     popup.innerHTML = `
         <div class="popup-drag-handle" title=""></div>
-        <h3>${t('wordNum', { num: i + 1 })}</h3>
+        <h3>${titleHtml}</h3>
         <p id="retryInfo">${t('attempts')}: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
         <br><br>
         <button onclick="Dictation.play()" class="btn-sound"></button>
@@ -77,7 +85,10 @@ export function play() {
     const s = _getState?.();
     if (s) {
         const textToSpeak = s.speakTexts[s.currentIndex];
-        speakWord(textToSpeak, s.slow);
+        if (textToSpeak) {  // 只有 provide=A 时才播放
+            speakWord(textToSpeak, s.slow);
+        }
+        // provide=B 时，textToSpeak 为 null，不播放音频
     }
 }
 

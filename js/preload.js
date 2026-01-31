@@ -3,7 +3,7 @@
  */
 
 import { preloadCache, clearAudioCache } from './state.js';
-import { audioBlobManager, slowAudioBlobManager } from './storage/blobManager.js';
+import { audioBlobManager } from './storage/blobManager.js';
 import { t } from './i18n/index.js';
 import { promiseAllWithLimit } from './utils/concurrency.js';
 import {
@@ -18,7 +18,8 @@ import {
     setTargetLang,
     updateAccentSelectorVisibility,
     checkLanguageConsistency,
-    showToast
+    showToast,
+    getAccent
 } from './utils.js';
 import {
     getTtsUrl,
@@ -242,29 +243,24 @@ export async function startPreload(forceReload = false) {
     preloadCache.translationLoaded = translationLoaded;
 
     // 收集所有需要预加载音频的文本，并统计已缓存的
+    // 只预加载单词(A)的音频，不预加载自定义释义(B)的音频
     const textsToPreload = new Set();
     entries.forEach(e => {
         textsToPreload.add(e.word);
-        if (e.definition) textsToPreload.add(e.definition);
     });
     preloadCache.audioTotal = textsToPreload.size;
 
-    // 统计已缓存的音频（所有变体都缓存了才算）
-    // 英语: 4个变体，其他语言: 2个变体
+    // 统计已缓存的音频（只检查正常速度和当前口音）
     let audioLoaded = 0;
-    const accentsCheck = targetLang === 'en' ? ['us', 'uk'] : ['us'];
-    const speedsCheck = [false, true];
-    const expectedVariants = accentsCheck.length * speedsCheck.length;
+    const currentAccent = getAccent(); // 获取当前选择的口音
+    const accentsCheck = targetLang === 'en' ? [currentAccent] : ['us']; // 只检查当前口音
     for (const text of textsToPreload) {
         let cachedCount = 0;
         for (const accent of accentsCheck) {
-            for (const slow of speedsCheck) {
-                const cacheKey = `${text}:${accent}:${targetLang}`;
-                const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
-                if (cacheObj[cacheKey]) cachedCount++;
-            }
+            const cacheKey = `${text}:${accent}:${targetLang}`;
+            if (preloadCache.audioUrls[cacheKey]) cachedCount++;
         }
-        if (cachedCount === expectedVariants) audioLoaded++;
+        if (cachedCount === accentsCheck.length) audioLoaded++;
     }
     preloadCache.audioLoaded = audioLoaded;
 
@@ -383,17 +379,17 @@ export async function startPreload(forceReload = false) {
     };
 
     // 加载单个音频的函数，返回 { cached, success } 表示状态
-    const loadSingleAudio = async (text, accent, slow, lang) => {
+    const loadSingleAudio = async (text, accent, lang) => {
         const cacheKey = `${text}:${accent}:${lang}`;
-        const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
-        const blobManager = slow ? slowAudioBlobManager : audioBlobManager;
+        const cacheObj = preloadCache.audioUrls; // 只使用正常速度缓存
+        const blobManager = audioBlobManager; // 只使用正常速度 BlobManager
 
         if (cacheObj[cacheKey]) {
             return { cached: true, success: true };  // 已缓存
         }
 
         try {
-            const url = getTtsUrl(text, slow, accent, lang);
+            const url = getTtsUrl(text, false, accent, lang); // slow 固定为 false
             const res = await fetchWithTimeout(url, { signal }, 15000);
             if (!res.ok) {
                 console.warn(t('errorTts', { status: res.status }) + ` for ${text}`);
@@ -413,21 +409,16 @@ export async function startPreload(forceReload = false) {
     };
 
     // 并行加载所有音频（限制并发数为 6，避免浏览器连接数耗尽）
-    // 英语: 两种口音 × 两种速度 = 4个
-    // 其他语言: 一种口音 × 两种速度 = 2个
-    const accents = targetLang === 'en' ? ['us', 'uk'] : ['us'];  // 非英语只用一种
-    const speeds = [false, true];  // normal, slow
-    const audioVariants = accents.length * speeds.length;  // 每个文本的音频数量
+    // 只加载正常速度和当前口音（使用上面已声明的 currentAccent）
+    const accents = targetLang === 'en' ? [currentAccent] : ['us']; // 只加载当前口音
+    const audioVariants = accents.length; // 每个文本的音频数量（现在是1）
 
     // 初始化每个文本的计数器（考虑已缓存的）
     textsToPreload.forEach(text => {
         let cachedCount = 0;
         for (const accent of accents) {
-            for (const slow of speeds) {
-                const cacheKey = `${text}:${accent}:${targetLang}`;
-                const cacheObj = slow ? preloadCache.slowAudioUrls : preloadCache.audioUrls;
-                if (cacheObj[cacheKey]) cachedCount++;
-            }
+            const cacheKey = `${text}:${accent}:${targetLang}`;
+            if (preloadCache.audioUrls[cacheKey]) cachedCount++;
         }
         preloadCache.audioPartial[text] = cachedCount;
     });
@@ -435,22 +426,20 @@ export async function startPreload(forceReload = false) {
     const audioTasks = [];
     for (const text of textsToPreload) {
         for (const accent of accents) {
-            for (const slow of speeds) {
-                audioTasks.push(() =>
-                    loadSingleAudio(text, accent, slow, targetLang).then((result) => {
-                        if (myId !== preloadCache.loadId) return;
-                        if (result.cached) return;  // 已缓存的不重复计数
-                        if (!result.success) return;  // 加载失败的不计数
+            audioTasks.push(() =>
+                loadSingleAudio(text, accent, targetLang).then((result) => {
+                    if (myId !== preloadCache.loadId) return;
+                    if (result.cached) return;  // 已缓存的不重复计数
+                    if (!result.success) return;  // 加载失败的不计数
 
-                        preloadCache.audioPartial[text]++;
-                        // 所有音频变体全部加载完才计入进度
-                        if (preloadCache.audioPartial[text] === audioVariants) {
-                            preloadCache.audioLoaded++;
-                            updatePreloadProgress();
-                        }
-                    })
-                );
-            }
+                    preloadCache.audioPartial[text]++;
+                    // 所有音频变体全部加载完才计入进度
+                    if (preloadCache.audioPartial[text] === audioVariants) {
+                        preloadCache.audioLoaded++;
+                        updatePreloadProgress();
+                    }
+                })
+            );
         }
     }
 

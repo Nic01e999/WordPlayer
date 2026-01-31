@@ -38,12 +38,16 @@
                 <label><span data-i18n="slow">Slow</span>: <input type="checkbox" id="slow"></label>
                 <div class="lang-selector">
                     <span data-i18n="interface">界面</span>:
-                    <select id="uiLang">
-                        <option value="zh">中文</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                    </select>
+                    <div class="segmented-control segmented-control-4">
+                        <input type="radio" name="ui-lang" id="lang-zh" value="zh" checked>
+                        <label for="lang-zh">中</label>
+                        <input type="radio" name="ui-lang" id="lang-en" value="en">
+                        <label for="lang-en">EN</label>
+                        <input type="radio" name="ui-lang" id="lang-ja" value="ja">
+                        <label for="lang-ja">日</label>
+                        <input type="radio" name="ui-lang" id="lang-ko" value="ko">
+                        <label for="lang-ko">한</label>
+                    </div>
                 </div>
                 <div class="accent-selector" id="accentSelector">
                     <span data-i18n="accent">Accent</span>:
@@ -80,7 +84,26 @@
             <div id="dictation-settings" class="mode-settings">
                 <h3 data-i18n="dictationSettings">Dictation</h3>
                 <label><span data-i18n="maxRetry">Max Retry</span>: <input type="number" id="retry" value="3" min="1"></label>
-                <label><span data-i18n="wordWriteDefListen">Word(write) : Def(listen)</span><input type="checkbox" id="dictateMode"></label>
+                <div class="dictate-config">
+                    <div class="dictate-option">
+                        <span data-i18n="dictateProvide">提供</span>:
+                        <div class="segmented-control">
+                            <input type="radio" name="dictate-provide" id="provide-word" value="A" checked>
+                            <label for="provide-word" data-i18n="optionWord">单词</label>
+                            <input type="radio" name="dictate-provide" id="provide-def" value="B">
+                            <label for="provide-def" data-i18n="optionDef">释义</label>
+                        </div>
+                    </div>
+                    <div class="dictate-option">
+                        <span data-i18n="dictateWrite">书写</span>:
+                        <div class="segmented-control">
+                            <input type="radio" name="dictate-write" id="write-word" value="A" checked>
+                            <label for="write-word" data-i18n="optionWord">单词</label>
+                            <input type="radio" name="dictate-write" id="write-def" value="B">
+                            <label for="write-def" data-i18n="optionDef">释义</label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="repeater-settings" class="mode-settings">
                 <h3 data-i18n="repeaterSettings">Repeater</h3>

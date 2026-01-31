@@ -76,22 +76,29 @@ export class Dictation {
         const list = settings.shuffle ? shuffleArray(entries) : [...entries];
         const words = list.map(e => e.word);
 
-        const dictateMode = settings.dictateMode;
-        const speakTexts = [];
-        const expectTexts = [];
+        const { dictateProvide, dictateWrite } = settings;
+        const speakTexts = [];      // 要播放的音频文本（只有 provide=A 时才有）
+        const provideTexts = [];    // 要显示的 provide 文本
+        const expectTexts = [];     // 期望的答案
 
         list.forEach(entry => {
-            if (entry.definition) {
-                if (dictateMode === "listenA_writeB") {
-                    speakTexts.push(entry.word);
-                    expectTexts.push(entry.definition);
-                } else {
-                    speakTexts.push(entry.definition);
-                    expectTexts.push(entry.word);
-                }
+            const wordText = entry.word;
+            const defText = entry.definition || wordText;
+
+            // 根据 provide 决定播放和显示的内容
+            if (dictateProvide === 'A') {
+                speakTexts.push(wordText);      // 播放单词读音
+                provideTexts.push(wordText);    // provide 显示单词
             } else {
-                speakTexts.push(entry.word);
-                expectTexts.push(entry.word);
+                speakTexts.push(null);          // 不播放音频
+                provideTexts.push(defText);     // provide 显示释义
+            }
+
+            // 根据 write 决定期望答案
+            if (dictateWrite === 'A') {
+                expectTexts.push(wordText);     // 期望写单词
+            } else {
+                expectTexts.push(defText);      // 期望写释义
             }
         });
 
@@ -99,8 +106,10 @@ export class Dictation {
             entries: list,
             words,
             speakTexts,
+            provideTexts,
             expectTexts,
-            dictateMode,
+            dictateProvide,
+            dictateWrite,
             currentIndex: 0,
             maxRetry: settings.retry,
             attempts: list.map(() => []),
