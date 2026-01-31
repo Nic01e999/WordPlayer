@@ -29,21 +29,54 @@ export function showPopup() {
     }
 
     const i = s.currentIndex;
+
+    // 在显示弹窗前，先更新记录区显示已答题目
+    updateWorkplace();
+
+    // 手动添加当前题目的占位符
+    const wp = document.getElementById("dictationWorkplace");
+    if (wp) {
+        const provideText = s.provideTexts[i];
+        const isCustom = s.isCustomWord[i];
+        const shouldShowProvide = isCustom && (s.dictateProvide !== s.dictateWrite);
+
+        const currentItemHTML = `<div class="result-item">
+            <span class="result-index">${i + 1}.</span>
+            ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
+            <div class="result-attempts"></div>
+        </div>`;
+
+        wp.insertAdjacentHTML('beforeend', currentItemHTML);
+
+        // 自动滚动到底部
+        setTimeout(() => {
+            const view = document.getElementById("dictationView");
+            if (view) {
+                view.scrollTop = view.scrollHeight;
+            }
+        }, 50);
+    }
+
     const retries = s.attempts[i].length;
 
     const entry = s.entries[i];
-    const writeHint = s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition');
+    const isCustom = s.isCustomWord[i];  // 获取单词类型标记
+
+    // 根据单词类型决定 write 提示
+    const writeHint = isCustom
+        ? (s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
+        : t('writeWord');  // 非自定义单词永远是"写单词"
 
     const { dictateProvide, dictateWrite, provideTexts } = s;
     const provideText = provideTexts[i];
 
     // 决定是否显示 provide
     let titleHtml;
-    if (dictateProvide !== dictateWrite) {
-        // provide != write，显示 provide 内容
+    if (isCustom && dictateProvide !== dictateWrite) {
+        // 自定义单词 && provide != write，显示 provide 内容
         titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
     } else {
-        // provide == write，不显示 provide
+        // 非自定义单词 || provide == write，不显示 provide
         titleHtml = t('wordNum', { num: i + 1 });
     }
 
@@ -135,7 +168,7 @@ export function updateWorkplace() {
     if (!wp || !s) return;
 
     wp.innerHTML = s.attempts.map((attempts, i) => {
-        if (!attempts.length) return '';
+        if (!attempts.length) return '';  // 只显示已答题目
 
         const result = s.results[i];
 
@@ -161,11 +194,12 @@ export function updateWorkplace() {
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
         }).join('');
 
-        const listenedText = s.speakTexts[i];
-        const hasCustomDef = s.entries[i].definition !== null;
+        const provideText = s.provideTexts[i];
+        const isCustom = s.isCustomWord[i];
+        const shouldShowProvide = isCustom && (s.dictateProvide !== s.dictateWrite);
         return `<div class="result-item">
                     <span class="result-index">${i + 1}.</span>
-                    ${hasCustomDef ? `<div class="result-listened">&lt${listenedText}&gt</div>` : ''}
+                    ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
                     <div class="result-attempts">${rows}</div>
                 </div>`;
     }).join('');
@@ -338,7 +372,7 @@ function createShareContainer(state, score, correct, warning, failed) {
 
     // 生成详细记录 HTML
     const detailsHTML = state.attempts.map((attempts, i) => {
-        if (!attempts.length) return '';
+        if (!attempts.length) return '';  // 只显示已答题目
 
         const result = state.results[i];
         const rows = attempts.map((a, j) => {
@@ -363,12 +397,13 @@ function createShareContainer(state, score, correct, warning, failed) {
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
         }).join('');
 
-        const listenedText = state.speakTexts[i];
-        const hasCustomDef = state.entries[i].definition !== null;
+        const provideText = state.provideTexts[i];
+        const isCustom = state.isCustomWord[i];
+        const shouldShowProvide = isCustom && (state.dictateProvide !== state.dictateWrite);
 
         return `<div class="result-item">
                     <span class="result-index">${i + 1}.</span>
-                    ${hasCustomDef ? `<div class="result-listened">&lt${listenedText}&gt</div>` : ''}
+                    ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
                     <div class="result-attempts">${rows}</div>
                 </div>`;
     }).join('');

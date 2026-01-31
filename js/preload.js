@@ -127,31 +127,9 @@ export async function startPreload(forceReload = false) {
         return;
     }
 
-    // 获取当前语言设置（提前获取，用于保存用户自定义）
+    // 获取当前语言设置
     const targetLang = getTargetLang();
     const translationLang = getTranslationLang();
-
-    // 保存用户自定义释义到数据库
-    const customDefinitions = entries.filter(e => e.definition);
-    if (customDefinitions.length > 0) {
-        // 异步保存用户自定义释义
-        await Promise.all(customDefinitions.map(async ({ word, definition }) => {
-            try {
-                await fetch('/api/dict/user/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        word: word,
-                        language: targetLang,
-                        definition: definition
-                    })
-                });
-                console.log(`[用户自定义] 保存成功: ${word} -> ${definition}`);
-            } catch (e) {
-                console.warn(`[用户自定义] 保存失败: ${word}`, e);
-            }
-        }));
-    }
 
     // 检查单词列表是否改变
     const entriesChanged = entries.length !== preloadCache.entries.length ||

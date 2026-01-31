@@ -171,7 +171,7 @@ body.dictation-mode #menu::after {
     right: 0;                  /* 靠右对齐 */
     width: auto;               /* 宽度自适应 */
     overflow-y: auto;          /* container 可滚动 */
-    overflow-x: visible;        /* 隐藏横向滚动 */
+    overflow-x: hidden;        /* 隐藏横向滚动 */
     z-index: 1001;             /* 提高层级，盖住 menu (z-index: 100) */
     pointer-events: none;      /* 默认点击穿透 */
     padding-top: 4rem;         /* 为 menu 留出空间 */
@@ -186,16 +186,11 @@ body.dictation-mode #menu::after {
     /* 宽度由内容决定（设置项的宽度） */
     width: fit-content;        /* 根据内容自适应 */
     min-width: 12rem;          /* 最小宽度 192px */
-    max-width: 20rem;          /* 最大宽度 320px */
+    max-width: 15rem;          /* 最大宽度 320px */
 
     /* 高度自适应内容，不设置 max-height */
     height: auto;
 
-    /* 添加滚动支持 */
-    max-height: calc(100vh - 5rem);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
 
     /* 保持液态玻璃风格 */
     background: linear-gradient(135deg,
@@ -221,14 +216,7 @@ body.dictation-mode #menu::after {
     pointer-events: auto;      /* sidebar 可点击 */
 }
 
-/* 设置面板显示状态 - 悬停显示（通过body.settings-hover类控制） */
-body.settings-hover .sidebar {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);  /* 改为 scale(1)，不放大 */
-}
-
-/* 设置面板显示状态 - 点击显示（body添加 settings-active 类） */
+body.settings-hover .sidebar,
 body.settings-active .sidebar {
     opacity: 1;
     visibility: visible;
@@ -404,6 +392,17 @@ body.settings-active .sidebar {
     background: var(--accent-primary);
     color: white;
     box-shadow: 0 2px 6px var(--shadow-pink-medium);
+}
+
+/* 禁用状态样式 */
+.segmented-control input[type="radio"]:disabled + label {
+    opacity: 0.4;
+    color: var(--text-muted);
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: line-through;
+    text-decoration-color: var(--text-muted);
+    text-decoration-thickness: 1px;
 }
 
 /* 主题选择器 */

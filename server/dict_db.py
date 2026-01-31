@@ -12,7 +12,6 @@ from typing import Dict, List, Optional
 DB_DIR = Path(__file__).parent.parent / 'data' / 'dict'
 ZH_DB = DB_DIR / 'zh_dict.db'
 EN_DB = DB_DIR / 'en_dict.db'
-USER_DB = DB_DIR / 'user_dict.db'
 
 
 class DictDatabase:
@@ -21,10 +20,8 @@ class DictDatabase:
     def __init__(self):
         self.zh_conn = None
         self.en_conn = None
-        self.user_conn = None
         self._connect_zh()
         self._connect_en()
-        self._connect_user()
 
     def _connect_zh(self):
         """连接中文数据库"""
@@ -65,19 +62,6 @@ class DictDatabase:
             print(f"⚠ 英文词典数据库不存在: {EN_DB}")
             self.en_conn = None
 
-    def _connect_user(self):
-        """连接用户自定义数据库"""
-        if USER_DB.exists():
-            try:
-                self.user_conn = sqlite3.connect(str(USER_DB), check_same_thread=False)
-                self.user_conn.row_factory = sqlite3.Row
-                print(f"✓ 用户自定义数据库已连接: {USER_DB}")
-            except Exception as e:
-                print(f"✗ 连接用户数据库失败: {e}")
-                self.user_conn = None
-        else:
-            print(f"⚠ 用户自定义数据库不存在: {USER_DB}")
-            self.user_conn = None
 
     def query_chinese_word(self, word: str) -> Optional[Dict]:
         """查询中文词语"""
@@ -327,90 +311,6 @@ class DictDatabase:
             print(f"✗ 模糊搜索失败: {e}")
             return []
 
-    def query_user_definition(self, word: str, language: str) -> Optional[Dict]:
-        """查询用户自定义释义"""
-        if not self.user_conn:
-            return None
-
-        try:
-            cursor = self.user_conn.cursor()
-            cursor.execute('''
-                SELECT * FROM user_definitions
-                WHERE word = ? AND language = ?
-                LIMIT 1
-            ''', (word, language))
-
-            row = cursor.fetchone()
-            if not row:
-                return None
-
-            return {
-                'word': row['word'],
-                'language': row['language'],
-                'definition': row['definition'],
-                'phonetic': row['phonetic'],
-                'notes': row['notes'],
-                'source': 'user_defined'
-            }
-
-        except Exception as e:
-            print(f"✗ 查询用户自定义失败: {e}")
-            return None
-
-    def save_user_definition(self, word: str, language: str, definition: str,
-                            phonetic: str = None, notes: str = None) -> bool:
-        """保存用户自定义释义"""
-        if not self.user_conn:
-            return False
-
-        try:
-            cursor = self.user_conn.cursor()
-            cursor.execute('''
-                INSERT OR REPLACE INTO user_definitions
-                (word, language, definition, phonetic, notes, updated_at)
-                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ''', (word, language, definition, phonetic, notes))
-
-            self.user_conn.commit()
-            print(f"✓ 保存用户自定义: {word} ({language})")
-            return True
-
-        except Exception as e:
-            print(f"✗ 保存用户自定义失败: {e}")
-            return False
-
-    def query_user_batch(self, words: List[str], language: str) -> Dict[str, Dict]:
-        """批量查询用户自定义"""
-        results = {}
-        for word in words:
-            info = self.query_user_definition(word, language)
-            if info:
-                results[word] = info
-        return results
-
-    def format_user_to_wordinfo(self, user_result: Dict) -> Dict:
-        """将用户自定义格式转换为前端 wordinfo 格式"""
-        if not user_result:
-            return None
-
-        return {
-            'word': user_result['word'],
-            'phonetic': user_result.get('phonetic', ''),
-            'translation': user_result.get('definition', ''),
-            'targetDefinitions': [{
-                'pos': '',
-                'meanings': [user_result.get('definition', '')]
-            }],
-            'nativeDefinitions': {},
-            'examples': {'common': [], 'fun': []},
-            'synonyms': [],
-            'antonyms': [],
-            'wordForms': {},
-            'meta': {
-                'source': 'user_defined',
-                'notes': user_result.get('notes', '')
-            }
-        }
 
     def close(self):
         """关闭数据库连接"""
@@ -418,8 +318,6 @@ class DictDatabase:
             self.zh_conn.close()
         if self.en_conn:
             self.en_conn.close()
-        if self.user_conn:
-            self.user_conn.close()
 
 
 # 全局数据库实例

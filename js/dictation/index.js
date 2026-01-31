@@ -83,22 +83,29 @@ export class Dictation {
 
         list.forEach(entry => {
             const wordText = entry.word;
+            const isCustomWord = entry.definition !== null;  // 区分单词类型
             const defText = entry.definition || wordText;
 
-            // 根据 provide 决定播放和显示的内容
-            if (dictateProvide === 'A') {
-                speakTexts.push(wordText);      // 播放单词读音
-                provideTexts.push(wordText);    // provide 显示单词
-            } else {
-                speakTexts.push(null);          // 不播放音频
-                provideTexts.push(defText);     // provide 显示释义
-            }
+            if (isCustomWord) {
+                // 自定义单词：按照用户设置的 provide/write 处理
+                if (dictateProvide === 'A') {
+                    speakTexts.push(wordText);      // 播放单词读音
+                    provideTexts.push(wordText);    // provide 显示单词
+                } else {
+                    speakTexts.push(null);          // 不播放音频
+                    provideTexts.push(defText);     // provide 显示释义
+                }
 
-            // 根据 write 决定期望答案
-            if (dictateWrite === 'A') {
-                expectTexts.push(wordText);     // 期望写单词
+                if (dictateWrite === 'A') {
+                    expectTexts.push(wordText);     // 期望写单词
+                } else {
+                    expectTexts.push(defText);      // 期望写释义
+                }
             } else {
-                expectTexts.push(defText);      // 期望写释义
+                // 非自定义单词：固定为 provide=A, write=A（听单词→写单词）
+                speakTexts.push(wordText);
+                provideTexts.push(wordText);
+                expectTexts.push(wordText);
             }
         });
 
@@ -115,7 +122,8 @@ export class Dictation {
             attempts: list.map(() => []),
             results: list.map(() => null),
             slow: settings.slow,
-            isPaused: false
+            isPaused: false,
+            isCustomWord: list.map(entry => entry.definition !== null)  // 新增：标记每个单词是否为自定义单词
         };
 
         showPopup();

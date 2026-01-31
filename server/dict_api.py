@@ -31,15 +31,7 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
     Returns:
         dict: 单词信息，如果未找到返回默认翻译
     """
-    # 1. 先查用户自定义
-    print(f"[Dict] 查询用户自定义: {word} ({target_lang})")
-    user_result = dict_db.query_user_definition(word, target_lang)
-    if user_result:
-        wordinfo = dict_db.format_user_to_wordinfo(user_result)
-        print(f"[Dict] ✓ 用户自定义找到: {word}")
-        return wordinfo
-
-    # 2. 如果是中文词，使用本地数据库
+    # 1. 如果是中文词，使用本地数据库
     if _is_chinese(word):
         print(f"[Dict] 查询中文词典: {word}")
         db_result = dict_db.query_chinese_word(word)
@@ -62,18 +54,18 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
                 'meta': {'source': 'default', 'language': target_lang}
             }
 
-    # 3. 如果是英文词，使用混合模式（本地优先，API 兜底）
+    # 2. 如果是英文词，使用混合模式（本地优先，API 兜底）
     elif target_lang == 'en':
         print(f"[Dict] 查询英文词典: {word}")
 
-        # 3.1 先查本地数据库
+        # 2.1 先查本地数据库
         db_result = dict_db.query_english_word(word)
         if db_result:
             wordinfo = dict_db.format_english_to_wordinfo(db_result)
             print(f"[Dict] ✓ 英文数据库找到: {word}")
             return wordinfo
 
-        # 3.2 本地未找到，尝试 API 兜底（待实现）
+        # 2.2 本地未找到，尝试 API 兜底（待实现）
         print(f"[Dict] ✗ 英文数据库未找到: {word}")
         # TODO: 实现有道词典 API 查询作为兜底
         # 可以参考 tts.py 中的有道 API 调用方式
@@ -87,7 +79,7 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
         # except Exception as e:
         #     print(f"[Dict] ✗ 有道 API 查询失败: {e}")
 
-        # 3.3 都失败，返回默认
+        # 2.3 都失败，返回默认
         print(f"[Dict] ✗ 所有数据源都未找到: {word}")
         return {
             'word': word,
@@ -101,7 +93,7 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
             'meta': {'source': 'default', 'language': target_lang}
         }
 
-    # 4. 日语、韩语等其他语言：返回默认翻译
+    # 3. 日语、韩语等其他语言：返回默认翻译
     else:
         print(f"[Dict] 非中英语言: {word} ({target_lang})")
         return {
@@ -234,37 +226,6 @@ def dict_stats():
             "source": "ECDICT" if dict_db.en_conn else "未安装",
             "count": en_count,
             "status": "✓ 本地数据库" if dict_db.en_conn else "⚠ 未安装"
-        },
-        "user": {
-            "available": dict_db.user_conn is not None,
-            "source": "User Defined",
-            "status": "✓ 已连接" if dict_db.user_conn else "✗ 未连接"
         }
     }
     return jsonify(stats)
-
-
-@dict_api_bp.route("/api/dict/user/save", methods=["POST"])
-def save_user_definition():
-    """
-    保存用户自定义释义
-    POST /api/dict/user/save
-    Body: { "word": "こんにちは", "language": "ja", "definition": "你好", "phonetic": "", "notes": "" }
-    """
-    data = request.get_json()
-    word = data.get("word", "") if data else ""
-    language = data.get("language", "en")
-    definition = data.get("definition", "")
-    phonetic = data.get("phonetic", "")
-    notes = data.get("notes", "")
-
-    if not word or not definition:
-        return jsonify({"error": "缺少 word 或 definition 参数"}), 400
-
-    # 保存到数据库
-    success = dict_db.save_user_definition(word, language, definition, phonetic, notes)
-
-    if success:
-        return jsonify({"success": True, "message": "保存成功"})
-    else:
-        return jsonify({"error": "保存失败"}), 500
