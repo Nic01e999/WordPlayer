@@ -163,6 +163,11 @@ export default {
     multipleTries: '複数回試行',
     failed: '失敗',
     stamp: '採点済',
+    shareResult: '結果を共有',
+    dictationRecord: 'ディクテーション記録',
+    generating: '生成中...',
+    copySuccess: 'クリップボードにコピーしました！',
+    copyFailed: 'コピー失敗',
 
     // リピーターモード
     playCount: '再生 {current}/{total}',

@@ -12,9 +12,11 @@ import { getAuthHeader, isLoggedIn, setSyncStatus } from './state.js';
  */
 export async function pullFromCloud() {
     if (!isLoggedIn()) {
+        console.warn('[Sync] 未登录，无法同步');
         return { error: '未登录' };
     }
 
+    console.log('[Sync] 开始从云端拉取数据...');
     setSyncStatus('syncing');
 
     try {
@@ -23,16 +25,28 @@ export async function pullFromCloud() {
             headers: getAuthHeader()
         });
 
-        if (!response.ok) {
+        console.log(`[Sync] 服务器响应: ${response.status}`);
+
+        if (response.status === 401) {
+            // Token 无效或已过期
+            console.error('[Sync] Token 已失效，请重新登录');
             setSyncStatus('error');
-            return { error: '同步失败' };
+            return { error: '登录已过期，请重新登录', needReauth: true };
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('[Sync] 同步失败:', errorData);
+            setSyncStatus('error');
+            return { error: errorData.error || '同步失败' };
         }
 
         const data = await response.json();
+        console.log('[Sync] 数据拉取成功');
         setSyncStatus('idle');
         return data;
     } catch (e) {
-        console.error('Pull from cloud failed:', e);
+        console.error('[Sync] 网络错误:', e);
         setSyncStatus('error');
         return { error: '网络错误' };
     }

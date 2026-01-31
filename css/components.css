@@ -2,107 +2,12 @@
  * 通用组件样式 - 按钮、状态颜色
  */
 
-/* ===== 模式视图容器 ===== */
-.mode-view {
-    display: none;
-    flex: 1;
-    min-height: 0;
-    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 1.875rem;
-    background: transparent;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-}
-
-.mode-view.active {
-    display: block;
-}
-
-/* 主页视图 - flex row 布局 */
-#homeView.active {
-    display: flex;
-}
-
-#wordlistContent {
-    flex: 1;
-    min-width: 0;
-    overflow-y: auto;
-}
-
-/* ===== 按钮样式 ===== */
-
-/* 暂停/播放按钮 - 圆形显示 Unicode 符号 */
-.btn-pause, .btn-play {
-    width: 3.125rem;
-    height: 3.125rem;
-    padding: 0;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    margin: 0.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* 暂停按钮 - 橙色调 */
-.btn-pause {
-    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-start) 100%);
-    border-color: var(--border-pause);
-    color: var(--text-button);
-}
-
-/* 播放按钮 - 绿色调 */
-.btn-play {
-    background: linear-gradient(135deg, var(--btn-play-start) 0%, var(--btn-play-end) 100%);
-    border-color: var(--border-play);
-    color: var(--btn-play-text);
-}
-
-.btn-play:hover {
-    box-shadow: 0 4px 15px var(--shadow-play-hover);
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, var(--btn-play-hover-start) 0%, var(--btn-play-hover-end) 100%);
-}
-
-/* 声音按钮 */
-.btn-sound {
-    width: 3.125rem;
-    height: 3.125rem;
-    border-radius: 50%;
-    font-size: 200%;
-    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-end) 100%);
-    border: 1px solid transparent;
-    position: relative;  /* 为伪元素定位做准备 */
-
-}
-
-.btn-sound::after {
-    content: '';
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 150%;  /* 图标大小 */
-    height: 150%;
-    background-image: url('/assets/images/headphone.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;  /* 保持图标比例 */
-    pointer-events: none;  /* 允许点击穿透到底层按钮 */
-    filter: drop-shadow(0 2px 3px var(--shadow-brown)) sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
-
-}
-
-
-/* 声音按钮悬停状态 */
-.btn-sound:hover, .btn-pause:hover {
-    box-shadow: 0 4px 15px var(--shadow-pink-strong);
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
+/* 提示文字样式 */
+.hint {
+    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 0.625rem;
 }
 
 /* ===== 状态颜色 - 试卷批改风格 ===== */

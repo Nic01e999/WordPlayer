@@ -33,7 +33,6 @@ import {
     onSettingsChange
 } from './sync/settings.js';
 import { initWebSocket, disconnectWebSocket } from './sync/websocket.js';
-import { clearLocalWordInfo } from './storage/localCache.js';
 import { checkFirstTime } from './guide.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
@@ -303,21 +302,7 @@ function initSettingsListeners() {
  * 初始化语言选择器事件
  */
 function initLangSelectors() {
-    const translationLangSelect = $("translationLang");
     const uiLangSelect = $("uiLang");
-
-    // 翻译语言变更 - 只影响翻译，不影响UI
-    if (translationLangSelect) {
-        translationLangSelect.addEventListener("change", async () => {
-            const translationLang = getTranslationLang();
-
-            // 清空本地 word info 缓存（翻译语言变了）
-            clearLocalWordInfo();
-
-            // 同步到服务端
-            await saveSettingToServer('translation_lang', translationLang);
-        });
-    }
 
     // 界面语言变更 - 只影响UI，不影响翻译
     if (uiLangSelect) {
@@ -403,9 +388,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     saveSettingToServer('accent', 'us');
                 }
             }
-        }
-        if (settings.translation_lang && $("translationLang")) {
-            $("translationLang").value = settings.translation_lang;
         }
         if (settings.ui_lang && $("uiLang")) {
             $("uiLang").value = settings.ui_lang;

@@ -19,13 +19,12 @@ except ImportError:
     print("[Warning] flask-socketio 未安装，WebSocket 功能不可用")
     print("         安装方法: pip install flask-socketio")
 
-from deepseek import deepseek_bp
 from tts import tts_bp
 from auth import auth_bp
 from sync import sync_bp
 from settings import settings_bp
 from db import init_db, get_db
-from youdao import youdao_bp
+from dict_api import dict_api_bp
 
 
 def _get_lan_ip():
@@ -71,12 +70,11 @@ CORS(app,
      supports_credentials=False)
 
 # 注册 API 蓝图
-app.register_blueprint(deepseek_bp)
 app.register_blueprint(tts_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(sync_bp)
 app.register_blueprint(settings_bp)
-app.register_blueprint(youdao_bp)
+app.register_blueprint(dict_api_bp)  # 数据库架构词典 API
 
 # 启动时初始化数据库
 init_db()

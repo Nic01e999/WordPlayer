@@ -308,9 +308,3 @@ export function setCardColor(name, colorId) {
         return false;
     }
 }
-
-// 为了兼容性，导出一个空的函数（这些函数已不再需要）
-export function saveWordListsToStorage() {
-    console.warn('saveWordListsToStorage is deprecated, use saveWordList instead');
-    return true;
-}

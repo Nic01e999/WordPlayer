@@ -194,12 +194,10 @@ body.dark-mode .guide-btn:hover {
 
 /* 上一步按钮 */
 .guide-btn-prev {
-    composes: guide-btn;
 }
 
 /* 下一步按钮 */
 .guide-btn-next {
-    composes: guide-btn;
     background: var(--primary-color, rgba(255, 105, 180, 0.8));
     color: white;
 }
@@ -214,7 +212,6 @@ body.dark-mode .guide-btn-next {
 
 /* 关闭按钮 */
 .guide-btn-close {
-    composes: guide-btn;
     background: rgba(255, 59, 48, 0.1);
     color: rgba(255, 59, 48, 0.9);
 }

@@ -23,13 +23,8 @@ import {
 import { updateHighlight, clearHighlight } from './app.js';
 import {
     getTtsUrl,
-    getWordDetailsUrl
+    getDictBatchUrl
 } from './api.js';
-import {
-    filterCachedWords,
-    addWordInfoBatch,
-    clearLocalWordInfo
-} from './storage/localCache.js';
 
 // 追踪上一次的 loading 状态
 let wasLoading = false;
@@ -97,9 +92,6 @@ export function updatePreloadProgress() {
  * 开始预加载翻译和音频
  */
 export async function startPreload(forceReload = false) {
-    console.log('[startPreload] called, loadId:', preloadCache.loadId, 'loading:', preloadCache.loading);
-    console.trace('[startPreload] call stack');
-
     // 获取输入内容并执行统一检测
     const wordInput = $("wordInput");
     const inputText = wordInput ? wordInput.value.trim() : '';
@@ -145,6 +137,32 @@ export async function startPreload(forceReload = false) {
         return;
     }
 
+    // 获取当前语言设置（提前获取，用于保存用户自定义）
+    const targetLang = getTargetLang();
+    const translationLang = getTranslationLang();
+
+    // 保存用户自定义释义到数据库
+    const customDefinitions = entries.filter(e => e.definition);
+    if (customDefinitions.length > 0) {
+        // 异步保存用户自定义释义
+        await Promise.all(customDefinitions.map(async ({ word, definition }) => {
+            try {
+                await fetch('/api/dict/user/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        word: word,
+                        language: targetLang,
+                        definition: definition
+                    })
+                });
+                console.log(`[用户自定义] 保存成功: ${word} -> ${definition}`);
+            } catch (e) {
+                console.warn(`[用户自定义] 保存失败: ${word}`, e);
+            }
+        }));
+    }
+
     // 检查单词列表是否改变
     const entriesChanged = entries.length !== preloadCache.entries.length ||
         entries.some((e, i) =>
@@ -159,7 +177,7 @@ export async function startPreload(forceReload = false) {
     // 强制重新加载：清除当前单词的缓存
     if (forceReload) {
         clearAudioCache(); // 释放 Blob URL 内存
-        clearLocalWordInfo(); // 清空 localStorage 缓存
+        // localStorage 缓存已移除，直接清空内存缓存
         entries.forEach(({ word, definition }) => {
             if (!definition) {
                 delete preloadCache.wordInfo[word];
@@ -190,10 +208,6 @@ export async function startPreload(forceReload = false) {
     preloadCache.translationLoaded = 0;
     preloadCache.audioLoaded = 0;
     preloadCache.audioPartial = {};
-
-    // 获取当前语言设置
-    const targetLang = getTargetLang();
-    const translationLang = getTranslationLang();
 
     // 验证单词/短语是否有效（根据目标语言）
     const isValidWord = (w) => w.length <= 100 && isValidForLanguage(w, targetLang);
@@ -272,18 +286,8 @@ export async function startPreload(forceReload = false) {
         .filter(e => !e.definition && !preloadCache.wordInfo[e.word] && isValidWord(e.word))
         .map(e => e.word);
 
-    // 先检查 localStorage 缓存（传递语言参数）
-    const { cached: localCached, missing: wordsToFetch } = filterCachedWords(wordsNeedInfo, targetLang, translationLang);
-
-    // 将 localStorage 缓存的单词应用到内存
-    for (const [word, info] of Object.entries(localCached)) {
-        preloadCache.wordInfo[word] = info;
-        preloadCache.translations[word] = info.translation || t('noTranslation');
-        preloadCache.translationLoaded++;
-    }
-    if (Object.keys(localCached).length > 0) {
-        updatePreloadProgress();
-    }
+    // localStorage 缓存已移除，直接从后端 API 获取所有需要的单词
+    const wordsToFetch = wordsNeedInfo;
 
     // 从 DeepSeek 获取完整单词信息（音标、翻译、释义、例句等）
     const BATCH_SIZE = 5;
@@ -302,7 +306,7 @@ export async function startPreload(forceReload = false) {
             // 请求 DeepSeek 获取完整单词信息
             let deepseekData = null;
             try {
-                const detailsRes = await fetch(getWordDetailsUrl(), {
+                const detailsRes = await fetch(getDictBatchUrl(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -323,7 +327,6 @@ export async function startPreload(forceReload = false) {
 
             // 处理结果
             const deepseekResults = deepseekData?.results || {};
-            const newWordInfos = {}; // 用于批量保存到 localStorage
             const invalidWords = []; // 收集验证失败的单词
 
             batch.forEach(word => {
@@ -348,7 +351,7 @@ export async function startPreload(forceReload = false) {
                     console.log(`[有道验证] 单词 "${word}" 验证失败`);
                     console.warn(`[有道验证] 单词 "${word}" 验证失败`);
                 } else {
-                    // 构建完整的单词信息（全部来自 DeepSeek）
+                    // 构建完整的单词信息（全部来自后端 API）
                     const wordInfo = {
                         word,
                         phonetic: info.phonetic || '',
@@ -362,7 +365,6 @@ export async function startPreload(forceReload = false) {
 
                     preloadCache.wordInfo[word] = wordInfo;
                     preloadCache.translations[word] = wordInfo.translation;
-                    newWordInfos[word] = wordInfo; // 收集用于保存
                 }
 
                 preloadCache.translationLoaded++;
@@ -376,10 +378,7 @@ export async function startPreload(forceReload = false) {
                 console.warn(`[验证] ${message}`);
             }
 
-            // 批量保存到 localStorage（传递语言参数）
-            if (Object.keys(newWordInfos).length > 0) {
-                addWordInfoBatch(newWordInfos, targetLang, translationLang);
-            }
+            // localStorage 缓存已移除，不再保存到本地
             updatePreloadProgress();
         }
     })();

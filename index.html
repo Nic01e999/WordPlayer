@@ -37,23 +37,12 @@
                 <label><span data-i18n="shuffle">Shuffle</span>: <input type="checkbox" id="shuffle"></label>
                 <label><span data-i18n="slow">Slow</span>: <input type="checkbox" id="slow"></label>
                 <div class="lang-selector">
-                    <span data-i18n="translation">翻译</span>:
-                    <select id="translationLang">
-                        <option value="zh">中文</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="fr">Français</option>
-                    </select>
-                </div>
-                <div class="lang-selector">
                     <span data-i18n="interface">界面</span>:
                     <select id="uiLang">
                         <option value="zh">中文</option>
                         <option value="en">English</option>
                         <option value="ja">日本語</option>
                         <option value="ko">한국어</option>
-                        <option value="fr">Français</option>
                     </select>
                 </div>
                 <div class="accent-selector" id="accentSelector">
@@ -144,7 +133,8 @@
             </div>
         </div>
 
-        
+        <!-- html2canvas 用于生成分享长图 -->
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     </body>
 </html>

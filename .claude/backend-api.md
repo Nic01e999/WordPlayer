@@ -166,7 +166,6 @@ cache/wordinfo/
 ├── en.json    # 英语单词缓存
 ├── ja.json    # 日语单词缓存
 ├── ko.json    # 韩语单词缓存
-├── fr.json    # 法语单词缓存
 └── zh.json    # 中文单词缓存
 ```
 
@@ -232,8 +231,6 @@ cache/wordinfo/
 | zh | ja | cj (中日) |
 | ko | zh | kc (韩中) |
 | zh | ko | ck (中韩) |
-| fr | zh | fc (法中) |
-| zh | fr | cf (中法) |
 
 ---
 
@@ -261,7 +258,6 @@ cache/wordinfo/
 | 英语 | en | US, UK |
 | 日语 | ja | - |
 | 韩语 | ko | - |
-| 法语 | fr | - |
 | 中文 | zh | - |
 
 ### 文本类型判断

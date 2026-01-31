@@ -28,7 +28,7 @@ export const loadingAudio = new Set();
 export const preloadCache = {
     entries: [],            // 已缓存的单词条目列表 { word, definition }
     translations: {},       // { word: translation } - 如果有 definition 则直接使用
-    wordInfo: {},           // { word: { translation, definitions, examples, synonyms, antonyms } } - DeepSeek 完整信息
+    wordInfo: {},           // 词典 API 完整信息（中文本地数据库 + 英文有道 API）
     audioUrls: {},          // { `${text}:${accent}`: Blob URL } (正常速度) - 支持双口音
     slowAudioUrls: {},      // { `${text}:${accent}`: Blob URL } (慢速) - 支持双口音
     sentenceAudioUrls: {},  // { `${sentence}:${accent}`: Blob URL } - 例句音频缓存

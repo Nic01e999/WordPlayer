@@ -65,10 +65,10 @@ export function getYoudaoTranslateUrl(word, fromLang, toLang) {
 }
 
 /**
- * 获取 DeepSeek 单词详情 API URL
+ * 获取词典批量查询 API URL（混合架构：中文本地数据库 + 英文有道 API）
  */
-export function getWordDetailsUrl() {
-    return `${API_BASE}/api/wordinfo/details`;
+export function getDictBatchUrl() {
+    return `${API_BASE}/api/dict/batch`;
 }
 
 

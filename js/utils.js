@@ -21,7 +21,6 @@ const LANG_PATTERNS = {
     en: /^[a-zA-Z\s\-']+$/,                                           // 英语
     ja: /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3000-\u303F\s]+$/, // 日语（平假名、片假名、汉字）
     ko: /^[\uAC00-\uD7AF\u1100-\u11FF\s]+$/,                           // 韩语
-    fr: /^[a-zA-Z\u00C0-\u00FF\s\-']+$/,                               // 法语（含重音字符）
     zh: /^[\u4e00-\u9fff\s]+$/                                         // 中文
 };
 
@@ -32,19 +31,17 @@ const LANG_INVALID_PATTERNS = {
     en: /[^a-zA-Z\s\-']/g,
     ja: /[^\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3000-\u303F\s]/g,
     ko: /[^\uAC00-\uD7AF\u1100-\u11FF\s]/g,
-    fr: /[^a-zA-Z\u00C0-\u00FF\s\-']/g,
     zh: /[^\u4e00-\u9fff\s]/g
 };
 
 /**
  * 语言检测正则（用于自动识别输入语言）
- * 优先级：韩语 > 日语 > 中文 > 法语 > 英语
+ * 优先级：韩语 > 日语 > 中文 > 英语
  */
 const DETECTION_PATTERNS = {
     ko: /[\uAC00-\uD7AF\u1100-\u11FF]/,  // 韩语字符
     ja: /[\u3040-\u309F\u30A0-\u30FF]/,  // 日语假名
     zh: /[\u4e00-\u9fff]/,               // 中文汉字
-    fr: /[\u00C0-\u00FF]/                // 法语特殊字符
 };
 
 /**
@@ -83,7 +80,6 @@ export function detectLanguage(text) {
     if (DETECTION_PATTERNS.ko.test(cleanText)) return 'ko';
     if (DETECTION_PATTERNS.ja.test(cleanText)) return 'ja';
     if (DETECTION_PATTERNS.zh.test(cleanText)) return 'zh';
-    if (DETECTION_PATTERNS.fr.test(cleanText)) return 'fr';
     return 'en';
 }
 
@@ -112,7 +108,7 @@ export function detectLanguageFromInput(content) {
  * @param {string} lang - 语言代码
  */
 export function setTargetLang(lang) {
-    if (['en', 'ja', 'ko', 'fr', 'zh'].includes(lang)) {
+    if (['en', 'ja', 'ko', 'zh'].includes(lang)) {
         detectedTargetLang = lang;
     }
 }
@@ -150,10 +146,26 @@ export function getTargetLang() {
 
 /**
  * 获取翻译语言（单词翻译显示的语言）
+ * 自动检测：根据目标语言返回对应的翻译语言
  * @returns {string} 语言代码 (en, ja, ko, fr, zh)
  */
 export function getTranslationLang() {
-    return $("translationLang")?.value || 'zh';
+    // 自动检测：根据目标语言返回对应的翻译语言
+    const targetLang = getTargetLang();
+    let translationLang;
+
+    // 英文 → 中文，中文 → 英文，其他语言 → 中文
+    if (targetLang === 'en') {
+        translationLang = 'zh';
+    } else if (targetLang === 'zh') {
+        translationLang = 'en';
+    } else {
+        // ja, ko, fr 等其他语言统一翻译成中文
+        translationLang = 'zh';
+    }
+
+    console.log(`[自动语言检测] 目标语言: ${targetLang}, 翻译语言: ${translationLang}`);
+    return translationLang;
 }
 
 /**
@@ -333,7 +345,7 @@ export function updateAccentSelectorVisibility() {
 /**
  * 支持的语言列表
  */
-export const SUPPORTED_LANGS = ['en', 'ja', 'ko', 'fr', 'zh'];
+export const SUPPORTED_LANGS = ['en', 'ja', 'ko', 'zh'];
 
 /**
  * 语言名称映射
@@ -342,7 +354,6 @@ export const LANG_NAMES = {
     en: 'English',
     ja: '日本語',
     ko: '한국어',
-    fr: 'Français',
     zh: '中文'
 };
 

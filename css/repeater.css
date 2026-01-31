@@ -2,19 +2,7 @@
  * 复读模式样式 - 单词滚动列表、当前单词显示等组件
  */
 
-/* 复读器主容器 */
-.repeater-container {
-    position: relative;
-    height: clamp(13.75rem, calc(100vh - 26.25rem), 25rem);
-    overflow: hidden;
-    border-radius: 1.5625rem;
-    perspective: 800px;
-    perspective-origin: 50% 50%;
-    border: 1px solid var(--border-pink-light);
-    box-shadow: 0 8px 30px var(--shadow-pink-light);
-    background: var(--bg-container);
-    flex-shrink: 0;
-}
+
 
 /* 中心指示条 */
 .center-pointer {
@@ -103,14 +91,6 @@
     font-size: clamp(0.875rem, 1.5vw, 1.125rem);
 }
 
-/* 单词信息卡片 */
-.word-info-wrapper {
-    margin-top: 0.75rem;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-}
 
 .word-info {
     text-align: center;

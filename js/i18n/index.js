@@ -7,10 +7,9 @@ import zh from './zh.js';
 import en from './en.js';
 import ja from './ja.js';
 import ko from './ko.js';
-import fr from './fr.js';
 
 // 语言包映射
-const locales = { zh, en, ja, ko, fr };
+const locales = { zh, en, ja, ko };
 
 // 当前语言（默认中文）
 let currentLang = 'zh';

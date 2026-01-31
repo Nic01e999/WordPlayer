@@ -30,7 +30,7 @@
         padding-right: 5%;
     }
     /* 平板屏幕 - 调整 sidebar 宽度范围 */
-    .settings-container .sidebar {
+    .setting-container .sidebar {
         min-width: 11rem;
         max-width: 13.75rem;
     }
@@ -75,7 +75,7 @@
         padding-left: 0.625rem;
     }
     /* 手机屏幕 - sidebar 占据 90vw */
-    .settings-container .sidebar {
+    .setting-container .sidebar {
         width: 90vw;
         min-width: auto;
         max-width: 90vw;

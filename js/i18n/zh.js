@@ -150,7 +150,6 @@ export default {
     langEnglish: '英文',
     langJapanese: '日语',
     langKorean: '韩语',
-    langFrench: '法语',
     langChinese: '中文',
     langWord: '单词',
 
@@ -166,6 +165,11 @@ export default {
     multipleTries: '多次尝试',
     failed: '失败',
     stamp: '批阅',
+    shareResult: '分享结果',
+    dictationRecord: '听写记录',
+    generating: '生成中...',
+    copySuccess: '已复制到剪贴板！',
+    copyFailed: '复制失败',
 
     // 复读模式
     playCount: '播放 {current}/{total}',

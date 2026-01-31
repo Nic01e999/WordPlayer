@@ -547,7 +547,6 @@ socket.on('wordlist:update', (data) => {
 - 英文 (en)
 - 日文 (ja)
 - 韩文 (ko)
-- 法文 (fr)
 
 ### 使用方式
 

@@ -120,6 +120,7 @@ def init_db():
                 interval_ms INTEGER DEFAULT 300,
                 slow_mode BOOLEAN DEFAULT FALSE,
                 shuffle_mode BOOLEAN DEFAULT FALSE,
+                dictate_mode BOOLEAN DEFAULT FALSE,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )

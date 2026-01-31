@@ -19,7 +19,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-多语言学习工具 - 支持英语、日语、韩语、法语、中文五种语言的学习。
+多语言学习工具 - 支持英语、日语、韩语、中文五种语言的学习。
 
 **两种核心模式**:
 - **Dictation Mode（听写模式）**: 听音频输入单词，练习拼写

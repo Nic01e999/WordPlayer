@@ -13,13 +13,21 @@ settings_bp = Blueprint('settings', __name__)
 
 def get_user_settings(user_id):
     """获取用户设置，如果不存在则创建默认设置"""
-    settings = SettingsRepository.get_by_user(user_id)
+    try:
+        settings = SettingsRepository.get_by_user(user_id)
 
-    if settings:
-        return settings
-    else:
-        # 创建默认设置
-        SettingsRepository.create_default(user_id, DEFAULT_SETTINGS)
+        if settings:
+            return settings
+        else:
+            # 创建默认设置
+            print(f"[Settings] 为用户 {user_id} 创建默认设置")
+            SettingsRepository.create_default(user_id, DEFAULT_SETTINGS)
+            return DEFAULT_SETTINGS.copy()
+    except Exception as e:
+        print(f"[Settings] 获取用户设置失败: {e}")
+        import traceback
+        traceback.print_exc()
+        # 返回默认设置，不中断流程
         return DEFAULT_SETTINGS.copy()
 
 

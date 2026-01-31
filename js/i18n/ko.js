@@ -163,6 +163,11 @@ export default {
     multipleTries: '여러 번 시도',
     failed: '실패',
     stamp: '채점완료',
+    shareResult: '결과 공유',
+    dictationRecord: '받아쓰기 기록',
+    generating: '생성 중...',
+    copySuccess: '클립보드에 복사되었습니다!',
+    copyFailed: '복사 실패',
 
     // 반복 모드
     playCount: '재생 {current}/{total}',

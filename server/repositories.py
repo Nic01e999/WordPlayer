@@ -285,7 +285,8 @@ class SettingsRepository:
                 'retry_count': row['retry_count'],
                 'interval_ms': row['interval_ms'],
                 'slow_mode': bool(row['slow_mode']),
-                'shuffle_mode': bool(row['shuffle_mode'])
+                'shuffle_mode': bool(row['shuffle_mode']),
+                'dictate_mode': bool(row['dictate_mode'])
             }
 
     @staticmethod
@@ -295,8 +296,8 @@ class SettingsRepository:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO user_settings (user_id, target_lang, translation_lang, ui_lang, theme, accent,
-                    repeat_count, retry_count, interval_ms, slow_mode, shuffle_mode)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    repeat_count, retry_count, interval_ms, slow_mode, shuffle_mode, dictate_mode)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 user_id,
                 defaults['target_lang'],
@@ -308,7 +309,8 @@ class SettingsRepository:
                 defaults['retry_count'],
                 defaults['interval_ms'],
                 defaults['slow_mode'],
-                defaults['shuffle_mode']
+                defaults['shuffle_mode'],
+                defaults['dictate_mode']
             ))
 
     @staticmethod

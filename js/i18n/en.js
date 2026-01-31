@@ -166,6 +166,11 @@ export default {
     multipleTries: 'Multiple tries',
     failed: 'Failed',
     stamp: 'Graded',
+    shareResult: 'Share Result',
+    dictationRecord: 'Dictation Record',
+    generating: 'Generating...',
+    copySuccess: 'Copied to clipboard!',
+    copyFailed: 'Copy failed',
 
     // Repeater mode
     playCount: 'Play {current}/{total}',

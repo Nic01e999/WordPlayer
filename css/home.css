@@ -43,16 +43,6 @@
 }
 
 
-/* 单词输入区域 - 主页左侧 */
-#wordSection {
-    width: clamp(14rem, 22vw, 17.5rem);
-    height: 100%;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    /* align-items: stretch; */
-}
 
 #wordSection h3 {
     font-family: 'Cinzel', 'Georgia', serif;

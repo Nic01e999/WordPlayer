@@ -24,21 +24,29 @@ def pull_data():
     """
     user_id = g.user['id']
 
-    # 获取所有单词表
-    wordlists = WordlistRepository.get_all_by_user(user_id)
+    try:
+        # 获取所有单词表
+        wordlists = WordlistRepository.get_all_by_user(user_id)
 
-    # 获取布局配置
-    layout, card_colors = LayoutRepository.get_by_user(user_id)
+        # 获取布局配置
+        layout, card_colors = LayoutRepository.get_by_user(user_id)
 
-    # 获取用户设置
-    settings = get_user_settings(user_id)
+        # 获取用户设置
+        settings = get_user_settings(user_id)
 
-    return jsonify({
-        'wordlists': wordlists,
-        'layout': layout,
-        'cardColors': card_colors,
-        'settings': settings
-    })
+        print(f"[Sync] 用户 {user_id} 拉取数据成功")
+
+        return jsonify({
+            'wordlists': wordlists,
+            'layout': layout,
+            'cardColors': card_colors,
+            'settings': settings
+        })
+    except Exception as e:
+        print(f"[Sync] 拉取数据失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': '同步失败，请稍后重试'}), 500
 
 
 @sync_bp.route("/api/sync/push", methods=["POST"])

@@ -12,6 +12,9 @@ import { t } from '../i18n/index.js';
 let _getState = null;
 let _setState = null;
 
+// 保存最后一次听写结果供分享使用
+let lastDictationResult = null;
+
 export function setQuizDeps(deps) {
     _getState = deps.getState;
     _setState = deps.setState;
@@ -141,7 +144,7 @@ export function updateWorkplace() {
             }
 
             const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">(${s.entries[i].word} - ${s.entries[i].definition || preloadCache.translations[s.entries[i].word] || ''})</span>`
+                ? `<br><span class="correct">${s.entries[i].word} - ${s.entries[i].definition || preloadCache.translations[s.entries[i].word] || ''}</span>`
                 : '';
 
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
@@ -186,6 +189,15 @@ export function showResults() {
 
     const score = ((correct + warning * 0.5) / s.entries.length * 100).toFixed(1);
 
+    // 保存结果数据供分享使用（深拷贝）
+    lastDictationResult = {
+        state: JSON.parse(JSON.stringify(s)),
+        score,
+        correct,
+        warning,
+        failed
+    };
+
     logToWorkplace(`
         <div class="results-box">
             <h3>${t('dictationComplete')}</h3>
@@ -193,8 +205,17 @@ export function showResults() {
             <p>${t('firstTryCorrect')}: ${correct}</p>
             <p>${t('multipleTries')}: ${warning}</p>
             <p>${t('failed')}: ${failed}</p>
+            <button id="shareResultBtn" class="share-btn">${t('shareResult')}</button>
         </div>
     `);
+
+    // 绑定分享按钮事件
+    setTimeout(() => {
+        const btn = document.getElementById('shareResultBtn');
+        if (btn) {
+            btn.addEventListener('click', () => shareResult(lastDictationResult));
+        }
+    }, 100);
 
     _setState?.(null);
 }
@@ -217,4 +238,150 @@ export function playPause() {
         }
         play();
     }
+}
+
+/**
+ * 生成听写结果长图并复制到剪贴板
+ */
+async function shareResult(result) {
+    if (!result) return;
+
+    const btn = document.getElementById('shareResultBtn');
+    if (!btn) return;
+
+    const { state, score, correct, warning, failed } = result;
+
+    // 显示加载状态
+    const originalText = btn.textContent;
+    btn.textContent = t('generating');
+    btn.disabled = true;
+
+    try {
+        // 1. 创建隐藏的长图容器
+        const container = createShareContainer(state, score, correct, warning, failed);
+        document.body.appendChild(container);
+
+        // 2. 等待字体和样式加载
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // 3. 检查 html2canvas 是否可用
+        if (typeof html2canvas === 'undefined') {
+            console.error('[Quiz] html2canvas 库未加载，无法生成分享图片');
+            btn.textContent = t('shareError') || '生成失败';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+            document.body.removeChild(container);
+            return;
+        }
+
+        // 4. 使用 html2canvas 生成图片
+        const canvas = await html2canvas(container, {
+            backgroundColor: '#f5f5dc', // 米黄色背景
+            scale: 2, // 2倍分辨率，提高清晰度
+            logging: false,
+            useCORS: true,
+            allowTaint: true
+        });
+
+        // 5. 转换为 Blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+        // 6. 复制到剪贴板
+        await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+        ]);
+
+        // 7. 清理和提示
+        document.body.removeChild(container);
+        btn.textContent = t('copySuccess');
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+
+    } catch (error) {
+        console.error('分享失败:', error);
+        const container = document.getElementById('shareContainer');
+        if (container) document.body.removeChild(container);
+        btn.textContent = t('copyFailed');
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    }
+}
+
+/**
+ * 创建用于生成长图的隐藏容器
+ */
+function createShareContainer(state, score, correct, warning, failed) {
+    const container = document.createElement('div');
+    container.id = 'shareContainer';
+    container.className = 'share-container';
+
+    // 生成时间戳
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // 生成详细记录 HTML
+    const detailsHTML = state.attempts.map((attempts, i) => {
+        if (!attempts.length) return '';
+
+        const result = state.results[i];
+        const rows = attempts.map((a, j) => {
+            const isLast = j === attempts.length - 1;
+            let symbol, cls;
+
+            if (a.isCorrect) {
+                symbol = "";
+                cls = "correct";
+            } else if (isLast && result?.status === "failed") {
+                symbol = "X";
+                cls = "failed";
+            } else {
+                symbol = "!";
+                cls = "warning";
+            }
+
+            const extra = (isLast && result?.status === "failed")
+                ? `<br><span class="correct">${state.entries[i].word} - ${state.entries[i].definition || preloadCache.translations[state.entries[i].word] || ''}</span>`
+                : '';
+
+            return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
+        }).join('');
+
+        const listenedText = state.speakTexts[i];
+        const hasCustomDef = state.entries[i].definition !== null;
+
+        return `<div class="result-item">
+                    <span class="result-index">${i + 1}.</span>
+                    ${hasCustomDef ? `<div class="result-listened">&lt${listenedText}&gt</div>` : ''}
+                    <div class="result-attempts">${rows}</div>
+                </div>`;
+    }).join('');
+
+    // 组装完整 HTML
+    container.innerHTML = `
+        <div class="share-header">
+            <h2>${t('dictationRecord')}</h2>
+            <p class="share-timestamp">${timestamp}</p>
+        </div>
+
+        <div class="share-summary">
+            <div class="share-score">${t('score')}: ${score}</div>
+            <div class="share-stats">
+                <span>${t('firstTryCorrect')}: ${correct}</span>
+                <span>${t('multipleTries')}: ${warning}</span>
+                <span>${t('failed')}: ${failed}</span>
+            </div>
+        </div>
+
+        <div class="share-details">
+            ${detailsHTML}
+        </div>
+    `;
+
+    return container;
 }

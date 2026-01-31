@@ -12,7 +12,6 @@ import { getLayout, saveLayout } from '../wordlist/layout.js';
 import { renderWordListCards } from '../wordlist/render.js';
 import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
 import { applySettings, clearSettings } from '../sync/settings.js';
-import { clearLocalWordInfo } from '../storage/localCache.js';
 
 let currentDialog = null;
 let currentMode = 'login'; // 'login' | 'register' | 'forgot' | 'reset'
@@ -399,6 +398,14 @@ async function syncAfterLogin() {
 
     if (cloudData.error) {
         console.error('[Sync] 同步失败:', cloudData.error);
+
+        // 如果是认证错误，清除登录状态并提示用户
+        if (cloudData.needReauth) {
+            const { clearAuth, showLoginDialog } = await import('./state.js');
+            clearAuth();
+            alert(cloudData.error);
+            showLoginDialog();
+        }
         return;
     }
 
@@ -454,8 +461,6 @@ export async function doLogout() {
     disconnectWebSocket();
     // 清除用户设置
     clearSettings();
-    // 清空本地 word info 缓存
-    clearLocalWordInfo();
 
     await api.logout();
     state.clearAuth();

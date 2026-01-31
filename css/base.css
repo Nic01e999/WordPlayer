@@ -44,36 +44,91 @@ body::before {
     min-height: 0;
     position: relative;
     z-index: 1;
+    overflow-y: auto;
+}
+/* ===== 模式视图容器 ===== */
+.mode-view {
+    display: none;
+    height: auto;
+    min-height: fit-content;
+    width: 100vw;
+    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 3rem;
+    margin-bottom: 20vh;
+    background: transparent;
+    /* overflow-y: hidden; */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.mode-view.active {
+    display: block;
+}
+
+/*================ 主页视图 - flex row 布局 ==============*/
+#homeView.active {
+    display: flex;
+}
+
+/* 单词输入区域 - 主页左侧 */
+#wordSection {
+    width: clamp(14rem, 22vw, 17.5rem);
+    min-height: 50rem;
+    height: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* align-items: stretch; */
+}
+
+#wordlistContent {
+    flex: 1;
+    min-width: 0;
+    /* overflow-y: auto; */
 }
 
 
-/* 听写工作区容器 */
+
+/*======================= 复读器主容器 =========================*/
+.repeater-container {
+    position: relative;
+    height: clamp(13.75rem, calc(100vh - 26.25rem), 25rem);
+    overflow: hidden;
+    border-radius: 1.5625rem;
+    perspective: 800px;
+    perspective-origin: 50% 50%;
+    border: 1px solid var(--border-pink-light);
+    box-shadow: 0 8px 30px var(--shadow-pink-light);
+    background: var(--bg-container);
+    flex-shrink: 0;
+}
+
+/* 单词信息卡片 */
+.word-info-wrapper {
+    margin-top: 0.75rem;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ==============================听写工作区容器 =========================*/
 #dictationWorkplace {
     position: relative;
     overflow: visible;
     margin: 0 0 6.25rem 0;
 }
 
-#dictationWorkplace h3 {
-    font-size: 200%;
-}
 
-/* 提示文字样式 */
-.hint {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-    margin-top: 0.625rem;
-}
-
-/* ===== Menu隐藏功能 ===== */
+/* =============================== Menu隐藏功能 ============================ */
 
 /* 默认状态：在听写和复读模式下上移2rem */
 body.dictation-mode #menu,
 body.repeater-mode #menu,
 body.dictation-mode .container,
 body.repeater-mode .container {
-    /* margin-top: -5rem; */
     transform: translateY(-5rem);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

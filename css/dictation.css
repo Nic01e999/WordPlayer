@@ -1,7 +1,9 @@
 /**
  * 听写模式样式 - 仿真纸质试卷批改风格
  */
-
+#dictationWorkplace h3 {
+    font-size: 200%;
+}
 /* 听写模式专用 - 模拟试卷纸张 */
 body.dictation-mode #dictationWorkplace {
     background-image:
@@ -191,6 +193,44 @@ body.dictation-mode #dictationWorkplace::after {
     margin-bottom: 0.625rem;
 }
 
+
+/* 声音按钮 */
+.btn-sound {
+    width: 3.125rem;
+    height: 3.125rem;
+    border-radius: 50%;
+    font-size: 200%;
+    background: linear-gradient(135deg, var(--btn-pause-start) 0%, var(--btn-pause-end) 100%);
+    border: 1px solid transparent;
+    position: relative;  /* 为伪元素定位做准备 */
+
+}
+
+.btn-sound::after {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;  /* 图标大小 */
+    height: 150%;
+    background-image: url('/assets/images/headphone.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;  /* 保持图标比例 */
+    pointer-events: none;  /* 允许点击穿透到底层按钮 */
+    filter: drop-shadow(0 2px 3px var(--shadow-brown)) sepia(30%) saturate(200%) hue-rotate(var(--filter-hue));
+
+}
+
+
+/* 声音按钮悬停状态 */
+.btn-sound:hover, .btn-pause:hover {
+    box-shadow: 0 4px 15px var(--shadow-pink-strong);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
+}
+
 /* 弹窗输入框 - 模拟手写答题区 */
 .popup input {
     font-family: 'Caveat', cursive;
@@ -252,7 +292,7 @@ body.dictation-mode #dictationWorkplace::after {
 .result-attempts {
     flex-basis: 100%;
     font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
-    font-size: 1.375rem;
+    font-size: 2rem;
     color: var(--text-dark);
     line-height: 1.6;
 }
@@ -343,4 +383,186 @@ body.dictation-mode #dictationWorkplace::after {
     justify-content: center;
     transform: rotate(-15deg);
     opacity: 0.7;
+}
+
+/* ========== 分享长图专用样式 ========== */
+
+/* 分享按钮 */
+.share-btn {
+    margin-top: 1.25rem;
+    padding: 0.625rem 1.875rem;
+    font-family: 'Caveat', cursive;
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    background: linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
+    border: 2px solid var(--border-paper-medium);
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 2px 2px 5px var(--shadow-brown);
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 8px var(--shadow-brown-medium);
+}
+
+.share-btn:active {
+    transform: translateY(0);
+}
+
+.share-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 隐藏的长图容器 */
+.share-container {
+    position: fixed;
+    left: -9999px;
+    top: 0;
+    width: 800px;
+    padding: 2.5rem 2rem;
+    background-image:
+        /* 左侧装订线 */
+        linear-gradient(90deg,
+            transparent 0px,
+            var(--bg-pink-subtle) 2px,
+            transparent 3px,
+            transparent 30px,
+            var(--shadow-pink-light) 31px,
+            transparent 32px,
+            transparent 100px,
+            var(--accent-line) 101px,
+            transparent 102px
+        ),
+        /* 横线纹理 */
+        repeating-linear-gradient(
+            transparent 0px,
+            transparent 39px,
+            var(--bg-paper-line) 39px,
+            var(--bg-paper-line) 40px
+        ),
+        /* 纸张底色 */
+        linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 50%, var(--bg-paper-end) 100%);
+    box-shadow:
+        2px 3px 8px var(--shadow-brown),
+        inset 0 1px 0 var(--white-strong);
+    border: 1px solid var(--border-paper);
+    border-radius: 0.5rem;
+}
+
+/* 长图标题区 */
+.share-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px double var(--glow-pink);
+}
+
+.share-header h2 {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 2rem;
+    color: var(--text-label);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.125rem;
+}
+
+.share-timestamp {
+    font-family: 'Caveat', cursive;
+    font-size: 1rem;
+    color: var(--text-stat);
+    margin: 0;
+}
+
+/* 长图汇总区 */
+.share-summary {
+    background: linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
+    border: 1px solid var(--border-paper-medium);
+    border-radius: 0.3125rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 2px 2px 8px var(--shadow-brown);
+}
+
+.share-score {
+    font-family: 'Caveat', cursive;
+    font-size: 3rem;
+    color: var(--status-score);
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 0 var(--shadow-soft);
+}
+
+.share-stats {
+    display: flex;
+    justify-content: space-around;
+    font-family: 'Caveat', cursive;
+    font-size: 1.25rem;
+    color: var(--text-stat);
+}
+
+/* 长图详细记录区 */
+.share-details {
+    margin-top: 2rem;
+}
+
+/* 复用现有的 result-item 样式 */
+.share-details .result-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 0.75rem 0.9375rem;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--bg-paper-line);
+    font-size: 1.125rem;
+}
+
+.share-details .result-item:last-child {
+    border-bottom: none;
+}
+
+.share-details .result-index {
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 600;
+    min-width: 2.5rem;
+    color: var(--text-label);
+    font-size: 1rem;
+}
+
+.share-details .result-listened {
+    font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
+    font-size: 1.875rem;
+    color: var(--text-dark);
+    padding: 0.25rem 0.5rem;
+    margin: 0.125rem 0;
+}
+
+.share-details .result-attempts {
+    flex-basis: 100%;
+    font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
+    font-size: 2rem;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.share-details .result-attempts > div {
+    padding: 0.25rem 0.5rem;
+    margin: 0 0 0 2.8125rem;
+    border-radius: 0.1875rem;
+}
+
+/* 长图中的正确/警告/失败样式 */
+.share-details .correct {
+    color: var(--status-correct);
+}
+
+.share-details .warning {
+    color: var(--status-warning);
+}
+
+.share-details .failed {
+    color: var(--status-failed);
 }
