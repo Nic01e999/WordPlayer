@@ -49,14 +49,14 @@ class DictDatabase:
 
                 # 检查 ECDICT 表结构
                 cursor = self.en_conn.cursor()
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='stardict'")
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='words'")
                 if cursor.fetchone():
                     # 获取词条数量
-                    cursor.execute("SELECT COUNT(*) FROM stardict")
+                    cursor.execute("SELECT COUNT(*) FROM words")
                     count = cursor.fetchone()[0]
                     print(f"✓ 英文词典数据库已连接: {EN_DB} ({count:,} 词条)")
                 else:
-                    print(f"⚠ 英文词典表结构不正确（缺少 stardict 表）")
+                    print(f"⚠ 英文词典表结构不正确（缺少 words 表）")
                     self.en_conn = None
             except Exception as e:
                 print(f"✗ 连接英文数据库失败: {e}")
@@ -135,9 +135,8 @@ class DictDatabase:
         try:
             cursor = self.en_conn.cursor()
             cursor.execute('''
-                SELECT word, phonetic, definition, translation, pos,
-                       collins, oxford, exchange, detail, bnc, frq
-                FROM stardict
+                SELECT word, phonetic, translation, pos, extra_data, frequency
+                FROM words
                 WHERE word = ? COLLATE NOCASE
                 LIMIT 1
             ''', (word.lower(),))
@@ -146,27 +145,31 @@ class DictDatabase:
             if not row:
                 return None
 
-            # 解析 detail JSON（包含详细释义）
-            detail_data = {}
-            if row['detail']:
+            # 解析 phonetic JSON
+            phonetic_data = {}
+            if row['phonetic']:
                 try:
                     import json
-                    detail_data = json.loads(row['detail'])
+                    phonetic_data = json.loads(row['phonetic'])
+                except:
+                    phonetic_data = {'us': row['phonetic']}
+
+            # 解析 extra_data JSON
+            extra_data = {}
+            if row['extra_data']:
+                try:
+                    import json
+                    extra_data = json.loads(row['extra_data'])
                 except:
                     pass
 
             return {
                 'word': row['word'],
-                'phonetic': row['phonetic'] or '',
-                'definition': row['definition'] or '',
-                'translation': row['translation'] or row['definition'] or '',
+                'phonetic': phonetic_data,
+                'translation': row['translation'] or '',
                 'pos': row['pos'] or '',
-                'collins': row['collins'] or 0,
-                'oxford': row['oxford'] or 0,
-                'exchange': row['exchange'] or '',
-                'detail': detail_data,
-                'frequency': row['frq'] or 0,
-                'bnc': row['bnc'] or 0,
+                'extra_data': extra_data,
+                'frequency': row['frequency'] or 0,
                 'source': 'local_db'
             }
 
@@ -188,62 +191,43 @@ class DictDatabase:
         if not db_result:
             return None
 
-        # 1. 解析音标（支持美式/英式）
-        phonetic_data = {}
-        if db_result.get('phonetic'):
-            phonetic_str = db_result['phonetic']
-            # ECDICT 格式: "ˈæp(ə)l" 或 "US: /ˈæp(ə)l/ UK: /ˈæp(ə)l/"
-            if 'US:' in phonetic_str or 'UK:' in phonetic_str:
-                parts = phonetic_str.replace('US:', '').replace('UK:', '|').split('|')
-                phonetic_data['us'] = parts[0].strip() if len(parts) > 0 else ''
-                phonetic_data['uk'] = parts[1].strip() if len(parts) > 1 else ''
-            else:
-                phonetic_data['us'] = phonetic_str.strip()
-                phonetic_data['uk'] = phonetic_str.strip()
+        # 1. 解析音标（已经是 JSON 格式）
+        phonetic_data = db_result.get('phonetic', {})
+        if not isinstance(phonetic_data, dict):
+            phonetic_data = {}
 
-        # 2. 解析词形变化
+        # 2. 解析词形变化（从 extra_data.wordForms）
         word_forms = {}
-        if db_result.get('exchange'):
-            try:
-                # exchange 格式: "p:apples/d:appled/i:appling/3:apples"
-                for item in db_result['exchange'].split('/'):
-                    if ':' in item:
-                        form_type, form_word = item.split(':', 1)
-                        form_map = {
-                            'p': 'plural',      # 复数
-                            'd': 'past',        # 过去式
-                            'i': 'doing',       # 进行时
-                            '3': 'third',       # 第三人称
-                            'r': 'comparative', # 比较级
-                            't': 'superlative', # 最高级
-                            's': 'singular'     # 单数
-                        }
-                        if form_type in form_map:
-                            word_forms[form_map[form_type]] = form_word
-            except:
-                pass
+        extra_data = db_result.get('extra_data', {})
+        if isinstance(extra_data, dict) and 'wordForms' in extra_data:
+            # extra_data.wordForms 格式: {"过去式": "appled", "复数": "apples"}
+            # 需要转换为英文键名
+            form_map = {
+                '过去式': 'past',
+                '过去分词': 'pastParticiple',
+                '现在分词': 'doing',
+                '第三人称单数': 'third',
+                '比较级': 'comparative',
+                '最高级': 'superlative',
+                '复数': 'plural',
+                '原型': 'lemma',
+                '词根': 'root'
+            }
+            for cn_key, value in extra_data['wordForms'].items():
+                en_key = form_map.get(cn_key, cn_key)
+                word_forms[en_key] = value
 
-        # 3. 解析定义（优先使用 detail，否则使用 translation）
+        # 3. 解析定义（从 extra_data.definitions 或 translation）
         target_definitions = []
         native_definitions = []
 
-        if db_result.get('detail'):
-            # detail 是 JSON，包含详细的词性和定义
-            detail = db_result['detail']
-            if isinstance(detail, dict):
-                for pos, meanings in detail.items():
-                    if isinstance(meanings, list):
-                        target_definitions.append({
-                            'pos': pos,
-                            'meanings': meanings
-                        })
-                    else:
-                        target_definitions.append({
-                            'pos': pos,
-                            'meanings': [str(meanings)]
-                        })
+        if isinstance(extra_data, dict) and 'definitions' in extra_data:
+            # extra_data.definitions 格式: [{"pos": "n.", "meanings": ["苹果", "苹果树"]}]
+            definitions = extra_data['definitions']
+            if isinstance(definitions, list):
+                target_definitions = definitions
 
-        # 如果没有 detail，使用 translation
+        # 如果没有 definitions，使用 translation
         if not target_definitions and db_result.get('translation'):
             translations = db_result['translation'].split(';')
             target_definitions = [{
@@ -254,7 +238,14 @@ class DictDatabase:
         # 中文释义（与 target 相同）
         native_definitions = target_definitions
 
-        # 4. 构建最终的 wordinfo 格式
+        # 4. 提取元数据
+        collins = 0
+        oxford = False
+        if isinstance(extra_data, dict):
+            collins = extra_data.get('collins', 0)
+            oxford = extra_data.get('oxford', False)
+
+        # 5. 构建最终的 wordinfo 格式
         return {
             'word': db_result['word'],
             'phonetic': phonetic_data,
@@ -272,9 +263,8 @@ class DictDatabase:
                 'source': 'local_db',
                 'db': 'ECDICT',
                 'frequency': db_result.get('frequency', 0),
-                'collins': db_result.get('collins', 0),
-                'oxford': db_result.get('oxford', 0),
-                'bnc': db_result.get('bnc', 0)
+                'collins': collins,
+                'oxford': oxford
             }
         }
 

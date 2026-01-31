@@ -62,28 +62,44 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
                 'meta': {'source': 'default', 'language': target_lang}
             }
 
-    # 3. 如果是英文词，使用英文数据库
+    # 3. 如果是英文词，使用混合模式（本地优先，API 兜底）
     elif target_lang == 'en':
         print(f"[Dict] 查询英文词典: {word}")
+
+        # 3.1 先查本地数据库
         db_result = dict_db.query_english_word(word)
         if db_result:
             wordinfo = dict_db.format_english_to_wordinfo(db_result)
             print(f"[Dict] ✓ 英文数据库找到: {word}")
             return wordinfo
-        else:
-            print(f"[Dict] ✗ 英文数据库未找到: {word}")
-            # 返回默认翻译
-            return {
-                'word': word,
-                'translation': '非中英，请自定义',
-                'targetDefinitions': [{'pos': '', 'meanings': ['非中英，请自定义']}],
-                'nativeDefinitions': {},
-                'examples': {'common': [], 'fun': []},
-                'synonyms': [],
-                'antonyms': [],
-                'wordForms': {},
-                'meta': {'source': 'default', 'language': target_lang}
-            }
+
+        # 3.2 本地未找到，尝试 API 兜底（待实现）
+        print(f"[Dict] ✗ 英文数据库未找到: {word}")
+        # TODO: 实现有道词典 API 查询作为兜底
+        # 可以参考 tts.py 中的有道 API 调用方式
+        # 示例：
+        # try:
+        #     from youdao_dict_api import query_youdao_dict
+        #     api_result = query_youdao_dict(word, 'en', 'zh')
+        #     if api_result:
+        #         print(f"[Dict] ✓ 有道 API 找到: {word}")
+        #         return api_result
+        # except Exception as e:
+        #     print(f"[Dict] ✗ 有道 API 查询失败: {e}")
+
+        # 3.3 都失败，返回默认
+        print(f"[Dict] ✗ 所有数据源都未找到: {word}")
+        return {
+            'word': word,
+            'translation': '未找到释义，请自定义',
+            'targetDefinitions': [{'pos': '', 'meanings': ['未找到释义，请自定义']}],
+            'nativeDefinitions': {},
+            'examples': {'common': [], 'fun': []},
+            'synonyms': [],
+            'antonyms': [],
+            'wordForms': {},
+            'meta': {'source': 'default', 'language': target_lang}
+        }
 
     # 4. 日语、韩语等其他语言：返回默认翻译
     else:
@@ -201,7 +217,7 @@ def dict_stats():
     if dict_db.en_conn:
         try:
             cursor = dict_db.en_conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM stardict")
+            cursor.execute("SELECT COUNT(*) FROM words")
             en_count = cursor.fetchone()[0]
         except:
             pass
