@@ -71,49 +71,43 @@
         right: 0.625rem;
         top: 9rem;
     }
-    /* 手机屏幕 - 调整 setting-container 的 padding */
     .setting-container {
         padding-right: 0.625rem;
         padding-left: 0.625rem;
         overflow-y: auto;
     }
-    /* 手机屏幕 - sidebar 占据 90vw */
     .setting-container .sidebar {
-        width: 90vw;
+        width: 60vw;
         min-width: auto;
-        max-width: 90vw;
+        max-width: 60vw;
         right: -2.1875rem;
         margin-bottom: 30rem;
         /* 移除滚动属性，让整个 sidebar 在容器中滚动 */
     }
+    /* ========================= */
+    .container {
+        margin-bottom: -20rem;
+    }
     .mode-view {
         padding: 0.625rem;
     }
-    .popup {
-        min-width: 90vw;
-        padding: 0.9375rem;
+    /* ========================== */
+    #dictationPopup {
+        width: 40vw;
+        min-height: 20vh;
+        padding: 0.5rem;
     }
-    .popup input {
+    #dictationPopup input {
         width: 90%;
-    }
-    .repeater-container {
-        height: 130%; /* 折叠状态：20rem - 18rem = 2rem */
-    }
-
-    /* 展开状态下恢复正常高度 */
-    body.menu-expanded .repeater-container {
-        height: clamp(12.5rem, calc(100vh - 20rem), 18.75rem);
     }
 
     /* Repeater 模式视图 - 折叠状态下增加高度 */
     body.repeater-mode #repeaterView {
-        height: calc(100vh - 0.5rem); /* 折叠状态：菜单完全隐藏，只留 0.5rem 缓冲 */
+        height: calc(100vh - 4rem); /* 折叠状态：菜单完全隐藏，只留 0.5rem 缓冲 */
     }
 
-    /* 展开状态下恢复正常高度 */
-    body.menu-expanded.repeater-mode #repeaterView {
-        height: calc(100vh - 7rem); /* 展开状态：菜单约 6rem + 1rem 缓冲 */
-    }
+
+
     /* iOS 风格网格 - 手机适配 */
     .wordlist-grid {
         padding: 1rem 0.75rem;
@@ -133,14 +127,12 @@
     }
 
     /* 听写模式视图 - 折叠状态下增加高度 */
-    body.dictation-mode #dictationView {
-        height: calc(100vh - 0.5rem); /* 折叠状态：菜单完全隐藏，只留 0.5rem 缓冲 */
+    body.dictation-mode #dictationWorkplace {
+        margin-bottom: 5rem;
     }
 
     /* 展开状态下恢复正常高度 */
-    body.menu-expanded.dictation-mode #dictationView {
-        height: calc(100vh - 7rem); /* 展开状态：菜单约 6rem + 1rem 缓冲 */
-    }
+
     .results-box {
         padding: 1.25rem;
     }

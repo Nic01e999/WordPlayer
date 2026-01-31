@@ -69,7 +69,6 @@
         transparent 100%);
     color: var(--text-active);
 }
-/* @todo: 这里要改色 */
 
 /* 单词文本样式（英文单词） */
 .word-item strong {

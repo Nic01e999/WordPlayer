@@ -356,7 +356,7 @@ export async function startPreload(forceReload = false) {
                         word,
                         phonetic: info.phonetic || '',
                         translation: info.translation || t('noTranslation'),
-                        nativeDefinitions: info.nativeDefinitions || [],
+                        nativeDefinitions: Array.isArray(info.nativeDefinitions) ? info.nativeDefinitions : [],
                         targetDefinitions: info.targetDefinitions || [],
                         examples: info.examples || { common: [], fun: [] },
                         synonyms: info.synonyms || [],

@@ -120,7 +120,11 @@ function renderNativePosView(wordInfo, fallbackTranslation) {
     const phonetic = wordInfo?.phonetic || '';
     const translation = wordInfo?.translation || fallbackTranslation || '...';
     // 兼容新旧字段: nativeDefinitions (新) / definitions (旧)
-    const nativeDefs = wordInfo?.nativeDefinitions || wordInfo?.definitions || wordInfo?.chineseDefinitions || [];
+    let nativeDefs = wordInfo?.nativeDefinitions || [];
+    // 确保 nativeDefs 是数组
+    if (!Array.isArray(nativeDefs)) {
+        nativeDefs = [];
+    }
 
     // 提取所有词性标签
     const posTags = [...new Set(nativeDefs.map(d => d.pos).filter(Boolean))];
@@ -161,7 +165,7 @@ function highlightWord(sentence, word) {
  */
 function renderPosView(wordInfo) {
     // 兼容新旧字段: targetDefinitions (新) / definitions (旧)
-    const defs = wordInfo?.targetDefinitions || wordInfo?.definitions || [];
+    const defs = wordInfo?.targetDefinitions || [];
     if (defs.length === 0) {
         return `<div class="view-empty">${t('noDefinitions')}</div>`;
     }
