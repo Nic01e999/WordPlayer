@@ -584,10 +584,10 @@
 
 /* ===== 重复模式自适应布局 ===== */
 body.repeater-mode #repeaterView {
-    overflow: hidden;
+    /* overflow: hidden; */
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 4.5rem); /* 从 6.25rem 改为 4.5rem */
+    height: 100%; 
 }
 
 /* ===== 词形变化视图 ===== */
@@ -790,6 +790,7 @@ body.repeater-mode #repeaterView {
     justify-content: flex-start;
     align-items: flex-start;
     min-height: 100px;
+    overflow: hidden;
 }
 
 .lemma-word-item {

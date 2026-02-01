@@ -177,6 +177,11 @@ body.dictation-mode #menu::after {
     padding-top: 4rem;         /* 为 menu 留出空间 */
     padding-right: 3.125rem;   /* 为齿轮按钮留出空间 */
 }
+
+.setting-container::-webkit-scrollbar{
+    display: none;
+}
+
 /* 设置面板样式 */
 .setting-container .sidebar {
     margin-top: 0.9375rem;
