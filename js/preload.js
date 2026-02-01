@@ -370,6 +370,16 @@ export async function startPreload(forceReload = false) {
             const url = getTtsUrl(text, false, accent, lang); // slow 固定为 false
             const res = await fetchWithTimeout(url, { signal }, 15000);
             if (!res.ok) {
+                console.error(`[TTS Error] 预加载请求失败: ${res.status}`, {
+                    word: text,
+                    lang,
+                    accent,
+                    url: url.substring(0, 100)
+                });
+                if (res.status === 500) {
+                    console.error('[TTS Error] 可能的原因：accent 和 lang 参数不兼容');
+                    console.error('[TTS Error] 请检查：1) getAccent() 是否返回正确值 2) DOM 状态是否已更新');
+                }
                 console.warn(t('errorTts', { status: res.status }) + ` for ${text}`);
                 return { cached: false, success: false };
             }

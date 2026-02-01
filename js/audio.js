@@ -73,9 +73,15 @@ export async function speakWord(word, slow = false) {
     try {
         const res = await fetch(url);
         if (!res.ok) {
-            console.error(`TTS请求失败: ${res.status}`, { word, lang, accent });
+            console.error(`[TTS Error] 请求失败: ${res.status}`, {
+                word,
+                lang,
+                accent,
+                url: url.substring(0, 100)
+            });
             if (res.status === 500) {
-                console.warn('可能的原因：accent 和 lang 参数不兼容');
+                console.error('[TTS Error] 可能的原因：accent 和 lang 参数不兼容');
+                console.error('[TTS Error] 请检查：1) getAccent() 是否返回正确值 2) DOM 状态是否已更新');
             }
             throw new Error(`TTS请求失败: ${res.status}`);
         }

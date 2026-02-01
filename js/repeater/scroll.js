@@ -74,6 +74,20 @@ export function setupScrollListener() {
     scrollToIndex(0, false);
 }
 
+/**
+ * 获取单词项的实际渲染高度
+ * @returns {number} 单词项高度（像素）
+ */
+function getActualItemHeight() {
+    const scroll = $("repeaterScroll");
+    if (!scroll) return ITEM_HEIGHT; // 降级到默认值
+
+    const firstItem = scroll.querySelector('.word-item');
+    if (!firstItem) return ITEM_HEIGHT; // 降级到默认值
+
+    return firstItem.offsetHeight;
+}
+
 function onUserScrollEnd() {
     const state = currentRepeaterState;
     if (!state) return;
@@ -81,7 +95,8 @@ function onUserScrollEnd() {
     const scroll = $("repeaterScroll");
     if (!scroll) return;
 
-    const newIndex = Math.round(scroll.scrollTop / ITEM_HEIGHT);
+    const actualHeight = getActualItemHeight();
+    const newIndex = Math.round(scroll.scrollTop / actualHeight);
     const idx = Math.max(0, Math.min(newIndex, state.words.length - 1));
 
     state.currentIndex = idx;
@@ -101,7 +116,8 @@ export function scrollToIndex(index, smooth = true) {
     const scroll = $("repeaterScroll");
     if (!scroll) return;
 
-    const target = index * ITEM_HEIGHT;
+    const actualHeight = getActualItemHeight();
+    const target = index * actualHeight;
     scroll.scrollTo({
         top: target,
         behavior: smooth ? 'smooth' : 'instant'

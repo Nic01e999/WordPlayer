@@ -136,7 +136,16 @@ export function filterChinese(text) {
  */
 export function getAccent() {
     const el = document.querySelector('input[name="accent"]:checked');
-    return el ? el.value : 'us';
+    const domAccent = el ? el.value : 'us';
+
+    // 兼容性检查：非英语语言强制返回 'us'
+    const targetLang = getTargetLang();
+    if (targetLang !== 'en' && domAccent !== 'us') {
+        console.warn(`[Accent] 非英语语言 ${targetLang} 不支持 ${domAccent} 口音，已自动重置为 us`);
+        return 'us';
+    }
+
+    return domAccent;
 }
 
 /**
@@ -361,8 +370,21 @@ export function loadLangSettings() {
  */
 export function updateAccentSelectorVisibility() {
     const accentSelector = $("accentSelector");
+    const targetLang = getTargetLang();
+
     if (accentSelector) {
-        accentSelector.style.display = getTargetLang() === 'en' ? '' : 'none';
+        if (targetLang === 'en') {
+            accentSelector.style.display = '';
+        } else {
+            accentSelector.style.display = 'none';
+
+            // 非英语语言时，自动重置 DOM 为 'us'
+            const usRadio = document.querySelector('input[name="accent"][value="us"]');
+            if (usRadio && !usRadio.checked) {
+                console.log(`[Accent] 切换到非英语语言 ${targetLang}，自动重置 accent 选择器为 us`);
+                usRadio.checked = true;
+            }
+        }
     }
 }
 
