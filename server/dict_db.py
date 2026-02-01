@@ -9,9 +9,10 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # 数据库路径
-DB_DIR = Path(__file__).parent.parent / 'data' / 'dict'
+DB_DIR = Path(__file__).parent.parent / 'data' / 'databases'
 ZH_DB = DB_DIR / 'zh_dict.db'
 EN_DB = DB_DIR / 'en_dict.db'
+SENTENCE_PAIRS_DB = DB_DIR / 'sentence_pairs.db'
 
 
 class DictDatabase:
@@ -20,8 +21,10 @@ class DictDatabase:
     def __init__(self):
         self.zh_conn = None
         self.en_conn = None
+        self.sentence_conn = None
         self._connect_zh()
         self._connect_en()
+        self._connect_sentences()
 
     def _connect_zh(self):
         """连接中文数据库"""
@@ -62,6 +65,25 @@ class DictDatabase:
             print(f"⚠ 英文词典数据库不存在: {EN_DB}")
             self.en_conn = None
 
+    def _connect_sentences(self):
+        """连接例句数据库"""
+        if SENTENCE_PAIRS_DB.exists():
+            try:
+                self.sentence_conn = sqlite3.connect(str(SENTENCE_PAIRS_DB), check_same_thread=False)
+                self.sentence_conn.row_factory = sqlite3.Row
+
+                # 获取例句数量
+                cursor = self.sentence_conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM sentence_pairs")
+                count = cursor.fetchone()[0]
+                print(f"✓ 例句数据库已连接: {SENTENCE_PAIRS_DB} ({count:,} 句子对)")
+            except Exception as e:
+                print(f"✗ 连接例句数据库失败: {e}")
+                self.sentence_conn = None
+        else:
+            print(f"⚠ 例句数据库不存在: {SENTENCE_PAIRS_DB}")
+            self.sentence_conn = None
+
 
     def query_chinese_word(self, word: str) -> Optional[Dict]:
         """查询中文词语"""
@@ -71,18 +93,33 @@ class DictDatabase:
         try:
             cursor = self.zh_conn.cursor()
 
+            # 检查是否有扩展字段
+            cursor.execute("PRAGMA table_info(words)")
+            columns = [row[1] for row in cursor.fetchall()]
+            has_extensions = 'synonyms' in columns and 'cilin_code' in columns
+
             # 查询简体或繁体
-            cursor.execute('''
-                SELECT * FROM words
-                WHERE simplified = ? OR traditional = ?
-                LIMIT 1
-            ''', (word, word))
+            if has_extensions:
+                cursor.execute('''
+                    SELECT simplified, traditional, pinyin, translation, pos, frequency,
+                           synonyms, cilin_code
+                    FROM words
+                    WHERE simplified = ? OR traditional = ?
+                    LIMIT 1
+                ''', (word, word))
+            else:
+                cursor.execute('''
+                    SELECT simplified, traditional, pinyin, translation, pos, frequency
+                    FROM words
+                    WHERE simplified = ? OR traditional = ?
+                    LIMIT 1
+                ''', (word, word))
 
             row = cursor.fetchone()
             if not row:
                 return None
 
-            return {
+            result = {
                 'word': row['simplified'],
                 'traditional': row['traditional'],
                 'pinyin': row['pinyin'],
@@ -90,6 +127,22 @@ class DictDatabase:
                 'pos': row['pos'],
                 'source': 'local_db'
             }
+
+            # 添加扩展数据
+            if has_extensions:
+                result['cilin_code'] = row['cilin_code']
+
+                # 解析 synonyms JSON
+                if row['synonyms']:
+                    try:
+                        import json
+                        result['synonyms'] = json.loads(row['synonyms'])
+                    except:
+                        result['synonyms'] = []
+                else:
+                    result['synonyms'] = []
+
+            return result
 
         except Exception as e:
             print(f"✗ 查询中文词语失败: {e}")
@@ -118,12 +171,27 @@ class DictDatabase:
 
         try:
             cursor = self.en_conn.cursor()
-            cursor.execute('''
-                SELECT word, phonetic, translation, pos, extra_data, frequency
-                FROM words
-                WHERE word = ? COLLATE NOCASE
-                LIMIT 1
-            ''', (word.lower(),))
+
+            # 检查是否有扩展字段
+            cursor.execute("PRAGMA table_info(words)")
+            columns = [row[1] for row in cursor.fetchall()]
+            has_extensions = 'lemma' in columns and 'synonyms_moby' in columns
+
+            if has_extensions:
+                cursor.execute('''
+                    SELECT word, phonetic, translation, pos, extra_data, frequency,
+                           lemma, lemma_frequency, synonyms_moby
+                    FROM words
+                    WHERE word = ? COLLATE NOCASE
+                    LIMIT 1
+                ''', (word.lower(),))
+            else:
+                cursor.execute('''
+                    SELECT word, phonetic, translation, pos, extra_data, frequency
+                    FROM words
+                    WHERE word = ? COLLATE NOCASE
+                    LIMIT 1
+                ''', (word.lower(),))
 
             row = cursor.fetchone()
             if not row:
@@ -147,7 +215,7 @@ class DictDatabase:
                 except:
                     pass
 
-            return {
+            result = {
                 'word': row['word'],
                 'phonetic': phonetic_data,
                 'translation': row['translation'] or '',
@@ -156,6 +224,22 @@ class DictDatabase:
                 'frequency': row['frequency'] or 0,
                 'source': 'local_db'
             }
+
+            # 添加扩展数据
+            if has_extensions:
+                result['lemma'] = row['lemma']
+                result['lemma_frequency'] = row['lemma_frequency']
+
+                # 解析 synonyms_moby JSON
+                if row['synonyms_moby']:
+                    try:
+                        result['synonyms_moby'] = json.loads(row['synonyms_moby'])
+                    except:
+                        result['synonyms_moby'] = []
+                else:
+                    result['synonyms_moby'] = []
+
+            return result
 
         except Exception as e:
             print(f"✗ 查询英文单词失败 [{word}]: {e}")
@@ -230,7 +314,7 @@ class DictDatabase:
             oxford = extra_data.get('oxford', False)
 
         # 5. 构建最终的 wordinfo 格式
-        return {
+        wordinfo = {
             'word': db_result['word'],
             'phonetic': phonetic_data,
             'translation': db_result.get('translation', ''),
@@ -240,7 +324,7 @@ class DictDatabase:
                 'common': [],  # ECDICT 不包含例句，后续可扩展
                 'fun': []
             },
-            'synonyms': [],    # 后续可从 Moby Thesaurus 补充
+            'synonyms': db_result.get('synonyms_moby', []),  # 使用 Moby Thesaurus 数据
             'antonyms': [],
             'wordForms': word_forms,
             'meta': {
@@ -252,6 +336,13 @@ class DictDatabase:
             }
         }
 
+        # 添加词根信息（如果有）
+        if db_result.get('lemma'):
+            wordinfo['lemma'] = db_result['lemma']
+            wordinfo['lemma_frequency'] = db_result.get('lemma_frequency', 0)
+
+        return wordinfo
+
     def format_chinese_to_wordinfo(self, db_result: Dict) -> Dict:
         """将中文数据库格式转换为前端 wordinfo 格式"""
         if not db_result:
@@ -260,7 +351,7 @@ class DictDatabase:
         # 解析释义（英文翻译）
         translations = db_result.get('translation', '').split('; ')
 
-        return {
+        wordinfo = {
             'word': db_result['word'],
             'traditional': db_result.get('traditional', ''),
             'pinyin': db_result.get('pinyin', ''),
@@ -283,7 +374,7 @@ class DictDatabase:
                 'common': [],
                 'fun': []
             },
-            'synonyms': [],
+            'synonyms': db_result.get('synonyms', []),  # 使用词林同义词数据
             'antonyms': [],
             'wordForms': {},
             'meta': {
@@ -291,6 +382,12 @@ class DictDatabase:
                 'db': 'CC-CEDICT'
             }
         }
+
+        # 添加词林编码（如果有）
+        if db_result.get('cilin_code'):
+            wordinfo['cilin_code'] = db_result['cilin_code']
+
+        return wordinfo
 
     def search_chinese_fuzzy(self, prefix: str, limit: int = 20) -> List[str]:
         """模糊搜索中文词语（用于自动补全）"""
@@ -311,6 +408,110 @@ class DictDatabase:
             print(f"✗ 模糊搜索失败: {e}")
             return []
 
+    def search_by_lemma(self, lemma: str, limit: int = 50) -> List[Dict]:
+        """根据词根查找所有变体形式
+
+        Args:
+            lemma: 词根（如 'be'）
+            limit: 返回结果数量限制
+
+        Returns:
+            包含所有变体的列表，按词频排序
+        """
+        if not self.en_conn:
+            return []
+
+        try:
+            cursor = self.en_conn.cursor()
+
+            # 检查是否有 lemma 字段
+            cursor.execute("PRAGMA table_info(words)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'lemma' not in columns:
+                return []
+
+            # 查询所有具有相同词根的单词
+            cursor.execute('''
+                SELECT word, pos, translation, frequency, lemma_frequency
+                FROM words
+                WHERE lemma = ?
+                ORDER BY frequency ASC
+                LIMIT ?
+            ''', (lemma.lower(), limit))
+
+            results = []
+            for row in cursor.fetchall():
+                results.append({
+                    'word': row['word'],
+                    'pos': row['pos'] or '',
+                    'translation': row['translation'] or '',
+                    'frequency': row['frequency'] or 0,
+                    'lemma': lemma,
+                    'lemma_frequency': row['lemma_frequency'] or 0
+                })
+
+            return results
+
+        except Exception as e:
+            print(f"✗ 词根查询失败 [{lemma}]: {e}")
+            return []
+
+
+    def search_examples(self, word: str, lang: str = 'en', limit: int = 5) -> List[Dict]:
+        """搜索包含指定单词的例句
+
+        Args:
+            word: 要搜索的单词或词语
+            lang: 语言 ('en' 或 'zh')
+            limit: 返回结果数量限制
+
+        Returns:
+            例句列表，每个例句包含 en_sentence 和 zh_sentence
+        """
+        if not self.sentence_conn:
+            return []
+
+        try:
+            cursor = self.sentence_conn.cursor()
+
+            if lang == 'en':
+                # 英文使用 FTS5 全文搜索
+                try:
+                    cursor.execute("""
+                        SELECT en_sentence, zh_sentence
+                        FROM sentence_pairs_fts
+                        WHERE en_sentence MATCH ?
+                        LIMIT ?
+                    """, (word, limit))
+                except:
+                    # 如果 FTS5 不可用，降级到 LIKE 搜索
+                    cursor.execute("""
+                        SELECT en_sentence, zh_sentence
+                        FROM sentence_pairs
+                        WHERE en_sentence LIKE ?
+                        LIMIT ?
+                    """, (f'%{word}%', limit))
+            else:
+                # 中文直接使用 LIKE 搜索（FTS5 对中文分词支持不好）
+                cursor.execute("""
+                    SELECT en_sentence, zh_sentence
+                    FROM sentence_pairs
+                    WHERE zh_sentence LIKE ?
+                    LIMIT ?
+                """, (f'%{word}%', limit))
+
+            results = []
+            for row in cursor.fetchall():
+                results.append({
+                    'en': row['en_sentence'],
+                    'zh': row['zh_sentence']
+                })
+
+            return results
+
+        except Exception as e:
+            print(f"✗ 例句搜索失败 [{word}]: {e}")
+            return []
 
     def close(self):
         """关闭数据库连接"""
@@ -318,6 +519,8 @@ class DictDatabase:
             self.zh_conn.close()
         if self.en_conn:
             self.en_conn.close()
+        if self.sentence_conn:
+            self.sentence_conn.close()
 
 
 # 全局数据库实例

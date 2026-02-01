@@ -10,9 +10,10 @@ import sys
 from pathlib import Path
 
 # 数据目录
-DATA_DIR = Path(__file__).parent.parent / 'data' / 'dict'
-ZH_DB = DATA_DIR / 'zh_dict.db'
-USER_DB = DATA_DIR / 'user_dict.db'
+DB_DIR = Path(__file__).parent.parent / 'data' / 'databases'
+SOURCE_DIR = Path(__file__).parent.parent / 'data' / 'resources' / 'cedict'
+ZH_DB = DB_DIR / 'zh_dict.db'
+USER_DB = DB_DIR / 'user_dict.db'
 
 
 class ChineseDictBuilder:
@@ -153,7 +154,7 @@ def main():
     print()
 
     # 检查数据文件
-    cedict_file = DATA_DIR / 'cedict_ts.u8'
+    cedict_file = SOURCE_DIR / 'cedict_ts.u8'
 
     # 构建中文词典
     if cedict_file.exists():
@@ -169,6 +170,30 @@ def main():
             return 1
 
         zh_builder.close()
+
+        # 集成词林同义词数据
+        print("=" * 60)
+        print("集成扩展数据...")
+        print("=" * 60)
+        print()
+
+        try:
+            print("集成词林（Cilin）同义词数据...")
+            from integrate_cilin import CilinIntegrator
+            cilin = CilinIntegrator(ZH_DB)
+            cilin.connect()
+            cilin.add_synonyms_columns()
+            cilin.integrate_cilin(SOURCE_DIR.parent / 'auxiliary' / 'cilin.txt')
+            cilin.create_index()
+            cilin.close()
+            print()
+        except Exception as e:
+            print(f"⚠ 词林集成失败: {e}")
+            print()
+
+        print("=" * 60)
+        print("✓ 中文词典构建完成（含扩展数据）！")
+        print("=" * 60)
         print()
     else:
         print(f"⚠ 未找到 CC-CEDICT 数据: {cedict_file}")

@@ -11,9 +11,10 @@ import sys
 from pathlib import Path
 
 # 数据目录
-DATA_DIR = Path(__file__).parent.parent / 'data' / 'dict'
-EN_DB = DATA_DIR / 'en_dict.db'
-ECDICT_CSV = DATA_DIR / 'ecdict.csv'
+DB_DIR = Path(__file__).parent.parent / 'data' / 'databases'
+SOURCE_DIR = Path(__file__).parent.parent / 'data' / 'resources' / 'ecdict'
+EN_DB = DB_DIR / 'en_dict.db'
+ECDICT_CSV = SOURCE_DIR / 'ecdict.csv'
 
 
 class EnglishDictBuilder:
@@ -231,7 +232,47 @@ def main():
     en_builder.close()
 
     print("\n" + "=" * 60)
-    print("✓ 词典构建完成！")
+    print("✓ 基础词典构建完成！")
+    print("=" * 60)
+
+    # 集成扩展数据
+    print("\n" + "=" * 60)
+    print("集成扩展数据...")
+    print("=" * 60)
+    print()
+
+    # 集成 Moby Thesaurus 同义词
+    try:
+        print("1. 集成 Moby Thesaurus 同义词数据...")
+        from integrate_moby import MobyIntegrator
+        moby = MobyIntegrator(EN_DB)
+        moby.connect()
+        moby.add_synonyms_column()
+        moby.integrate_moby(SOURCE_DIR.parent / 'moby' / 'moby_thesaurus.txt')
+        moby.create_index()
+        moby.close()
+        print()
+    except Exception as e:
+        print(f"⚠ Moby 集成失败: {e}")
+        print()
+
+    # 集成 Lemma 词根数据
+    try:
+        print("2. 集成 Lemma 词根数据...")
+        from integrate_lemma import LemmaIntegrator
+        lemma = LemmaIntegrator(EN_DB)
+        lemma.connect()
+        lemma.add_lemma_columns()
+        lemma.integrate_lemma(SOURCE_DIR.parent / 'auxiliary' / 'lemma.en.txt')
+        lemma.create_index()
+        lemma.close()
+        print()
+    except Exception as e:
+        print(f"⚠ Lemma 集成失败: {e}")
+        print()
+
+    print("=" * 60)
+    print("✓ 英文词典构建完成（含扩展数据）！")
     print("=" * 60)
 
     # 显示数据库大小
