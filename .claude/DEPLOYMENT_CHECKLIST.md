@@ -30,8 +30,8 @@ export TOKEN_EXPIRE_DAYS=30
 export CODE_EXPIRE_MINUTES=5
 export CODE_RESEND_SECONDS=60
 
-# 数据库路径（可选，默认为 data/dictation.db）
-export DATABASE_PATH=/path/to/production/dictation.db
+# 数据库路径（可选，默认为 data/databases/user_data.db）
+export DATABASE_PATH=/path/to/production/user_data.db
 ```
 
 ## ✅ 已修复的问题
@@ -100,7 +100,7 @@ python3 run.py
 
 ## ⚠️ 注意事项
 
-1. **数据库备份**: 定期备份 `data/dictation.db`
+1. **数据库备份**: 定期备份 `data/databases/user_data.db`
 2. **日志监控**: 监控服务器日志，关注错误和异常
 3. **API 配额**: 注意 DeepSeek API 的使用配额
 4. **HTTPS**: 生产环境建议使用 HTTPS（可用 nginx 反向代理）

@@ -8,22 +8,24 @@ import { currentSliderPosition, setCurrentSliderPosition } from './state.js';
 
 /**
  * 获取当前语言模式的最大索引
- * @returns {number} 最大索引（中文2，英文3）
+ * @returns {number} 最大索引（中文2，英文2）
  */
 function getMaxIndex() {
     const targetLang = getTargetLang();
-    return targetLang === 'zh' ? 2 : 3;
+    return 2;  // 中文和英文都是3页（索引0,1,2）
 }
 
 // 延迟绑定
 let _pauseIfPlaying = null;
 let _renderViewContent = null;
 let _setupContentClickHandlers = null;
+let _onViewChanged = null;
 
 export function setSliderDeps(deps) {
     _pauseIfPlaying = deps.pauseIfPlaying;
     _renderViewContent = deps.renderViewContent;
     _setupContentClickHandlers = deps.setupContentClickHandlers;
+    _onViewChanged = deps.onViewChanged;
 }
 
 export function sliderLeft() {
@@ -219,5 +221,8 @@ export function animateContentSwitch(newPosition) {
         content.innerHTML = _renderViewContent?.(newPosition, wordInfo, translation) || '';
         _setupContentClickHandlers?.(content);
         content.classList.remove('fading');
+
+        // 触发视图切换回调
+        _onViewChanged?.(newPosition, wordInfo);
     }, 150);
 }

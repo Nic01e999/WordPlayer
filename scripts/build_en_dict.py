@@ -241,21 +241,6 @@ def main():
     print("=" * 60)
     print()
 
-    # 集成 Moby Thesaurus 同义词
-    try:
-        print("1. 集成 Moby Thesaurus 同义词数据...")
-        from integrate_moby import MobyIntegrator
-        moby = MobyIntegrator(EN_DB)
-        moby.connect()
-        moby.add_synonyms_column()
-        moby.integrate_moby(SOURCE_DIR.parent / 'moby' / 'moby_thesaurus.txt')
-        moby.create_index()
-        moby.close()
-        print()
-    except Exception as e:
-        print(f"⚠ Moby 集成失败: {e}")
-        print()
-
     # 集成 Lemma 词根数据
     try:
         print("2. 集成 Lemma 词根数据...")

@@ -14,7 +14,7 @@ import { setupKeyboardListener, removeKeyboardListener, setKeyboardDeps } from '
 import { sliderLeft, sliderRight, setupSliderListeners, setSliderDeps } from './slider.js';
 import { setupScrollListener, scrollToIndex, highlightCurrent, setScrollDeps } from './scroll.js';
 import { startPlayLoop, playPause, pauseIfPlaying, setPlaybackDeps } from './playback.js';
-import { renderUI, renderContent, updateInfo, renderViewContent, setupContentClickHandlers, setRenderDeps } from './render.js';
+import { renderUI, renderContent, updateInfo, renderViewContent, setupContentClickHandlers, onViewChanged, setRenderDeps } from './render.js';
 
 // 设置延迟绑定（解决循环依赖）
 setKeyboardDeps({
@@ -29,7 +29,8 @@ setKeyboardDeps({
 setSliderDeps({
     pauseIfPlaying,
     renderViewContent,
-    setupContentClickHandlers
+    setupContentClickHandlers,
+    onViewChanged
 });
 
 setScrollDeps({

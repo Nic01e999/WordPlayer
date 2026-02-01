@@ -44,12 +44,10 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
             # 返回默认翻译
             return {
                 'word': word,
-                'translation': '非中英，请自定义',
+                'translation': '未找到释义，请自定义',
                 'targetDefinitions': [{'pos': '', 'meanings': ['非中英，请自定义']}],
                 'nativeDefinitions': {},
-                'examples': {'common': [], 'fun': []},
-                'synonyms': [],
-                'antonyms': [],
+                'examples': {},
                 'wordForms': {},
                 'meta': {'source': 'default', 'language': target_lang}
             }
@@ -87,8 +85,6 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
             'targetDefinitions': [{'pos': '', 'meanings': ['未找到释义，请自定义']}],
             'nativeDefinitions': {},
             'examples': {'common': [], 'fun': []},
-            'synonyms': [],
-            'antonyms': [],
             'wordForms': {},
             'meta': {'source': 'default', 'language': target_lang}
         }
@@ -102,8 +98,6 @@ def _query_word_info(word, target_lang='en', native_lang='zh'):
             'targetDefinitions': [{'pos': '', 'meanings': ['非中英，请自定义']}],
             'nativeDefinitions': {},
             'examples': {'common': [], 'fun': []},
-            'synonyms': [],
-            'antonyms': [],
             'wordForms': {},
             'meta': {'source': 'default', 'language': target_lang}
         }
@@ -188,6 +182,40 @@ def dict_search():
     return jsonify({"results": []})
 
 
+@dict_api_bp.route("/api/dict/lemma/<lemma>", methods=["GET"])
+def get_lemma_words(lemma):
+    """
+    查询同词根的所有词汇
+    GET /api/dict/lemma/<lemma>?limit=50&exclude_word=current_word
+    """
+    limit = request.args.get("limit", 50, type=int)
+    exclude_word = request.args.get("exclude_word", "", type=str)
+
+    # 限制最大返回数量
+    limit = min(limit, 100)
+
+    print(f"[Dict] 查询同词根词汇: {lemma}, limit={limit}, exclude_word={exclude_word}")
+
+    # 调用 dict_db 的 search_by_lemma 方法
+    words = dict_db.search_by_lemma(lemma, limit)
+
+    # 过滤掉当前单词
+    if exclude_word:
+        words = [w for w in words if w['word'].lower() != exclude_word.lower()]
+        print(f"[Dict] 过滤掉当前单词: {exclude_word}")
+
+    if words:
+        print(f"[Dict] ✓ 找到 {len(words)} 个同词根词汇")
+    else:
+        print(f"[Dict] ✗ 未找到同词根词汇")
+
+    return jsonify({
+        "lemma": lemma,
+        "count": len(words),
+        "words": words
+    })
+
+
 @dict_api_bp.route("/api/dict/stats", methods=["GET"])
 def dict_stats():
     """
@@ -229,3 +257,44 @@ def dict_stats():
         }
     }
     return jsonify(stats)
+
+
+@dict_api_bp.route("/api/dict/examples/<word>", methods=["GET"])
+def get_examples(word):
+    """
+    获取单词例句
+    GET /api/dict/examples/<word>?lang=en&limit=10
+
+    Args:
+        word: 单词
+        lang: 语言 (en/zh)
+        limit: 返回数量限制
+
+    Returns:
+        {
+            "word": "happy",
+            "lang": "en",
+            "count": 5,
+            "examples": [
+                {"en": "I am happy.", "zh": "我很开心。"},
+                ...
+            ]
+        }
+    """
+    lang = request.args.get('lang', 'en')
+    limit = int(request.args.get('limit', 10))
+
+    print(f"[Dict] 查询例句: word={word}, lang={lang}, limit={limit}")
+
+    # 调用数据库查询例句
+    examples = dict_db.search_examples(word, lang=lang, limit=limit)
+
+    print(f"[Dict] 找到 {len(examples)} 条例句")
+
+    return jsonify({
+        "word": word,
+        "lang": lang,
+        "count": len(examples),
+        "examples": examples
+    })
+

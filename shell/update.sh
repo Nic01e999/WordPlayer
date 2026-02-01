@@ -74,16 +74,16 @@ backup_database() {
     mkdir -p "$BACKUP_DIR"
 
     # 备份数据库
-    if [ -f "data/dictation.db" ]; then
-        BACKUP_FILE="$BACKUP_DIR/dictation.db.backup.$(date +%Y%m%d_%H%M%S)"
-        cp data/dictation.db "$BACKUP_FILE"
+    if [ -f "data/databases/user_data.db" ]; then
+        BACKUP_FILE="$BACKUP_DIR/user_data.db.backup.$(date +%Y%m%d_%H%M%S)"
+        cp data/databases/user_data.db "$BACKUP_FILE"
         print_success "数据库已备份到: $BACKUP_FILE"
 
         # 清理旧备份（保留最近 N 个）
-        BACKUP_COUNT=$(ls -1 "$BACKUP_DIR"/dictation.db.backup.* 2>/dev/null | wc -l)
+        BACKUP_COUNT=$(ls -1 "$BACKUP_DIR"/user_data.db.backup.* 2>/dev/null | wc -l)
         if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
             print_info "清理旧备份（保留最近 $MAX_BACKUPS 个）..."
-            ls -1t "$BACKUP_DIR"/dictation.db.backup.* | tail -n +$((MAX_BACKUPS + 1)) | xargs rm -f
+            ls -1t "$BACKUP_DIR"/user_data.db.backup.* | tail -n +$((MAX_BACKUPS + 1)) | xargs rm -f
         fi
     else
         print_warning "未找到数据库文件，跳过备份"

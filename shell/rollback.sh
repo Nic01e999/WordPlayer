@@ -102,7 +102,7 @@ restore_database() {
         fi
 
         # 列出可用的备份
-        BACKUPS=($(ls -1t "$BACKUP_DIR"/dictation.db.backup.* 2>/dev/null))
+        BACKUPS=($(ls -1t "$BACKUP_DIR"/user_data.db.backup.* 2>/dev/null))
 
         if [ ${#BACKUPS[@]} -eq 0 ]; then
             print_warning "未找到数据库备份文件"
@@ -127,14 +127,14 @@ restore_database() {
             SELECTED_BACKUP="${BACKUPS[$((REPLY-1))]}"
 
             # 备份当前数据库
-            if [ -f "data/dictation.db" ]; then
-                CURRENT_BACKUP="$BACKUP_DIR/dictation.db.before_rollback.$(date +%Y%m%d_%H%M%S)"
-                cp data/dictation.db "$CURRENT_BACKUP"
+            if [ -f "data/databases/user_data.db" ]; then
+                CURRENT_BACKUP="$BACKUP_DIR/user_data.db.before_rollback.$(date +%Y%m%d_%H%M%S)"
+                cp data/databases/user_data.db "$CURRENT_BACKUP"
                 print_info "当前数据库已备份到: $CURRENT_BACKUP"
             fi
 
             # 恢复备份
-            cp "$SELECTED_BACKUP" data/dictation.db
+            cp "$SELECTED_BACKUP" data/databases/user_data.db
             print_success "数据库已恢复: $(basename "$SELECTED_BACKUP")"
         else
             print_info "已取消数据库恢复"

@@ -15,30 +15,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / 'server'))
 from dict_db import DictDatabase
 
 def test_english_synonyms():
-    """测试英文同义词功能"""
+    """测试英文同义词功能（已废弃）"""
     print("=" * 60)
-    print("测试 1: 英文同义词（Moby Thesaurus）")
+    print("测试 1: 英文同义词（已废弃）")
     print("=" * 60)
-
-    db = DictDatabase()
-
-    # 测试单词 "happy"
-    result = db.query_english_word("happy")
-    if result:
-        print(f"✓ 查询单词: {result['word']}")
-        print(f"  翻译: {result['translation'][:50]}...")
-
-        if 'synonyms_moby' in result and result['synonyms_moby']:
-            synonyms = result['synonyms_moby'][:10]  # 只显示前10个
-            print(f"  同义词数量: {len(result['synonyms_moby'])}")
-            print(f"  同义词示例: {', '.join(synonyms)}")
-            print("✓ 同义词功能正常")
-        else:
-            print("✗ 未找到同义词数据")
-    else:
-        print("✗ 查询失败")
-
-    db.close()
+    print("⚠ 同义词功能已被移除")
     print()
 
 def test_english_lemma():
@@ -124,17 +105,12 @@ def test_database_stats():
         cursor.execute("SELECT COUNT(*) FROM words")
         total = cursor.fetchone()[0]
 
-        # 有同义词的词条数
-        cursor.execute("SELECT COUNT(*) FROM words WHERE synonyms_moby IS NOT NULL")
-        with_synonyms = cursor.fetchone()[0]
-
         # 有词根的词条数
         cursor.execute("SELECT COUNT(*) FROM words WHERE lemma IS NOT NULL")
         with_lemma = cursor.fetchone()[0]
 
         print(f"英文词典:")
         print(f"  总词条数: {total:,}")
-        print(f"  有同义词: {with_synonyms:,} ({with_synonyms/total*100:.1f}%)")
         print(f"  有词根: {with_lemma:,} ({with_lemma/total*100:.1f}%)")
 
         conn.close()
@@ -149,13 +125,8 @@ def test_database_stats():
         cursor.execute("SELECT COUNT(*) FROM words")
         total = cursor.fetchone()[0]
 
-        # 有同义词的词条数
-        cursor.execute("SELECT COUNT(*) FROM words WHERE synonyms IS NOT NULL")
-        with_synonyms = cursor.fetchone()[0]
-
         print(f"\n中文词典:")
         print(f"  总词条数: {total:,}")
-        print(f"  有同义词: {with_synonyms:,} ({with_synonyms/total*100:.1f}%)")
 
         conn.close()
 

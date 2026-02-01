@@ -172,15 +172,15 @@ class DictDatabase:
         try:
             cursor = self.en_conn.cursor()
 
-            # 检查是否有扩展字段
+            # 检查是否有 lemma 扩展字段
             cursor.execute("PRAGMA table_info(words)")
             columns = [row[1] for row in cursor.fetchall()]
-            has_extensions = 'lemma' in columns and 'synonyms_moby' in columns
+            has_lemma = 'lemma' in columns
 
-            if has_extensions:
+            if has_lemma:
                 cursor.execute('''
                     SELECT word, phonetic, translation, pos, extra_data, frequency,
-                           lemma, lemma_frequency, synonyms_moby
+                           lemma, lemma_frequency
                     FROM words
                     WHERE word = ? COLLATE NOCASE
                     LIMIT 1
@@ -225,19 +225,10 @@ class DictDatabase:
                 'source': 'local_db'
             }
 
-            # 添加扩展数据
-            if has_extensions:
-                result['lemma'] = row['lemma']
-                result['lemma_frequency'] = row['lemma_frequency']
-
-                # 解析 synonyms_moby JSON
-                if row['synonyms_moby']:
-                    try:
-                        result['synonyms_moby'] = json.loads(row['synonyms_moby'])
-                    except:
-                        result['synonyms_moby'] = []
-                else:
-                    result['synonyms_moby'] = []
+            # 添加词根信息（如果有）
+            if has_lemma:
+                result['lemma'] = row['lemma'] or ''
+                result['lemma_frequency'] = row['lemma_frequency'] or 0
 
             return result
 
@@ -324,8 +315,6 @@ class DictDatabase:
                 'common': [],  # ECDICT 不包含例句，后续可扩展
                 'fun': []
             },
-            'synonyms': db_result.get('synonyms_moby', []),  # 使用 Moby Thesaurus 数据
-            'antonyms': [],
             'wordForms': word_forms,
             'meta': {
                 'source': 'local_db',
@@ -374,8 +363,6 @@ class DictDatabase:
                 'common': [],
                 'fun': []
             },
-            'synonyms': db_result.get('synonyms', []),  # 使用词林同义词数据
-            'antonyms': [],
             'wordForms': {},
             'meta': {
                 'source': 'local_db',
@@ -383,9 +370,6 @@ class DictDatabase:
             }
         }
 
-        # 添加词林编码（如果有）
-        if db_result.get('cilin_code'):
-            wordinfo['cilin_code'] = db_result['cilin_code']
 
         return wordinfo
 

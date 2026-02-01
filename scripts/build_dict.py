@@ -171,26 +171,6 @@ def main():
 
         zh_builder.close()
 
-        # 集成词林同义词数据
-        print("=" * 60)
-        print("集成扩展数据...")
-        print("=" * 60)
-        print()
-
-        try:
-            print("集成词林（Cilin）同义词数据...")
-            from integrate_cilin import CilinIntegrator
-            cilin = CilinIntegrator(ZH_DB)
-            cilin.connect()
-            cilin.add_synonyms_columns()
-            cilin.integrate_cilin(SOURCE_DIR.parent / 'auxiliary' / 'cilin.txt')
-            cilin.create_index()
-            cilin.close()
-            print()
-        except Exception as e:
-            print(f"⚠ 词林集成失败: {e}")
-            print()
-
         print("=" * 60)
         print("✓ 中文词典构建完成（含扩展数据）！")
         print("=" * 60)

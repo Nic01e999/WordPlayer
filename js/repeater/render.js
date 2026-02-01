@@ -3,7 +3,7 @@
  */
 
 import { currentRepeaterState, preloadCache } from '../state.js';
-import { $, showView, escapeHtml, getTargetLang } from '../utils.js';
+import { $, showView, escapeHtml, getTargetLang, getAccent } from '../utils.js';
 import { currentSliderPosition, setCurrentSliderPosition } from './state.js';
 import { t } from '../i18n/index.js';
 
@@ -94,16 +94,31 @@ export function updateInfo() {
         _setupSliderListeners?.();
         const sliderContent = document.getElementById('sliderContent');
         setupContentClickHandlers(sliderContent);
+
+        // 修复例句加载bug：如果当前在例句页，切换单词后立即加载例句
+        const targetLang = getTargetLang();
+        const examplePagePosition = 2; // 中文和英文都是第3页（position=2）
+
+        if (currentSliderPosition === examplePagePosition && word) {
+            loadExamples(word, targetLang);
+        }
+
+        // 修复词根加载bug：如果当前在词根页，切换单词后立即加载词根
+        const lemmaPagePosition = 1; // 英文模式第2页（position=1）
+
+        if (currentSliderPosition === lemmaPagePosition && wordInfo?.lemma && wordInfo.lemma !== '-') {
+            loadLemmaWords(wordInfo.lemma);
+        }
     }
 }
 
 /**
  * 获取当前语言模式的页面数量
- * @returns {number} 页面数量（中文3页，英文4页）
+ * @returns {number} 页面数量（中文3页，英文3页）
  */
 function getPageCount() {
     const targetLang = getTargetLang();
-    return targetLang === 'zh' ? 3 : 4;
+    return 3;  // 中文和英文都是3页
 }
 
 export function renderSliderContent(wordInfo, translation) {
@@ -146,33 +161,63 @@ export function renderViewContent(position, wordInfo, translation) {
     const targetLang = getTargetLang();
     const isChinese = targetLang === 'zh';
 
-    // 中文模式：[基础信息, 详细释义, 难度等级]（跳过词形变化）
-    // 英文模式：[基础信息, 详细释义, 词形变化, 难度等级]
+    // 中文模式：[基础信息+CL+难度, 英文翻译, 例句]
+    // 英文模式：[核心信息, 同词根词汇, 例句]
     if (isChinese) {
         switch (position) {
             case 0:
-                return renderNativePosView(wordInfo, translation);
+                return renderNativePosView(wordInfo, translation);  // 第1页：拼音+翻译+CL+难度
             case 1:
-                return renderPosView(wordInfo);
+                return renderPosView(wordInfo);                     // 第2页：英文翻译
             case 2:
-                return renderDifficultyView(wordInfo);
+                return renderExamplesView(wordInfo, word);          // 第3页：例句
             default:
                 return '';
         }
     } else {
         switch (position) {
             case 0:
-                return renderNativePosView(wordInfo, translation);
+                return renderCoreInfoView(wordInfo, translation);  // 第1页：音标+翻译+难度
             case 1:
-                return renderPosView(wordInfo);
+                return renderWordFormsAndLemmaView(wordInfo);      // 第2页：同词根词汇
             case 2:
-                return renderWordFormsView(wordInfo);
-            case 3:
-                return renderDifficultyView(wordInfo);
+                return renderExamplesView(wordInfo, word);         // 第3页：例句
             default:
                 return '';
         }
     }
+}
+
+/**
+ * 解析中文翻译,分离主要翻译和CL信息
+ */
+function parseChineseTranslation(translation) {
+    if (!translation) return { mainTranslation: '', clInfo: null };
+
+    // 分离主要翻译和CL部分
+    const clMatch = translation.match(/;\s*CL:(.+)$/);
+    let mainTranslation = translation;
+    let clInfo = null;
+
+    if (clMatch) {
+        mainTranslation = translation.substring(0, clMatch.index).trim();
+        const clRaw = clMatch[1];
+
+        // 处理 張|张[zhang1],包[bao1] 格式
+        const clItems = clRaw.split(',').map(item => {
+            item = item.trim();
+            const match = item.match(/([^[|]+)\|?([^[]*)\[([^\]]+)\]/);
+            if (match) {
+                const simplified = match[2] || match[1]; // 取简体
+                const pinyin = match[3]
+                return `${simplified}（${pinyin}）`;
+            }
+            return item;
+        });
+        clInfo = 'CL: ' + clItems.join('  ');
+    }
+
+    return { mainTranslation, clInfo };
 }
 
 /**
@@ -182,25 +227,54 @@ function renderNativePosView(wordInfo, fallbackTranslation) {
     const targetLang = getTargetLang();
     const isChinese = targetLang === 'zh';
 
-    // 中文模式：显示拼音、繁体字、英文翻译
+    // 中文模式：显示拼音、汉字本身、CL信息、难度
     if (isChinese) {
+        console.log('[renderNativePosView] 中文模式 - wordInfo:', wordInfo);
         const pinyin = wordInfo?.pinyin || '';
-        const traditional = wordInfo?.traditional || '';
-        const translation = wordInfo?.translation || fallbackTranslation || '...';
-        const pos = wordInfo?.pos || '';
+        console.log('[renderNativePosView] pinyin:', pinyin, 'type:', typeof pinyin);
+        const translation = wordInfo?.translation || '';
+
+        // 获取当前汉字（不是英文翻译！）
+        const word = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
+        console.log('[renderNativePosView] 当前汉字:', word);
+
+        // 解析CL信息（不需要mainTranslation）
+        const { clInfo } = parseChineseTranslation(translation);
+
+        // 获取难度信息
+        const meta = wordInfo?.meta || {};
+        const frequency = meta.frequency || 0;
+
+        // 生成难度徽章
+        let difficultyBadge = '';
+        if (frequency > 0) {
+            difficultyBadge = `<div class="difficulty-badge">词频: ${frequency}</div>`;
+        }
 
         return `
             <div class="view-phonetic-pos">
                 ${pinyin ? `<div class="phonetic">${pinyin}</div>` : ''}
-                ${traditional ? `<div class="traditional-text">繁体: ${traditional}</div>` : ''}
-                ${pos ? `<div class="pos-tags"><span class="pos-tag">${pos}</span></div>` : ''}
-                <div class="main-translation">${escapeAndFormat(translation)}</div>
+                <div class="chinese-word">${escapeHtml(word)}</div>
+                ${clInfo ? `<div class="cl-info">${clInfo}</div>` : ''}
+                ${difficultyBadge}
             </div>
         `;
     }
 
     // 英文模式：显示音标、词性标签、中文翻译
-    const phonetic = wordInfo?.phonetic || '';
+    // 处理音标显示：根据口音选择显示美式或英式音标
+    let phoneticDisplay = '';
+    if (wordInfo?.phonetic) {
+        if (typeof wordInfo.phonetic === 'object') {
+            // 对象格式：{us: "...", uk: "..."}
+            const accent = getAccent(); // 获取当前选择的口音
+            phoneticDisplay = wordInfo.phonetic[accent] || wordInfo.phonetic.us || wordInfo.phonetic.uk || '';
+        } else {
+            // 字符串格式（向后兼容）
+            phoneticDisplay = wordInfo.phonetic;
+        }
+    }
+
     const translation = wordInfo?.translation || fallbackTranslation || '...';
     // 兼容新旧字段: nativeDefinitions (新) / definitions (旧)
     let nativeDefs = wordInfo?.nativeDefinitions || [];
@@ -214,7 +288,7 @@ function renderNativePosView(wordInfo, fallbackTranslation) {
 
     return `
         <div class="view-phonetic-pos">
-            ${phonetic ? `<div class="phonetic">${phonetic}</div>` : ''}
+            ${phoneticDisplay ? `<div class="phonetic">${phoneticDisplay}</div>` : ''}
             ${posTags.length > 0 ? `<div class="pos-tags">${posTags.map(p => `<span class="pos-tag">${p}</span>`).join(' ')}</div>` : ''}
             <div class="main-translation">${escapeAndFormat(translation)}</div>
         </div>
@@ -244,9 +318,36 @@ function highlightWord(sentence, word) {
 }
 
 /**
- * Mode 1: 渲染目标语言词性释义
+ * Mode 1: 渲染目标语言词性释义（中文模式显示英文翻译）
  */
 function renderPosView(wordInfo) {
+    const targetLang = getTargetLang();
+    const isChinese = targetLang === 'zh';
+
+    if (isChinese) {
+        // 中文模式：显示英文翻译
+        const translation = wordInfo?.translation || '';
+
+        // 移除CL部分
+        const cleanTranslation = translation.replace(/;\s*CL:.+$/, '').trim();
+
+        // 按分号分割并换行
+        const translations = cleanTranslation.split(';').map(t => t.trim()).filter(t => t);
+
+        if (translations.length === 0) {
+            return '<div class="view-pos"><div class="no-data">无英文翻译</div></div>';
+        }
+
+        return `
+            <div class="view-pos">
+                <div class="english-translations">
+                    ${translations.map(t => `<div class="translation-line">${escapeHtml(t)}</div>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // 英文模式：显示目标语言词性释义
     // 兼容新旧字段: targetDefinitions (新) / definitions (旧)
     const defs = wordInfo?.targetDefinitions || [];
     if (defs.length === 0) {
@@ -270,101 +371,10 @@ function renderPosView(wordInfo) {
 }
 
 function renderExamplesView(wordInfo, word) {
-    const examples = wordInfo?.examples || {};
-    const commonExamples = examples.common || [];
-    const funExamples = examples.fun || [];
-
-    if (Array.isArray(wordInfo?.examples)) {
-        const oldExamples = wordInfo.examples;
-        if (oldExamples.length === 0) {
-            return `<div class="view-empty">${t('noExamples')}</div>`;
-        }
-        return `
-            <div class="view-examples">
-                ${oldExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${escapeHtml(ex)}">${highlightWord(ex, word)}</p>`).join('')}
-            </div>
-        `;
-    }
-
-    if (commonExamples.length === 0 && funExamples.length === 0) {
-        return `<div class="view-empty">${t('noExamples')}</div>`;
-    }
-
+    // 直接在view层渲染，不需要额外的examples-container
     return `
-        <div class="examples-grid">
-            <div class="example-column">
-                <span class="example-label"></span>
-                ${commonExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${escapeHtml(ex)}">${highlightWord(ex, word)}</p>`).join('')}
-            </div>
-            <div class="example-column">
-                <span class="example-label"></span>
-                ${funExamples.slice(0, 2).map(ex => `<p class="example-sentence clickable-text" data-text="${escapeHtml(ex)}">${highlightWord(ex, word)}</p>`).join('')}
-            </div>
-        </div>
-    `;
-}
-
-function renderSynonymsView(wordInfo) {
-    const synonyms = wordInfo?.synonyms || [];
-    const antonyms = wordInfo?.antonyms || [];
-
-    if (synonyms.length === 0 && antonyms.length === 0) {
-        return `<div class="view-empty">${t('noSynonyms')}</div>`;
-    }
-
-    const renderClickableWords = (words) => words.map(w =>
-        `<span class="clickable-word" data-word="${escapeHtml(w)}">${w}</span>`
-    ).join(', ');
-
-    return `
-        <div class="view-synonyms">
-            ${synonyms.length > 0 ? `
-                <div class="syn-group">
-                    <span class="syn-label">${t('syn')}:</span>
-                    <span class="syn-words">${renderClickableWords(synonyms.slice(0, 5))}</span>
-                </div>
-            ` : ''}
-            ${antonyms.length > 0 ? `
-                <div class="ant-group">
-                    <span class="ant-label">${t('ant')}:</span>
-                    <span class="ant-words">${renderClickableWords(antonyms.slice(0, 3))}</span>
-                </div>
-            ` : ''}
-        </div>
-    `;
-}
-
-/**
- * 渲染词形变化页面（英文模式专用）
- */
-function renderWordFormsView(wordInfo) {
-    const wordForms = wordInfo?.wordForms || {};
-
-    const forms = [
-        { key: 'past', label: t('wordFormPast') },
-        { key: 'pastParticiple', label: t('wordFormPastParticiple') },
-        { key: 'doing', label: t('wordFormDoing') },
-        { key: 'third', label: t('wordFormThird') },
-        { key: 'comparative', label: t('wordFormComparative') },
-        { key: 'superlative', label: t('wordFormSuperlative') },
-        { key: 'plural', label: t('wordFormPlural') },
-        { key: 'lemma', label: t('wordFormLemma') },
-        { key: 'root', label: t('wordFormRoot') }
-    ];
-
-    return `
-        <div class="view-word-forms">
-            <div class="word-forms-grid">
-                ${forms.map(form => {
-                    const value = wordForms[form.key] || '-';
-                    return `
-                        <div class="word-form-item">
-                            <span class="word-form-label">${form.label}:</span>
-                            <span class="word-form-value">${escapeAndFormat(value)}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
+        <div class="view-examples" data-word="${escapeAndFormat(word)}">
+            <div class="loading">加载中...</div>
         </div>
     `;
 }
@@ -418,6 +428,60 @@ function renderDifficultyView(wordInfo) {
     `;
 }
 
+/**
+ * 第1页：核心信息（音标 + 翻译 + 难度等级）
+ */
+function renderCoreInfoView(wordInfo, fallbackTranslation) {
+    // 处理音标显示
+    let phoneticText = '';
+    if (wordInfo?.phonetic) {
+        if (typeof wordInfo.phonetic === 'object') {
+            const accent = getAccent();
+            phoneticText = wordInfo.phonetic[accent] || wordInfo.phonetic.us || wordInfo.phonetic.uk || wordInfo.phonetic.ipa || '';
+        } else {
+            phoneticText = wordInfo.phonetic;
+        }
+    }
+
+    const translation = wordInfo?.translation || fallbackTranslation || '...';
+
+    // 难度信息
+    const meta = wordInfo?.meta || {};
+    const collins = meta.collins || 0;
+    const oxford = meta.oxford || false;
+    const frequency = meta.frequency || 0;
+
+    return `
+        <div class="view-core-info">
+            ${phoneticText ? `<div class="phonetic-large">[${escapeAndFormat(phoneticText)}]</div>` : ''}
+            <div class="translation-main">${escapeAndFormat(translation)}</div>
+            <div class="difficulty-badges">
+                ${collins > 0 ? `<span class="badge collins">柯林斯 ${'★'.repeat(collins)}</span>` : ''}
+                ${oxford ? `<span class="badge oxford">牛津3000</span>` : ''}
+                ${frequency > 0 ? `<span class="badge frequency">词频: ${frequency}</span>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 第2页：同词根词汇（删除词形变化，删除标题，使用Flex布局）
+ */
+function renderWordFormsAndLemmaView(wordInfo) {
+    const lemma = wordInfo?.lemma || '';
+
+    if (!lemma || lemma === '-') {
+        return '<div class="view-word-forms-lemma"><div class="no-data">无词根信息</div></div>';
+    }
+
+    // 直接在view层使用Flex，不需要额外的lemma-words-container
+    return `
+        <div class="view-word-forms-lemma" data-lemma="${escapeAndFormat(lemma)}">
+            <div class="loading">加载中...</div>
+        </div>
+    `;
+}
+
 export function setupContentClickHandlers(container) {
     if (!container) return;
 
@@ -450,4 +514,99 @@ async function playTextWithFeedback(element, text) {
     await speakText(text, false);
 
     element.classList.remove('playing');
+}
+
+/**
+ * 异步加载同词根词汇（修改为Flex布局）
+ */
+async function loadLemmaWords(lemma) {
+    const container = document.querySelector(`[data-lemma="${lemma}"]`);
+    if (!container) return;
+
+    try {
+        // 获取当前单词，用于排除自身
+        const currentWord = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
+        const response = await fetch(
+            `/api/dict/lemma/${encodeURIComponent(lemma)}?limit=30&exclude_word=${encodeURIComponent(currentWord)}`
+        );
+        const data = await response.json();
+
+        if (data.words && data.words.length > 0) {
+            container.innerHTML = data.words.map(w => `
+                <div class="lemma-word-item">
+                    <div class="lemma-word">${escapeAndFormat(w.word)}</div>
+                    <div class="lemma-translation">${escapeAndFormat(w.translation || '')}</div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div class="no-data">未找到同词根词汇</div>';
+        }
+    } catch (err) {
+        container.innerHTML = '<div class="error">加载失败</div>';
+        console.error('加载同词根词汇失败:', err);
+    }
+}
+
+/**
+ * 异步加载例句（限制4句）
+ */
+async function loadExamples(word, lang) {
+    // 直接查找view层
+    const container = document.querySelector(`.view-examples[data-word="${word}"]`);
+    if (!container) return;
+
+    try {
+        const response = await fetch(`/api/dict/examples/${encodeURIComponent(word)}?lang=${lang}&limit=2`);
+        const data = await response.json();
+
+        if (data.examples && data.examples.length > 0) {
+            // 直接渲染到view层，不需要额外的examples-list容器
+            container.innerHTML = data.examples.map(ex => `
+                <div class="example-item">
+                    <div class="example-en clickable-text" data-text="${escapeAndFormat(ex.en)}">
+                        ${highlightWord(escapeAndFormat(ex.en), word)}
+                    </div>
+                    <div class="example-zh">${escapeAndFormat(ex.zh)}</div>
+                </div>
+            `).join('');
+            // 重新绑定点击事件
+            setupContentClickHandlers(container);
+        } else {
+            container.innerHTML = '<div class="no-data">暂无例句</div>';
+        }
+    } catch (err) {
+        container.innerHTML = '<div class="error">加载失败</div>';
+        console.error('加载例句失败:', err);
+    }
+}
+
+/**
+ * 视图切换后的回调（由 slider.js 调用）
+ */
+export function onViewChanged(position, wordInfo) {
+    const targetLang = getTargetLang();
+    const isChinese = targetLang === 'zh';
+    const word = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
+
+    if (isChinese) {
+        // 中文模式：第3页加载例句
+        if (position === 2 && word) {
+            loadExamples(word, targetLang);
+        }
+    } else {
+        // 英文模式
+        switch (position) {
+            case 1:  // 第2页：同词根词汇
+                const lemma = wordInfo?.lemma || '';
+                if (lemma && lemma !== '-') {
+                    loadLemmaWords(lemma);
+                }
+                break;
+            case 2:  // 第3页：例句
+                if (word) {
+                    loadExamples(word, targetLang);
+                }
+                break;
+        }
+    }
 }

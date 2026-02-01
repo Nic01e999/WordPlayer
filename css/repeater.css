@@ -195,17 +195,16 @@
 .slider-content {
     flex: 1;
     min-height: 3.125rem;
-    padding: clamp(0.5rem, 2vw, 0.9375rem);
+    padding: 0;
     background: var(--white-medium);
     border-radius: 0.75rem;
     border: 1px solid var(--border-pink-light);
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
     transition: opacity 0.15s ease, transform 0.15s ease;
-    overflow: auto;
 }
 
 .slider-content.fading {
@@ -327,11 +326,15 @@
 
 /* Mode 0: 音标+词性+翻译视图 */
 .view-phonetic-pos {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 12px;
+    padding: 16px;
     text-align: center;
+    justify-content: center;
 }
 
 .view-phonetic-pos .phonetic {
@@ -364,13 +367,26 @@
     margin-top: 0.25rem;
 }
 
+/* 中文第一页 - 汉字显示 */
+.chinese-word {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    margin: 20px 0;
+    line-height: 1.2;
+}
+
 /* 词性视图 - 并排布局 */
 .view-pos {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 0.375rem 1.25rem;
-    width: 100%;
     justify-content: center;
+    align-items: center;
+    padding: 16px;
 }
 
 .view-pos .pos-item {
@@ -385,9 +401,14 @@
 
 /* 例句视图 */
 .view-examples {
-    text-align: left;
-    max-width: 21.875rem;
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    text-align: left;
+    overflow-y: auto;
 }
 
 .example-sentence {
@@ -401,52 +422,32 @@
     line-height: 1.5;
 }
 
-/* 同义词/反义词视图 */
-.view-synonyms {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-}
-
-.syn-group, .ant-group {
-    display: block;
-    text-align: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.25rem, 4.5vw, 2rem);
-}
-
-.syn-label, .ant-label {
-    font-weight: 600;
-    color: var(--text-accent);
-    margin-right: 0.5rem;
-}
-
-.syn-words {
-    color: var(--status-success);
-}
-
-.ant-words {
-    color: var(--status-warning);
-}
 
 /* 空状态 */
 .view-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Cormorant Garamond', serif;
     font-size: 1rem;
     font-style: italic;
     color: var(--text-muted);
     text-align: center;
+    padding: 16px;
 }
 
 /* ===== 中文词性视图 ===== */
 .view-chinese-pos {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 0.375rem 1.25rem;
-    width: 100%;
     justify-content: center;
+    align-items: center;
+    padding: 16px;
 }
 
 .view-chinese-pos .pos-item {
@@ -583,6 +584,7 @@
 
 /* ===== 重复模式自适应布局 ===== */
 body.repeater-mode #repeaterView {
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     height: calc(100vh - 4.5rem); /* 从 6.25rem 改为 4.5rem */
@@ -623,11 +625,13 @@ body.repeater-mode #repeaterView {
 
 /* ===== 难度等级视图 ===== */
 .view-difficulty {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    width: 100%;
-    padding: 0.5rem;
+    padding: 16px;
+    justify-content: center;
 }
 
 .difficulty-item {
@@ -704,4 +708,251 @@ body.repeater-mode #repeaterView {
     padding: 0.25rem 0.75rem;
     background: var(--bg-hover);
     border-radius: 0.5rem;
+}
+
+
+/* ==================== 第1页：核心信息 ==================== */
+
+.view-core-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 24px;
+    margin: 0 auto;
+}
+
+.phonetic-large {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+}
+
+.translation-main {
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.6;
+}
+
+.difficulty-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.badge.collins {
+    color: #e74c3c;
+}
+
+.badge.oxford {
+    color: #3498db;
+}
+
+.badge.frequency {
+    color: #2ecc71;
+}
+
+/* ==================== 第2页：同词根词汇（Flex布局） ==================== */
+
+/* 第2页：同词根词汇 - 直接Flex布局，无额外容器 */
+.view-word-forms-lemma {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+    overflow-y: auto;
+}
+
+/* 同词根词汇容器 - Flex布局 */
+.lemma-words-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    min-height: 100px;
+}
+
+.lemma-word-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    border: 0.2rem dashed var(--border-pink-light);
+    border-radius: 3rem;
+
+    
+}
+
+.lemma-word-item:hover {
+    background: rgba(255, 220, 220, 0.15);
+    transform: translateY(-2px) scale(1.1);
+}
+
+.lemma-word {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: var(--text-primary);
+}
+
+.lemma-translation {
+    font-size: 0.9em;
+    opacity: 0.8;
+    color: var(--text-secondary);
+}
+
+.loading,
+.no-data,
+.error {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.error {
+    color: #e74c3c;
+}
+
+
+
+/* ==================== 通用：空视图 ==================== */
+
+.view-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+/*         ========= 通用 第3页：例句（Flex布局）=======     */
+
+/* 第3页：例句 - 直接Flex布局，无额外容器 */
+
+
+.example-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.example-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.example-en {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.example-zh {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.examples-loading,
+.examples-empty,
+.examples-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.examples-error {
+    color: #e74c3c;
+}
+/* ==================== 中文模式样式 ==================== */
+
+/* 中文第一页 - 格式化显示 */
+.main-translation {
+    text-align: center;
+    line-height: 1.8;
+    font-size: 1.2em;
+    margin: 16px 0;
+    color: var(--text-primary);
+}
+
+.cl-info {
+    font-size: 1.1em;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.traditional-text {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-top: 8px;
+}
+
+.difficulty-badge {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: rgba(52, 152, 219, 0.3);
+    border-radius: 8px;
+    font-size: 1em;
+    text-align: center;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* 中文第二页 - 英文翻译 */
+.english-translations {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px;
+}
+
+.translation-line {
+    font-size: 2rem;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.translation-line:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(4px);
 }

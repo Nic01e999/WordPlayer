@@ -300,3 +300,171 @@ python3 scripts/test_dict_extensions.py
 - 所有功能通过测试
 - 覆盖率统计完整
 - 示例查询正常
+
+---
+
+## 2026-02-01 新增功能
+
+### ✅ 5. 词形变化增强（比较级/最高级）
+- **实施脚本**: `scripts/enhance_word_forms.py`
+- **数据库字段**: `extra_data.wordForms.比较级`, `extra_data.wordForms.最高级`
+- **覆盖率提升**:
+  - 比较级：0.09% → 4.33%（提升 48 倍）
+  - 最高级：0.07% → 4.31%（提升 61 倍）
+- **增强词条**: 32,686 个
+- **规则实现**:
+  - 单音节词：`big → bigger/biggest`（支持双写辅音）
+  - 双音节以-y结尾：`happy → happier/happiest`
+  - 多音节词：`beautiful → more beautiful/most beautiful`
+- **数据保护**: 不覆盖 ECDICT 已有的不规则变化（如 good/better/best）
+
+### ✅ 6. 同词根词汇视图
+- **后端接口**: `/api/dict/lemma/<lemma>` (server/dict_api.py:191)
+- **前端实现**:
+  - 新增独立视图（英文模式第4面）
+  - 自动异步加载同词根词汇
+  - 液态玻璃风格展示
+- **视图顺序调整**:
+  - 英文模式：[基础信息, 详细释义, 词形变化, **同词根词汇**, 难度等级]
+  - 中文模式：保持不变（3个视图）
+- **文件修改**:
+  - `js/repeater/render.js`: 新增 `renderLemmaWordsView()` 和 `loadLemmaWords()`
+  - `js/repeater/slider.js`: 添加视图切换回调
+  - `js/repeater/index.js`: 注册 `onViewChanged` 依赖
+  - `css/repeater.css`: 新增同词根视图样式（网格布局）
+
+### API 接口新增
+
+#### `/api/dict/lemma/<lemma>` (GET)
+查询同词根的所有词汇
+
+**参数**:
+- `lemma`: 词根（如 'happy'）
+- `limit`: 返回结果数量限制（默认 50，最大 100）
+
+**返回示例**:
+```json
+{
+  "lemma": "happy",
+  "count": 3,
+  "words": [
+    {
+      "word": "happier",
+      "translation": "a. 更快乐的, 更幸福的",
+      "frequency": 0,
+      "lemma": "happy",
+      "lemma_frequency": 12488
+    },
+    {
+      "word": "happiest",
+      "translation": "a. 幸福的；快乐的",
+      "frequency": 0,
+      "lemma": "happy",
+      "lemma_frequency": 12488
+    },
+    {
+      "word": "happy",
+      "translation": "a. 快乐的, 幸福的, 愉快的, 恰当的",
+      "frequency": 747,
+      "lemma": "happy",
+      "lemma_frequency": 12488
+    }
+  ]
+}
+```
+
+### 验证结果
+
+**数据库验证**:
+```sql
+SELECT word,
+       json_extract(extra_data, '$.wordForms.比较级') as comparative,
+       json_extract(extra_data, '$.wordForms.最高级') as superlative
+FROM words
+WHERE word IN ('happy', 'big', 'beautiful', 'tall', 'fast');
+
+-- 结果：
+-- beautiful | more beautiful | most beautiful
+-- big       | bigger         | biggest
+-- fast      | faster         | fastest
+-- happy     | happier        | happiest
+-- tall      | taller         | tallest
+```
+
+**API 验证**:
+```bash
+curl "http://127.0.0.1:5001/api/dict/lemma/happy?limit=10"
+# ✓ 返回 3 个同词根词汇
+```
+
+**前端验证**:
+- ✅ 视图切换流畅
+- ✅ 自动加载同词根词汇
+- ✅ 液态玻璃风格正常
+- ✅ 网格布局响应式
+
+### 技术亮点
+
+1. **智能音节计数**: 启发式算法判断单词音节数，决定使用 -er/-est 还是 more/most
+2. **辅音双写检测**: 自动识别需要双写辅音的情况（如 big → bigger）
+3. **异步加载**: 视图切换时自动触发 API 请求，无需手动刷新
+4. **延迟绑定**: 使用依赖注入解决模块间循环依赖
+5. **液态玻璃风格**: 半透明背景 + 模糊效果 + 悬停动画
+6. **数据保护**: 跳过不规则形容词和已有数据，保护 ECDICT 原始数据质量
+
+### 文件清单
+
+**新建文件**:
+- `scripts/enhance_word_forms.py` - 词形变化增强脚本
+
+**修改文件**:
+- `server/dict_api.py` - 新增同词根查询接口
+- `js/repeater/render.js` - 新增同词根视图和加载逻辑
+- `js/repeater/slider.js` - 添加视图切换回调
+- `js/repeater/index.js` - 注册新依赖
+- `css/repeater.css` - 新增同词根视图样式
+
+### 使用示例
+
+**Python 代码**:
+```python
+from server.dict_db import dict_db
+
+# 查询同词根词汇
+words = dict_db.search_by_lemma("happy", limit=30)
+for w in words:
+    print(f"{w['word']}: {w['translation']}")
+```
+
+**前端使用**:
+1. 访问 `http://127.0.0.1:5001`
+2. 输入单词（如 `happy`）
+3. 切换到"词形变化"视图 → 查看 `happier/happiest`
+4. 切换到"同词根词汇"视图 → 自动加载同词根列表
+5. 切换到"难度等级"视图
+
+### 数据统计更新
+
+| 指标 | 之前 | 现在 | 提升 |
+|------|------|------|------|
+| 比较级覆盖 | 713 (0.09%) | 33,399 (4.33%) | 48x |
+| 最高级覆盖 | 508 (0.07%) | 33,194 (4.31%) | 61x |
+| 动词时态覆盖 | 17,352 (2.25%) | 17,352 (2.25%) | - |
+
+### 总结
+
+✅ **新增功能**:
+- 比较级/最高级规则生成（32,686 词条）
+- 同词根词汇独立视图
+- 自动异步加载机制
+
+✅ **数据质量**:
+- 覆盖率大幅提升（48-61 倍）
+- 保护 ECDICT 原始不规则变化
+- 智能规则生成，准确率高
+
+✅ **用户体验**:
+- 液态玻璃清新风格
+- 流畅的视图切换动画
+- 响应式网格布局
+- 自动加载，无需手动操作

@@ -12,7 +12,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 class Config:
     # 数据库配置
     DATABASE_PATH = os.environ.get('DATABASE_PATH',
-        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'dictation.db'))
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'databases', 'user_data.db'))
 
     # SMTP 配置（忘记密码功能需要）
     SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.qq.com')

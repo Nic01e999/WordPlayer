@@ -192,9 +192,7 @@ export async function startPreload(forceReload = false) {
                 word,
                 translation: definition,
                 definitions: [],
-                examples: [],
-                synonyms: [],
-                antonyms: []
+                examples: []
             };
             translationLoaded++;
         } else if (!preloadCache.wordInfo[word] && !isValidWord(word)) {
@@ -206,9 +204,7 @@ export async function startPreload(forceReload = false) {
                 word,
                 translation: invalidMsg,
                 definitions: [],
-                examples: [],
-                synonyms: [],
-                antonyms: []
+                examples: []
             };
             translationLoaded++;
         } else if (preloadCache.wordInfo[word]) {
@@ -264,7 +260,7 @@ export async function startPreload(forceReload = false) {
             if (myId !== preloadCache.loadId) return;
 
             const batch = wordsToFetch.slice(i, i + BATCH_SIZE);
-            console.log('[DeepSeek] 开始请求批次:', batch, 'targetLang:', targetLang, 'translationLang:', translationLang);
+            console.log('[请求] 开始请求批次:', batch, 'targetLang:', targetLang, 'translationLang:', translationLang);
 
             // 请求 DeepSeek 获取完整单词信息
             let deepseekData = null;
@@ -283,7 +279,7 @@ export async function startPreload(forceReload = false) {
                     deepseekData = await detailsRes.json();
                 }
             } catch (e) {
-                console.log('[DeepSeek] 请求失败:', e.message);
+                console.log('[请求] 请求失败:', e.message);
             }
 
             if (myId !== preloadCache.loadId) return;
@@ -304,9 +300,7 @@ export async function startPreload(forceReload = false) {
                         translation: errorMsg,
                         nativeDefinitions: [],
                         targetDefinitions: [],
-                        examples: { common: [], fun: [] },
-                        synonyms: [],
-                        antonyms: []
+                        examples: {}
                     };
                     preloadCache.wordInfo[word] = wordInfo;
                     preloadCache.translations[word] = errorMsg;
@@ -318,12 +312,14 @@ export async function startPreload(forceReload = false) {
                     const wordInfo = {
                         word,
                         phonetic: info.phonetic || '',
+                        pinyin: info.pinyin || '',
                         translation: info.translation || t('noTranslation'),
                         nativeDefinitions: Array.isArray(info.nativeDefinitions) ? info.nativeDefinitions : [],
                         targetDefinitions: info.targetDefinitions || [],
                         examples: info.examples || { common: [], fun: [] },
-                        synonyms: info.synonyms || [],
-                        antonyms: info.antonyms || []
+                        wordForms: info.wordForms || {},
+                        lemma: info.lemma || '',
+                        lemma_frequency: info.lemma_frequency || 0
                     };
 
                     preloadCache.wordInfo[word] = wordInfo;
