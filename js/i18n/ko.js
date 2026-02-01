@@ -175,12 +175,31 @@ export default {
 
     // 반복 모드
     playCount: '재생 {current}/{total}',
+    wordProgress: '단어 {current}/{total} ({percentage}%)',
     noDefinitions: '정의가 없습니다',
     noExamples: '예문이 없습니다',
     noSynonyms: '동의어/반의어가 없습니다',
+    noDifficultyInfo: '난이도 정보가 없습니다',
     syn: '동',
     ant: '반',
     noWordsProvided: '단어를 입력하세요',
+
+    // 어형 변화
+    wordFormPast: '과거형',
+    wordFormPastParticiple: '과거분사',
+    wordFormDoing: '현재분사',
+    wordFormThird: '3인칭 단수',
+    wordFormComparative: '비교급',
+    wordFormSuperlative: '최상급',
+    wordFormPlural: '복수형',
+    wordFormLemma: '원형',
+    wordFormRoot: '어근',
+
+    // 난이도 레벨
+    collinsStars: '콜린스 별점',
+    oxford3000: '옥스퍼드 3000',
+    coreVocabulary: '핵심 어휘',
+    frequencyRank: '빈도 순위',
 
     // 카드 색상
     colorOriginal: '원본',

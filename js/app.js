@@ -178,6 +178,9 @@ function initSettingsListeners() {
                 currentRepeaterState.settings.accent = value;
             }
             await saveSettingToServer('accent', value);
+
+            // 立即刷新当前模式（与 shuffle/slow 保持一致）
+            refreshCurrentMode();
         });
     });
 

@@ -177,12 +177,31 @@ export default {
 
     // 复读模式
     playCount: '播放 {current}/{total}',
+    wordProgress: '单词 {current}/{total} ({percentage}%)',
     noDefinitions: '暂无释义',
     noExamples: '暂无例句',
     noSynonyms: '暂无同/反义词',
+    noDifficultyInfo: '暂无难度信息',
     syn: '近',
     ant: '反',
     noWordsProvided: '请输入单词',
+
+    // 词形变化
+    wordFormPast: '过去式',
+    wordFormPastParticiple: '过去分词',
+    wordFormDoing: '现在分词',
+    wordFormThird: '第三人称单数',
+    wordFormComparative: '比较级',
+    wordFormSuperlative: '最高级',
+    wordFormPlural: '复数',
+    wordFormLemma: '原型',
+    wordFormRoot: '词根',
+
+    // 难度等级
+    collinsStars: '柯林斯星级',
+    oxford3000: '牛津3000核心词汇',
+    coreVocabulary: '核心词汇',
+    frequencyRank: '词频排名',
 
     // 卡片颜色
     colorOriginal: '原色',

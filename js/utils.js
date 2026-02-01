@@ -110,6 +110,9 @@ export function detectLanguageFromInput(content) {
 export function setTargetLang(lang) {
     if (['en', 'ja', 'ko', 'zh'].includes(lang)) {
         detectedTargetLang = lang;
+
+        // 语言切换后，如果在复读模式中，会在下次渲染时自动调整滑块位置
+        // 参见 js/repeater/render.js 中的 renderSliderContent 函数
     }
 }
 

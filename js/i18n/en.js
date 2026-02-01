@@ -178,12 +178,31 @@ export default {
 
     // Repeater mode
     playCount: 'Play {current}/{total}',
+    wordProgress: 'Word {current}/{total} ({percentage}%)',
     noDefinitions: 'No definitions available',
     noExamples: 'No examples available',
     noSynonyms: 'No synonyms/antonyms available',
+    noDifficultyInfo: 'No difficulty information available',
     syn: 'Syn',
     ant: 'Ant',
     noWordsProvided: 'No words provided',
+
+    // Word forms
+    wordFormPast: 'Past',
+    wordFormPastParticiple: 'Past Participle',
+    wordFormDoing: 'Present Participle',
+    wordFormThird: '3rd Person Singular',
+    wordFormComparative: 'Comparative',
+    wordFormSuperlative: 'Superlative',
+    wordFormPlural: 'Plural',
+    wordFormLemma: 'Lemma',
+    wordFormRoot: 'Root',
+
+    // Difficulty levels
+    collinsStars: 'Collins Stars',
+    oxford3000: 'Oxford 3000',
+    coreVocabulary: 'Core Vocabulary',
+    frequencyRank: 'Frequency Rank',
 
     // Card colors
     colorOriginal: 'Original',

@@ -175,12 +175,31 @@ export default {
 
     // リピーターモード
     playCount: '再生 {current}/{total}',
+    wordProgress: '単語 {current}/{total} ({percentage}%)',
     noDefinitions: '定義がありません',
     noExamples: '例文がありません',
     noSynonyms: '同義語/反義語がありません',
+    noDifficultyInfo: '難易度情報がありません',
     syn: '同',
     ant: '反',
     noWordsProvided: '単語を入力してください',
+
+    // 語形変化
+    wordFormPast: '過去形',
+    wordFormPastParticiple: '過去分詞',
+    wordFormDoing: '現在分詞',
+    wordFormThird: '三人称単数',
+    wordFormComparative: '比較級',
+    wordFormSuperlative: '最上級',
+    wordFormPlural: '複数形',
+    wordFormLemma: '原形',
+    wordFormRoot: '語根',
+
+    // 難易度レベル
+    collinsStars: 'コリンズ星評価',
+    oxford3000: 'オックスフォード3000',
+    coreVocabulary: 'コア語彙',
+    frequencyRank: '頻度ランク',
 
     // カードの色
     colorOriginal: 'オリジナル',

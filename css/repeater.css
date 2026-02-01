@@ -587,3 +587,121 @@ body.repeater-mode #repeaterView {
     flex-direction: column;
     height: calc(100vh - 4.5rem); /* 从 6.25rem 改为 4.5rem */
 }
+
+/* ===== 词形变化视图 ===== */
+.view-word-forms {
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.word-forms-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1rem;
+    width: 100%;
+}
+
+.word-form-item {
+    display: flex;
+    align-items: baseline;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+}
+
+.word-form-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 5rem;
+    margin-right: 0.5rem;
+}
+
+.word-form-value {
+    color: var(--text-secondary);
+    font-weight: 600;
+    flex: 1;
+}
+
+/* ===== 难度等级视图 ===== */
+.view-difficulty {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.difficulty-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--bg-hover);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.difficulty-item:hover {
+    background: var(--bg-pink-overlay-light);
+    transform: translateX(2px);
+}
+
+.difficulty-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.difficulty-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.difficulty-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.difficulty-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* ===== 中文模式特殊样式 ===== */
+.view-phonetic-pos .traditional-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* ===== 进度信息样式 ===== */
+.progress-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.word-progress {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--text-count);
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-hover);
+    border-radius: 0.5rem;
+}
+
+.progress-info .play-count {
+    margin-top: 0;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-hover);
+    border-radius: 0.5rem;
+}

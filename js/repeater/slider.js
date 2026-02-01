@@ -3,8 +3,17 @@
  */
 
 import { currentRepeaterState, preloadCache } from '../state.js';
-import { escapeHtml } from '../utils.js';
+import { escapeHtml, getTargetLang } from '../utils.js';
 import { currentSliderPosition, setCurrentSliderPosition } from './state.js';
+
+/**
+ * 获取当前语言模式的最大索引
+ * @returns {number} 最大索引（中文2，英文3）
+ */
+function getMaxIndex() {
+    const targetLang = getTargetLang();
+    return targetLang === 'zh' ? 2 : 3;
+}
 
 // 延迟绑定
 let _pauseIfPlaying = null;
@@ -26,7 +35,8 @@ export function sliderLeft() {
 }
 
 export function sliderRight() {
-    if (currentSliderPosition < 3) {
+    const maxIndex = getMaxIndex();
+    if (currentSliderPosition < maxIndex) {
         const newPos = currentSliderPosition + 1;
         updateSliderUI(newPos);
         animateContentSwitch(newPos);
@@ -37,12 +47,13 @@ export function updateSliderUI(position) {
     const slider = document.getElementById('appleSlider');
     if (!slider) return;
 
+    const maxIndex = getMaxIndex();
     const thumb = slider.querySelector('.apple-slider-thumb');
     const fill = slider.querySelector('.apple-slider-fill');
     const labels = slider.querySelectorAll('.apple-slider-label');
 
-    if (thumb) thumb.style.left = `${(position / 3) * 100}%`;
-    if (fill) fill.style.width = `${(position / 3) * 100}%`;
+    if (thumb) thumb.style.left = `${(position / maxIndex) * 100}%`;
+    if (fill) fill.style.width = `${(position / maxIndex) * 100}%`;
     labels?.forEach((l, i) => l.classList.toggle('active', i === position));
 }
 
@@ -58,6 +69,7 @@ export function setupSliderListeners() {
     if (slider.dataset.listenersInitialized) return;
     slider.dataset.listenersInitialized = 'true';
 
+    const maxIndex = getMaxIndex();
     let isDragging = false;
     let dragStartX = 0;
 
@@ -68,7 +80,7 @@ export function setupSliderListeners() {
     };
 
     const getNearestNode = (ratio) => {
-        return Math.round(ratio * 3);
+        return Math.round(ratio * maxIndex);
     };
 
     const updateThumbPosition = (ratio) => {
@@ -80,7 +92,7 @@ export function setupSliderListeners() {
     const snapToNode = (nodeIndex) => {
         thumb.classList.remove('dragging');
         fill.classList.remove('no-transition');
-        const percent = (nodeIndex / 3) * 100;
+        const percent = (nodeIndex / maxIndex) * 100;
         thumb.style.left = `${percent}%`;
         fill.style.width = `${percent}%`;
 
@@ -151,7 +163,7 @@ export function setupSliderListeners() {
     slider.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
             e.preventDefault();
-            const next = Math.min(3, currentSliderPosition + 1);
+            const next = Math.min(maxIndex, currentSliderPosition + 1);
             snapToNode(next);
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
             e.preventDefault();

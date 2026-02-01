@@ -3,9 +3,27 @@
  */
 
 import { currentRepeaterState, preloadCache } from '../state.js';
-import { $, showView, escapeHtml } from '../utils.js';
-import { currentSliderPosition } from './state.js';
+import { $, showView, escapeHtml, getTargetLang } from '../utils.js';
+import { currentSliderPosition, setCurrentSliderPosition } from './state.js';
 import { t } from '../i18n/index.js';
+
+/**
+ * 处理文本中的转义字符
+ * @param {string} text - 原始文本
+ * @returns {string} - 处理后的 HTML
+ */
+function escapeAndFormat(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, '&amp;')   // 先转义 HTML 特殊字符
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/\\n/g, '<br>')  // 将 \n 转换为 <br>
+        .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')  // 将 \t 转换为空格
+        .replace(/\\\\/g, '\\');  // 将 \\ 转换为 \
+}
 
 // 延迟绑定
 let _setupScrollListener = null;
@@ -59,9 +77,17 @@ export function updateInfo() {
         contentHTML = renderSliderContent(wordInfo, simpleTranslation);
     }
 
+    // 计算学习进度
+    const totalWords = words.length;
+    const currentWordNum = currentIndex + 1;
+    const percentage = Math.round((currentWordNum / totalWords) * 100);
+
     info.innerHTML = `
         ${contentHTML}
-        <div class="play-count">${t('playCount', { current: currentRepeat + 1, total: settings.repeat })}</div>
+        <div class="progress-info">
+            <span class="word-progress">${t('wordProgress', { current: currentWordNum, total: totalWords, percentage })}</span>
+            <span class="play-count">${t('playCount', { current: currentRepeat + 1, total: settings.repeat })}</span>
+        </div>
     `;
 
     if (!isCustomWord && !isPhrase) {
@@ -71,9 +97,27 @@ export function updateInfo() {
     }
 }
 
+/**
+ * 获取当前语言模式的页面数量
+ * @returns {number} 页面数量（中文3页，英文4页）
+ */
+function getPageCount() {
+    const targetLang = getTargetLang();
+    return targetLang === 'zh' ? 3 : 4;
+}
+
 export function renderSliderContent(wordInfo, translation) {
-    const position = currentSliderPosition;
-    const labels = ['', '', '', ''];
+    const pageCount = getPageCount();
+    const maxIndex = pageCount - 1;
+
+    // 检查当前位置是否超出新的最大索引，如果超出则调整
+    let position = currentSliderPosition;
+    if (position > maxIndex) {
+        position = maxIndex;
+        setCurrentSliderPosition(maxIndex);
+    }
+
+    const labels = Array(pageCount).fill('');
 
     return `
         <div class="slider-content" id="sliderContent">
@@ -87,11 +131,11 @@ export function renderSliderContent(wordInfo, translation) {
                 `).join('')}
             </div>
             <div class="apple-slider-track">
-                <div class="apple-slider-fill" style="width:${(position / 3) * 100}%"></div>
-                ${[0, 1, 2, 3].map(i => `
-                    <div class="apple-slider-node" style="left:${(i / 3) * 100}%"></div>
+                <div class="apple-slider-fill" style="width:${(position / maxIndex) * 100}%"></div>
+                ${Array.from({ length: pageCount }, (_, i) => `
+                    <div class="apple-slider-node" style="left:${(i / maxIndex) * 100}%"></div>
                 `).join('')}
-                <div class="apple-slider-thumb" style="left:${(position / 3) * 100}%"></div>
+                <div class="apple-slider-thumb" style="left:${(position / maxIndex) * 100}%"></div>
             </div>
         </div>
     `;
@@ -99,17 +143,35 @@ export function renderSliderContent(wordInfo, translation) {
 
 export function renderViewContent(position, wordInfo, translation) {
     const word = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
-    switch (position) {
-        case 0:
-            return renderNativePosView(wordInfo, translation);
-        case 1:
-            return renderPosView(wordInfo);
-        case 2:
-            return renderExamplesView(wordInfo, word);
-        case 3:
-            return renderSynonymsView(wordInfo);
-        default:
-            return '';
+    const targetLang = getTargetLang();
+    const isChinese = targetLang === 'zh';
+
+    // 中文模式：[基础信息, 详细释义, 难度等级]（跳过词形变化）
+    // 英文模式：[基础信息, 详细释义, 词形变化, 难度等级]
+    if (isChinese) {
+        switch (position) {
+            case 0:
+                return renderNativePosView(wordInfo, translation);
+            case 1:
+                return renderPosView(wordInfo);
+            case 2:
+                return renderDifficultyView(wordInfo);
+            default:
+                return '';
+        }
+    } else {
+        switch (position) {
+            case 0:
+                return renderNativePosView(wordInfo, translation);
+            case 1:
+                return renderPosView(wordInfo);
+            case 2:
+                return renderWordFormsView(wordInfo);
+            case 3:
+                return renderDifficultyView(wordInfo);
+            default:
+                return '';
+        }
     }
 }
 
@@ -117,6 +179,27 @@ export function renderViewContent(position, wordInfo, translation) {
  * Mode 0: 渲染音标 + 词性标签 + 母语翻译
  */
 function renderNativePosView(wordInfo, fallbackTranslation) {
+    const targetLang = getTargetLang();
+    const isChinese = targetLang === 'zh';
+
+    // 中文模式：显示拼音、繁体字、英文翻译
+    if (isChinese) {
+        const pinyin = wordInfo?.pinyin || '';
+        const traditional = wordInfo?.traditional || '';
+        const translation = wordInfo?.translation || fallbackTranslation || '...';
+        const pos = wordInfo?.pos || '';
+
+        return `
+            <div class="view-phonetic-pos">
+                ${pinyin ? `<div class="phonetic">${pinyin}</div>` : ''}
+                ${traditional ? `<div class="traditional-text">繁体: ${traditional}</div>` : ''}
+                ${pos ? `<div class="pos-tags"><span class="pos-tag">${pos}</span></div>` : ''}
+                <div class="main-translation">${escapeAndFormat(translation)}</div>
+            </div>
+        `;
+    }
+
+    // 英文模式：显示音标、词性标签、中文翻译
     const phonetic = wordInfo?.phonetic || '';
     const translation = wordInfo?.translation || fallbackTranslation || '...';
     // 兼容新旧字段: nativeDefinitions (新) / definitions (旧)
@@ -133,7 +216,7 @@ function renderNativePosView(wordInfo, fallbackTranslation) {
         <div class="view-phonetic-pos">
             ${phonetic ? `<div class="phonetic">${phonetic}</div>` : ''}
             ${posTags.length > 0 ? `<div class="pos-tags">${posTags.map(p => `<span class="pos-tag">${p}</span>`).join(' ')}</div>` : ''}
-            <div class="main-translation">${translation}</div>
+            <div class="main-translation">${escapeAndFormat(translation)}</div>
         </div>
     `;
 }
@@ -171,12 +254,17 @@ function renderPosView(wordInfo) {
     }
     return `
         <div class="view-pos">
-            ${defs.map(def => `
-                <div class="pos-item">
-                    <span class="pos-tag">${def.pos}</span>
-                    <span class="pos-meaning">${Array.isArray(def.meanings) ? def.meanings.slice(0, 2).join('; ') : def.meanings}</span>
-                </div>
-            `).join('')}
+            ${defs.map(def => {
+                const meanings = Array.isArray(def.meanings)
+                    ? def.meanings.slice(0, 2).map(m => escapeAndFormat(m)).join('; ')
+                    : escapeAndFormat(def.meanings);
+                return `
+                    <div class="pos-item">
+                        <span class="pos-tag">${def.pos}</span>
+                        <span class="pos-meaning">${meanings}</span>
+                    </div>
+                `;
+            }).join('')}
         </div>
     `;
 }
@@ -240,6 +328,90 @@ function renderSynonymsView(wordInfo) {
                 <div class="ant-group">
                     <span class="ant-label">${t('ant')}:</span>
                     <span class="ant-words">${renderClickableWords(antonyms.slice(0, 3))}</span>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/**
+ * 渲染词形变化页面（英文模式专用）
+ */
+function renderWordFormsView(wordInfo) {
+    const wordForms = wordInfo?.wordForms || {};
+
+    const forms = [
+        { key: 'past', label: t('wordFormPast') },
+        { key: 'pastParticiple', label: t('wordFormPastParticiple') },
+        { key: 'doing', label: t('wordFormDoing') },
+        { key: 'third', label: t('wordFormThird') },
+        { key: 'comparative', label: t('wordFormComparative') },
+        { key: 'superlative', label: t('wordFormSuperlative') },
+        { key: 'plural', label: t('wordFormPlural') },
+        { key: 'lemma', label: t('wordFormLemma') },
+        { key: 'root', label: t('wordFormRoot') }
+    ];
+
+    return `
+        <div class="view-word-forms">
+            <div class="word-forms-grid">
+                ${forms.map(form => {
+                    const value = wordForms[form.key] || '-';
+                    return `
+                        <div class="word-form-item">
+                            <span class="word-form-label">${form.label}:</span>
+                            <span class="word-form-value">${escapeAndFormat(value)}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 渲染难度等级页面
+ */
+function renderDifficultyView(wordInfo) {
+    const meta = wordInfo?.meta || {};
+    const collins = meta.collins || 0;
+    const oxford = meta.oxford || false;
+    const frequency = meta.frequency || 0;
+
+    // 如果没有任何难度信息
+    if (!collins && !oxford && !frequency) {
+        return `<div class="view-empty">${t('noDifficultyInfo')}</div>`;
+    }
+
+    return `
+        <div class="view-difficulty">
+            ${collins > 0 ? `
+                <div class="difficulty-item">
+                    <div class="difficulty-icon">⭐</div>
+                    <div class="difficulty-content">
+                        <div class="difficulty-label">${t('collinsStars')}</div>
+                        <div class="difficulty-value">
+                            ${'★'.repeat(collins)}${'☆'.repeat(5 - collins)} (${collins}/5)
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+            ${oxford ? `
+                <div class="difficulty-item">
+                    <div class="difficulty-icon">🎓</div>
+                    <div class="difficulty-content">
+                        <div class="difficulty-label">${t('oxford3000')}</div>
+                        <div class="difficulty-value">✓ ${t('coreVocabulary')}</div>
+                    </div>
+                </div>
+            ` : ''}
+            ${frequency > 0 ? `
+                <div class="difficulty-item">
+                    <div class="difficulty-icon">📊</div>
+                    <div class="difficulty-content">
+                        <div class="difficulty-label">${t('frequencyRank')}</div>
+                        <div class="difficulty-value">#${frequency}</div>
+                    </div>
                 </div>
             ` : ''}
         </div>
