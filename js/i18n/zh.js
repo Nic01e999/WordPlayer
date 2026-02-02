@@ -216,5 +216,16 @@ export default {
     colorPastel3: '淡紫粉',
     colorNavy: '金蓝',
     colorLime: '绿黄',
-    colorSlate: '灰蓝'
+    colorSlate: '灰蓝',
+
+    // 指引模块
+    guidePrevious: '上一步',
+    guideClose: '关闭',
+    guideNext: '下一步',
+
+    // 其他消息
+    shareError: '生成失败',
+    noLemmaWords: '未找到同词根词汇',
+    loadFailed: '加载失败',
+    savedToDownload: '已保存到下载'
 };

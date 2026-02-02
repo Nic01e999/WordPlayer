@@ -95,12 +95,14 @@
     margin-top: 0.75rem;
     text-align: center;
     padding: 1.875rem 2.5rem;
+    margin-bottom: 5rem;
     background: var(--bg-container);
     border: 1px solid var(--border-pink-light);
     border-radius: 1.25rem;
     box-shadow: 0 4px 20px var(--shadow-pink-light);
     flex: 1;
     min-height: 0;
+    overflow-y: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -206,6 +208,7 @@
     border: 1px solid var(--border-pink-light);
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+    overflow: auto;
     display: flex;
     align-items: stretch;
     justify-content: stretch;
@@ -407,13 +410,11 @@
 /* 例句视图 */
 .view-examples {
     width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding: 16px;
     text-align: left;
-    overflow-y: auto;
 }
 
 .example-sentence {
@@ -593,6 +594,7 @@ body.repeater-mode #repeaterView {
     flex-direction: column;
     height: 100%;
 }
+
 
 /* ===== 词形变化视图 ===== */
 .view-word-forms {
@@ -774,7 +776,6 @@ body.repeater-mode #repeaterView {
 /* 第2页：同词根词汇 - 直接Flex布局，无额外容器 */
 .view-word-forms-lemma {
     width: 100%;
-    height: 100%;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -782,7 +783,6 @@ body.repeater-mode #repeaterView {
     justify-content: flex-start;
     align-items: flex-start;
     align-content: flex-start;
-    overflow-y: auto;
 }
 
 /* 同词根词汇容器 - Flex布局 */

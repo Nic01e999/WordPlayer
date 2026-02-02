@@ -89,6 +89,9 @@ export default {
     backToLogin: 'ログインに戻る',
     resendCode: 'コードを再送信',
     processing: '処理中...',
+    sending: '送信中...',
+    emailRequired: 'メールアドレスを入力してください',
+    codeRequired: '認証コードを入力してください',
     passwordMismatch: 'パスワードが一致しません',
     operationFailed: '操作に失敗しました。後でもう一度お試しください',
     networkError: 'ネットワークエラー、後でもう一度お試しください',
@@ -150,7 +153,6 @@ export default {
     langEnglish: '英語',
     langJapanese: '日本語',
     langKorean: '韓国語',
-    langFrench: 'フランス語',
     langChinese: '中国語',
     langWord: '単語',
 
@@ -214,5 +216,16 @@ export default {
     colorPastel3: 'ライトパープルピンク',
     colorNavy: 'ゴールドブルー',
     colorLime: 'グリーンイエロー',
-    colorSlate: 'グレーブルー'
+    colorSlate: 'グレーブルー',
+
+    // ガイドモジュール
+    guidePrevious: '前へ',
+    guideClose: '閉じる',
+    guideNext: '次へ',
+
+    // その他のメッセージ
+    shareError: '生成に失敗しました',
+    noLemmaWords: '語根が同じ単語が見つかりません',
+    loadFailed: '読み込みに失敗しました',
+    savedToDownload: 'ダウンロードに保存されました'
 };

@@ -3,6 +3,8 @@
  * 提供图片播放器功能，用于显示用户指引
  */
 
+import { t } from './i18n/index.js';
+
 // 指引图片配置（使用CSS渐变作为占位图片）
 const guideImages = {
     home: [
@@ -76,7 +78,7 @@ export function showGuide(mode = 'home') {
 
     const prevBtn = document.createElement('button');
     prevBtn.className = 'guide-btn guide-btn-prev';
-    prevBtn.textContent = '上一步';
+    prevBtn.textContent = t('guidePrevious');
     prevBtn.onclick = () => prevImage();
 
     const progress = document.createElement('span');
@@ -84,12 +86,12 @@ export function showGuide(mode = 'home') {
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'guide-btn guide-btn-close';
-    closeBtn.textContent = '关闭';
+    closeBtn.textContent = t('guideClose');
     closeBtn.onclick = () => closeGuide();
 
     const nextBtn = document.createElement('button');
     nextBtn.className = 'guide-btn guide-btn-next';
-    nextBtn.textContent = '下一步';
+    nextBtn.textContent = t('guideNext');
     nextBtn.onclick = () => nextImage();
 
     nav.appendChild(prevBtn);

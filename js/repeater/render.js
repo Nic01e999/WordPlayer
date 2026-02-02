@@ -539,10 +539,10 @@ async function loadLemmaWords(lemma) {
                 </div>
             `).join('');
         } else {
-            container.innerHTML = '<div class="no-data">未找到同词根词汇</div>';
+            container.innerHTML = '<div class="no-data">' + t('noLemmaWords') + '</div>';
         }
     } catch (err) {
-        container.innerHTML = '<div class="error">加载失败</div>';
+        container.innerHTML = '<div class="error">' + t('loadFailed') + '</div>';
         console.error('加载同词根词汇失败:', err);
     }
 }
@@ -575,7 +575,7 @@ async function loadExamples(word, lang) {
             container.innerHTML = '<div class="no-data">暂无例句</div>';
         }
     } catch (err) {
-        container.innerHTML = '<div class="error">加载失败</div>';
+        container.innerHTML = '<div class="error">' + t('loadFailed') + '</div>';
         console.error('加载例句失败:', err);
     }
 }

@@ -153,7 +153,6 @@ export default {
     langEnglish: 'English',
     langJapanese: 'Japanese',
     langKorean: 'Korean',
-    langFrench: 'French',
     langChinese: 'Chinese',
     langWord: 'words',
 
@@ -217,5 +216,16 @@ export default {
     colorPastel3: 'Light Purple-Pink',
     colorNavy: 'Gold-Blue',
     colorLime: 'Green-Yellow',
-    colorSlate: 'Gray-Blue'
+    colorSlate: 'Gray-Blue',
+
+    // Guide module
+    guidePrevious: 'Previous',
+    guideClose: 'Close',
+    guideNext: 'Next',
+
+    // Additional messages
+    shareError: 'Failed to generate share',
+    noLemmaWords: 'No lemma words found',
+    loadFailed: 'Load failed',
+    savedToDownload: 'Saved to downloads'
 };

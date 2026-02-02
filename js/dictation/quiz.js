@@ -344,7 +344,7 @@ async function shareResult(result) {
         // 3. 检查 html2canvas 是否可用
         if (typeof html2canvas === 'undefined') {
             console.error('[Quiz] html2canvas 库未加载，无法生成分享图片');
-            btn.textContent = t('shareError') || '生成失败';
+            btn.textContent = t('shareError');
             setTimeout(() => {
                 btn.textContent = originalText;
                 btn.disabled = false;
@@ -398,7 +398,7 @@ async function shareResult(result) {
 
         // 7. 清理和提示
         document.body.removeChild(container);
-        btn.textContent = copySuccess ? t('copySuccess') : '已保存到下载';
+        btn.textContent = copySuccess ? t('copySuccess') : t('savedToDownload');
         setTimeout(() => {
             btn.textContent = originalText;
             btn.disabled = false;

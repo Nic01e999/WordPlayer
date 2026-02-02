@@ -42,7 +42,7 @@ body::before {
     display: flex;
     height: 100vh;
     width: 100vw;
-    margin-bottom: -10rem;
+    margin-bottom: -14rem;
     min-height: 0;
     position: relative;
     z-index: 1;
@@ -51,10 +51,10 @@ body::before {
 /* ===== 模式视图容器 ===== */
 .mode-view {
     display: none;
-    height: 100vh;
+    /* height: 100vh; */
     width: 100vw;
     padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 0rem;
-    margin-bottom: 20vh;
+    /* margin-bottom: 20vh; */
     background: transparent;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -92,7 +92,8 @@ body::before {
 /*======================= 复读器主容器 =========================*/
 .repeater-container {
     position: relative;
-    height: clamp(13.75rem, calc(100vh - 26.25rem), 25rem);
+    flex: 1;
+    min-height: 15rem;
     overflow: hidden;
     border-radius: 1.5625rem;
     perspective: 800px;
@@ -100,7 +101,6 @@ body::before {
     border: 1px solid var(--border-pink-light);
     box-shadow: 0 8px 30px var(--shadow-pink-light);
     background: var(--bg-container);
-    flex-shrink: 0;
 }
 
 /* ==============================听写工作区容器 =========================*/

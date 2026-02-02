@@ -13,7 +13,6 @@ const WEB_SPEECH_LANG_CODES = {
     en: { us: 'en-US', uk: 'en-GB' },
     ja: 'ja-JP',
     ko: 'ko-KR',
-    fr: 'fr-FR',
     zh: 'zh-CN'
 };
 

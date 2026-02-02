@@ -89,6 +89,9 @@ export default {
     backToLogin: '로그인으로 돌아가기',
     resendCode: '코드 재전송',
     processing: '처리 중...',
+    sending: '전송 중...',
+    emailRequired: '이메일을 입력하세요',
+    codeRequired: '인증 코드를 입력하세요',
     passwordMismatch: '비밀번호가 일치하지 않습니다',
     operationFailed: '작업에 실패했습니다. 나중에 다시 시도하세요',
     networkError: '네트워크 오류, 나중에 다시 시도하세요',
@@ -150,7 +153,6 @@ export default {
     langEnglish: '영어',
     langJapanese: '일본어',
     langKorean: '한국어',
-    langFrench: '프랑스어',
     langChinese: '중국어',
     langWord: '단어',
 
@@ -214,5 +216,16 @@ export default {
     colorPastel3: '라이트퍼플핑크',
     colorNavy: '골드블루',
     colorLime: '그린옐로',
-    colorSlate: '그레이블루'
+    colorSlate: '그레이블루',
+
+    // 가이드 모듈
+    guidePrevious: '이전',
+    guideClose: '닫기',
+    guideNext: '다음',
+
+    // 기타 메시지
+    shareError: '생성 실패',
+    noLemmaWords: '어근이 같은 단어를 찾을 수 없습니다',
+    loadFailed: '로드 실패',
+    savedToDownload: '다운로드에 저장됨'
 };

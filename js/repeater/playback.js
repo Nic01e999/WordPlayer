@@ -57,11 +57,13 @@ function waitSpeechEnd(myId) {
                 state.currentIndex = 0;
             }
 
-            _highlightCurrent?.();
-            _scrollToIndex?.(state.currentIndex);
-
+            // ✅ 延迟后再更新 UI 和播放音频，确保信息面板和声音同步
             const interval = state.settings.interval;
-            setTimeout(() => playCurrentWord(myId), interval);
+            setTimeout(() => {
+                _highlightCurrent?.();
+                _scrollToIndex?.(state.currentIndex);
+                playCurrentWord(myId);
+            }, interval);
             return;
         }
 
@@ -82,12 +84,18 @@ function waitSpeechEnd(myId) {
                     state.currentIndex = 0;
                 }
 
-                _highlightCurrent?.();
-                _scrollToIndex?.(state.currentIndex);
+                // ✅ 延迟后再更新 UI 和播放音频，确保信息面板和声音同步
+                const interval = state.settings.interval;
+                setTimeout(() => {
+                    _highlightCurrent?.();
+                    _scrollToIndex?.(state.currentIndex);
+                    playCurrentWord(myId);
+                }, interval);
+            } else {
+                // 同一单词重复播放，直接延迟播放即可
+                const interval = state.settings.interval;
+                setTimeout(() => playCurrentWord(myId), interval);
             }
-
-            const interval = state.settings.interval;
-            setTimeout(() => playCurrentWord(myId), interval);
         }
     }, 100);
 }
