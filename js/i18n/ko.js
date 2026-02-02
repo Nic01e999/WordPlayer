@@ -145,7 +145,6 @@ export default {
     warnWebSpeech: 'Youdao TTS 실패, Web Speech 시도: {error}',
     warnNoWebSpeech: '브라우저가 Web Speech API를 지원하지 않습니다',
     warningInvalidLang: '⚠️ {lang}만 입력 가능합니다',
-    mixedLanguageWarning: '같은 언어로 입력해주세요',
 
     // 언어 이름
     langEnglish: '영어',

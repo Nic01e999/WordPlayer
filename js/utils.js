@@ -489,36 +489,6 @@ export function bindSettingControls(bindings) {
 }
 
 /**
- * 检测输入文本中的所有单词是否属于同一种语言
- * @param {string} content - 输入文本
- * @returns {Object} { consistent: boolean, detectedLangs: string[] }
- */
-export function checkLanguageConsistency(content) {
-    const lines = content.split(/\r?\n/);
-    const detectedLangs = new Set();
-
-    for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-
-        const colonIdx = trimmed.indexOf(':');
-        const wordPart = colonIdx !== -1 ? trimmed.substring(0, colonIdx).trim() : trimmed;
-
-        if (wordPart) {
-            const lang = detectLanguage(wordPart);
-            if (lang) {
-                detectedLangs.add(lang);
-            }
-        }
-    }
-
-    return {
-        consistent: detectedLangs.size <= 1,
-        detectedLangs: Array.from(detectedLangs)
-    };
-}
-
-/**
  * 显示 Toast 提示消息
  * @param {string} message - 提示消息
  * @param {string|number} typeOrDuration - 类型（'error', 'success', 'info'）或显示时长（毫秒）

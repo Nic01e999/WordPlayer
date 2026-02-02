@@ -564,5 +564,5 @@ body.dictation-mode #dictationWorkplace::after {
 }
 
 .share-details .failed {
-    color: var(--status-failed);
+    color: var(--status-error);
 }

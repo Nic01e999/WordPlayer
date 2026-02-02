@@ -3,10 +3,26 @@
  */
 
 import { preloadCache } from '../state.js';
-import { $, logToWorkplace } from '../utils.js';
+import { $, logToWorkplace, escapeHtml } from '../utils.js';
 import { stopAudio, speakWord, updatePlayPauseBtn } from '../audio.js';
-import { initDrag, clearDragCleanupFns } from './drag.js';
+import { createPositionDragger } from '../utils/drag.js';
 import { t } from '../i18n/index.js';
+
+/**
+ * 格式化翻译文本：转换换行符并限制显示行数
+ * @param {string} text - 原始翻译文本
+ * @param {number} maxLines - 最大显示行数，默认为 2
+ * @returns {string} - 格式化后的 HTML
+ */
+function formatTranslation(text, maxLines = 2) {
+    if (!text) return '';
+
+    // 分割成行，过滤空行
+    const lines = text.split(/\\n|\n/).filter(line => line.trim());
+
+    // 只取前 maxLines 行，转义 HTML 并用 <br> 连接
+    return lines.slice(0, maxLines).map(escapeHtml).join('<br>');
+}
 
 // 状态引用（由 index.js 设置）
 let _getState = null;
@@ -14,6 +30,9 @@ let _setState = null;
 
 // 保存最后一次听写结果供分享使用
 let lastDictationResult = null;
+
+// 拖拽处理器
+let dragHandler = null;
 
 export function setQuizDeps(deps) {
     _getState = deps.getState;
@@ -94,7 +113,17 @@ export function showPopup() {
     `;
 
     document.body.append(popup);
-    initDrag(popup);
+
+    // 初始化拖拽
+    const handle = popup.querySelector('.popup-drag-handle');
+    if (handle) {
+        popup.style.position = 'absolute';
+        popup.style.transform = 'rotate(-1deg)';
+        dragHandler = createPositionDragger(popup, handle, {
+            onStart: () => popup.classList.add('dragging'),
+            onEnd: () => popup.classList.remove('dragging')
+        });
+    }
 
     if (!s.isPaused) {
         setTimeout(() => play(), 500);
@@ -110,7 +139,10 @@ export function showPopup() {
 }
 
 export function closePopup() {
-    clearDragCleanupFns();
+    if (dragHandler) {
+        dragHandler.destroy();
+        dragHandler = null;
+    }
     $("dictationPopup")?.remove();
 }
 
@@ -188,7 +220,7 @@ export function updateWorkplace() {
             }
 
             const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">${s.entries[i].word} - ${s.entries[i].definition || preloadCache.translations[s.entries[i].word] || ''}</span>`
+                ? `<br><span class="correct">${s.entries[i].word} - ${formatTranslation(s.entries[i].definition || preloadCache.translations[s.entries[i].word] || '')}</span>`
                 : '';
 
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
@@ -333,21 +365,47 @@ async function shareResult(result) {
         // 5. 转换为 Blob
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
-        // 6. 复制到剪贴板
-        await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-        ]);
+        // 6. 复制到剪贴板（带兼容性检查）
+        let copySuccess = false;
+        if (navigator.clipboard && typeof navigator.clipboard.write === 'function') {
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                copySuccess = true;
+                console.log('[Success] 图片已复制到剪贴板');
+            } catch (clipboardErr) {
+                console.warn('[Warning] 剪贴板复制失败，降级为下载:', clipboardErr);
+                copySuccess = false;
+            }
+        } else {
+            console.warn('[Warning] 浏览器不支持剪贴板 API，降级为下载');
+            copySuccess = false;
+        }
+
+        // 如果复制失败，降级为下载
+        if (!copySuccess) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dictation-share-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log('[Success] 图片已下载');
+        }
 
         // 7. 清理和提示
         document.body.removeChild(container);
-        btn.textContent = t('copySuccess');
+        btn.textContent = copySuccess ? t('copySuccess') : '已保存到下载';
         setTimeout(() => {
             btn.textContent = originalText;
             btn.disabled = false;
         }, 2000);
 
     } catch (error) {
-        console.error('分享失败:', error);
+        console.error('[Error] 分享失败:', error);
         const container = document.getElementById('shareContainer');
         if (container) document.body.removeChild(container);
         btn.textContent = t('copyFailed');
@@ -391,7 +449,7 @@ function createShareContainer(state, score, correct, warning, failed) {
             }
 
             const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">${state.entries[i].word} - ${state.entries[i].definition || preloadCache.translations[state.entries[i].word] || ''}</span>`
+                ? `<br><span class="correct">${state.entries[i].word} - ${formatTranslation(state.entries[i].definition || preloadCache.translations[state.entries[i].word] || '')}</span>`
                 : '';
 
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;

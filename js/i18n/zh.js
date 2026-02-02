@@ -148,7 +148,6 @@ export default {
     warnWebSpeech: '有道TTS失败，尝试Web Speech: {error}',
     warnNoWebSpeech: '浏览器不支持 Web Speech API',
     warningInvalidLang: '⚠️ 只允许输入{lang}',
-    mixedLanguageWarning: '请输入同一种语言',
 
     // 语言名称
     langEnglish: '英文',

@@ -148,7 +148,6 @@ export default {
     warnWebSpeech: 'Youdao TTS failed, trying Web Speech: {error}',
     warnNoWebSpeech: 'Browser does not support Web Speech API',
     warningInvalidLang: '⚠️ Only {lang} input allowed',
-    mixedLanguageWarning: 'Please enter words in the same language',
 
     // Language names
     langEnglish: 'English',

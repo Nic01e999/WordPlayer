@@ -101,15 +101,3 @@ export async function syncLayoutToCloud(layout, cardColors) {
 
     return pushToCloud({ layout, cardColors, wordlists: {} });
 }
-
-// saveWordlistToCloud 和 deleteWordlistFromCloud 已移至 storage.js
-// 这里保留空实现以兼容旧代码
-export async function saveWordlistToCloud() {
-    console.warn('saveWordlistToCloud is deprecated, use storage.saveWordList instead');
-    return { success: true };
-}
-
-export async function deleteWordlistFromCloud() {
-    console.warn('deleteWordlistFromCloud is deprecated, use storage.removeWordListFromStorage instead');
-    return { success: true };
-}

@@ -289,6 +289,16 @@ def get_examples(word):
     # 调用数据库查询例句
     examples = dict_db.search_examples(word, lang=lang, limit=limit)
 
+    # 去重：过滤掉中英文都相同的重复例句
+    seen = set()
+    unique_examples = []
+    for ex in examples:
+        key = (ex.get('en'), ex.get('zh'))
+        if key not in seen:
+            seen.add(key)
+            unique_examples.append(ex)
+    examples = unique_examples
+
     print(f"[Dict] 找到 {len(examples)} 条例句")
 
     return jsonify({

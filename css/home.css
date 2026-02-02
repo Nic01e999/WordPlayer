@@ -36,7 +36,6 @@
     position: absolute;
     top: 105%;
     right: 1%;
-    /* margin-top: rem; */
     font-size: 13px;
     color: var(--loading-text);
     white-space: nowrap;
@@ -74,6 +73,7 @@
     resize: none;
     box-sizing: border-box;
     transition: all 0.2s;
+    overflow-x: auto;
 }
 
 #wordSection textarea:focus {
@@ -606,7 +606,7 @@
 }
 
 .color-picker-segment:hover {
-    transform: scale(1。1);
+    transform: scale(1.1);
     filter: brightness(1.2);
     z-index: 1;
 }

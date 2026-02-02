@@ -80,13 +80,11 @@ body::before {
     flex-direction: column;
     flex-shrink: 0;
     overflow: hidden;
-    /* align-items: stretch; */
 }
 
 #wordlistContent {
     flex: 1;
     min-width: 0;
-    /* overflow-y: auto; */
 }
 
 
@@ -104,16 +102,6 @@ body::before {
     background: var(--bg-container);
     flex-shrink: 0;
 }
-
-/* 单词信息卡片 */
-.word-info-wrapper {
-    margin-top: 0.75rem;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-}
-
 
 /* ==============================听写工作区容器 =========================*/
 #dictationWorkplace {

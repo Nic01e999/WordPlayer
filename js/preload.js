@@ -17,7 +17,6 @@ import {
     detectLanguageFromInput,
     setTargetLang,
     updateAccentSelectorVisibility,
-    checkLanguageConsistency,
     showToast,
     getAccent
 } from './utils.js';
@@ -102,15 +101,6 @@ export async function startPreload(forceReload = false) {
         if (detected) {
             setTargetLang(detected);
             updateAccentSelectorVisibility();
-        }
-
-        const targetLang = getTargetLang();
-
-        // 2. 检测语言一致性
-        const { consistent, detectedLangs } = checkLanguageConsistency(inputText);
-        if (!consistent && detectedLangs.length > 1) {
-            showToast(t('mixedLanguageWarning'));
-            return; // 阻止加载
         }
     }
 
@@ -363,7 +353,7 @@ export async function startPreload(forceReload = false) {
         }
 
         try {
-            const url = getTtsUrl(text, false, accent, lang); // slow 固定为 false
+            const url = getTtsUrl(text, accent, lang);
             const res = await fetchWithTimeout(url, { signal }, 15000);
             if (!res.ok) {
                 console.error(`[TTS Error] 预加载请求失败: ${res.status}`, {

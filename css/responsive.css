@@ -159,7 +159,7 @@
         font-size: clamp(2rem, 8vw, 3rem);
     }
     .current-translation {
-        font-size: 1.25rem;
+        font-size: 2.5rem;
     }
     .popup input {
         font-size: 2rem;

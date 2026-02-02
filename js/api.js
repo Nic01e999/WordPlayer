@@ -40,18 +40,16 @@ export function getFetchErrorMessage(e) {
 /**
  * 获取 TTS URL（支持多语言）
  * @param {string} word - 单词或文本
- * @param {boolean} slow - 是否慢速（保留参数以兼容旧代码，但不再使用）
  * @param {string} accent - 口音 (us/uk，仅英语有效)
  * @param {string} lang - 语言代码 (en, ja, ko, fr, zh)
  */
-export function getTtsUrl(word, slow = false, accent = 'us', lang = 'en') {
+export function getTtsUrl(word, accent = 'us', lang = 'en') {
     // 验证参数兼容性
     if (lang !== 'en' && accent !== 'us') {
         console.warn(`[TTS] 非英语语言 ${lang} 不支持 ${accent} 口音，已重置为 us`);
         accent = 'us';
     }
 
-    // slow 参数不再传递给后端（前端使用 playbackRate 实现慢速）
     return `${API_BASE}/api/tts?word=${encodeURIComponent(word)}&accent=${accent}&lang=${lang}`;
 }
 

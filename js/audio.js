@@ -69,7 +69,7 @@ export async function speakWord(word, slow = false) {
 
     // 缓存未命中，fetch 并缓存
     loadingAudio.add(loadingKey);
-    const url = getTtsUrl(word, false, accent, lang); // slow 固定为 false
+    const url = getTtsUrl(word, accent, lang);
     try {
         const res = await fetch(url);
         if (!res.ok) {

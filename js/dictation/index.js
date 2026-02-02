@@ -10,7 +10,6 @@ import { stopAudio } from '../audio.js';
 import { checkFirstTime } from '../guide.js';
 
 // 导入子模块
-import { clearDragCleanupFns } from './drag.js';
 import {
     showPopup, closePopup, play, submit,
     updateWorkplace, showResults, playPause,

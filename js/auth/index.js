@@ -29,8 +29,6 @@ export {
 export {
     pullFromCloud,
     pushToCloud,
-    saveWordlistToCloud,
-    deleteWordlistFromCloud,
     syncLayoutToCloud
 } from './sync.js';
 

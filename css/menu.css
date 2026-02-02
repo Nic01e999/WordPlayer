@@ -31,7 +31,6 @@ body.dictation-mode #menu::after {
     background: url('../assets/images/iron.png') repeat-x center bottom;
     background-size: auto 100%;
     z-index: 101;
-    /* pointer-events: none; */
     filter: sepia(30%) saturate(var(--filter-saturate)) hue-rotate(var(--filter-hue));
 }
 
