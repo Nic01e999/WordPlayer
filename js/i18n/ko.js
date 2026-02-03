@@ -4,7 +4,7 @@
 export default {
     // 제목과 네비게이션
     appTitle: '단어 플레이어',
-    homeBtn: '영어 받아쓰기',
+    homeBtn: '단어 플레이어',
     dictation: '받아쓰기',
     repeater: '반복',
 

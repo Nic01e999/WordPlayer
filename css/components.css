@@ -303,5 +303,6 @@
 
 [data-theme-mode="dark"] .glass-dialog-btn.primary {
     background: var(--accent-primary);
+    color: white;
 }
 

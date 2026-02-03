@@ -4,7 +4,7 @@
 export default {
     // Title and navigation
     appTitle: 'Word Player',
-    homeBtn: 'English Dictation',
+    homeBtn: 'Word Player',
     dictation: 'Dictation',
     repeater: 'Repeater',
 

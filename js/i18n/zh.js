@@ -3,8 +3,8 @@
  */
 export default {
     // 标题和导航
-    appTitle: '单词播放器',
-    homeBtn: '单词听写',
+    appTitle: '单词玩家',
+    homeBtn: '单词玩家',
     dictation: '听 写',
     repeater: '复 读',
 

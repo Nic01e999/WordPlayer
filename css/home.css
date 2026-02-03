@@ -677,6 +677,11 @@
     background: var(--dark-folder-close-hover);
 }
 
+[data-theme-mode="dark"] .folder-open-title {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
 /* ===== Load 按钮和预加载指示器 ===== */
 
 .load-btn-container {

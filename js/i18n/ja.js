@@ -4,7 +4,7 @@
 export default {
     // タイトルとナビゲーション
     appTitle: '単語プレーヤー',
-    homeBtn: '英語ディクテーション',
+    homeBtn: '単語プレーヤー',
     dictation: 'ディクテーション',
     repeater: 'リピーター',
 
