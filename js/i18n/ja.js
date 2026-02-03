@@ -227,5 +227,20 @@ export default {
     shareError: '生成に失敗しました',
     noLemmaWords: '語根が同じ単語が見つかりません',
     loadFailed: '読み込みに失敗しました',
-    savedToDownload: 'ダウンロードに保存されました'
+    savedToDownload: 'ダウンロードに保存されました',
+
+    // 公開フォルダ
+    searchPublicFolders: '公開フォルダを検索',
+    searchPlaceholder: 'フォルダ名または作成者のメールを検索...',
+    publishFolder: '公開する',
+    unpublishFolder: '非公開にする',
+    createCopy: 'コピーを作成',
+    publicFolderAdded: '公開フォルダを追加しました',
+    folderPublished: 'フォルダを公開しました',
+    folderUnpublished: 'フォルダを非公開にしました',
+    folderCopyCreated: 'コピーを作成しました',
+    searchFailed: '検索に失敗しました',
+    addFailed: '追加に失敗しました',
+    copyFailed: 'コピーに失敗しました',
+    words: '語'
 };

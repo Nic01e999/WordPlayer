@@ -5,6 +5,8 @@
         <title>Word player</title>
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/guide.css">
+        <link rel="stylesheet" href="css/public-search.css">
+        <link rel="stylesheet" href="css/context-menu.css">
         <!-- Socket.IO 客户端（用于实时同步） -->
         <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
         <script type="module" src="js/guide.js"></script>
@@ -157,5 +159,27 @@
         <!-- html2canvas 用于生成分享长图 -->
         <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+        <!-- 公开文件夹搜索框 -->
+        <div class="public-search-overlay" id="publicSearchOverlay">
+            <div class="public-search-container">
+                <div class="public-search-header">
+                    <h3>🔍 <span data-i18n="searchPublicFolders">搜索公开单词表</span></h3>
+                    <button class="close-btn" id="closePublicSearch">✕</button>
+                </div>
+                <input
+                    type="text"
+                    class="public-search-input"
+                    id="publicSearchInput"
+                    data-i18n="searchPlaceholder"
+                    data-i18n-attr="placeholder"
+                    placeholder="搜索文件夹名称或作者邮箱..."
+                />
+                <div class="public-search-results" id="publicSearchResults">
+                    <!-- 搜索结果动态渲染 -->
+                </div>
+            </div>
+        </div>
+
     </body>
+
 </html>

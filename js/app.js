@@ -34,6 +34,7 @@ import {
 } from './sync/settings.js';
 import { initWebSocket, disconnectWebSocket } from './sync/websocket.js';
 import { checkFirstTime } from './guide.js';
+import { initPublicSearch, openPublicSearch } from './public-search.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -42,10 +43,24 @@ applyTheme(getStoredTheme());
 setDictationRef(Dictation);
 setRepeaterRef(Repeater);
 
+/**
+ * Home 按钮点击处理
+ * 如果已在 home，则打开搜索框；否则返回 home
+ */
+function goHomeOrSearch() {
+    if (!window.currentActiveMode) {
+        // 已经在 home，打开搜索框
+        openPublicSearch();
+    } else {
+        // 不在 home，返回 home
+        goHome();
+    }
+}
+
 // 暴露到全局（供 HTML onclick 使用）
 window.Repeater = Repeater;
 window.Dictation = Dictation;
-window.goHome = goHome;
+window.goHome = goHomeOrSearch;  // 使用新的函数
 window.showLoginDialog = showLoginDialog;
 
 // 暴露当前模式到全局（供模块内部检测使用）
@@ -267,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initPreloadListeners();
     initWordListUI();
     initSettingsToggle();  // 初始化设置面板点击切换功能
+    initPublicSearch();    // 初始化公开文件夹搜索功能
 
     // 从 localStorage 恢复语言设置（未登录用户使用，已登录用户会被服务端设置覆盖）
     loadLangSettings();

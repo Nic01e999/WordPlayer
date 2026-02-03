@@ -9,6 +9,9 @@ import { getLayout, deleteWordList, deleteFolder } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
+import { showContextMenu } from '../utils/context-menu.js';
+import { authToken } from '../auth/state.js';
+import { showToast } from '../utils.js';
 
 /**
  * 主题色配置 - 根据当前主题自动获取
@@ -222,13 +225,26 @@ function renderFolder(folder, lists, layoutIdx) {
     const emptySlots = Math.max(0, 4 - folder.items.length);
     const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
 
+    // 检查是否为公开文件夹
+    const isPublic = folder.isPublic || false;
+    const publicIcon = isPublic ? '<span class="folder-public-icon">🌐</span>' : '';
+    const ownerInfo = isPublic && folder.ownerEmail
+        ? `<div class="folder-owner-info">👤 ${escapeHtml(folder.ownerEmail)}</div>`
+        : '';
+
     return `
-        <div class="wordlist-folder" data-folder-name="${escapeHtml(folder.name)}" data-layout-idx="${layoutIdx}" data-type="folder">
+        <div class="wordlist-folder ${isPublic ? 'public-folder' : ''}"
+             data-folder-name="${escapeHtml(folder.name)}"
+             data-layout-idx="${layoutIdx}"
+             data-type="folder"
+             ${isPublic ? `data-public-folder-id="${folder.publicFolderId || ''}"` : ''}>
             <button class="wordlist-delete" data-folder-name="${escapeHtml(folder.name)}" title="Delete">&times;</button>
             <div class="wordlist-folder-icon">
+                ${publicIcon}
                 <div class="wordlist-folder-preview">${previewItems}${emptyHtml}</div>
             </div>
             <div class="wordlist-label">${escapeHtml(folder.name)}</div>
+            ${ownerInfo}
         </div>
     `;
 }
@@ -282,6 +298,20 @@ function bindCardEvents(workplace) {
             if (_exitEditMode) _exitEditMode();
         }
     });
+
+    // 添加右键菜单事件
+    grid.addEventListener('contextmenu', (e) => {
+        // 只在非编辑模式下显示右键菜单
+        if (_isEditMode && _isEditMode()) return;
+
+        const folder = e.target.closest('.wordlist-folder');
+        if (folder) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleFolderContextMenu(folder, e.clientX, e.clientY);
+            return;
+        }
+    });
 }
 
 /**
@@ -307,3 +337,188 @@ async function handleDeleteCard(name) {
         renderWordListCards();
     }
 }
+
+/**
+ * 处理文件夹右键菜单
+ */
+async function handleFolderContextMenu(folderElement, x, y) {
+    const folderName = folderElement.dataset.folderName;
+    const isPublic = folderElement.classList.contains('public-folder');
+    const publicFolderId = folderElement.dataset.publicFolderId;
+
+    const menuItems = [];
+
+    if (isPublic && publicFolderId) {
+        // 这是别人的公开文件夹
+        menuItems.push({
+            label: t('createCopy') || '创建副本',
+            icon: '📋',
+            action: () => handleCopyPublicFolder(publicFolderId, folderName)
+        });
+    } else {
+        // 这是自己的文件夹
+        // 检查是否已公开
+        const isPublished = await checkFolderPublicStatus(folderName);
+
+        if (isPublished) {
+            menuItems.push({
+                label: t('unpublishFolder') || '取消公开',
+                icon: '🔒',
+                action: () => handleToggleFolderPublic(folderName, false)
+            });
+        } else {
+            menuItems.push({
+                label: t('publishFolder') || '设为公开',
+                icon: '🌐',
+                action: () => handleToggleFolderPublic(folderName, true)
+            });
+        }
+
+        menuItems.push({
+            label: t('createCopy') || '创建副本',
+            icon: '📋',
+            action: () => handleCopyOwnFolder(folderName)
+        });
+    }
+
+    showContextMenu(menuItems, x, y);
+}
+
+/**
+ * 检查文件夹是否已公开
+ */
+async function checkFolderPublicStatus(folderName) {
+    try {
+        const token = authToken;
+        if (!token) return false;
+
+        const response = await fetch('/api/public/folder/check', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ folderName })
+        });
+
+        if (!response.ok) return false;
+
+        const data = await response.json();
+        return data.isPublic || false;
+    } catch (error) {
+        console.error('[右键菜单] 检查公开状态失败:', error);
+        return false;
+    }
+}
+
+/**
+ * 切换文件夹公开状态
+ */
+async function handleToggleFolderPublic(folderName, isPublic) {
+    try {
+        const token = authToken;
+        if (!token) {
+            showToast(t('pleaseLogin') || '请先登录', 'error');
+            return;
+        }
+
+        const response = await fetch('/api/public/folder/set', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                folderName,
+                isPublic,
+                description: ''
+            })
+        });
+
+        if (!response.ok) {
+            let errorMsg = '操作失败';
+            try {
+                const error = await response.json();
+                errorMsg = error.error || errorMsg;
+            } catch (e) {
+                // 无法解析 JSON，使用默认错误信息
+                console.error('[右键菜单] 无法解析错误响应:', e);
+            }
+            throw new Error(errorMsg);
+        }
+
+        const data = await response.json();
+
+        if (isPublic) {
+            showToast(t('folderPublished') || '文件夹已设为公开', 'success');
+            console.log(`[右键菜单] 文件夹 "${folderName}" 已设为公开 (ID: ${data.publicFolderId})`);
+        } else {
+            showToast(t('folderUnpublished') || '文件夹已取消公开', 'success');
+            console.log(`[右键菜单] 文件夹 "${folderName}" 已取消公开`);
+        }
+    } catch (error) {
+        console.error('[右键菜单] 切换公开状态失败:', error);
+        showToast(error.message || t('operationFailed') || '操作失败', 'error');
+    }
+}
+
+/**
+ * 复制公开文件夹
+ */
+async function handleCopyPublicFolder(publicFolderId, originalName) {
+    try {
+        const token = authToken;
+        if (!token) {
+            showToast(t('pleaseLogin') || '请先登录', 'error');
+            return;
+        }
+
+        // 生成新文件夹名称
+        const newFolderName = `${originalName} (副本)`;
+
+        const response = await fetch('/api/public/folder/copy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                publicFolderId: parseInt(publicFolderId),
+                newFolderName
+            })
+        });
+
+        if (!response.ok) {
+            let errorMsg = '复制失败';
+            try {
+                const error = await response.json();
+                errorMsg = error.error || errorMsg;
+            } catch (e) {
+                // 无法解析 JSON，使用默认错误信息
+                console.error('[右键菜单] 无法解析错误响应:', e);
+            }
+            throw new Error(errorMsg);
+        }
+
+        const data = await response.json();
+
+        // 重新渲染主页
+        renderWordListCards();
+
+        showToast(t('folderCopyCreated') || '已创建副本', 'success');
+        console.log(`[右键菜单] 已创建公开文件夹副本: ${newFolderName}`);
+    } catch (error) {
+        console.error('[右键菜单] 复制公开文件夹失败:', error);
+        showToast(error.message || t('copyFailed') || '复制失败', 'error');
+    }
+}
+
+/**
+ * 复制自己的文件夹
+ */
+async function handleCopyOwnFolder(folderName) {
+    // TODO: 实现复制自己文件夹的逻辑
+    showToast('此功能即将推出', 'info');
+    console.log(`[右键菜单] 复制自己的文件夹: ${folderName}`);
+}
+

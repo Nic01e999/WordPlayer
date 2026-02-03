@@ -8,6 +8,8 @@ import { getLayout, saveLayout, deleteWordList } from './layout.js';
 import { showConfirm } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
 import { t } from '../i18n/index.js';
+import { authToken } from '../auth/state.js';
+import { showToast } from '../utils.js';
 
 // 分页配置
 const CARDS_PER_PAGE = 9;  // 3x3 网格
@@ -78,15 +80,45 @@ function renameFolder(oldName, newName) {
 /**
  * 打开文件夹视图
  */
-export function openFolder(folderName) {
+export async function openFolder(folderName) {
     const layout = getLayout();
     const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
     if (!folderItem) return;
 
-    const lists = getWordLists();
+    // 检查是否为公开文件夹
+    const isPublic = folderItem.isPublic || false;
+    const publicFolderId = folderItem.publicFolderId;
 
-    // 过滤有效卡片
-    const validCards = folderItem.items.filter(name => lists[name]);
+    let lists;
+    let validCards;
+
+    if (isPublic && publicFolderId) {
+        // 公开文件夹：从 API 获取实时内容
+        try {
+            const content = await fetchPublicFolderContent(publicFolderId);
+            lists = {};
+            validCards = [];
+
+            // 将 API 返回的卡片转换为 lists 格式
+            content.cards.forEach(card => {
+                lists[card.name] = {
+                    name: card.name,
+                    words: card.words,
+                    translations: card.translations,
+                    wordInfo: card.wordInfo
+                };
+                validCards.push(card.name);
+            });
+        } catch (error) {
+            console.error('[文件夹] 获取公开文件夹内容失败:', error);
+            showToast(t('loadFailed') || '加载失败', 'error');
+            return;
+        }
+    } else {
+        // 自己的文件夹：正常流程
+        lists = getWordLists();
+        validCards = folderItem.items.filter(name => lists[name]);
+    }
 
     // 计算总页数
     const totalPages = Math.max(1, Math.ceil(validCards.length / CARDS_PER_PAGE));
@@ -100,9 +132,13 @@ export function openFolder(folderName) {
             const wordCount = countWords(list.words);
             const customColor = getCardColor(name);
             const [color1, color2] = generateGradient(name, customColor);
+
+            // 只读模式下不显示删除按钮
+            const deleteBtn = isPublic ? '' : `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`;
+
             return `
-                <div class="wordlist-card" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
-                    <button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">\u00d7</button>
+                <div class="wordlist-card ${isPublic ? 'readonly' : ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
+                    ${deleteBtn}
                     <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
                         <span class="wordlist-icon-count">${wordCount}</span>
                     </div>
@@ -123,7 +159,7 @@ export function openFolder(folderName) {
     const overlay = document.createElement('div');
     overlay.className = 'folder-open-overlay';
     overlay.innerHTML = `
-        <span class="folder-open-title">${escapeHtml(folderName)}</span>
+        <span class="folder-open-title ${isPublic ? 'readonly' : ''}">${escapeHtml(folderName)}</span>
         <div class="folder-open-view">
             <div class="folder-pages-container">
                 ${pagesHtml.join('')}
@@ -142,45 +178,47 @@ export function openFolder(folderName) {
     // 当前文件夹名（可能被重命名）
     let currentFolderName = folderName;
 
-    // 双击标题重命名
-    function bindTitleDblClick(titleEl) {
-        titleEl.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'folder-open-title-input';
-            input.value = currentFolderName;
-            titleEl.replaceWith(input);
-            input.focus();
-            input.select();
+    // 双击标题重命名（只读模式下禁用）
+    if (!isPublic) {
+        function bindTitleDblClick(titleEl) {
+            titleEl.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'folder-open-title-input';
+                input.value = currentFolderName;
+                titleEl.replaceWith(input);
+                input.focus();
+                input.select();
 
-            let saved = false;
-            const save = () => {
-                if (saved) return;
-                saved = true;
-                const newName = input.value.trim();
-                if (newName && newName !== currentFolderName) {
-                    renameFolder(currentFolderName, newName);
-                    currentFolderName = newName;
-                    if (_renderWordListCards) _renderWordListCards();
-                }
-                const newTitle = document.createElement('span');
-                newTitle.className = 'folder-open-title';
-                newTitle.textContent = currentFolderName;
-                input.replaceWith(newTitle);
-                bindTitleDblClick(newTitle);
-            };
+                let saved = false;
+                const save = () => {
+                    if (saved) return;
+                    saved = true;
+                    const newName = input.value.trim();
+                    if (newName && newName !== currentFolderName) {
+                        renameFolder(currentFolderName, newName);
+                        currentFolderName = newName;
+                        if (_renderWordListCards) _renderWordListCards();
+                    }
+                    const newTitle = document.createElement('span');
+                    newTitle.className = 'folder-open-title';
+                    newTitle.textContent = currentFolderName;
+                    input.replaceWith(newTitle);
+                    bindTitleDblClick(newTitle);
+                };
 
-            input.addEventListener('blur', save);
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); save(); }
-                if (e.key === 'Escape') { input.value = currentFolderName; save(); }
+                input.addEventListener('blur', save);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); save(); }
+                    if (e.key === 'Escape') { input.value = currentFolderName; save(); }
+                });
             });
-        });
-    }
+        }
 
-    const titleEl = overlay.querySelector('.folder-open-title');
-    bindTitleDblClick(titleEl);
+        const titleEl = overlay.querySelector('.folder-open-title');
+        bindTitleDblClick(titleEl);
+    }
 
     // 点击遮罩关闭
     overlay.addEventListener('click', (e) => {
@@ -196,22 +234,48 @@ export function openFolder(folderName) {
         });
     });
 
-    // 文件夹内删除
-    overlay.querySelectorAll('.wordlist-delete').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const name = btn.dataset.name;
-            const confirmed = await showConfirm(t('deleteCard', { name }));
-            if (confirmed) {
-                await deleteWordList(name);
-                overlay.remove();
-                if (_renderWordListCards) _renderWordListCards();
-            }
+    // 文件夹内删除（只读模式下不绑定）
+    if (!isPublic) {
+        overlay.querySelectorAll('.wordlist-delete').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const name = btn.dataset.name;
+                const confirmed = await showConfirm(t('deleteCard', { name }));
+                if (confirmed) {
+                    await deleteWordList(name);
+                    overlay.remove();
+                    if (_renderWordListCards) _renderWordListCards();
+                }
+            });
         });
+
+        // 文件夹内拖拽取出卡片（只读模式下不绑定）
+        bindFolderDrag(overlay, folderName);
+    }
+}
+
+/**
+ * 获取公开文件夹的实时内容
+ */
+async function fetchPublicFolderContent(publicFolderId) {
+    const token = authToken;
+    if (!token) {
+        throw new Error('请先登录');
+    }
+
+    const response = await fetch(`/api/public/folder/${publicFolderId}/content`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
 
-    // 文件夹内拖拽取出卡片
-    bindFolderDrag(overlay, folderName);
+    if (!response.ok) {
+        throw new Error(`获取内容失败: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
 }
 
 /**

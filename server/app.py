@@ -25,6 +25,7 @@ from sync import sync_bp
 from settings import settings_bp
 from db import init_db, get_db
 from dict_api import dict_api_bp
+from public_api import public_api_bp
 
 
 def _get_lan_ip():
@@ -75,6 +76,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(sync_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(dict_api_bp)  # 数据库架构词典 API
+app.register_blueprint(public_api_bp)  # 公开文件夹分享 API
 
 # 启动时初始化数据库
 init_db()

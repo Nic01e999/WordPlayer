@@ -55,7 +55,7 @@ export async function pullFromCloud() {
 /**
  * 推送数据到云端（仅布局配置）
  * @param {object} data - { layout, cardColors }
- * @returns {Promise<{success: boolean, error?: string}>}
+ * @returns {Promise<{success: boolean, error?: string, statusCode?: number}>}
  */
 export async function pushToCloud(data) {
     if (!isLoggedIn()) {
@@ -75,14 +75,19 @@ export async function pushToCloud(data) {
         });
 
         if (!response.ok) {
+            console.error(`[Sync] 推送失败: ${response.status}`);
             setSyncStatus('error');
-            return { error: '同步失败' };
+            return {
+                error: '同步失败',
+                statusCode: response.status
+            };
         }
 
+        console.log('[Sync] 推送成功');
         setSyncStatus('idle');
         return { success: true };
     } catch (e) {
-        console.error('Push to cloud failed:', e);
+        console.error('[Sync] 网络错误:', e);
         setSyncStatus('error');
         return { error: '网络错误' };
     }

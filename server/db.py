@@ -126,5 +126,37 @@ def init_db():
             )
         """)
 
+        # 公开文件夹表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS public_folders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                folder_name TEXT NOT NULL,
+                description TEXT,
+                word_count INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                UNIQUE(user_id, folder_name)
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_user ON public_folders(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_name ON public_folders(folder_name)")
+
+        # 用户添加的公开文件夹表
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_public_folders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                public_folder_id INTEGER NOT NULL,
+                display_name TEXT NOT NULL,
+                added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (public_folder_id) REFERENCES public_folders(id) ON DELETE CASCADE,
+                UNIQUE(user_id, display_name)
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_public_folders_user ON user_public_folders(user_id)")
+
         conn.commit()
         print("数据库初始化完成")

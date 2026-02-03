@@ -91,7 +91,7 @@ export function enterEditMode(workplace) {
 /**
  * 退出编辑模式 - 停止抖动，上传布局到服务端
  */
-export function exitEditMode() {
+export async function exitEditMode() {
     if (!editMode) return;
     editMode = false;
 
@@ -109,7 +109,25 @@ export function exitEditMode() {
     currentWorkplace = null;
 
     // 退出编辑模式时上传布局到服务端
-    syncLayoutToServer();
+    console.log('[Drag] 退出编辑模式，开始保存布局...');
+
+    // 显示保存指示器
+    showSavingIndicator();
+
+    // 等待保存完成
+    const result = await syncLayoutToServer();
+
+    // 隐藏指示器
+    hideSavingIndicator();
+
+    // 显示结果提示
+    if (result.success) {
+        console.log('[Drag] 布局保存成功');
+        showToast('布局已保存', 'success', 2000);
+    } else if (result.error) {
+        console.error('[Drag] 布局保存失败:', result.error);
+        showToast(`保存失败: ${result.error}`, 'error', 10000);
+    }
 }
 
 /**

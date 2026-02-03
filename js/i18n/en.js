@@ -227,5 +227,20 @@ export default {
     shareError: 'Failed to generate share',
     noLemmaWords: 'No lemma words found',
     loadFailed: 'Load failed',
-    savedToDownload: 'Saved to downloads'
+    savedToDownload: 'Saved to downloads',
+
+    // Public folders
+    searchPublicFolders: 'Search Public Folders',
+    searchPlaceholder: 'Search folder name or author email...',
+    publishFolder: 'Make Public',
+    unpublishFolder: 'Make Private',
+    createCopy: 'Create Copy',
+    publicFolderAdded: 'Public folder added',
+    folderPublished: 'Folder is now public',
+    folderUnpublished: 'Folder is now private',
+    folderCopyCreated: 'Copy created',
+    searchFailed: 'Search failed',
+    addFailed: 'Add failed',
+    copyFailed: 'Copy failed',
+    words: 'words'
 };

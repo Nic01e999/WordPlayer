@@ -6,6 +6,14 @@ This file provides guidance to Claude Code when working with this repository.
 
 **IMPORTANT**: Always communicate with the user in Chinese (中文) when reporting progress, explaining changes, or discussing implementation details, and also use white background. 当和用户探讨计划的时候，不懂的多次询问一起确定方案细节，写log的时候服务器和网页控制台都发一份
 
+## 用户种类
+**未登录**
+用户无法建立单词卡或文件夹，他们可以临时访问到公共文件夹，但是并不会保存到他们的桌面
+
+**已登陆**
+可以在桌面上保存单词卡和文件夹，或者在桌面建立访问到公共文件夹的文件夹接口
+
+
 ## Design Style
 
 **液态玻璃清新风 (Liquid Glass Fresh Style)**

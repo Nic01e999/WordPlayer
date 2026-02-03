@@ -227,5 +227,20 @@ export default {
     shareError: '生成失败',
     noLemmaWords: '未找到同词根词汇',
     loadFailed: '加载失败',
-    savedToDownload: '已保存到下载'
+    savedToDownload: '已保存到下载',
+
+    // 公开文件夹
+    searchPublicFolders: '搜索公开单词表',
+    searchPlaceholder: '搜索文件夹名称或作者邮箱...',
+    publishFolder: '设为公开',
+    unpublishFolder: '取消公开',
+    createCopy: '创建副本',
+    publicFolderAdded: '已添加公开文件夹',
+    folderPublished: '文件夹已设为公开',
+    folderUnpublished: '文件夹已取消公开',
+    folderCopyCreated: '已创建副本',
+    searchFailed: '搜索失败',
+    addFailed: '添加失败',
+    copyFailed: '复制失败',
+    words: '词'
 };

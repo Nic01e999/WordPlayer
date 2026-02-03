@@ -489,6 +489,30 @@ export function bindSettingControls(bindings) {
 }
 
 /**
+ * 显示保存指示器
+ */
+export function showSavingIndicator() {
+    let indicator = document.getElementById('saving-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'saving-indicator';
+        indicator.innerHTML = '<div class="spinner"></div><span>保存中...</span>';
+        document.body.appendChild(indicator);
+    }
+    indicator.classList.add('show');
+}
+
+/**
+ * 隐藏保存指示器
+ */
+export function hideSavingIndicator() {
+    const indicator = document.getElementById('saving-indicator');
+    if (indicator) {
+        indicator.classList.remove('show');
+    }
+}
+
+/**
  * 显示 Toast 提示消息
  * @param {string} message - 提示消息
  * @param {string|number} typeOrDuration - 类型（'error', 'success', 'info'）或显示时长（毫秒）

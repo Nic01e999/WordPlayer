@@ -227,5 +227,20 @@ export default {
     shareError: '생성 실패',
     noLemmaWords: '어근이 같은 단어를 찾을 수 없습니다',
     loadFailed: '로드 실패',
-    savedToDownload: '다운로드에 저장됨'
+    savedToDownload: '다운로드에 저장됨',
+
+    // 공개 폴더
+    searchPublicFolders: '공개 폴더 검색',
+    searchPlaceholder: '폴더 이름 또는 작성자 이메일 검색...',
+    publishFolder: '공개하기',
+    unpublishFolder: '비공개하기',
+    createCopy: '복사본 만들기',
+    publicFolderAdded: '공개 폴더가 추가되었습니다',
+    folderPublished: '폴더가 공개되었습니다',
+    folderUnpublished: '폴더가 비공개되었습니다',
+    folderCopyCreated: '복사본이 생성되었습니다',
+    searchFailed: '검색 실패',
+    addFailed: '추가 실패',
+    copyFailed: '복사 실패',
+    words: '단어'
 };

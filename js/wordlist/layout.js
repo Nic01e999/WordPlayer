@@ -155,11 +155,12 @@ export function isFolderNameExists(folderName) {
 
 /**
  * 同步布局到服务端（退出编辑模式时调用）
+ * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function syncLayoutToServer() {
     const layout = getLayout();
     const cardColors = getCardColors();
-    await syncLayoutToCloud(layout, cardColors);
+    return await syncLayoutToCloud(layout, cardColors);
 }
 
 /**
