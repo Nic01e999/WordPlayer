@@ -73,13 +73,14 @@ body::before {
 /* 单词输入区域 - 主页左侧 */
 #wordSection {
     width: clamp(14rem, 22vw, 17.5rem);
-    min-height: fit-content;
-    height: auto;
+    min-height: 0;
+    height: 100%;
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
+    margin-bottom: 13.5rem;
 }
 
 #wordlistContent {

@@ -9,6 +9,7 @@ import time
 import hashlib
 import requests
 from pathlib import Path
+from typing import Optional
 from flask import Blueprint, request, jsonify, send_file
 from constants import DICTVOICE_LANG_CODES, API_TIMEOUT_TTS
 
@@ -27,7 +28,7 @@ def _get_cache_path(text: str, accent: str, lang: str) -> Path:
     return CACHE_DIR / f"{hash_key}.mp3"
 
 
-def _get_cached_audio(cache_path: Path) -> bytes | None:
+def _get_cached_audio(cache_path: Path) -> Optional[bytes]:
     """获取缓存的音频，如果过期则返回 None"""
     if not cache_path.exists():
         return None
