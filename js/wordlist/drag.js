@@ -6,7 +6,10 @@
 import { getLayout, saveLayout, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
 import { showColorPicker, hideColorPicker, hasOpenColorPicker } from './colorpicker.js';
+import { showSavingIndicator, hideSavingIndicator, showToast } from '../utils.js';
 import { t } from '../i18n/index.js';
+import { bindPointerInteraction, isJustInteracted } from './interactions.js';
+import { isLoggedIn } from '../auth/state.js';
 
 // 拖拽状态
 let dragState = null;
@@ -17,6 +20,7 @@ let currentWorkplace = null;
 
 // 事件委托标记
 let dragEventsInitialized = false;
+let globalTapHandlerInitialized = false;
 
 // 延迟绑定的函数引用
 let _renderWordListCards = null;
@@ -67,8 +71,56 @@ function handleGlobalTap(e) {
     if (e.target.closest('.wordlist-card, .wordlist-folder, .wordlist-delete')) {
         return;
     }
+
+    // 检查是否在文件夹内部（文件夹视图区域）
+    const folderContent = e.target.closest('.folder-open-view');
+    if (folderContent) {
+        // 点击文件夹内部空白
+        console.log('[Drag] 点击文件夹内部空白');
+        hideColorPicker();
+        if (editMode) {
+            // 编辑模式：退出编辑模式，文件夹保持打开
+            console.log('[Drag] 编辑模式下，退出编辑模式但保持文件夹打开');
+            exitEditMode();
+        }
+        return;
+    }
+
+    // 检查是否在文件夹overlay背景上（文件夹外部空间）
+    const folderOverlay = e.target.closest('.folder-open-overlay');
+    if (folderOverlay && e.target === folderOverlay) {
+        // 点击文件夹外部空间
+        console.log('[Drag] 点击文件夹外部空间');
+        hideColorPicker();
+        if (editMode) {
+            // 编辑模式：关闭文件夹，保持编辑模式
+            console.log('[Drag] 编辑模式下，关闭文件夹但保持编辑模式');
+            folderOverlay.remove();
+        } else {
+            // 非编辑模式：直接关闭文件夹
+            console.log('[Drag] 非编辑模式下关闭文件夹');
+            folderOverlay.remove();
+        }
+        return;
+    }
+
+    // 桌面点击空白
+    console.log('[Drag] 点击桌面空白');
     hideColorPicker();
-    exitEditMode();
+    if (editMode) {
+        console.log('[Drag] 编辑模式下，退出编辑模式');
+        exitEditMode();
+    }
+}
+
+/**
+ * 初始化全局点击处理器
+ */
+export function initGlobalTapHandler() {
+    if (globalTapHandlerInitialized) return;
+    globalTapHandlerInitialized = true;
+    document.addEventListener('pointerdown', handleGlobalTap);
+    console.log('[Drag] 全局点击处理器已初始化');
 }
 
 /**
@@ -81,7 +133,14 @@ export function enterEditMode(workplace) {
     const items = workplace.querySelectorAll('.wordlist-card, .wordlist-folder');
     items.forEach(item => item.classList.add('edit-mode'));
 
-    document.addEventListener('pointerdown', handleGlobalTap);
+    // 检查是否有打开的文件夹overlay
+    const folderOverlay = document.querySelector('.folder-open-overlay');
+    if (folderOverlay && !folderOverlay.querySelector('.readonly')) {
+        // 给文件夹内的卡片也添加edit-mode
+        folderOverlay.querySelectorAll('.wordlist-card').forEach(card => {
+            card.classList.add('edit-mode');
+        });
+    }
 
     if (navigator.vibrate) {
         navigator.vibrate(10);
@@ -98,134 +157,92 @@ export async function exitEditMode() {
     // 关闭颜色选择器
     hideColorPicker();
 
-    document.removeEventListener('pointerdown', handleGlobalTap);
-
     if (currentWorkplace) {
         const items = currentWorkplace.querySelectorAll('.wordlist-card, .wordlist-folder');
         items.forEach(item => {
             item.classList.remove('edit-mode');
         });
     }
+
+    // 移除文件夹内的edit-mode
+    const folderOverlay = document.querySelector('.folder-open-overlay');
+    if (folderOverlay) {
+        folderOverlay.querySelectorAll('.wordlist-card').forEach(card => {
+            card.classList.remove('edit-mode');
+        });
+    }
+
     currentWorkplace = null;
 
-    // 退出编辑模式时上传布局到服务端
-    console.log('[Drag] 退出编辑模式，开始保存布局...');
+    // 退出编辑模式时上传布局到服务端（仅在已登录时）
+    if (isLoggedIn()) {
+        console.log('[Drag] 退出编辑模式，开始保存布局...');
 
-    // 显示保存指示器
-    showSavingIndicator();
+        // 显示保存指示器
+        showSavingIndicator();
 
-    // 等待保存完成
-    const result = await syncLayoutToServer();
+        // 等待保存完成
+        const result = await syncLayoutToServer();
 
-    // 隐藏指示器
-    hideSavingIndicator();
+        // 隐藏指示器
+        hideSavingIndicator();
 
-    // 显示结果提示
-    if (result.success) {
-        console.log('[Drag] 布局保存成功');
-        showToast('布局已保存', 'success', 2000);
-    } else if (result.error) {
-        console.error('[Drag] 布局保存失败:', result.error);
-        showToast(`保存失败: ${result.error}`, 'error', 10000);
+        // 显示结果提示（仅保留错误提示）
+        if (result.success) {
+            console.log('[Drag] 布局保存成功');
+            // 移除toast提示以保持界面清爽
+        } else if (result.error) {
+            console.error('[Drag] 布局保存失败:', result.error);
+            showToast(`保存失败: ${result.error}`, 'error', 10000);
+        }
+    } else {
+        console.log('[Drag] 退出编辑模式，未登录状态，跳过保存');
     }
 }
 
 /**
- * 绑定拖拽事件
+ * 绑定拖拽事件 - 使用统一交互管理
  */
 export function bindDragEvents(workplace) {
     const grid = workplace.querySelector('.wordlist-grid');
     if (!grid || dragEventsInitialized) return;
     dragEventsInitialized = true;
 
-    grid.addEventListener('pointerdown', (e) => {
-        const item = e.target.closest('.wordlist-card, .wordlist-folder');
-        if (!item) return;
-        if (e.target.classList.contains('wordlist-delete')) return;
-        if (e.button !== 0) return;
+    const items = workplace.querySelectorAll('.wordlist-card, .wordlist-folder');
 
-        const startX = e.clientX;
-        const startY = e.clientY;
-
-        if (editMode) {
-            // 编辑模式下：区分点击（显示颜色选择器）和拖拽（移动卡片）
-            const isCard = item.dataset.type === 'card';
-            let didMove = false;
-            let dragStarted = false;
-
-            const onEditMove = (me) => {
-                if (Math.abs(me.clientX - startX) > 5 || Math.abs(me.clientY - startY) > 5) {
-                    didMove = true;
-                    if (!dragStarted) {
-                        dragStarted = true;
-                        startDrag(e, item, workplace);
-                    }
-                }
-            };
-
-            const onEditUp = () => {
-                document.removeEventListener('pointermove', onEditMove);
-                document.removeEventListener('pointerup', onEditUp);
-
-                // 如果没有移动且是卡片，显示颜色选择器
-                if (!didMove && isCard) {
-                    // 如果已有选择器打开，先关闭
-                    if (hasOpenColorPicker()) {
-                        hideColorPicker();
-                    } else {
-                        showColorPicker(item);
-                    }
-                }
-            };
-
-            document.addEventListener('pointermove', onEditMove);
-            document.addEventListener('pointerup', onEditUp);
-            return;
-        }
-
-        // 非编辑模式：长按后进入编辑模式并显示颜色选择器
+    items.forEach(item => {
         const isCard = item.dataset.type === 'card';
-        let longPressTriggered = false;
-        let didMoveAfterLongPress = false;
 
-        const longPressTimer = setTimeout(() => {
-            longPressTriggered = true;
-            enterEditMode(workplace);
-            // 如果是卡片，显示颜色选择器
-            if (isCard) {
-                showColorPicker(item);
-            }
-        }, 300);
-
-        const cancelLongPress = () => {
-            clearTimeout(longPressTimer);
-            document.removeEventListener('pointermove', onEarlyMove);
-            document.removeEventListener('pointerup', onLongPressUp);
-        };
-
-        const onEarlyMove = (me) => {
-            if (Math.abs(me.clientX - startX) > 5 || Math.abs(me.clientY - startY) > 5) {
-                if (longPressTriggered) {
-                    // 长按已触发，用户开始移动 → 隐藏选择器，开始拖拽
-                    didMoveAfterLongPress = true;
-                    hideColorPicker();
-                    startDrag(e, item, workplace);
-                    cancelLongPress();
+        // 统一绑定，在onClick内部根据editMode决定行为
+        bindPointerInteraction(item, {
+            onLongPress: (el) => {
+                enterEditMode(workplace);
+                if (isCard) {
+                    showColorPicker(el);
+                }
+            },
+            onDrag: (el, startEvent) => {
+                hideColorPicker();
+                startDrag(startEvent, el, workplace);
+            },
+            onClick: (el) => {
+                if (isCard) {
+                    if (editMode) {
+                        // 编辑模式：打开/关闭色环
+                        if (hasOpenColorPicker()) {
+                            hideColorPicker();
+                        } else {
+                            showColorPicker(el);
+                        }
+                        console.log('[Drag] 编辑模式下点击单词卡，打开色环');
+                    }
+                    // 非编辑模式：由render.js的click监听器处理（加载单词卡）
                 } else {
-                    // 长按未触发，取消长按
-                    cancelLongPress();
+                    // 文件夹：由render.js的click监听器处理（打开文件夹）
+                    // 编辑模式下不处理，保持抖动状态
                 }
             }
-        };
-
-        const onLongPressUp = () => {
-            cancelLongPress();
-            // 如果长按已触发且没有移动，颜色选择器保持显示
-            // 不需要额外操作，选择器已经在长按时显示了
-        };
-
-        document.addEventListener('pointerup', onLongPressUp, { once: true });
-        document.addEventListener('pointermove', onEarlyMove);
+        });
     });
 }
 

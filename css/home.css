@@ -141,7 +141,7 @@
     gap: 1.75rem 1.25rem;
     padding: 1.5rem;
     justify-content: center;
-    min-height: 18.75rem;
+    min-height: 0;
 }
 
 /* ===== iOS App 图标卡片 ===== */
@@ -607,7 +607,7 @@
     position: fixed;
     border-radius: 50%;
     pointer-events: auto;
-    z-index: 1000;
+    z-index: 10001;  /* 比 Dialog 的 10000 高，确保在弹窗上方 */
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.15s ease, transform 0.15s ease;

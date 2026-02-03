@@ -16,7 +16,7 @@ import { getLayout, saveLayout, deleteWordList, deleteFolder } from './layout.js
 import { renderWordListCards, setRenderDeps, resetEventFlags } from './render.js';
 import {
     bindDragEvents, exitEditMode, isEditMode, setCurrentWorkplace,
-    getDragState, enterEditMode, setDragDeps, resetDragEventFlags
+    getDragState, enterEditMode, setDragDeps, resetDragEventFlags, initGlobalTapHandler
 } from './drag.js';
 import { openFolder, setFolderDeps } from './folder.js';
 import { setColorPickerDeps } from './colorpicker.js';
@@ -73,6 +73,9 @@ export function initWordListUI() {
     const saveBtn = $("saveListBtn");
     const updateBtn = $("updateListBtn");
     const wordInput = $("wordInput");
+
+    // 初始化全局点击处理器
+    initGlobalTapHandler();
 
     // Save 按钮
     if (saveBtn) {

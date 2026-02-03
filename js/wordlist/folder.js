@@ -10,6 +10,9 @@ import { CARD_COLORS, getCurrentThemeColors } from './render.js';
 import { t } from '../i18n/index.js';
 import { authToken } from '../auth/state.js';
 import { showToast } from '../utils.js';
+import { isEditMode, enterEditMode } from './drag.js';
+import { showColorPicker, hideColorPicker } from './colorpicker.js';
+import { bindPointerInteraction } from './interactions.js';
 
 // 分页配置
 const CARDS_PER_PAGE = 9;  // 3x3 网格
@@ -175,6 +178,15 @@ export async function openFolder(folderName) {
         bindFolderPagination(overlay, totalPages);
     }
 
+    // 检查桌面是否在编辑模式
+    const inEditMode = isEditMode();
+    if (inEditMode && !isPublic) {
+        // 如果桌面在编辑模式，文件夹内卡片也抖动
+        overlay.querySelectorAll('.wordlist-card').forEach(card => {
+            card.classList.add('edit-mode');
+        });
+    }
+
     // 当前文件夹名（可能被重命名）
     let currentFolderName = folderName;
 
@@ -220,15 +232,20 @@ export async function openFolder(folderName) {
         bindTitleDblClick(titleEl);
     }
 
-    // 点击遮罩关闭
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-
     // 文件夹内卡片点击加载
     overlay.querySelectorAll('.wordlist-card').forEach(card => {
         card.addEventListener('click', async (e) => {
             if (e.target.classList.contains('wordlist-delete')) return;
+
+            // 检查是否在编辑模式
+            if (isEditMode()) {
+                // 编辑模式：显示颜色选择器
+                e.stopPropagation();
+                showColorPicker(card);
+                return;
+            }
+
+            // 非编辑模式：关闭文件夹并加载单词卡
             overlay.remove();
             await loadWordList(card.dataset.name);
         });
@@ -250,7 +267,10 @@ export async function openFolder(folderName) {
         });
 
         // 文件夹内拖拽取出卡片（只读模式下不绑定）
-        bindFolderDrag(overlay, folderName);
+        const view = overlay.querySelector('.folder-open-view');
+        const container = overlay.querySelector('.folder-pages-container');
+        const pages = overlay.querySelectorAll('.folder-page');
+        bindFolderInteractions(overlay, folderName, view, container, pages);
     }
 }
 
@@ -381,35 +401,61 @@ function bindFolderPagination(overlay, totalPages) {
     observer.observe(document.body, { childList: true });
 }
 
-function bindFolderDrag(overlay, folderName) {
-    const cards = overlay.querySelectorAll('.wordlist-card');
-    cards.forEach(card => {
-        card.addEventListener('pointerdown', (e) => {
-            if (e.target.classList.contains('wordlist-delete')) return;
-            const longPressTimer = setTimeout(() => {
-                startFolderCardDrag(e, card, overlay, folderName);
-            }, 300);
+/**
+ * 绑定文件夹内卡片交互 - 使用统一交互管理
+ */
+function bindFolderInteractions(overlay, folderName, view, container, pages) {
+    const inEditMode = isEditMode();
 
-            const cancelLongPress = () => {
-                clearTimeout(longPressTimer);
-                card.removeEventListener('pointerup', cancelLongPress);
-                card.removeEventListener('pointermove', onMove);
-            };
-            const onMove = (me) => {
-                if (Math.abs(me.clientX - e.clientX) > 5 || Math.abs(me.clientY - e.clientY) > 5) {
-                    cancelLongPress();
+    overlay.querySelectorAll('.wordlist-card').forEach(card => {
+        if (inEditMode) {
+            // 编辑模式：拖拽排序（点击事件由 folder.js:241 的 click 监听器处理）
+            bindPointerInteraction(card, {
+                onDrag: (el, startEvent) => {
+                    hideColorPicker();
+                    startFolderCardDrag(startEvent, el, overlay, folderName, view, container, pages);
                 }
-            };
-            card.addEventListener('pointerup', cancelLongPress, { once: true });
-            card.addEventListener('pointermove', onMove);
-        });
+            });
+        } else {
+            // 非编辑模式：长按进入编辑模式
+            bindPointerInteraction(card, {
+                onLongPress: (el) => {
+                    console.log('[Folder] 文件夹内长按，进入编辑模式');
+
+                    // 进入编辑模式
+                    const workplace = document.querySelector('#wordlistContent');
+                    if (workplace) {
+                        enterEditMode(workplace);
+                    }
+
+                    // 文件夹内卡片同步编辑模式
+                    console.log('[Folder] 文件夹内同步编辑模式状态');
+                    overlay.querySelectorAll('.wordlist-card').forEach(c => {
+                        c.classList.add('edit-mode');
+                    });
+
+                    // 显示色环
+                    showColorPicker(el);
+
+                    // 振动反馈
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10);
+                    }
+                },
+                onDrag: (el, startEvent) => {
+                    hideColorPicker();
+                    startFolderCardDrag(startEvent, el, overlay, folderName, view, container, pages);
+                }
+            });
+        }
     });
 }
 
-function startFolderCardDrag(startEvent, card, overlay, folderName) {
+function startFolderCardDrag(startEvent, card, overlay, folderName, view, container, pages) {
     const name = card.dataset.name;
     card.classList.add('dragging');
 
+    // 创建拖拽克隆
     const clone = card.cloneNode(true);
     clone.className = 'wordlist-card drag-clone';
     const rect = card.getBoundingClientRect();
@@ -421,9 +467,86 @@ function startFolderCardDrag(startEvent, card, overlay, folderName) {
     const offsetX = startEvent.clientX - rect.left;
     const offsetY = startEvent.clientY - rect.top;
 
+    // 获取文件夹边界
+    const viewRect = view.getBoundingClientRect();
+
+    // 分页信息
+    const totalPages = pages.length;
+    let currentPage = getCurrentPage(container, pages);
+
+    // 边缘翻页状态
+    let edgeScrollTimer = null;
+    let isOutsideFolder = false;
+
     const onMove = (e) => {
+        // 更新克隆位置
         clone.style.left = (e.clientX - offsetX) + 'px';
         clone.style.top = (e.clientY - offsetY) + 'px';
+
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        // 动态获取当前页（因为可能已通过拖拽边缘或手动翻页）
+        currentPage = getCurrentPage(container, pages);
+
+        // 检测是否在文件夹边界外
+        isOutsideFolder = (
+            mouseX < viewRect.left ||
+            mouseX > viewRect.right ||
+            mouseY < viewRect.top ||
+            mouseY > viewRect.bottom
+        );
+
+        if (isOutsideFolder) {
+            // 在边界外：关闭文件夹（视觉上淡出）
+            overlay.style.opacity = '0.3';
+        } else {
+            // 在边界内：恢复显示
+            overlay.style.opacity = '1';
+
+            // 文件夹内排序：计算插入位置
+            const currentPageEl = pages[currentPage];
+            const cardsInPage = Array.from(currentPageEl.querySelectorAll('.wordlist-card'));
+            const insertIndex = calculateInsertIndexInFolder(e, cardsInPage, card);
+
+            if (insertIndex !== -1) {
+                reorderFolderCards(currentPageEl, card, insertIndex);
+            }
+
+            // 边缘翻页（多页时）
+            if (totalPages > 1) {
+                const dragX = mouseX - viewRect.left;
+                const edgeThreshold = viewRect.width * 0.15;
+
+                // 左边缘 → 上一页
+                if (dragX < edgeThreshold && currentPage > 0) {
+                    if (!edgeScrollTimer) {
+                        edgeScrollTimer = setTimeout(() => {
+                            currentPage--;
+                            goToPage(container, pages, currentPage);
+                            edgeScrollTimer = null;
+                        }, 500);
+                    }
+                }
+                // 右边缘 → 下一页
+                else if (dragX > viewRect.width - edgeThreshold && currentPage < totalPages - 1) {
+                    if (!edgeScrollTimer) {
+                        edgeScrollTimer = setTimeout(() => {
+                            currentPage++;
+                            goToPage(container, pages, currentPage);
+                            edgeScrollTimer = null;
+                        }, 500);
+                    }
+                }
+                // 离开边缘
+                else {
+                    if (edgeScrollTimer) {
+                        clearTimeout(edgeScrollTimer);
+                        edgeScrollTimer = null;
+                    }
+                }
+            }
+        }
     };
 
     const onUp = () => {
@@ -432,27 +555,154 @@ function startFolderCardDrag(startEvent, card, overlay, folderName) {
         clone.remove();
         card.classList.remove('dragging');
 
-        // 从文件夹中取出
-        const layout = getLayout();
-        const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
-        if (folderItem) {
-            folderItem.items = folderItem.items.filter(n => n !== name);
-            // 文件夹为空则删除
-            if (folderItem.items.length === 0) {
-                const idx = layout.items.indexOf(folderItem);
-                layout.items.splice(idx, 1);
-            }
-            // 将卡片放到文件夹后面
-            const folderIdx = layout.items.indexOf(folderItem);
-            const insertIdx = folderIdx >= 0 ? folderIdx + 1 : layout.items.length;
-            layout.items.splice(insertIdx, 0, { type: 'card', name });
-            saveLayout(layout);
+        if (edgeScrollTimer) {
+            clearTimeout(edgeScrollTimer);
         }
 
-        overlay.remove();
-        if (_renderWordListCards) _renderWordListCards();
+        overlay.style.opacity = '1';
+
+        const layout = getLayout();
+        const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
+
+        if (isOutsideFolder) {
+            // 拖到边界外：从文件夹中移除，放到桌面
+            if (folderItem) {
+                folderItem.items = folderItem.items.filter(n => n !== name);
+
+                // 文件夹为空则删除
+                if (folderItem.items.length === 0) {
+                    const idx = layout.items.indexOf(folderItem);
+                    layout.items.splice(idx, 1);
+                }
+
+                // 将卡片放到文件夹后面
+                const folderIdx = layout.items.indexOf(folderItem);
+                const insertIdx = folderIdx >= 0 ? folderIdx + 1 : layout.items.length;
+                layout.items.splice(insertIdx, 0, { type: 'card', name });
+
+                saveLayout(layout);
+            }
+
+            // 关闭文件夹
+            overlay.remove();
+            if (_renderWordListCards) _renderWordListCards();
+        } else {
+            // 在文件夹内：更新文件夹内卡片顺序
+            if (folderItem) {
+                const newOrder = [];
+                pages.forEach(page => {
+                    page.querySelectorAll('.wordlist-card').forEach(c => {
+                        const cardName = c.dataset.name;
+                        if (cardName && !newOrder.includes(cardName)) {
+                            newOrder.push(cardName);
+                        }
+                    });
+                });
+                folderItem.items = newOrder;
+                saveLayout(layout);
+            }
+        }
     };
 
     document.addEventListener('pointermove', onMove);
     document.addEventListener('pointerup', onUp);
+}
+
+/**
+ * 计算文件夹内插入位置
+ */
+function calculateInsertIndexInFolder(e, cards, draggedCard) {
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        if (card === draggedCard) continue;
+
+        const rect = card.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        if (mouseY < centerY - rect.height / 4) {
+            return i;
+        }
+        if (mouseY < centerY + rect.height / 4 && mouseX < centerX) {
+            return i;
+        }
+    }
+
+    return cards.length;
+}
+
+/**
+ * 文件夹内 DOM 重排（FLIP 动画）
+ */
+function reorderFolderCards(pageEl, draggedCard, targetIdx) {
+    const cards = Array.from(pageEl.querySelectorAll('.wordlist-card'));
+    const currentIdx = cards.indexOf(draggedCard);
+
+    if (currentIdx === targetIdx || currentIdx === -1) return;
+
+    // First - 记录初始位置
+    const firstRects = new Map();
+    cards.forEach(card => {
+        if (card !== draggedCard) {
+            firstRects.set(card, card.getBoundingClientRect());
+        }
+    });
+
+    // 执行 DOM 重排
+    if (targetIdx >= cards.length) {
+        pageEl.appendChild(draggedCard);
+    } else {
+        const targetCard = cards[targetIdx];
+        if (targetCard !== draggedCard) {
+            pageEl.insertBefore(draggedCard, targetCard);
+        }
+    }
+
+    // Last & Invert & Play - FLIP 动画
+    firstRects.forEach((firstRect, card) => {
+        const lastRect = card.getBoundingClientRect();
+        const dx = firstRect.left - lastRect.left;
+        const dy = firstRect.top - lastRect.top;
+
+        if (dx !== 0 || dy !== 0) {
+            card.style.transform = `translate(${dx}px, ${dy}px)`;
+            card.style.transition = 'none';
+            card.offsetHeight;
+            card.style.transition = 'transform 0.25s cubic-bezier(0.28, 0.11, 0.32, 1)';
+            card.style.transform = '';
+        }
+    });
+}
+
+/**
+ * 获取当前页码
+ */
+function getCurrentPage(container, pages) {
+    if (!container || pages.length === 0) return 0;
+    const pageWidth = pages[0].offsetWidth;
+    const transform = container.style.transform;
+    const match = transform.match(/translateX\((-?\d+)px\)/);
+    if (match) {
+        const offset = parseInt(match[1]);
+        return Math.round(Math.abs(offset) / pageWidth);
+    }
+    return 0;
+}
+
+/**
+ * 跳转到指定页
+ */
+function goToPage(container, pages, pageIndex) {
+    if (!container || pages.length === 0) return;
+    const pageWidth = pages[0].offsetWidth;
+    pageIndex = Math.max(0, Math.min(pages.length - 1, pageIndex));
+    container.style.transform = `translateX(${-pageIndex * pageWidth}px)`;
+
+    const dots = document.querySelectorAll('.folder-page-dot');
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === pageIndex);
+    });
 }

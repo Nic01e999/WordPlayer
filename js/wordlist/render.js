@@ -12,6 +12,7 @@ import { t } from '../i18n/index.js';
 import { showContextMenu } from '../utils/context-menu.js';
 import { authToken } from '../auth/state.js';
 import { showToast } from '../utils.js';
+import { isJustInteracted } from './interactions.js';
 
 /**
  * 主题色配置 - 根据当前主题自动获取
@@ -288,7 +289,13 @@ function bindCardEvents(workplace) {
         const folder = e.target.closest('.wordlist-folder');
         if (folder) {
             if (dragState?.didDrag) return;
-            if (_isEditMode && _isEditMode()) return;
+
+            // 如果刚刚交互过（长按），不打开
+            if (isJustInteracted(folder)) {
+                console.log('[Render] 文件夹刚刚长按过，跳过打开操作');
+                return;
+            }
+
             if (_openFolder) _openFolder(folder.dataset.folderName);
             return;
         }
