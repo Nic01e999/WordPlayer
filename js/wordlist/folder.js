@@ -3,7 +3,7 @@
  */
 
 import { escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor } from './storage.js';
+import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showConfirm, showAlert } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
@@ -74,6 +74,16 @@ function renameFolder(oldName, newName) {
     const folder = layout.items.find(item => item.type === 'folder' && item.name === oldName);
     if (folder) {
         folder.name = newName;
+
+        // 更新文件夹缓存：删除旧名称，添加新名称
+        const folders = getFolders();
+        if (folders[oldName]) {
+            const folderData = { ...folders[oldName], name: newName };
+            removeFolder(oldName);
+            addOrUpdateFolder(newName, folderData);
+            console.log('[Folder] 文件夹重命名，缓存已更新:', oldName, '->', newName);
+        }
+
         saveLayout(layout);
         return true;
     }
@@ -661,6 +671,10 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
                 if (folderItem.items.length === 0) {
                     const idx = layout.items.indexOf(folderItem);
                     layout.items.splice(idx, 1);
+
+                    // 从文件夹缓存中删除
+                    removeFolder(folderName);
+                    console.log('[Folder] 空文件夹已删除，缓存已更新:', folderName);
                 }
 
                 // 将卡片放到文件夹后面

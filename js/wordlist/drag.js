@@ -10,6 +10,8 @@ import { showSavingIndicator, hideSavingIndicator, showToast } from '../utils.js
 import { t } from '../i18n/index.js';
 import { bindPointerInteraction, isJustInteracted } from './interactions.js';
 import { isLoggedIn } from '../auth/state.js';
+import { addOrUpdateFolder } from './storage.js';
+import { getIdByName } from './adapter.js';
 
 // 拖拽状态
 let dragState = null;
@@ -546,6 +548,29 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
     const indicesToRemove = [layoutIdx, targetLayoutIdx].sort((a, b) => b - a);
     indicesToRemove.forEach(idx => layout.items.splice(idx, 1));
     layout.items.push(newFolder);
+
+    // ===== 更新文件夹缓存 =====
+    // 将卡片名称转换为 ID
+    const cardIds = [targetName, dragName]
+        .map(name => getIdByName('cards', name))
+        .filter(id => id !== null);
+
+    // 创建文件夹数据对象
+    const now = new Date().toISOString();
+    const folderData = {
+        id: null,  // 新文件夹还没有服务器 ID
+        name: trimmedName,
+        cards: cardIds,
+        is_public: false,
+        description: null,
+        created: now,
+        updated: now
+    };
+
+    // 添加到文件夹缓存
+    addOrUpdateFolder(trimmedName, folderData);
+    console.log('[Drag] 文件夹已添加到缓存:', trimmedName, folderData);
+    // ===== 更新文件夹缓存结束 =====
 
     saveLayout(layout);
     if (_renderWordListCards) _renderWordListCards();

@@ -5,6 +5,7 @@
 
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
 import { setCardColor, getCardColor } from './storage.js';
+import { syncLayoutToServer } from './layout.js';
 
 let currentPicker = null;
 let currentCardName = null;
@@ -209,7 +210,7 @@ export function hideColorPicker() {
 /**
  * 选择颜色
  */
-function selectColor(cardName, colorId, cardElement) {
+async function selectColor(cardName, colorId, cardElement) {
     setCardColor(cardName, colorId);
 
     // 更新当前卡片的背景色
@@ -222,6 +223,10 @@ function selectColor(cardName, colorId, cardElement) {
     if (_renderWordListCards) {
         _renderWordListCards();
     }
+
+    // 同步颜色到服务器
+    console.log('[ColorPicker] 同步颜色到服务器...');
+    await syncLayoutToServer();
 }
 
 /**

@@ -3,7 +3,7 @@
  * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
-import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors } from './storage.js';
+import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder } from './storage.js';
 import { syncLayoutToCloud } from '../auth/sync.js';
 
 const LAYOUT_KEY = 'wordlist_layout';
@@ -160,7 +160,8 @@ export function isFolderNameExists(folderName) {
 export async function syncLayoutToServer() {
     const layout = getLayout();
     const cardColors = getCardColors();
-    return await syncLayoutToCloud(layout, cardColors);
+    const folders = getFolders();
+    return await syncLayoutToCloud(layout, cardColors, folders);
 }
 
 /**
@@ -177,5 +178,9 @@ export async function deleteFolder(folderName) {
         // 从 layout 中移除文件夹
         layout.items = layout.items.filter(item => !(item.type === 'folder' && item.name === folderName));
         saveLayout(layout);
+
+        // 从文件夹缓存中删除
+        removeFolder(folderName);
+        console.log('[Layout] 文件夹已删除，缓存已更新:', folderName);
     }
 }

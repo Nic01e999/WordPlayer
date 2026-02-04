@@ -6,12 +6,13 @@
 import * as api from './api.js';
 import * as state from './state.js';
 import { pullFromCloud, pushToCloud } from './sync.js';
-import { setWordListsCache, clearWordListsCache, getCardColors } from '../wordlist/storage.js';
+import { setWordListsCache, clearWordListsCache, getCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache } from '../wordlist/storage.js';
 import { t } from '../i18n/index.js';
 import { getLayout, saveLayout } from '../wordlist/layout.js';
 import { renderWordListCards } from '../wordlist/render.js';
 import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
 import { applySettings, clearSettings } from '../sync/settings.js';
+import { migrateLocalStorage } from '../wordlist/migration.js';
 
 let currentDialog = null;
 let currentMode = 'login'; // 'login' | 'register' | 'forgot' | 'reset'
@@ -393,7 +394,10 @@ function getSubmitButtonText() {
 async function syncAfterLogin() {
     console.log('[Sync] 开始从云端拉取数据...');
 
-    // 从云端拉取数据
+    // 执行本地数据迁移（如果需要）
+    migrateLocalStorage();
+
+    // 从云端拉取数据（已经通过 adapter 转换为前端格式）
     const cloudData = await pullFromCloud();
 
     if (cloudData.error) {
@@ -415,12 +419,21 @@ async function syncAfterLogin() {
     setWordListsCache(cloudData.wordlists || {});
     console.log('[Sync] 单词表已更新:', Object.keys(cloudData.wordlists || {}).length, '个');
 
+    // 将文件夹存入内存缓存
+    setFoldersCache(cloudData.folders || {});
+    console.log('[Sync] 文件夹已更新:', Object.keys(cloudData.folders || {}).length, '个');
+
+    // 将公开文件夹引用存入内存缓存
+    setPublicFoldersCache(cloudData.publicFolders || []);
+    console.log('[Sync] 公开文件夹引用已更新:', (cloudData.publicFolders || []).length, '个');
+
     // 同步布局配置（云端 -> 本地）
     if (cloudData.layout) {
         saveLayout(cloudData.layout);
         console.log('[Sync] 布局配置已更新');
     }
 
+    // 同步卡片颜色（云端 -> 本地）
     if (cloudData.cardColors && Object.keys(cloudData.cardColors).length > 0) {
         localStorage.setItem('cardColors', JSON.stringify(cloudData.cardColors));
         console.log('[Sync] 卡片颜色已更新');
@@ -440,6 +453,7 @@ async function syncAfterLogin() {
         await pushToCloud({
             layout: localLayout,
             cardColors: localCardColors,
+            folders: {},
             wordlists: {}
         });
     }
@@ -466,6 +480,10 @@ export async function doLogout() {
     state.clearAuth();
     // 清空单词表缓存
     clearWordListsCache();
+    // 清空文件夹缓存
+    clearFoldersCache();
+    // 清空公开文件夹缓存
+    clearPublicFoldersCache();
     // 刷新 UI
     renderWordListCards();
 }

@@ -47,12 +47,12 @@ def delete_all_users():
 
         # 定义需要清空的表（按顺序，考虑外键约束）
         tables = [
-            'user_public_folders',  # 依赖 users 和 public_folders
+            'folders',              # 依赖 users 和 public_folders
             'public_folders',       # 依赖 users
             'sessions',             # 依赖 users
             'reset_codes',          # 独立表
             'user_settings',        # 依赖 users
-            'user_layout',          # 依赖 users
+            'layout',               # 依赖 users
             'wordlists',            # 依赖 users
             'users'                 # 最后删除
         ]
@@ -85,14 +85,14 @@ def delete_all_users():
             cursor.execute("""
                 DELETE FROM sqlite_sequence
                 WHERE name IN ( 
-                            'users', 
-                            'sessions',
-                            'reset_codes',
-                            'user_settings',
-                            'user_layout',
-                            'wordlists',
-                            'public_folders',
-                            'user_public_folders'
+                            'folders',             
+                            'public_folders',     
+                            'sessions',             
+                            'reset_codes',        
+                            'user_settings',       
+                            'layout',               
+                            'wordlists',          
+                            'users'                
                            )""")
             print(f"✓ 已重置自增 ID")
 

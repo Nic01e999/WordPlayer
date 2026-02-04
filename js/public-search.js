@@ -183,7 +183,7 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
     }
 
     // 生成显示名称（包含发布者邮箱）
-    const displayName = `${folderName} -${ownerEmail})`;
+    const displayName = `${folderName} (${ownerEmail})`;
 
     const response = await fetch('/api/public/folder/add', {
       method: 'POST',
@@ -192,7 +192,7 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        publicFolderId: folderId,
+        folderId: folderId,  // 修正：使用 folderId 而不是 publicFolderId
         displayName: displayName
       })
     });

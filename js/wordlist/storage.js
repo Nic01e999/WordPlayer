@@ -11,10 +11,17 @@ import { API_BASE } from '../api.js';
 import { isLoggedIn, getAuthHeader } from '../auth/state.js';
 import { showLoginDialog } from '../auth/login.js';
 
-const CARD_COLORS_KEY = 'cardColors';
+const CARD_COLORS_KEY = 'cardColors';  // 保留用于数据迁移
+const FOLDERS_KEY = 'folders';
 
 // 内存缓存：存储从服务端拉取的单词表列表
 let _wordlistsCache = {};
+
+// 内存缓存：存储文件夹数据
+let _foldersCache = {};
+
+// 内存缓存：存储公开文件夹引用
+let _publicFoldersCache = [];
 
 /**
  * 从服务端拉取所有单词表
@@ -284,8 +291,15 @@ export function getCardColors() {
 
 /**
  * 获取单个卡片的颜色
+ * 优先从 wordlist.color 读取，如果没有则从 localStorage 的 cardColors 读取（兼容旧数据）
  */
 export function getCardColor(name) {
+    // 优先从内存缓存的 wordlist.color 读取
+    if (_wordlistsCache[name] && _wordlistsCache[name].color) {
+        return _wordlistsCache[name].color;
+    }
+
+    // 兼容旧数据：从 localStorage 的 cardColors 读取
     const colors = getCardColors();
     return colors[name] || null;
 }
@@ -302,9 +316,83 @@ export function setCardColor(name, colorId) {
             colors[name] = colorId;
         }
         localStorage.setItem(CARD_COLORS_KEY, JSON.stringify(colors));
+
+        // 同时更新内存缓存中的 color 字段
+        if (_wordlistsCache[name]) {
+            _wordlistsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
+        }
+
         return true;
     } catch (e) {
         console.error('Failed to save card color:', e);
         return false;
     }
+}
+
+/**
+ * 设置文件夹缓存（用于登录后同步）
+ */
+export function setFoldersCache(folders) {
+    _foldersCache = folders || {};
+}
+
+/**
+ * 获取所有文件夹（从内存缓存）
+ */
+export function getFolders() {
+    return _foldersCache;
+}
+
+/**
+ * 添加或更新单个文件夹到缓存
+ * @param {string} name - 文件夹名称
+ * @param {object} folderData - 文件夹数据 { id, name, cards, is_public, description, created, updated }
+ */
+export function addOrUpdateFolder(name, folderData) {
+    _foldersCache[name] = folderData;
+    console.log(`[Storage] 文件夹已添加/更新: ${name}`, folderData);
+}
+
+/**
+ * 删除单个文件夹从缓存
+ * @param {string} name - 文件夹名称
+ */
+export function removeFolder(name) {
+    delete _foldersCache[name];
+    console.log(`[Storage] 文件夹已删除: ${name}`);
+}
+
+/**
+ * 获取单个文件夹
+ */
+export function getFolder(name) {
+    return _foldersCache[name] || null;
+}
+
+/**
+ * 清空文件夹缓存（用于登出）
+ */
+export function clearFoldersCache() {
+    _foldersCache = {};
+}
+
+/**
+ * 设置公开文件夹缓存（用于登录后同步）
+ */
+export function setPublicFoldersCache(publicFolders) {
+    _publicFoldersCache = publicFolders || [];
+}
+
+/**
+ * 获取所有公开文件夹引用（从内存缓存）
+ */
+export function getPublicFolders() {
+    return _publicFoldersCache;
+}
+
+/**
+ * 清空公开文件夹缓存（用于登出）
+ */
+export function clearPublicFoldersCache() {
+    _publicFoldersCache = [];
 }

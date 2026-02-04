@@ -156,7 +156,7 @@ class WordlistRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT name, words, created_at, updated_at
+                SELECT id, name, words, color, created_at, updated_at
                 FROM wordlists
                 WHERE user_id = ?
             """, (user_id,))
@@ -164,8 +164,10 @@ class WordlistRepository:
             wordlists = {}
             for row in cursor.fetchall():
                 wordlists[row['name']] = {
+                    'id': row['id'],
                     'name': row['name'],
                     'words': row['words'],
+                    'color': row['color'],
                     'created': row['created_at'],
                     'updated': row['updated_at']
                 }
@@ -177,7 +179,7 @@ class WordlistRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT name, words, created_at, updated_at
+                SELECT id, name, words, color, created_at, updated_at
                 FROM wordlists
                 WHERE user_id = ? AND name = ?
             """, (user_id, name))
@@ -187,15 +189,41 @@ class WordlistRepository:
                 return None
 
             return {
+                'id': row['id'],
                 'name': row['name'],
                 'words': row['words'],
+                'color': row['color'],
                 'created': row['created_at'],
                 'updated': row['updated_at']
             }
 
     @staticmethod
-    def save(user_id: int, name: str, words: str, created: str = None) -> None:
-        """保存单词表（插入或更新）"""
+    def get_by_id(user_id: int, card_id: int) -> Optional[Dict[str, Any]]:
+        """根据ID获取单词表"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, name, words, color, created_at, updated_at
+                FROM wordlists
+                WHERE user_id = ? AND id = ?
+            """, (user_id, card_id))
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            return {
+                'id': row['id'],
+                'name': row['name'],
+                'words': row['words'],
+                'color': row['color'],
+                'created': row['created_at'],
+                'updated': row['updated_at']
+            }
+
+    @staticmethod
+    def save(user_id: int, name: str, words: str, color: str = None, created: str = None) -> int:
+        """保存单词表（插入或更新），返回卡片ID"""
         if created is None:
             created = datetime.now().isoformat()
         updated = datetime.now().isoformat()
@@ -203,12 +231,27 @@ class WordlistRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO wordlists (user_id, name, words, translations, word_info, created_at, updated_at)
-                VALUES (?, ?, ?, '{}', '{}', ?, ?)
+                INSERT INTO wordlists (user_id, name, words, color, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(user_id, name) DO UPDATE SET
                     words = excluded.words,
+                    color = excluded.color,
                     updated_at = excluded.updated_at
-            """, (user_id, name, words, created, updated))
+                RETURNING id
+            """, (user_id, name, words, color, created, updated))
+            result = cursor.fetchone()
+            return result['id'] if result else None
+
+    @staticmethod
+    def update_color(user_id: int, name: str, color: str) -> None:
+        """更新单词表颜色"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE wordlists
+                SET color = ?, updated_at = ?
+                WHERE user_id = ? AND name = ?
+            """, (color, datetime.now().isoformat(), user_id, name))
 
     @staticmethod
     def delete(user_id: int, name: str) -> None:
@@ -225,40 +268,37 @@ class LayoutRepository:
     """布局配置数据访问"""
 
     @staticmethod
-    def get_by_user(user_id: int) -> Tuple[Optional[Dict], Dict]:
-        """获取用户的布局配置，返回 (layout, card_colors)"""
+    def get_by_user(user_id: int) -> Optional[List[str]]:
+        """获取用户的布局配置，返回 layout 数组"""
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT layout, card_colors, updated_at
-                FROM user_layout
+                SELECT layout, updated_at
+                FROM layout
                 WHERE user_id = ?
             """, (user_id,))
 
             row = cursor.fetchone()
             if not row:
-                return None, {}
+                return None
 
-            layout = json.loads(row['layout']) if row['layout'] else None
-            card_colors = json.loads(row['card_colors']) if row['card_colors'] else {}
-            return layout, card_colors
+            layout = json.loads(row['layout']) if row['layout'] else []
+            return layout
 
     @staticmethod
-    def save(user_id: int, layout: Dict, card_colors: Dict) -> None:
+    def save(user_id: int, layout: List[str]) -> None:
         """保存布局配置"""
         layout_json = json.dumps(layout, ensure_ascii=False)
-        card_colors_json = json.dumps(card_colors, ensure_ascii=False)
 
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO user_layout (user_id, layout, card_colors, updated_at)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO layout (user_id, layout, updated_at)
+                VALUES (?, ?, ?)
                 ON CONFLICT(user_id) DO UPDATE SET
                     layout = excluded.layout,
-                    card_colors = excluded.card_colors,
                     updated_at = excluded.updated_at
-            """, (user_id, layout_json, card_colors_json, datetime.now().isoformat()))
+            """, (user_id, layout_json, datetime.now().isoformat()))
 
 
 class SettingsRepository:
@@ -341,3 +381,239 @@ class SettingsRepository:
             cursor = conn.cursor()
             cursor.execute("SELECT user_id FROM user_settings WHERE user_id = ?", (user_id,))
             return cursor.fetchone() is not None
+
+
+class FolderRepository:
+    """文件夹数据访问"""
+
+    @staticmethod
+    def get_all_by_user(user_id: int) -> Dict[str, Dict[str, Any]]:
+        """获取用户的所有文件夹"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, name, cards, is_public, description, created_at, updated_at
+                FROM folders
+                WHERE user_id = ?
+            """, (user_id,))
+
+            folders = {}
+            for row in cursor.fetchall():
+                folders[row['name']] = {
+                    'id': row['id'],
+                    'name': row['name'],
+                    'cards': json.loads(row['cards']),
+                    'is_public': bool(row['is_public']),
+                    'description': row['description'],
+                    'created': row['created_at'],
+                    'updated': row['updated_at']
+                }
+            return folders
+
+    @staticmethod
+    def get_by_name(user_id: int, name: str) -> Optional[Dict[str, Any]]:
+        """获取单个文件夹"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, name, cards, is_public, description, created_at, updated_at
+                FROM folders
+                WHERE user_id = ? AND name = ?
+            """, (user_id, name))
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            return {
+                'id': row['id'],
+                'name': row['name'],
+                'cards': json.loads(row['cards']),
+                'is_public': bool(row['is_public']),
+                'description': row['description'],
+                'created': row['created_at'],
+                'updated': row['updated_at']
+            }
+
+    @staticmethod
+    def get_by_id(folder_id: int) -> Optional[Dict[str, Any]]:
+        """根据ID获取文件夹"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, user_id, name, cards, is_public, description, created_at, updated_at
+                FROM folders
+                WHERE id = ?
+            """, (folder_id,))
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            return {
+                'id': row['id'],
+                'user_id': row['user_id'],
+                'name': row['name'],
+                'cards': json.loads(row['cards']),
+                'is_public': bool(row['is_public']),
+                'description': row['description'],
+                'created': row['created_at'],
+                'updated': row['updated_at']
+            }
+
+    @staticmethod
+    def save(user_id: int, name: str, cards: List[int], is_public: bool = False,
+             description: str = None, created: str = None) -> int:
+        """保存文件夹（插入或更新），返回文件夹ID"""
+        if created is None:
+            created = datetime.now().isoformat()
+        updated = datetime.now().isoformat()
+
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO folders (user_id, name, cards, is_public, description, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(user_id, name) DO UPDATE SET
+                    cards = excluded.cards,
+                    is_public = excluded.is_public,
+                    description = excluded.description,
+                    updated_at = excluded.updated_at
+                RETURNING id
+            """, (user_id, name, json.dumps(cards), is_public, description, created, updated))
+            result = cursor.fetchone()
+            return result['id'] if result else None
+
+    @staticmethod
+    def update_cards(user_id: int, name: str, cards: List[int]) -> None:
+        """更新文件夹包含的卡片"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE folders
+                SET cards = ?, updated_at = ?
+                WHERE user_id = ? AND name = ?
+            """, (json.dumps(cards), datetime.now().isoformat(), user_id, name))
+
+    @staticmethod
+    def delete(user_id: int, name: str) -> None:
+        """删除文件夹"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM folders WHERE user_id = ? AND name = ?",
+                (user_id, name)
+            )
+
+    @staticmethod
+    def search_public(keyword: str, limit: int = 50) -> List[Dict[str, Any]]:
+        """搜索公开文件夹"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT f.id, f.user_id, f.name, f.cards, f.description, f.created_at, u.email as owner_email
+                FROM folders f
+                JOIN users u ON f.user_id = u.id
+                WHERE f.is_public = TRUE AND (f.name LIKE ? OR f.description LIKE ?)
+                ORDER BY f.created_at DESC
+                LIMIT ?
+            """, (f'%{keyword}%', f'%{keyword}%', limit))
+
+            results = []
+            for row in cursor.fetchall():
+                results.append({
+                    'id': row['id'],
+                    'user_id': row['user_id'],
+                    'name': row['name'],
+                    'cards': json.loads(row['cards']),
+                    'description': row['description'],
+                    'created': row['created_at'],
+                    'owner_email': row['owner_email']
+                })
+            return results
+
+
+class PublicFolderRepository:
+    """公开文件夹引用数据访问"""
+
+    @staticmethod
+    def get_all_by_user(user_id: int) -> List[Dict[str, Any]]:
+        """获取用户添加的所有公开文件夹引用"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, folder_id, owner_id, owner_name, display_name, created_at
+                FROM public_folders
+                WHERE user_id = ?
+            """, (user_id,))
+
+            results = []
+            for row in cursor.fetchall():
+                results.append({
+                    'id': row['id'],
+                    'folder_id': row['folder_id'],
+                    'owner_id': row['owner_id'],
+                    'owner_name': row['owner_name'],
+                    'display_name': row['display_name'],
+                    'created': row['created_at']
+                })
+            return results
+
+    @staticmethod
+    def get_by_display_name(user_id: int, display_name: str) -> Optional[Dict[str, Any]]:
+        """根据显示名称获取公开文件夹引用"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, folder_id, owner_id, owner_name, display_name, created_at
+                FROM public_folders
+                WHERE user_id = ? AND display_name = ?
+            """, (user_id, display_name))
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            return {
+                'id': row['id'],
+                'folder_id': row['folder_id'],
+                'owner_id': row['owner_id'],
+                'owner_name': row['owner_name'],
+                'display_name': row['display_name'],
+                'created': row['created_at']
+            }
+
+    @staticmethod
+    def add(user_id: int, folder_id: int, owner_id: int, owner_name: str, display_name: str) -> int:
+        """添加公开文件夹引用"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO public_folders (user_id, folder_id, owner_id, owner_name, display_name)
+                VALUES (?, ?, ?, ?, ?)
+                RETURNING id
+            """, (user_id, folder_id, owner_id, owner_name, display_name))
+            result = cursor.fetchone()
+            return result['id'] if result else None
+
+    @staticmethod
+    def update_display_name(user_id: int, old_name: str, new_name: str) -> None:
+        """更新显示名称"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE public_folders
+                SET display_name = ?
+                WHERE user_id = ? AND display_name = ?
+            """, (new_name, user_id, old_name))
+
+    @staticmethod
+    def delete(user_id: int, display_name: str) -> None:
+        """删除公开文件夹引用"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM public_folders WHERE user_id = ? AND display_name = ?",
+                (user_id, display_name)
+            )
+

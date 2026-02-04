@@ -78,15 +78,14 @@ def init_db():
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)")
 
-        # 单词表
+        # 单词表（简化版：只存储单词文本和颜色）
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS wordlists (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
                 words TEXT NOT NULL,
-                translations TEXT,
-                word_info TEXT,
+                color TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -95,12 +94,29 @@ def init_db():
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_wordlists_user_id ON wordlists(user_id)")
 
-        # 用户布局配置表
+        # 文件夹表（新增）
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_layout (
+            CREATE TABLE IF NOT EXISTS folders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                cards TEXT NOT NULL,
+                is_public BOOLEAN DEFAULT FALSE,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                UNIQUE(user_id, name)
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_folders_user ON folders(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_folders_public ON folders(is_public) WHERE is_public = TRUE")
+
+        # 布局配置表（简化版：只存储布局数组）
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS layout (
                 user_id INTEGER PRIMARY KEY,
                 layout TEXT NOT NULL,
-                card_colors TEXT,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
@@ -126,37 +142,23 @@ def init_db():
             )
         """)
 
-        # 公开文件夹表
+        # 公开文件夹引用表（用户添加的公开文件夹）
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS public_folders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
-                folder_name TEXT NOT NULL,
-                description TEXT,
-                word_count INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                UNIQUE(user_id, folder_name)
-            )
-        """)
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_user ON public_folders(user_id)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_name ON public_folders(folder_name)")
-
-        # 用户添加的公开文件夹表
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_public_folders (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                public_folder_id INTEGER NOT NULL,
+                folder_id INTEGER NOT NULL,
+                owner_id INTEGER NOT NULL,
+                owner_name TEXT NOT NULL,
                 display_name TEXT NOT NULL,
-                added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (public_folder_id) REFERENCES public_folders(id) ON DELETE CASCADE,
+                FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE,
                 UNIQUE(user_id, display_name)
             )
         """)
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_public_folders_user ON user_public_folders(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_user ON public_folders(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_public_folders_folder ON public_folders(folder_id)")
 
         conn.commit()
         print("数据库初始化完成")

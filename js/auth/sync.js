@@ -5,10 +5,11 @@
 
 import { API_BASE } from '../api.js';
 import { getAuthHeader, isLoggedIn, setSyncStatus } from './state.js';
+import { backendToFrontend, frontendToBackend, updateFolderIdMapping } from '../wordlist/adapter.js';
 
 /**
  * 从云端拉取数据
- * @returns {Promise<{wordlists?: object, layout?: object, cardColors?: object, error?: string}>}
+ * @returns {Promise<{wordlists?: object, layout?: object, cardColors?: object, folders?: object, publicFolders?: array, error?: string}>}
  */
 export async function pullFromCloud() {
     if (!isLoggedIn()) {
@@ -41,10 +42,15 @@ export async function pullFromCloud() {
             return { error: errorData.error || '同步失败' };
         }
 
-        const data = await response.json();
-        console.log('[Sync] 数据拉取成功');
+        const backendData = await response.json();
+        console.log('[Sync] 后端数据拉取成功:', backendData);
+
+        // 使用 adapter 转换为前端格式
+        const frontendData = backendToFrontend(backendData);
+        console.log('[Sync] 数据转换完成，前端格式:', frontendData);
+
         setSyncStatus('idle');
-        return data;
+        return frontendData;
     } catch (e) {
         console.error('[Sync] 网络错误:', e);
         setSyncStatus('error');
@@ -54,7 +60,7 @@ export async function pullFromCloud() {
 
 /**
  * 推送数据到云端（仅布局配置）
- * @param {object} data - { layout, cardColors }
+ * @param {object} data - { layout, cardColors, folders }
  * @returns {Promise<{success: boolean, error?: string, statusCode?: number}>}
  */
 export async function pushToCloud(data) {
@@ -62,16 +68,22 @@ export async function pushToCloud(data) {
         return { error: '未登录' };
     }
 
+    console.log('[Sync] 开始推送数据到云端...');
+    console.log('[Sync] 前端数据:', data);
     setSyncStatus('syncing');
 
     try {
+        // 使用 adapter 转换前端格式 -> 后端格式
+        const backendData = frontendToBackend(data);
+        console.log('[Sync] 转换后的后端数据:', backendData);
+
         const response = await fetch(`${API_BASE}/api/sync/push`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeader()
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(backendData)
         });
 
         if (!response.ok) {
@@ -81,6 +93,13 @@ export async function pushToCloud(data) {
                 error: '同步失败',
                 statusCode: response.status
             };
+        }
+
+        // 获取返回的 ID 映射
+        const result = await response.json();
+        if (result.folderIdMap) {
+            updateFolderIdMapping(result.folderIdMap);
+            console.log('[Sync] 文件夹 ID 映射已更新:', result.folderIdMap);
         }
 
         console.log('[Sync] 推送成功');
@@ -97,12 +116,13 @@ export async function pushToCloud(data) {
  * 同步布局配置到云端
  * @param {object} layout 布局配置
  * @param {object} cardColors 卡片颜色
+ * @param {object} folders 文件夹配置
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function syncLayoutToCloud(layout, cardColors) {
+export async function syncLayoutToCloud(layout, cardColors, folders = {}) {
     if (!isLoggedIn()) {
         return { success: true };
     }
 
-    return pushToCloud({ layout, cardColors, wordlists: {} });
+    return pushToCloud({ layout, cardColors, folders, wordlists: {} });
 }
