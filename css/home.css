@@ -401,8 +401,8 @@
 /* 公开文件夹图标 */
 .folder-public-icon {
     position: absolute;
-    top: -0.25rem;
-    right: -0.25rem;
+    top: -0.6rem;
+    right: -0.5rem;
     font-size: 1rem;
     z-index: 1;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
@@ -512,7 +512,7 @@
     font-weight: 600;
     font-size: 1.125rem;
     color: var(--text-primary);
-    background: var(--folder-title-bg);
+    background: var(--folder-view-bg-start);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 0.5rem 1.25rem;

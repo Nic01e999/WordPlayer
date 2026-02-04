@@ -332,11 +332,13 @@ function updateLayoutOrder(layout, grid) {
         if (type === 'card') {
             const name = el.dataset.name;
             const existing = layout.items.find(i => i.type === 'card' && i.name === name);
-            if (existing) newItems.push({ type: 'card', name });
+            // 保留所有字段，包括 isPublic, publicFolderId, ownerEmail 等
+            if (existing) newItems.push({ ...existing });
         } else if (type === 'folder') {
             const folderName = el.dataset.folderName;
             const existing = layout.items.find(i => i.type === 'folder' && i.name === folderName);
-            if (existing) newItems.push({ type: 'folder', name: folderName, items: existing.items });
+            // 保留所有字段，包括 isPublic, publicFolderId, ownerEmail 等
+            if (existing) newItems.push({ ...existing });
         }
     });
 
@@ -527,6 +529,8 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
 
     const trimmedName = folderName.trim();
     if (isFolderNameExists(trimmedName)) {
+        // 等待一帧，确保前一个弹窗的事件处理完成
+        await new Promise(resolve => requestAnimationFrame(resolve));
         await showAlert(t('folderNameExists', { name: trimmedName }));
         return;
     }

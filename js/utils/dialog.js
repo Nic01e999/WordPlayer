@@ -87,8 +87,12 @@ function showDialog(config) {
         const keydownTarget = inputElement || dialog;
         keydownTarget.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();  // 阻止默认行为
+                e.stopPropagation(); // 阻止事件冒泡
                 close(handleAction('enter', inputElement?.value));
             } else if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
                 close(handleAction('escape', inputElement?.value));
             }
         });

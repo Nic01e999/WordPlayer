@@ -213,8 +213,19 @@ function renderCard(list, layoutIdx) {
  * 渲染文件夹 - iOS 风格 2x2 预览（CSS Grid 自动布局）
  */
 function renderFolder(folder, lists, layoutIdx) {
+    // 检查是否为公开文件夹（提前检查，因为预览生成需要用到）
+    const isPublic = folder.isPublic || false;
+
     // 生成 2x2 迷你图标预览
     const previewItems = folder.items.slice(0, 4).map(name => {
+        // 对于公开文件夹，不依赖 lists，直接基于卡片名称生成预览
+        if (isPublic) {
+            const customColor = getCardColor(name);
+            const [color1, color2] = generateGradient(name, customColor);
+            return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
+        }
+
+        // 对于普通文件夹，保持原有逻辑
         const list = lists[name];
         if (!list) return '<div class="wordlist-folder-mini"></div>';
         const customColor = getCardColor(name);
@@ -226,9 +237,17 @@ function renderFolder(folder, lists, layoutIdx) {
     const emptySlots = Math.max(0, 4 - folder.items.length);
     const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
 
-    // 检查是否为公开文件夹
-    const isPublic = folder.isPublic || false;
-    const publicIcon = isPublic ? '<span class="folder-public-icon">🌐</span>' : '';
+    // 公开文件夹图标和所有者信息
+    // 区分发布者和添加者：
+    // - 发布者：有 isPublic 但没有 ownerEmail → 显示📂图标
+    // - 添加者：有 isPublic 和 ownerEmail → 显示🌐图标
+    let publicIcon = '';
+    if (isPublic && !folder.ownerEmail) {
+        publicIcon = '<span class="folder-public-icon">📂</span>';  // 发布者显示📂
+    } else if (isPublic && folder.ownerEmail) {
+        publicIcon = '<span class="folder-public-icon">🌐</span>';  // 添加者显示🌐
+    }
+
     const ownerInfo = isPublic && folder.ownerEmail
         ? `<div class="folder-owner-info">👤 ${escapeHtml(folder.ownerEmail)}</div>`
         : '';
@@ -455,6 +474,13 @@ async function handleToggleFolderPublic(folderName, isPublic) {
         }
 
         const data = await response.json();
+
+        // 如果返回了 layout，更新本地存储并重新渲染
+        if (data.layout) {
+            saveLayout(data.layout);
+            renderWordListCards();
+            console.log('[右键菜单] 已更新 layout 并重新渲染');
+        }
 
         if (isPublic) {
             showToast(t('folderPublished') || '文件夹已设为公开', 'success');

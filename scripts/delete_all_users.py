@@ -18,16 +18,16 @@ import sqlite3
 import sys
 import os
 
-# 添加项目根目录到 Python 路径
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from server.config import Config
+# 获取项目根目录
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 数据库路径
+DATABASE_PATH = os.path.join(PROJECT_ROOT, 'data', 'databases', 'user_data.db')
 
 
 def delete_all_users():
     """删除所有用户及相关数据"""
 
-    db_path = Config.DATABASE_PATH
+    db_path = DATABASE_PATH
 
     print(f"数据库路径: {db_path}")
     print("=" * 60)
@@ -45,14 +45,16 @@ def delete_all_users():
         # 开启外键约束
         cursor.execute("PRAGMA foreign_keys = ON")
 
-        # 定义需要清空的表（按顺序）
+        # 定义需要清空的表（按顺序，考虑外键约束）
         tables = [
-            'sessions',
-            'reset_codes',
-            'user_settings',
-            'user_layout',
-            'wordlists',
-            'users'
+            'user_public_folders',  # 依赖 users 和 public_folders
+            'public_folders',       # 依赖 users
+            'sessions',             # 依赖 users
+            'reset_codes',          # 独立表
+            'user_settings',        # 依赖 users
+            'user_layout',          # 依赖 users
+            'wordlists',            # 依赖 users
+            'users'                 # 最后删除
         ]
 
         # 统计删除前的记录数
@@ -82,9 +84,16 @@ def delete_all_users():
             # 重置自增 ID
             cursor.execute("""
                 DELETE FROM sqlite_sequence
-                WHERE name IN ('users', 'sessions', 'reset_codes',
-                              'user_settings', 'user_layout', 'wordlists')
-            """)
+                WHERE name IN ( 
+                            'users', 
+                            'sessions',
+                            'reset_codes',
+                            'user_settings',
+                            'user_layout',
+                            'wordlists',
+                            'public_folders',
+                            'user_public_folders'
+                           )""")
             print(f"✓ 已重置自增 ID")
 
             # 提交事务

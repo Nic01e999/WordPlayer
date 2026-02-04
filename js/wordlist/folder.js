@@ -4,11 +4,11 @@
 
 import { escapeHtml } from '../utils.js';
 import { getWordLists, loadWordList, getCardColor } from './storage.js';
-import { getLayout, saveLayout, deleteWordList } from './layout.js';
-import { showConfirm } from '../utils/dialog.js';
+import { getLayout, saveLayout, deleteWordList, isFolderNameExists, syncLayoutToServer } from './layout.js';
+import { showConfirm, showAlert } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
 import { t } from '../i18n/index.js';
-import { authToken } from '../auth/state.js';
+import { authToken, isLoggedIn } from '../auth/state.js';
 import { showToast } from '../utils.js';
 import { isEditMode, enterEditMode } from './drag.js';
 import { showColorPicker, hideColorPicker } from './colorpicker.js';
@@ -190,8 +190,14 @@ export async function openFolder(folderName) {
     // 当前文件夹名（可能被重命名）
     let currentFolderName = folderName;
 
-    // 双击标题重命名（只读模式下禁用）
-    if (!isPublic) {
+    // 双击标题重命名
+    // 发布者的公开文件夹（isPublic && !ownerEmail）不允许重命名
+    // 添加者的公开文件夹（isPublic && ownerEmail）允许重命名
+    // 普通文件夹允许重命名
+    const isOwner = isPublic && !folder.ownerEmail;  // 发布者
+    const isAdder = isPublic && folder.ownerEmail;   // 添加者
+
+    if (!isOwner) {  // 非发布者可以重命名
         function bindTitleDblClick(titleEl) {
             titleEl.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
@@ -204,15 +210,97 @@ export async function openFolder(folderName) {
                 input.select();
 
                 let saved = false;
-                const save = () => {
+                const save = async () => {
                     if (saved) return;
                     saved = true;
                     const newName = input.value.trim();
-                    if (newName && newName !== currentFolderName) {
-                        renameFolder(currentFolderName, newName);
-                        currentFolderName = newName;
-                        if (_renderWordListCards) _renderWordListCards();
+
+                    // 检查是否为空或无变化
+                    if (!newName || newName === currentFolderName) {
+                        // 恢复原标题
+                        const newTitle = document.createElement('span');
+                        newTitle.className = 'folder-open-title';
+                        newTitle.textContent = currentFolderName;
+                        input.replaceWith(newTitle);
+                        bindTitleDblClick(newTitle);
+                        return;
                     }
+
+                    // 检查是否与其他文件夹重名
+                    if (isFolderNameExists(newName)) {
+                        await showAlert(t('folderNameExists', { name: newName }));
+
+                        // 恢复原标题（不保存重复名称）
+                        const newTitle = document.createElement('span');
+                        newTitle.className = 'folder-open-title';
+                        newTitle.textContent = currentFolderName;
+                        input.replaceWith(newTitle);
+                        bindTitleDblClick(newTitle);
+                        return;
+                    }
+
+                    // 名称有效且不重复，执行重命名
+                    let success = false;
+
+                    if (isAdder) {
+                        // 添加者的公开文件夹：调用专用API
+                        try {
+                            const response = await fetch('/api/public/folder/rename', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify({
+                                    publicFolderId: folder.publicFolderId,
+                                    newDisplayName: newName
+                                })
+                            });
+
+                            if (!response.ok) {
+                                const error = await response.json();
+                                throw new Error(error.error || '重命名失败');
+                            }
+
+                            const data = await response.json();
+
+                            // 更新本地 layout
+                            if (data.layout) {
+                                saveLayout(data.layout);
+                            }
+
+                            success = true;
+                            currentFolderName = newName;
+                            if (_renderWordListCards) _renderWordListCards();
+
+                            console.log('[Folder] 公开文件夹重命名成功:', newName);
+                        } catch (error) {
+                            console.error('[Folder] 公开文件夹重命名失败:', error);
+                            showToast(error.message || '重命名失败', 'error');
+                        }
+                    } else {
+                        // 普通文件夹：使用原有逻辑
+                        success = renameFolder(currentFolderName, newName);
+                        if (success) {
+                            currentFolderName = newName;
+                            if (_renderWordListCards) _renderWordListCards();
+
+                            // 关键修复：立即同步到云端
+                            if (isLoggedIn()) {
+                                console.log('[Folder] 文件夹重命名，开始同步到云端...');
+                                const result = await syncLayoutToServer();
+
+                                if (result.success) {
+                                    console.log('[Folder] 云端同步成功');
+                                } else if (result.error) {
+                                    console.error('[Folder] 云端同步失败:', result.error);
+                                    showToast(`保存失败: ${result.error}`, 'error', 5000);
+                                }
+                            }
+                        }
+                    }
+
+                    // 更新标题显示
                     const newTitle = document.createElement('span');
                     newTitle.className = 'folder-open-title';
                     newTitle.textContent = currentFolderName;
