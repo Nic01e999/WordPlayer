@@ -13,6 +13,7 @@ import { showContextMenu } from '../utils/context-menu.js';
 import { authToken } from '../auth/state.js';
 import { showToast } from '../utils.js';
 import { isJustInteracted } from './interactions.js';
+import { countWords, hexToRgba, generateGradient, generateFolderPreview } from './folder.js';
 
 /**
  * 主题色配置 - 根据当前主题自动获取
@@ -54,39 +55,6 @@ export const CARD_COLORS = [
     { id: 'gold', label: '粉黄', colors: ['#FA709A', '#FEE140'] },
 ];
 
-/**
- * hex 转 rgba
- */
-function hexToRgba(hex, alpha = 1) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-/**
- * 根据名称生成渐变色
- * 原色（null 或 'original'）= 当前主题色
- * 其他 colorId = 对应预设颜色
- */
-function generateGradient(name, customColorId = null) {
-    // 原色 = 使用当前主题色
-    if (!customColorId || customColorId === 'original') {
-        const themeColors = getCurrentThemeColors();
-        return themeColors.map(c => hexToRgba(c, 0.75));
-    }
-
-    // 其他自定义颜色
-    const colorConfig = CARD_COLORS.find(c => c.id === customColorId);
-    if (colorConfig && colorConfig.colors) {
-        return colorConfig.colors.map(c => hexToRgba(c, 0.75));
-    }
-
-    // 找不到配置，回退到主题色
-    const themeColors = getCurrentThemeColors();
-    return themeColors.map(c => hexToRgba(c, 0.75));
-}
-
 // 延迟绑定的函数引用（由 index.js 设置）
 let _bindDragEvents = null;
 let _exitEditMode = null;
@@ -117,13 +85,6 @@ let cardEventsInitialized = false;
  */
 export function resetEventFlags() {
     cardEventsInitialized = false;
-}
-
-/**
- * 统计单词数量
- */
-function countWords(words) {
-    return words.split(/\r?\n/).filter(line => line.trim()).length;
 }
 
 /**
@@ -256,19 +217,8 @@ function renderFolder(folder, lists, layoutIdx) {
         if (card.id) cardById[card.id] = card;
     }
 
-    // 生成 2x2 迷你图标预览（folder.cards 是 ID 数组）
-    const previewItems = folder.cards.slice(0, 4).map(cardId => {
-        const card = cardById[cardId];
-        if (!card) return '<div class="wordlist-folder-mini"></div>';
-
-        const customColor = getCardColor(card.name);
-        const [color1, color2] = generateGradient(card.name, customColor);
-        return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
-    }).join('');
-
-    // 补全到 4 个空位
-    const emptySlots = Math.max(0, 4 - folder.cards.length);
-    const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
+    // 生成 2x2 迷你图标预览（使用统一的预览生成函数）
+    const previewHtml = generateFolderPreview(folder.cards, cardById);
 
     // 公开文件夹图标和所有者信息
     // 区分发布者和添加者：
@@ -295,7 +245,7 @@ function renderFolder(folder, lists, layoutIdx) {
             <button class="wordlist-delete" data-folder-name="${escapeHtml(folder.name)}" title="Delete">&times;</button>
             <div class="wordlist-folder-icon">
                 ${publicIcon}
-                <div class="wordlist-folder-preview">${previewItems}${emptyHtml}</div>
+                <div class="wordlist-folder-preview">${previewHtml}</div>
             </div>
             <div class="wordlist-label">${escapeHtml(folder.name)}</div>
             ${ownerInfo}
@@ -319,16 +269,8 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
     const folderIcon = isOwner ? '📂' : '🌐';
     const invalidClass = isInvalid ? 'folder-invalid' : '';
 
-    // 生成 2x2 预览（和普通文件夹一样）
-    const previewItems = previewCards.slice(0, 4).map(card => {
-        const customColor = getCardColor(card.name);
-        const [color1, color2] = generateGradient(card.name, customColor);
-        return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
-    }).join('');
-
-    // 补全到 4 个空位
-    const emptySlots = Math.max(0, 4 - previewCards.length);
-    const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
+    // 生成 2x2 预览（使用统一的预览生成函数）
+    const previewHtml = generateFolderPreview(previewCards);
 
     return `
         <div class="wordlist-folder public-folder ${invalidClass}"
@@ -341,7 +283,7 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
             <button class="wordlist-delete" data-folder-name="${escapeHtml(displayName)}" title="Delete">&times;</button>
             <div class="wordlist-folder-icon">
                 <span class="folder-public-icon">${folderIcon}</span>
-                <div class="wordlist-folder-preview">${previewItems}${emptyHtml}</div>
+                <div class="wordlist-folder-preview">${previewHtml}</div>
             </div>
             <div class="wordlist-label">${escapeHtml(displayName)}</div>
         </div>

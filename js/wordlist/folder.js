@@ -67,6 +67,121 @@ function generateGradient(name, customColorId = null) {
 }
 
 /**
+ * 生成文件夹 2x2 预览网格 HTML
+ * @param {Array} cards - 卡片数组（可以是 cardId 数组或 card 对象数组）
+ * @param {Object} cardById - 卡片映射表（如果 cards 是 ID 数组则需要）
+ * @returns {string} 预览 HTML
+ */
+function generateFolderPreview(cards, cardById = null) {
+    const previewCards = cards.slice(0, 4);
+
+    const previewItems = previewCards.map(item => {
+        // 支持两种输入：cardId 或 card 对象
+        const card = cardById ? cardById[item] : item;
+        if (!card) return '<div class="wordlist-folder-mini"></div>';
+
+        const customColor = getCardColor(card.name);
+        const [color1, color2] = generateGradient(card.name, customColor);
+        return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
+    }).join('');
+
+    const emptySlots = Math.max(0, 4 - previewCards.length);
+    const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
+
+    return previewItems + emptyHtml;
+}
+
+/**
+ * 生成文件夹分页 HTML
+ * @param {Array} validCards - 有效的卡片名称数组
+ * @param {Object} lists - 单词列表映射
+ * @param {Object} options - 配置选项
+ * @param {number} options.cardsPerPage - 每页卡片数（默认9）
+ * @param {boolean} options.showDelete - 是否显示删除按钮（默认true）
+ * @param {boolean} options.isReadonly - 是否为只读模式（默认false）
+ * @param {string} options.folderName - 文件夹名称（用于 data-in-folder 属性）
+ * @returns {Array} 分页 HTML 数组
+ */
+function generateFolderPages(validCards, lists, options = {}) {
+    const {
+        cardsPerPage = CARDS_PER_PAGE,
+        showDelete = true,
+        isReadonly = false,
+        folderName = ''
+    } = options;
+
+    const totalPages = Math.ceil(validCards.length / cardsPerPage);
+    const pagesHtml = [];
+
+    for (let page = 0; page < totalPages; page++) {
+        const pageCards = validCards.slice(page * cardsPerPage, (page + 1) * cardsPerPage);
+        const cardsHtml = pageCards.map(name => {
+            const list = lists[name];
+            const wordCount = countWords(list.words);
+            const customColor = getCardColor(name);
+            const [color1, color2] = generateGradient(name, customColor);
+
+            const deleteBtn = showDelete
+                ? `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`
+                : '';
+
+            const readonlyClass = isReadonly ? 'readonly' : '';
+
+            return `
+                <div class="wordlist-card ${readonlyClass}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
+                    ${deleteBtn}
+                    <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
+                        <span class="wordlist-icon-count">${wordCount}</span>
+                    </div>
+                    <div class="wordlist-label">${escapeHtml(name)}</div>
+                </div>
+            `;
+        }).join('');
+
+        pagesHtml.push(`<div class="folder-page">${cardsHtml}</div>`);
+    }
+
+    return pagesHtml;
+}
+
+/**
+ * 生成分页圆点指示器 HTML
+ * @param {number} totalPages - 总页数
+ * @returns {string} 圆点 HTML（如果只有1页则返回空字符串）
+ */
+function generatePageDots(totalPages) {
+    if (totalPages <= 1) return '';
+
+    return Array.from({ length: totalPages }, (_, i) =>
+        `<div class="folder-page-dot${i === 0 ? ' active' : ''}" data-page="${i}"></div>`
+    ).join('');
+}
+
+/**
+ * 绑定文件夹卡片点击事件
+ * @param {HTMLElement} overlay - 文件夹展开视图容器
+ */
+function bindFolderCardClicks(overlay) {
+    overlay.querySelectorAll('.wordlist-card').forEach(card => {
+        card.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('wordlist-delete')) return;
+
+            // 检查是否在编辑模式
+            if (isEditMode()) {
+                // 编辑模式：显示颜色选择器
+                e.stopPropagation();
+                showColorPicker(card);
+                return;
+            }
+
+            // 非编辑模式：关闭文件夹并加载单词卡
+            overlay.remove();
+            await loadWordList(card.dataset.name);
+        });
+    });
+}
+
+/**
  * 重命名文件夹
  */
 function renameFolder(oldName, newName) {
@@ -151,39 +266,18 @@ export async function openFolder(folderName) {
     // 计算总页数
     const totalPages = Math.max(1, Math.ceil(validCards.length / CARDS_PER_PAGE));
 
-    // 生成分页 HTML
-    const pagesHtml = [];
-    for (let page = 0; page < totalPages; page++) {
-        const pageCards = validCards.slice(page * CARDS_PER_PAGE, (page + 1) * CARDS_PER_PAGE);
-        const cardsHtml = pageCards.map(name => {
-            const list = lists[name];
-            const wordCount = countWords(list.words);
-            const customColor = getCardColor(name);
-            const [color1, color2] = generateGradient(name, customColor);
+    // 生成分页 HTML（使用统一的分页生成函数）
+    // 发布者可以删除，添加者不能删除
+    const isOwner = isPublic && !folder.ownerEmail;
+    const pagesHtml = generateFolderPages(validCards, lists, {
+        cardsPerPage: CARDS_PER_PAGE,
+        showDelete: !isPublic || isOwner,
+        isReadonly: isPublic,
+        folderName: folderName
+    });
 
-            // 发布者可以删除，添加者不能删除
-            const isOwner = isPublic && !folder.ownerEmail;
-            const deleteBtn = (isPublic && !isOwner) ? '' : `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`;
-
-            return `
-                <div class="wordlist-card ${isPublic ? 'readonly' : ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
-                    ${deleteBtn}
-                    <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
-                        <span class="wordlist-icon-count">${wordCount}</span>
-                    </div>
-                    <div class="wordlist-label">${escapeHtml(name)}</div>
-                </div>
-            `;
-        }).join('');
-        pagesHtml.push(`<div class="folder-page">${cardsHtml}</div>`);
-    }
-
-    // 生成圆点指示器 HTML（仅多页时显示）
-    const dotsHtml = totalPages > 1
-        ? Array.from({ length: totalPages }, (_, i) =>
-            `<div class="folder-page-dot${i === 0 ? ' active' : ''}" data-page="${i}"></div>`
-          ).join('')
-        : '';
+    // 生成圆点指示器 HTML（使用统一的圆点生成函数）
+    const dotsHtml = generatePageDots(totalPages);
 
     const overlay = document.createElement('div');
     overlay.className = 'folder-open-overlay';
@@ -221,7 +315,7 @@ export async function openFolder(folderName) {
     // 发布者和添加者都可以重命名，但方式不同
     // 发布者：修改原始文件夹名称（影响所有引用者）
     // 添加者：修改本地显示名称（只影响自己）
-    const isOwner = isPublic && !folder.ownerEmail;  // 发布者
+    // isOwner 已在上面声明（第271行）
     const isAdder = isPublic && folder.ownerEmail;   // 添加者
 
     // 发布者和添加者都可以重命名，普通文件夹也可以重命名
@@ -379,24 +473,8 @@ export async function openFolder(folderName) {
         bindTitleDblClick(titleEl);
     }
 
-    // 文件夹内卡片点击加载
-    overlay.querySelectorAll('.wordlist-card').forEach(card => {
-        card.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('wordlist-delete')) return;
-
-            // 检查是否在编辑模式
-            if (isEditMode()) {
-                // 编辑模式：显示颜色选择器
-                e.stopPropagation();
-                showColorPicker(card);
-                return;
-            }
-
-            // 非编辑模式：关闭文件夹并加载单词卡
-            overlay.remove();
-            await loadWordList(card.dataset.name);
-        });
-    });
+    // 文件夹内卡片点击加载（使用统一的卡片点击绑定函数）
+    bindFolderCardClicks(overlay);
 
     // 文件夹内删除和拖拽（发布者可以操作，添加者不能操作）
     // 使用上面已声明的 isOwner 变量
@@ -962,35 +1040,16 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
     // 计算总页数
     const totalPages = Math.max(1, Math.ceil(validCards.length / CARDS_PER_PAGE));
 
-    // 生成分页 HTML
-    const pagesHtml = [];
-    for (let page = 0; page < totalPages; page++) {
-        const pageCards = validCards.slice(page * CARDS_PER_PAGE, (page + 1) * CARDS_PER_PAGE);
-        const cardsHtml = pageCards.map(name => {
-            const list = lists[name];
-            const wordCount = countWords(list.words);
-            const customColor = getCardColor(name);
-            const [color1, color2] = generateGradient(name, customColor);
+    // 生成分页 HTML（使用统一的分页生成函数）
+    const pagesHtml = generateFolderPages(validCards, lists, {
+        cardsPerPage: CARDS_PER_PAGE,
+        showDelete: false,  // 公开文件夹不显示删除按钮
+        isReadonly: true,   // 公开文件夹为只读模式
+        folderName: displayName
+    });
 
-            // 公开文件夹不显示删除按钮
-            return `
-                <div class="wordlist-card readonly" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(displayName)}">
-                    <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
-                        <span class="wordlist-icon-count">${wordCount}</span>
-                    </div>
-                    <div class="wordlist-label">${escapeHtml(name)}</div>
-                </div>
-            `;
-        }).join('');
-        pagesHtml.push(`<div class="folder-page">${cardsHtml}</div>`);
-    }
-
-    // 生成圆点指示器 HTML（仅多页时显示）
-    const dotsHtml = totalPages > 1
-        ? Array.from({ length: totalPages }, (_, i) =>
-            `<div class="folder-page-dot${i === 0 ? ' active' : ''}" data-page="${i}"></div>`
-          ).join('')
-        : '';
+    // 生成圆点指示器 HTML（使用统一的圆点生成函数）
+    const dotsHtml = generatePageDots(totalPages);
 
     // 创建文件夹展开视图
     const overlay = document.createElement('div');
@@ -1017,24 +1076,8 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
         }
     });
 
-    // 绑定卡片点击事件
-    overlay.querySelectorAll('.wordlist-card').forEach(card => {
-        card.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('wordlist-delete')) return;
-
-            // 检查是否在编辑模式
-            if (isEditMode()) {
-                // 编辑模式：显示颜色选择器
-                e.stopPropagation();
-                showColorPicker(card);
-                return;
-            }
-
-            // 非编辑模式：关闭文件夹并加载单词卡
-            overlay.remove();
-            await loadWordList(card.dataset.name);
-        });
-    });
+    // 绑定卡片点击事件（使用统一的卡片点击绑定函数）
+    bindFolderCardClicks(overlay);
 
     // 绑定分页交互
     if (totalPages > 1) {
@@ -1149,3 +1192,6 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
     const titleEl = overlay.querySelector('.folder-open-title');
     bindTitleDblClick(titleEl);
 }
+
+// 导出工具函数供其他模块使用
+export { countWords, hexToRgba, generateGradient, generateFolderPreview };
