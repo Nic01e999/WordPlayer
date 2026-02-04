@@ -97,6 +97,13 @@ export function clearAuth() {
 }
 
 /**
+ * 获取当前用户信息
+ */
+export function getCurrentUser() {
+    return currentUser;
+}
+
+/**
  * 获取授权头
  */
 export function getAuthHeader() {

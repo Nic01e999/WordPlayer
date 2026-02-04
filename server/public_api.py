@@ -43,6 +43,9 @@ def set_folder_public():
             created=folder['created']
         )
 
+        # 获取更新后的 layout
+        layout = LayoutRepository.get_by_user(user_id) or []
+
         if is_public:
             # 计算单词数
             word_count = 0
@@ -56,11 +59,15 @@ def set_folder_public():
             return jsonify({
                 'success': True,
                 'folderId': folder_id,
-                'wordCount': word_count
+                'wordCount': word_count,
+                'layout': layout
             })
         else:
             print(f"[公开文件夹] 用户 {user_id} 取消文件夹 '{folder_name}' 的公开")
-            return jsonify({'success': True})
+            return jsonify({
+                'success': True,
+                'layout': layout
+            })
 
     except Exception as e:
         print(f"[公开文件夹] 设置公开状态失败: {e}")

@@ -9,6 +9,7 @@ import { showToast } from './utils.js';
 import { t } from './i18n/index.js';
 import { getLayout, saveLayout } from './wordlist/layout.js';
 import { renderWordListCards } from './wordlist/render.js';
+import { setPublicFoldersCache } from './wordlist/storage.js';
 
 let searchTimeout = null;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -182,39 +183,67 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
       return;
     }
 
-    // 生成显示名称（包含发布者邮箱）
-    const displayName = `${folderName} (${ownerEmail})`;
+    // 生成显示名称（只使用文件夹名称）
+    let displayName = folderName;
+    let attempt = 1;
+    const maxAttempts = 10;
+    let data = null;
 
-    const response = await fetch('/api/public/folder/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        folderId: folderId,  // 修正：使用 folderId 而不是 publicFolderId
-        displayName: displayName
-      })
-    });
+    // 尝试添加，如果重名则自动添加序号
+    while (attempt <= maxAttempts) {
+      const response = await fetch('/api/public/folder/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          folderId: folderId,
+          displayName: displayName
+        })
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || '添加失败');
+      if (response.ok) {
+        data = await response.json();
+        break;
+      } else {
+        const error = await response.json();
+        if (error.error && error.error.includes('已存在同名文件夹')) {
+          attempt++;
+          displayName = `${folderName} (${attempt})`;
+          console.log(`[公开搜索] 文件夹重名，尝试新名称: ${displayName}`);
+          console.log(`[Server] 文件夹重名，尝试新名称: ${displayName}`);
+        } else {
+          throw new Error(error.error || '添加失败');
+        }
+      }
     }
 
-    const data = await response.json();
+    if (attempt > maxAttempts) {
+      throw new Error('文件夹名称冲突次数过多，请手动重命名');
+    }
+
+    if (!data) {
+      throw new Error('添加失败');
+    }
 
     // 优先使用返回的 layout 更新本地存储
     if (data.layout) {
       saveLayout(data.layout);
       console.log('[公开搜索] 使用返回的 layout 更新本地存储');
-    } else {
-      // 备用方案：从服务端拉取
-      console.log('[公开搜索] layout 未返回，使用备用方案拉取');
-      const syncResult = await pullFromCloud();
-      if (syncResult.layout) {
-        saveLayout(syncResult.layout);
-      }
+    }
+
+    // 调用 pullFromCloud() 更新 publicFolders 缓存
+    console.log('[公开搜索] 调用 pullFromCloud() 更新公开文件夹缓存');
+    console.log('[Server] 调用 pullFromCloud() 更新公开文件夹缓存');
+    const syncResult = await pullFromCloud();
+    if (syncResult.publicFolders) {
+      setPublicFoldersCache(syncResult.publicFolders);  // 关键：更新缓存
+      console.log('[公开搜索] 公开文件夹缓存已更新');
+      console.log('[Server] 公开文件夹缓存已更新');
+    } else if (syncResult.error) {
+      console.warn('[公开搜索] 更新缓存失败:', syncResult.error);
+      console.warn('[Server] 更新缓存失败:', syncResult.error);
     }
 
     // 重新渲染主页

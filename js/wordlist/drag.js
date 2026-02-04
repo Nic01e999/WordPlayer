@@ -344,9 +344,17 @@ function updateLayoutOrder(layout, grid) {
             if (folderId) {
                 newLayout.push(`folder_${folderId}`);
             }
+        } else if (type === 'public-folder') {
+            // 处理公开文件夹引用
+            const publicRefId = el.dataset.publicRefId;
+            if (publicRefId) {
+                newLayout.push(`public_${publicRefId}`);
+            }
         }
     });
 
+    console.log('[Drag] 更新后的布局:', newLayout);
+    console.log('[Server] 更新后的布局:', newLayout);
     return newLayout;
 }
 
@@ -406,6 +414,13 @@ function startDrag(startEvent, draggedEl, workplace) {
 
             // 卡片拖到文件夹中心 - 准备合并
             if (isCard && targetType === 'folder' && inCenter) {
+                // 检查是否为公开文件夹 - 不允许合并
+                const isPublicFolder = target.dataset.type === 'public-folder';
+                if (isPublicFolder) {
+                    clearMergeState();
+                    return;
+                }
+
                 if (dragState.mergeTarget !== target) {
                     clearMergeState();
                     dragState.mergeTarget = target;
@@ -455,6 +470,15 @@ function startDrag(startEvent, draggedEl, workplace) {
             const targetElType = targetEl.dataset.type;
 
             if (targetElType === 'folder') {
+                // 检查是否为公开文件夹 - 不允许合并
+                const isPublicFolder = targetEl.dataset.type === 'public-folder';
+                if (isPublicFolder) {
+                    console.warn('[Drag] 不允许将卡片拖入公开文件夹');
+                    console.warn('[Server] 不允许将卡片拖入公开文件夹');
+                    clearMergeState();
+                    return;
+                }
+
                 // 拖入已有文件夹
                 const targetFolderName = targetEl.dataset.folderName;
                 const folders = getFolders();

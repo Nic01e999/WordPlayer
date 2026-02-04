@@ -9,6 +9,7 @@ import { updatePreloadProgress } from '../preload.js';
 import { stopAudio } from '../audio.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
+import { getCurrentUser } from '../auth/state.js';
 
 // 导入子模块
 import { getWordLists, saveWordList, loadWordList, updateWordList, isWordListNameExists } from './storage.js';
@@ -28,7 +29,8 @@ setRenderDeps({
     isEditMode,
     setCurrentWorkplace,
     getDragState,
-    openFolder
+    openFolder,
+    getCurrentUser
 });
 
 setDragDeps({

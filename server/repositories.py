@@ -549,13 +549,27 @@ class PublicFolderRepository:
 
             results = []
             for row in cursor.fetchall():
+                # 获取文件夹的前 4 张卡片用于预览
+                folder = FolderRepository.get_by_id(row['folder_id'])
+                preview_cards = []
+                if folder and folder.get('cards'):
+                    # 获取前 4 张卡片
+                    for card_id in folder['cards'][:4]:
+                        card = WordlistRepository.get_by_id(folder['user_id'], card_id)
+                        if card:
+                            preview_cards.append({
+                                'id': card['id'],
+                                'name': card['name']
+                            })
+
                 results.append({
                     'id': row['id'],
                     'folder_id': row['folder_id'],
                     'owner_id': row['owner_id'],
                     'owner_name': row['owner_name'],
                     'display_name': row['display_name'],
-                    'created': row['created_at']
+                    'created': row['created_at'],
+                    'preview_cards': preview_cards  # 新增字段
                 })
             return results
 

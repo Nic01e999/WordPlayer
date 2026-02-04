@@ -3,7 +3,7 @@
  */
 
 import { escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder } from './storage.js';
+import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder, getPublicFolders, setPublicFoldersCache } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showConfirm, showAlert } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
@@ -161,8 +161,9 @@ export async function openFolder(folderName) {
             const customColor = getCardColor(name);
             const [color1, color2] = generateGradient(name, customColor);
 
-            // 只读模式下不显示删除按钮
-            const deleteBtn = isPublic ? '' : `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`;
+            // 发布者可以删除，添加者不能删除
+            const isOwner = isPublic && !folder.ownerEmail;
+            const deleteBtn = (isPublic && !isOwner) ? '' : `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`;
 
             return `
                 <div class="wordlist-card ${isPublic ? 'readonly' : ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
@@ -217,12 +218,14 @@ export async function openFolder(folderName) {
 
     // 双击标题重命名
     // 发布者的公开文件夹（isPublic && !ownerEmail）不允许重命名
-    // 添加者的公开文件夹（isPublic && ownerEmail）允许重命名
-    // 普通文件夹允许重命名
+    // 发布者和添加者都可以重命名，但方式不同
+    // 发布者：修改原始文件夹名称（影响所有引用者）
+    // 添加者：修改本地显示名称（只影响自己）
     const isOwner = isPublic && !folder.ownerEmail;  // 发布者
     const isAdder = isPublic && folder.ownerEmail;   // 添加者
 
-    if (!isOwner) {  // 非发布者可以重命名
+    // 发布者和添加者都可以重命名，普通文件夹也可以重命名
+    if (isOwner || isAdder || !isPublic) {
         function bindTitleDblClick(titleEl) {
             titleEl.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
@@ -267,8 +270,28 @@ export async function openFolder(folderName) {
                     // 名称有效且不重复，执行重命名
                     let success = false;
 
-                    if (isAdder) {
-                        // 添加者的公开文件夹：调用专用API
+                    if (isOwner) {
+                        // 发布者的公开文件夹：修改原始文件夹名称（影响所有引用者）
+                        success = renameFolder(currentFolderName, newName);
+                        if (success) {
+                            currentFolderName = newName;
+                            if (_renderWordListCards) _renderWordListCards();
+
+                            // 立即同步到云端
+                            if (isLoggedIn()) {
+                                console.log('[Folder] 发布者重命名公开文件夹，开始同步到云端...');
+                                const result = await syncLayoutToServer();
+
+                                if (result.success) {
+                                    console.log('[Folder] 云端同步成功');
+                                } else if (result.error) {
+                                    console.error('[Folder] 云端同步失败:', result.error);
+                                    showToast(`保存失败: ${result.error}`, 'error', 5000);
+                                }
+                            }
+                        }
+                    } else if (isAdder) {
+                        // 添加者的公开文件夹：调用专用API修改本地显示名称
                         try {
                             const response = await fetch('/api/public/folder/rename', {
                                 method: 'POST',
@@ -292,6 +315,17 @@ export async function openFolder(folderName) {
                             // 更新本地 layout
                             if (data.layout) {
                                 saveLayout(data.layout);
+                            }
+
+                            // 更新 publicFolders 缓存中的 display_name
+                            const publicFolders = getPublicFolders();
+                            const targetRef = publicFolders.find(ref =>
+                                ref.folder_id === folder.publicFolderId
+                            );
+                            if (targetRef) {
+                                targetRef.display_name = newName;
+                                setPublicFoldersCache(publicFolders);
+                                console.log('[Folder] 已更新公开文件夹缓存:', newName);
                             }
 
                             success = true;
@@ -364,8 +398,9 @@ export async function openFolder(folderName) {
         });
     });
 
-    // 文件夹内删除（只读模式下不绑定）
-    if (!isPublic) {
+    // 文件夹内删除和拖拽（发布者可以操作，添加者不能操作）
+    // 使用上面已声明的 isOwner 变量
+    if (!isPublic || isOwner) {
         overlay.querySelectorAll('.wordlist-delete').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -379,7 +414,7 @@ export async function openFolder(folderName) {
             });
         });
 
-        // 文件夹内拖拽取出卡片（只读模式下不绑定）
+        // 文件夹内拖拽取出卡片（发布者可以操作，添加者不能操作）
         const view = overlay.querySelector('.folder-open-view');
         const container = overlay.querySelector('.folder-pages-container');
         const pages = overlay.querySelectorAll('.folder-page');
@@ -404,11 +439,35 @@ async function fetchPublicFolderContent(publicFolderId) {
     });
 
     if (!response.ok) {
+        if (response.status === 404) {
+            throw new Error('FOLDER_NOT_FOUND');  // 特殊错误码
+        }
         throw new Error(`获取内容失败: ${response.status}`);
     }
 
     const data = await response.json();
     return data;
+}
+
+/**
+ * 标记公开文件夹引用为失效状态
+ * @param {number} refId - 公开文件夹引用ID
+ */
+function markPublicFolderAsInvalid(refId) {
+    // 在内存中标记为失效
+    const publicFolders = getPublicFolders();
+    const folder = publicFolders.find(f => f.id === refId);
+    if (folder) {
+        folder.isInvalid = true;
+        setPublicFoldersCache(publicFolders);
+    }
+
+    // 重新渲染以显示灰色状态
+    if (_renderWordListCards) {
+        _renderWordListCards();
+    }
+
+    console.log(`[Folder] 标记公开文件夹引用为失效: ${refId}`);
 }
 
 /**
@@ -848,4 +907,245 @@ function goToPage(container, pages, pageIndex) {
     dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === pageIndex);
     });
+}
+
+/**
+ * 打开公开文件夹引用
+ * @param {number} folderId 公开文件夹的 folder_id
+ * @param {string} displayName 显示名称
+ * @param {string} ownerEmail 所有者邮箱
+ */
+export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
+    console.log('[Folder] 打开公开文件夹引用:', folderId, displayName);
+    console.log('[Server] 打开公开文件夹引用:', folderId, displayName);
+
+    let lists;
+    let validCards;
+
+    // 从 API 获取公开文件夹内容
+    let originalFolderName = '';
+    try {
+        const content = await fetchPublicFolderContent(folderId);
+        lists = {};
+        validCards = [];
+        originalFolderName = content.folderName || '';  // 获取原始文件夹名
+
+        // 将 API 返回的卡片转换为 lists 格式
+        content.cards.forEach(card => {
+            lists[card.name] = {
+                name: card.name,
+                words: card.words,
+                translations: card.translations,
+                wordInfo: card.wordInfo
+            };
+            validCards.push(card.name);
+        });
+    } catch (error) {
+        console.error('[Folder] 获取公开文件夹内容失败:', error);
+        console.error('[Server] 获取公开文件夹内容失败:', error);
+
+        if (error.message === 'FOLDER_NOT_FOUND') {
+            // 获取公开文件夹引用的 refId
+            const publicFolders = getPublicFolders();
+            const folderRef = publicFolders.find(f => f.folder_id === folderId);
+            if (folderRef) {
+                // 标记为失效状态
+                markPublicFolderAsInvalid(folderRef.id);
+            }
+            showToast('发布者已删除或私有化此文件夹', 'error');
+        } else {
+            showToast(t('loadFailed') || '加载失败', 'error');
+        }
+        return;
+    }
+
+    // 计算总页数
+    const totalPages = Math.max(1, Math.ceil(validCards.length / CARDS_PER_PAGE));
+
+    // 生成分页 HTML
+    const pagesHtml = [];
+    for (let page = 0; page < totalPages; page++) {
+        const pageCards = validCards.slice(page * CARDS_PER_PAGE, (page + 1) * CARDS_PER_PAGE);
+        const cardsHtml = pageCards.map(name => {
+            const list = lists[name];
+            const wordCount = countWords(list.words);
+            const customColor = getCardColor(name);
+            const [color1, color2] = generateGradient(name, customColor);
+
+            // 公开文件夹不显示删除按钮
+            return `
+                <div class="wordlist-card readonly" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(displayName)}">
+                    <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
+                        <span class="wordlist-icon-count">${wordCount}</span>
+                    </div>
+                    <div class="wordlist-label">${escapeHtml(name)}</div>
+                </div>
+            `;
+        }).join('');
+        pagesHtml.push(`<div class="folder-page">${cardsHtml}</div>`);
+    }
+
+    // 生成圆点指示器 HTML（仅多页时显示）
+    const dotsHtml = totalPages > 1
+        ? Array.from({ length: totalPages }, (_, i) =>
+            `<div class="folder-page-dot${i === 0 ? ' active' : ''}" data-page="${i}"></div>`
+          ).join('')
+        : '';
+
+    // 创建文件夹展开视图
+    const overlay = document.createElement('div');
+    overlay.className = 'folder-open-overlay';
+    overlay.innerHTML = `
+        <span class="folder-open-title">${escapeHtml(displayName)}</span>
+        <div class="folder-open-view">
+            <div class="folder-pages-container">
+                ${pagesHtml.join('')}
+            </div>
+        </div>
+        ${totalPages > 1 ? `<div class="folder-page-dots">${dotsHtml}</div>` : ''}
+        <div class="folder-owner-info">
+            <span class="owner-email">${escapeHtml(originalFolderName)} : ${escapeHtml(ownerEmail)}</span>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // 点击背景关闭
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
+
+    // 绑定卡片点击事件
+    overlay.querySelectorAll('.wordlist-card').forEach(card => {
+        card.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('wordlist-delete')) return;
+
+            // 检查是否在编辑模式
+            if (isEditMode()) {
+                // 编辑模式：显示颜色选择器
+                e.stopPropagation();
+                showColorPicker(card);
+                return;
+            }
+
+            // 非编辑模式：关闭文件夹并加载单词卡
+            overlay.remove();
+            await loadWordList(card.dataset.name);
+        });
+    });
+
+    // 绑定分页交互
+    if (totalPages > 1) {
+        bindFolderPagination(overlay, totalPages);
+    }
+
+    // 绑定双击重命名功能
+    let currentDisplayName = displayName;
+
+    function bindTitleDblClick(titleEl) {
+        titleEl.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'folder-open-title-input';
+            input.value = currentDisplayName;
+            titleEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            let saved = false;
+            const save = async () => {
+                if (saved) return;
+                saved = true;
+                const newName = input.value.trim();
+
+                // 检查是否为空或无变化
+                if (!newName || newName === currentDisplayName) {
+                    const newTitle = document.createElement('span');
+                    newTitle.className = 'folder-open-title';
+                    newTitle.textContent = currentDisplayName;
+                    input.replaceWith(newTitle);
+                    bindTitleDblClick(newTitle);
+                    return;
+                }
+
+                // 执行重命名
+                try {
+                    const response = await fetch('/api/public/folder/rename', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            displayName: currentDisplayName,
+                            newDisplayName: newName
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || '重命名失败');
+                    }
+
+                    const data = await response.json();
+                    if (data.layout) {
+                        saveLayout(data.layout);
+                    }
+
+                    // 更新 publicFolders 缓存中的 display_name
+                    const publicFolders = getPublicFolders();
+                    const targetRef = publicFolders.find(ref =>
+                        ref.display_name === currentDisplayName
+                    );
+                    if (targetRef) {
+                        targetRef.display_name = newName;
+                        setPublicFoldersCache(publicFolders);
+                        console.log('[Folder] 已更新公开文件夹缓存:', newName);
+                    }
+
+                    currentDisplayName = newName;
+                    if (_renderWordListCards) _renderWordListCards();
+
+                    const newTitle = document.createElement('span');
+                    newTitle.className = 'folder-open-title';
+                    newTitle.textContent = newName;
+                    input.replaceWith(newTitle);
+                    bindTitleDblClick(newTitle);
+
+                    showToast(t('renameSuccess') || '重命名成功', 'success');
+                    console.log('[Folder] 公开文件夹重命名成功:', newName);
+                    console.log('[Server] 公开文件夹重命名成功:', newName);
+                } catch (error) {
+                    console.error('[Folder] 重命名失败:', error);
+                    console.error('[Server] 重命名失败:', error);
+                    showToast(error.message || '重命名失败', 'error');
+
+                    const newTitle = document.createElement('span');
+                    newTitle.className = 'folder-open-title';
+                    newTitle.textContent = currentDisplayName;
+                    input.replaceWith(newTitle);
+                    bindTitleDblClick(newTitle);
+                }
+            };
+
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); save(); }
+                if (e.key === 'Escape') {
+                    saved = true;
+                    const newTitle = document.createElement('span');
+                    newTitle.className = 'folder-open-title';
+                    newTitle.textContent = currentDisplayName;
+                    input.replaceWith(newTitle);
+                    bindTitleDblClick(newTitle);
+                }
+            });
+        });
+    }
+
+    const titleEl = overlay.querySelector('.folder-open-title');
+    bindTitleDblClick(titleEl);
 }

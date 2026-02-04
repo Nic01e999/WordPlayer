@@ -4,8 +4,8 @@
  */
 
 import { $, showView, escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor, getFolders } from './storage.js';
-import { getLayout, deleteWordList, deleteFolder } from './layout.js';
+import { getWordLists, loadWordList, getCardColor, getFolders, getPublicFolders, addOrUpdateFolder } from './storage.js';
+import { getLayout, saveLayout, deleteWordList, deleteFolder, deletePublicFolderRef } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
@@ -94,6 +94,7 @@ let _isEditMode = null;
 let _setCurrentWorkplace = null;
 let _getDragState = null;
 let _openFolder = null;
+let _getCurrentUser = null;
 
 /**
  * 设置延迟绑定的函数
@@ -105,6 +106,7 @@ export function setRenderDeps(deps) {
     _setCurrentWorkplace = deps.setCurrentWorkplace;
     _getDragState = deps.getDragState;
     _openFolder = deps.openFolder;
+    _getCurrentUser = deps.getCurrentUser;
 }
 
 // 事件委托标记
@@ -184,8 +186,17 @@ export function renderWordListCards() {
             if (!folder) return '';
             return renderFolder(folder, lists, idx);
         } else if (item.startsWith('public_')) {
-            // TODO: 处理公开文件夹
-            return '';
+            // 处理公开文件夹引用
+            const refId = parseInt(item.substring(7)); // 提取 ref_id (如 "public_3" → 3)
+            const publicFolderRef = getPublicFolders().find(ref => ref.id === refId);
+
+            if (!publicFolderRef) {
+                // 引用不存在，可能已被删除
+                console.warn(`[Render] 公开文件夹引用不存在: ${item}`);
+                return '';
+            }
+
+            return renderPublicFolder(publicFolderRef, idx);
         }
         return '';
     }).join('');
@@ -237,7 +248,7 @@ function renderCard(list, layoutIdx) {
  */
 function renderFolder(folder, lists, layoutIdx) {
     // 检查是否为公开文件夹（提前检查，因为预览生成需要用到）
-    const isPublic = folder.isPublic || false;
+    const isPublic = folder.is_public || false;
 
     // 建立 ID → 卡片的映射
     const cardById = {};
@@ -293,6 +304,51 @@ function renderFolder(folder, lists, layoutIdx) {
 }
 
 /**
+ * 渲染公开文件夹引用 - 根据角色显示不同图标
+ * 发布者（owner）显示📂，添加者显示🌐
+ */
+function renderPublicFolder(publicFolderRef, layoutIdx) {
+    const displayName = publicFolderRef.display_name || '未命名文件夹';
+    const ownerName = publicFolderRef.owner_name || '未知作者';
+    const previewCards = publicFolderRef.preview_cards || [];
+    const isInvalid = publicFolderRef.isInvalid || false;
+
+    // 判断当前用户是否为发布者
+    const currentUserId = _getCurrentUser ? _getCurrentUser()?.id : null;
+    const isOwner = currentUserId && publicFolderRef.owner_id === currentUserId;
+    const folderIcon = isOwner ? '📂' : '🌐';
+    const invalidClass = isInvalid ? 'folder-invalid' : '';
+
+    // 生成 2x2 预览（和普通文件夹一样）
+    const previewItems = previewCards.slice(0, 4).map(card => {
+        const customColor = getCardColor(card.name);
+        const [color1, color2] = generateGradient(card.name, customColor);
+        return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
+    }).join('');
+
+    // 补全到 4 个空位
+    const emptySlots = Math.max(0, 4 - previewCards.length);
+    const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
+
+    return `
+        <div class="wordlist-folder public-folder ${invalidClass}"
+             data-public-ref-id="${publicFolderRef.id}"
+             data-folder-id="${publicFolderRef.folder_id}"
+             data-folder-name="${escapeHtml(displayName)}"
+             data-layout-idx="${layoutIdx}"
+             data-type="public-folder"
+             data-owner-email="${escapeHtml(ownerName)}">
+            <button class="wordlist-delete" data-folder-name="${escapeHtml(displayName)}" title="Delete">&times;</button>
+            <div class="wordlist-folder-icon">
+                <span class="folder-public-icon">${folderIcon}</span>
+                <div class="wordlist-folder-preview">${previewItems}${emptyHtml}</div>
+            </div>
+            <div class="wordlist-label">${escapeHtml(displayName)}</div>
+        </div>
+    `;
+}
+
+/**
  * 绑定卡片事件（使用事件委托）
  */
 function bindCardEvents(workplace) {
@@ -310,7 +366,13 @@ function bindCardEvents(workplace) {
             const name = deleteBtn.dataset.name;
             const folderName = deleteBtn.dataset.folderName;
 
-            if (folderName) {
+            // 检查是否为公开文件夹引用
+            const parentFolder = deleteBtn.closest('.wordlist-folder');
+            if (parentFolder && parentFolder.dataset.type === 'public-folder') {
+                // 删除公开文件夹引用
+                const refId = parentFolder.dataset.publicRefId;
+                handleDeletePublicFolderRef(parseInt(refId), folderName);
+            } else if (folderName) {
                 handleDeleteFolder(folderName);
             } else if (name) {
                 handleDeleteCard(name);
@@ -338,7 +400,22 @@ function bindCardEvents(workplace) {
                 return;
             }
 
-            if (_openFolder) _openFolder(folder.dataset.folderName);
+            // 检查是否为公开文件夹引用
+            const folderType = folder.dataset.type;
+            if (folderType === 'public-folder') {
+                // 打开公开文件夹引用
+                const folderId = folder.dataset.folderId;
+                const displayName = folder.dataset.folderName;
+                const ownerEmail = folder.dataset.ownerEmail;
+
+                // 动态导入 openPublicFolderRef 函数
+                import('./folder.js').then(module => {
+                    module.openPublicFolderRef(parseInt(folderId), displayName, ownerEmail);
+                });
+            } else {
+                // 打开普通文件夹
+                if (_openFolder) _openFolder(folder.dataset.folderName);
+            }
             return;
         }
 
@@ -370,6 +447,18 @@ async function handleDeleteFolder(folderName) {
     const confirmed = await showConfirm(t('deleteFolder', { name: folderName }));
     if (confirmed) {
         await deleteFolder(folderName);
+        if (_exitEditMode) _exitEditMode();
+        renderWordListCards();
+    }
+}
+
+/**
+ * 处理删除公开文件夹引用（异步弹窗）
+ */
+async function handleDeletePublicFolderRef(refId, displayName) {
+    const confirmed = await showConfirm(t('deleteFolder', { name: displayName }));
+    if (confirmed) {
+        await deletePublicFolderRef(refId);
         if (_exitEditMode) _exitEditMode();
         renderWordListCards();
     }
@@ -497,12 +586,25 @@ async function handleToggleFolderPublic(folderName, isPublic) {
         }
 
         const data = await response.json();
+        console.log('[右键菜单] 服务器返回数据:', data);
+
+        // 更新文件夹缓存中的 is_public 状态
+        const folders = getFolders();
+        const folder = folders[folderName];
+        if (folder) {
+            folder.is_public = isPublic;
+            addOrUpdateFolder(folderName, folder);
+            console.log(`[右键菜单] 已更新文件夹缓存: ${folderName}, is_public=${isPublic}`);
+        }
 
         // 如果返回了 layout，更新本地存储并重新渲染
         if (data.layout) {
+            console.log('[右键菜单] 收到 layout，准备更新:', data.layout);
             saveLayout(data.layout);
             renderWordListCards();
             console.log('[右键菜单] 已更新 layout 并重新渲染');
+        } else {
+            console.warn('[右键菜单] 服务器未返回 layout，无法刷新UI');
         }
 
         if (isPublic) {

@@ -5,6 +5,7 @@
 
 import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder } from './storage.js';
 import { syncLayoutToCloud } from '../auth/sync.js';
+import { authToken } from '../auth/state.js';
 
 // ============================================
 // 布局内存缓存（不使用 localStorage）
@@ -194,4 +195,46 @@ export async function deleteFolder(folderName) {
         console.log('[Layout] 文件夹删除已同步到服务器:', folderName);
         console.log('[Server] 文件夹删除已同步到服务器:', folderName);
     }
+}
+
+/**
+ * 删除公开文件夹引用
+ */
+export async function deletePublicFolderRef(refId) {
+    console.log('[Layout] 删除公开文件夹引用:', refId);
+    console.log('[Server] 删除公开文件夹引用:', refId);
+
+    // 从 layout 中移除
+    let layout = getLayout();
+    layout = layout.filter(item => item !== `public_${refId}`);
+    saveLayout(layout);
+
+    // 调用服务器 API 删除引用
+    const token = authToken();
+    if (token) {
+        try {
+            const response = await fetch('/api/public/folder/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ ref_id: refId })
+            });
+
+            if (!response.ok) {
+                console.error('[Layout] 删除公开文件夹引用失败:', response.status);
+                console.error('[Server] 删除公开文件夹引用失败:', response.status);
+            } else {
+                console.log('[Layout] 公开文件夹引用已从服务器删除:', refId);
+                console.log('[Server] 公开文件夹引用已从服务器删除:', refId);
+            }
+        } catch (error) {
+            console.error('[Layout] 删除公开文件夹引用时出错:', error);
+            console.error('[Server] 删除公开文件夹引用时出错:', error);
+        }
+    }
+
+    // 同步布局到服务器
+    await syncLayoutToServer();
 }
