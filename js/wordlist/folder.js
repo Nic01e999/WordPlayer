@@ -70,21 +70,17 @@ function generateGradient(name, customColorId = null) {
  * 重命名文件夹
  */
 function renameFolder(oldName, newName) {
-    const layout = getLayout();
-    const folder = layout.items.find(item => item.type === 'folder' && item.name === oldName);
+    const folders = getFolders();
+
+    // 查找文件夹
+    const folder = Object.values(folders).find(f => f.name === oldName);
     if (folder) {
-        folder.name = newName;
-
         // 更新文件夹缓存：删除旧名称，添加新名称
-        const folders = getFolders();
-        if (folders[oldName]) {
-            const folderData = { ...folders[oldName], name: newName };
-            removeFolder(oldName);
-            addOrUpdateFolder(newName, folderData);
-            console.log('[Folder] 文件夹重命名，缓存已更新:', oldName, '->', newName);
-        }
+        const folderData = { ...folder, name: newName };
+        removeFolder(oldName);
+        addOrUpdateFolder(newName, folderData);
+        console.log('[Folder] 文件夹重命名，缓存已更新:', oldName, '->', newName);
 
-        saveLayout(layout);
         return true;
     }
     return false;
@@ -92,15 +88,21 @@ function renameFolder(oldName, newName) {
 
 /**
  * 打开文件夹视图
+ * @param {string} folderName 文件夹名称
  */
 export async function openFolder(folderName) {
-    const layout = getLayout();
-    const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
-    if (!folderItem) return;
+    const folders = getFolders();
+
+    // 根据名称查找文件夹
+    const folder = Object.values(folders).find(f => f.name === folderName);
+    if (!folder) {
+        console.error('[Folder] 找不到文件夹:', folderName);
+        return;
+    }
 
     // 检查是否为公开文件夹
-    const isPublic = folderItem.isPublic || false;
-    const publicFolderId = folderItem.publicFolderId;
+    const isPublic = folder.is_public || false;
+    const publicFolderId = folder.publicFolderId;
 
     let lists;
     let validCards;
@@ -128,9 +130,22 @@ export async function openFolder(folderName) {
             return;
         }
     } else {
-        // 自己的文件夹：正常流程
+        // 自己的文件夹：使用 folder.cards (ID 数组)
         lists = getWordLists();
-        validCards = folderItem.items.filter(name => lists[name]);
+
+        // 建立 ID → 卡片的映射
+        const cardById = {};
+        for (const card of Object.values(lists)) {
+            if (card.id) cardById[card.id] = card;
+        }
+
+        // 根据 ID 数组获取卡片名称
+        validCards = folder.cards
+            .map(cardId => {
+                const card = cardById[cardId];
+                return card ? card.name : null;
+            })
+            .filter(name => name !== null);
     }
 
     // 计算总页数
@@ -659,50 +674,76 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
 
         overlay.style.opacity = '1';
 
-        const layout = getLayout();
-        const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
+        // 获取当前布局和文件夹数据
+        let layout = getLayout();  // 字符串数组：["card_1", "folder_2"]
+        const folders = getFolders();  // 对象：{ "folderName": { id, name, cards: [1,2,3] } }
+        const folder = folders[folderName];
+
+        if (!folder) {
+            console.error('[Folder] 文件夹不存在:', folderName);
+            return;
+        }
+
+        // 获取卡片 ID
+        const lists = getWordLists();
+        const cardData = Object.values(lists).find(c => c.name === name);
+        if (!cardData || !cardData.id) {
+            console.error('[Folder] 卡片 ID 不存在:', name);
+            return;
+        }
+        const cardId = cardData.id;
 
         if (isOutsideFolder) {
             // 拖到边界外：从文件夹中移除，放到桌面
-            if (folderItem) {
-                folderItem.items = folderItem.items.filter(n => n !== name);
+            console.log('[Folder] 卡片拖出文件夹:', name);
 
-                // 文件夹为空则删除
-                if (folderItem.items.length === 0) {
-                    const idx = layout.items.indexOf(folderItem);
-                    layout.items.splice(idx, 1);
+            // 从文件夹的 cards 数组中移除卡片 ID
+            folder.cards = folder.cards.filter(id => id !== cardId);
+            addOrUpdateFolder(folderName, folder);
+            console.log('[Folder] 文件夹已更新，移除卡片 ID:', cardId);
 
-                    // 从文件夹缓存中删除
-                    removeFolder(folderName);
-                    console.log('[Folder] 空文件夹已删除，缓存已更新:', folderName);
-                }
+            // 将卡片添加回 layout（在文件夹后面）
+            const folderLayoutId = `folder_${folder.id}`;
+            const folderIdx = layout.indexOf(folderLayoutId);
+            const insertIdx = folderIdx >= 0 ? folderIdx + 1 : layout.length;
+            layout.splice(insertIdx, 0, `card_${cardId}`);
+            console.log('[Folder] 卡片已添加回 layout，位置:', insertIdx);
 
-                // 将卡片放到文件夹后面
-                const folderIdx = layout.items.indexOf(folderItem);
-                const insertIdx = folderIdx >= 0 ? folderIdx + 1 : layout.items.length;
-                layout.items.splice(insertIdx, 0, { type: 'card', name });
-
-                saveLayout(layout);
+            // 如果文件夹为空，删除文件夹
+            if (folder.cards.length === 0) {
+                layout = layout.filter(item => item !== folderLayoutId);
+                removeFolder(folderName);
+                console.log('[Folder] 空文件夹已删除:', folderName);
             }
+
+            saveLayout(layout);
+            syncLayoutToServer();
 
             // 关闭文件夹
             overlay.remove();
             if (_renderWordListCards) _renderWordListCards();
         } else {
             // 在文件夹内：更新文件夹内卡片顺序
-            if (folderItem) {
-                const newOrder = [];
-                pages.forEach(page => {
-                    page.querySelectorAll('.wordlist-card').forEach(c => {
-                        const cardName = c.dataset.name;
-                        if (cardName && !newOrder.includes(cardName)) {
-                            newOrder.push(cardName);
+            console.log('[Folder] 更新文件夹内卡片顺序');
+
+            const newOrder = [];
+            pages.forEach(page => {
+                page.querySelectorAll('.wordlist-card').forEach(c => {
+                    const cardName = c.dataset.name;
+                    if (cardName) {
+                        const card = Object.values(lists).find(l => l.name === cardName);
+                        if (card && card.id && !newOrder.includes(card.id)) {
+                            newOrder.push(card.id);
                         }
-                    });
+                    }
                 });
-                folderItem.items = newOrder;
-                saveLayout(layout);
-            }
+            });
+
+            folder.cards = newOrder;
+            addOrUpdateFolder(folderName, folder);
+            saveLayout(layout);
+            syncLayoutToServer();
+            console.log('[Folder] 文件夹内卡片顺序已更新:', newOrder);
         }
     };
 

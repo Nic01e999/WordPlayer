@@ -3,82 +3,45 @@
  * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
-import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder } from './storage.js';
+import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder } from './storage.js';
 import { syncLayoutToCloud } from '../auth/sync.js';
 
-const LAYOUT_KEY = 'wordlist_layout';
-const LAYOUT_VERSION = 3;
+// ============================================
+// 布局内存缓存（不使用 localStorage）
+// 后端格式：["card_1", "folder_2", "public_3"]
+// ============================================
+let _layoutCache = null;
 
 /**
- * 将旧版 row/col 布局转换为纯顺序数组
- */
-function migrateFromGrid(oldLayout) {
-    const items = oldLayout.items || [];
-
-    // 如果已经没有 row/col，直接返回
-    if (items.length === 0 || items[0].row === undefined) {
-        return { version: LAYOUT_VERSION, items };
-    }
-
-    // 按 row/col 排序
-    const sortedItems = [...items].sort((a, b) => {
-        if (a.row !== b.row) return a.row - b.row;
-        return a.col - b.col;
-    });
-
-    // 删除 row/col 属性
-    const newItems = sortedItems.map(item => {
-        const { row, col, ...rest } = item;
-        return rest;
-    });
-
-    return { version: LAYOUT_VERSION, items: newItems };
-}
-
-/**
- * 获取布局
+ * 获取布局（从内存缓存）
+ * @returns {Array<string>} 字符串数组，如 ["card_1", "folder_2"]
  */
 export function getLayout() {
-    try {
-        const data = localStorage.getItem(LAYOUT_KEY);
-        if (data) {
-            let layout = JSON.parse(data);
-
-            // 检测并迁移旧版格式（有 row/col 的转为纯顺序）
-            if (Array.isArray(layout)) {
-                // v1 格式：直接是数组
-                layout = migrateFromGrid({ items: layout });
-                saveLayout(layout);
-            } else if (!layout.version || layout.version < LAYOUT_VERSION) {
-                // 旧版格式
-                layout = migrateFromGrid(layout);
-                saveLayout(layout);
-            }
-
-            return syncLayout(layout);
-        }
-    } catch (e) {
-        console.error('Failed to load layout:', e);
+    if (_layoutCache) {
+        return syncLayout(_layoutCache);
     }
     return buildDefaultLayout();
 }
 
 /**
- * 保存布局
+ * 保存布局（仅保存到内存）
+ * @param {Array<string>} layout 字符串数组
  */
 export function saveLayout(layout) {
-    try {
-        if (!layout.version) {
-            layout = { version: LAYOUT_VERSION, items: layout.items || [] };
-        }
-        localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout));
-    } catch (e) {
-        console.error('Failed to save layout:', e);
-    }
+    _layoutCache = Array.isArray(layout) ? layout : [];
+}
+
+/**
+ * 设置布局（用于登录后同步）
+ * @param {Array<string>} layout 字符串数组
+ */
+export function setLayout(layout) {
+    _layoutCache = Array.isArray(layout) ? layout : [];
 }
 
 /**
  * 构建默认布局（按更新时间排序）
+ * @returns {Array<string>} 字符串数组，如 ["card_1", "card_2"]
  */
 function buildDefaultLayout() {
     const lists = getWordLists();
@@ -86,62 +49,96 @@ function buildDefaultLayout() {
         new Date(b.updated || b.created) - new Date(a.updated || a.created)
     );
 
-    const items = entries.map(list => ({ type: 'card', name: list.name }));
-
-    return { version: LAYOUT_VERSION, items };
+    // 返回字符串数组格式
+    return entries.map(list => `card_${list.id}`);
 }
 
 /**
  * 同步 layout 和实际 wordlists（处理新增/删除的列表）
+ * @param {Array<string>} layout 字符串数组
+ * @returns {Array<string>} 同步后的字符串数组
  */
 function syncLayout(layout) {
     const lists = getWordLists();
-    const allNames = new Set(Object.keys(lists));
-    const layoutNames = new Set();
+    const folders = getFolders();
 
-    // 收集 layout 中所有名称
-    layout.items.forEach(item => {
-        if (item.type === 'card') layoutNames.add(item.name);
-        if (item.type === 'folder') item.items.forEach(n => layoutNames.add(n));
-    });
+    // 建立 ID 集合
+    const cardIds = new Set();
+    for (const card of Object.values(lists)) {
+        if (card.id) cardIds.add(card.id);
+    }
 
-    // 移除 layout 中已不存在的列表
-    layout.items = layout.items.filter(item => {
-        if (item.type === 'card') return allNames.has(item.name);
-        if (item.type === 'folder') {
-            item.items = item.items.filter(n => allNames.has(n));
-            return item.items.length > 0;
+    const folderIds = new Set();
+    for (const folder of Object.values(folders)) {
+        if (folder.id) folderIds.add(folder.id);
+    }
+
+    // 过滤掉不存在的项
+    const validLayout = layout.filter(item => {
+        if (item.startsWith('card_')) {
+            const cardId = parseInt(item.substring(5));
+            return cardIds.has(cardId);
+        } else if (item.startsWith('folder_')) {
+            // 保留临时文件夹 ID（folder_temp_*）
+            if (item.startsWith('folder_temp_')) {
+                return true;
+            }
+            const folderId = parseInt(item.substring(7));
+            return folderIds.has(folderId);
+        } else if (item.startsWith('public_')) {
+            // 公开文件夹暂时保留
+            return true;
         }
         return false;
     });
 
-    // 新列表追加到末尾
-    allNames.forEach(name => {
-        if (!layoutNames.has(name)) {
-            layout.items.push({ type: 'card', name });
+    // 添加新卡片（不在 layout 中的）
+    const layoutCardIds = new Set();
+    for (const item of validLayout) {
+        if (item.startsWith('card_')) {
+            layoutCardIds.add(parseInt(item.substring(5)));
         }
-    });
+    }
 
-    return layout;
+    for (const cardId of cardIds) {
+        if (!layoutCardIds.has(cardId) && !isCardInAnyFolder(cardId)) {
+            validLayout.push(`card_${cardId}`);
+        }
+    }
+
+    return validLayout;
 }
 
 /**
  * 删除单词表（同时更新 storage 和 layout）
  */
 export async function deleteWordList(name) {
+    // 先获取卡片信息（删除前）
+    const lists = getWordLists();
+    const card = Object.values(lists).find(c => c.name === name);
+
+    if (!card) return false;
+
+    // 删除服务器数据
     await removeWordListFromStorage(name);
 
     // 从 layout 中移除
-    let layout = getLayout();
-    layout.items = layout.items.filter(item => {
-        if (item.type === 'card' && item.name === name) return false;
-        if (item.type === 'folder') {
-            item.items = item.items.filter(n => n !== name);
-            return item.items.length > 0;
+    if (card.id) {
+        let layout = getLayout();
+        layout = layout.filter(item => item !== `card_${card.id}`);
+        saveLayout(layout);
+
+        // 从所有文件夹中移除引用
+        const foldersUpdated = removeCardFromAllFolders(card.id);
+
+        // 如果更新了文件夹，同步到服务器
+        if (foldersUpdated) {
+            await syncLayoutToServer();
+            console.log('[Layout] 文件夹更新已同步到服务器');
+            console.log('[Server] 文件夹更新已同步到服务器');
         }
-        return true;
-    });
-    saveLayout(layout);
+    }
+
     return true;
 }
 
@@ -149,8 +146,8 @@ export async function deleteWordList(name) {
  * 检查文件夹名称是否已存在
  */
 export function isFolderNameExists(folderName) {
-    const layout = getLayout();
-    return layout.items.some(item => item.type === 'folder' && item.name === folderName);
+    const folders = getFolders();
+    return Object.keys(folders).some(name => name === folderName);
 }
 
 /**
@@ -168,19 +165,33 @@ export async function syncLayoutToServer() {
  * 删除文件夹（同时删除其中的所有单词表）
  */
 export async function deleteFolder(folderName) {
-    const layout = getLayout();
-    const folderItem = layout.items.find(item => item.type === 'folder' && item.name === folderName);
+    const folders = getFolders();
+    const folder = Object.values(folders).find(f => f.name === folderName);
 
-    if (folderItem) {
-        // 删除文件夹中的所有单词表
-        await removeWordListsFromStorage(folderItem.items);
+    if (folder) {
+        // 删除文件夹中的所有单词表（根据 ID 查找名称）
+        const lists = getWordLists();
+        const cardNames = folder.cards
+            .map(cardId => {
+                const card = Object.values(lists).find(c => c.id === cardId);
+                return card ? card.name : null;
+            })
+            .filter(name => name !== null);
+
+        await removeWordListsFromStorage(cardNames);
 
         // 从 layout 中移除文件夹
-        layout.items = layout.items.filter(item => !(item.type === 'folder' && item.name === folderName));
+        let layout = getLayout();
+        layout = layout.filter(item => item !== `folder_${folder.id}`);
         saveLayout(layout);
 
         // 从文件夹缓存中删除
         removeFolder(folderName);
         console.log('[Layout] 文件夹已删除，缓存已更新:', folderName);
+
+        // 同步到服务器
+        await syncLayoutToServer();
+        console.log('[Layout] 文件夹删除已同步到服务器:', folderName);
+        console.log('[Server] 文件夹删除已同步到服务器:', folderName);
     }
 }

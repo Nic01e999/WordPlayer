@@ -104,21 +104,27 @@ def push_data():
             folder_id_map[name] = folder_id
             print(f"[Sync] 保存文件夹: {name}, id: {folder_id}, cards: {cards}, is_public: {is_public}")
 
+        # 处理 cardColors（在保存完 wordlists 和 folders 之后）
+        for name, color in card_colors.items():
+            if color:  # 只处理非空颜色
+                WordlistRepository.update_color(user_id, name, color)
+                print(f"[Sync] 更新单词表颜色: {name}, color: {color}")
+
         # 同步布局配置
         if layout is not None:
-            # 前端发送的是对象格式 { version: 3, items: [...] }
-            # 但后端需要的是字符串数组格式 ['card_1', 'folder_2', ...]
-            # 需要使用 adapter 转换，但前端暂时没有启用
-            # 临时方案：如果是对象格式，提取 items 并转换
-            if isinstance(layout, dict) and 'items' in layout:
-                # 前端格式：{ version: 3, items: [{ type: 'card', name: 'xxx' }, ...] }
-                # 需要转换为后端格式：['card_1', 'folder_2', ...]
-                # 但这需要知道 name -> id 的映射，暂时跳过
-                print(f"[Sync] 警告: layout 是对象格式，暂时不保存（等待前端启用 adapter）")
-            elif isinstance(layout, list):
-                # 后端格式：['card_1', 'folder_2', ...]
+            # 前端应该通过 adapter 转换为数组格式 ['card_1', 'folder_2', ...]
+            if isinstance(layout, list):
+                # 正确的后端格式：['card_1', 'folder_2', ...]
                 LayoutRepository.save(user_id, layout)
                 print(f"[Sync] 保存布局: {len(layout)} 项")
+            elif isinstance(layout, dict) and 'items' in layout:
+                # 如果收到对象格式，说明前端 adapter 未正确调用
+                print(f"[Sync] 错误: layout 是对象格式，前端应使用 adapter 转换")
+                print(f"[Sync] 收到的 layout: {layout}")
+                return jsonify({'error': 'Layout 格式错误，请更新客户端'}), 400
+            else:
+                print(f"[Sync] 错误: layout 格式未知: {type(layout)}")
+                return jsonify({'error': 'Layout 格式错误'}), 400
 
         print(f"[Sync] 用户 {user_id} 推送数据成功")
         return jsonify({'success': True, 'folderIdMap': folder_id_map})
@@ -166,7 +172,7 @@ def save_single_wordlist():
     保存单个单词表（只存储单词文本，不存储翻译数据）
     请求头: Authorization: Bearer <token>
     请求体: { name: "...", words: "..." }
-    响应: { success: true }
+    响应: { success: true, id: <card_id> }
     """
     user_id = g.user['id']
     data = request.get_json() or {}
@@ -178,6 +184,10 @@ def save_single_wordlist():
     words = data.get('words', '')
     created = data.get('created', datetime.now().isoformat())
 
-    WordlistRepository.save(user_id, name, words, created)
+    # 保存并获取卡片 ID
+    card_id = WordlistRepository.save(user_id, name, words, created)
 
-    return jsonify({'success': True})
+    print(f"[Sync] 保存单词表成功: {name}, ID: {card_id}")
+
+    # 返回卡片 ID
+    return jsonify({'success': True, 'id': card_id})

@@ -1,15 +1,14 @@
 /**
  * 数据同步模块（简化版）
- * 纯服务端存储，不再需要本地/云端合并
+ * 纯服务端存储，前端直接使用后端数据格式
  */
 
 import { API_BASE } from '../api.js';
 import { getAuthHeader, isLoggedIn, setSyncStatus } from './state.js';
-import { backendToFrontend, frontendToBackend, updateFolderIdMapping } from '../wordlist/adapter.js';
 
 /**
  * 从云端拉取数据
- * @returns {Promise<{wordlists?: object, layout?: object, cardColors?: object, folders?: object, publicFolders?: array, error?: string}>}
+ * @returns {Promise<{wordlists?: object, layout?: array, cardColors?: object, folders?: object, publicFolders?: array, error?: string}>}
  */
 export async function pullFromCloud() {
     if (!isLoggedIn()) {
@@ -45,12 +44,9 @@ export async function pullFromCloud() {
         const backendData = await response.json();
         console.log('[Sync] 后端数据拉取成功:', backendData);
 
-        // 使用 adapter 转换为前端格式
-        const frontendData = backendToFrontend(backendData);
-        console.log('[Sync] 数据转换完成，前端格式:', frontendData);
-
+        // 直接返回后端数据，不再转换
         setSyncStatus('idle');
-        return frontendData;
+        return backendData;
     } catch (e) {
         console.error('[Sync] 网络错误:', e);
         setSyncStatus('error');
@@ -69,21 +65,18 @@ export async function pushToCloud(data) {
     }
 
     console.log('[Sync] 开始推送数据到云端...');
-    console.log('[Sync] 前端数据:', data);
+    console.log('[Sync] 推送数据:', data);
     setSyncStatus('syncing');
 
     try {
-        // 使用 adapter 转换前端格式 -> 后端格式
-        const backendData = frontendToBackend(data);
-        console.log('[Sync] 转换后的后端数据:', backendData);
-
+        // 直接发送数据，不再转换
         const response = await fetch(`${API_BASE}/api/sync/push`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 ...getAuthHeader()
             },
-            body: JSON.stringify(backendData)
+            body: JSON.stringify(data)
         });
 
         if (!response.ok) {
@@ -95,16 +88,10 @@ export async function pushToCloud(data) {
             };
         }
 
-        // 获取返回的 ID 映射
         const result = await response.json();
-        if (result.folderIdMap) {
-            updateFolderIdMapping(result.folderIdMap);
-            console.log('[Sync] 文件夹 ID 映射已更新:', result.folderIdMap);
-        }
-
-        console.log('[Sync] 推送成功');
+        console.log('[Sync] 推送成功，服务器返回:', result);
         setSyncStatus('idle');
-        return { success: true };
+        return { success: true, result };
     } catch (e) {
         console.error('[Sync] 网络错误:', e);
         setSyncStatus('error');

@@ -4,14 +4,14 @@
  */
 
 import { getLayout, saveLayout, isFolderNameExists, syncLayoutToServer } from './layout.js';
+import { syncLayoutToCloud } from '../auth/sync.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
 import { showColorPicker, hideColorPicker, hasOpenColorPicker } from './colorpicker.js';
 import { showSavingIndicator, hideSavingIndicator, showToast } from '../utils.js';
 import { t } from '../i18n/index.js';
 import { bindPointerInteraction, isJustInteracted } from './interactions.js';
 import { isLoggedIn } from '../auth/state.js';
-import { addOrUpdateFolder } from './storage.js';
-import { getIdByName } from './adapter.js';
+import { addOrUpdateFolder, getWordLists, getFolders, getCardColors } from './storage.js';
 
 // 拖拽状态
 let dragState = null;
@@ -324,27 +324,30 @@ function reorderDOM(grid, draggedEl, targetIdx) {
 
 /**
  * 根据 DOM 顺序更新 layout
+ * @param {Array<string>} layout 字符串数组
+ * @param {HTMLElement} grid 网格容器
+ * @returns {Array<string>} 新的 layout 数组
  */
 function updateLayoutOrder(layout, grid) {
     const items = Array.from(grid.querySelectorAll('.wordlist-card, .wordlist-folder'));
-    const newItems = [];
+    const newLayout = [];
 
     items.forEach(el => {
         const type = el.dataset.type;
         if (type === 'card') {
-            const name = el.dataset.name;
-            const existing = layout.items.find(i => i.type === 'card' && i.name === name);
-            // 保留所有字段，包括 isPublic, publicFolderId, ownerEmail 等
-            if (existing) newItems.push({ ...existing });
+            const cardId = el.dataset.cardId;
+            if (cardId) {
+                newLayout.push(`card_${cardId}`);
+            }
         } else if (type === 'folder') {
-            const folderName = el.dataset.folderName;
-            const existing = layout.items.find(i => i.type === 'folder' && i.name === folderName);
-            // 保留所有字段，包括 isPublic, publicFolderId, ownerEmail 等
-            if (existing) newItems.push({ ...existing });
+            const folderId = el.dataset.folderId;
+            if (folderId) {
+                newLayout.push(`folder_${folderId}`);
+            }
         }
     });
 
-    layout.items = newItems;
+    return newLayout;
 }
 
 function startDrag(startEvent, draggedEl, workplace) {
@@ -436,7 +439,7 @@ function startDrag(startEvent, draggedEl, workplace) {
         }
     };
 
-    const onUp = () => {
+    const onUp = async () => {
         document.removeEventListener('pointermove', onMove);
         document.removeEventListener('pointerup', onUp);
         clone.remove();
@@ -454,12 +457,28 @@ function startDrag(startEvent, draggedEl, workplace) {
             if (targetElType === 'folder') {
                 // 拖入已有文件夹
                 const targetFolderName = targetEl.dataset.folderName;
-                const folderItem = layout.items.find(item => item.type === 'folder' && item.name === targetFolderName);
-                if (folderItem) {
-                    folderItem.items.push(dragName);
-                    layout.items = layout.items.filter((_, idx) => idx !== layoutIdx);
-                    saveLayout(layout);
-                    if (_renderWordListCards) _renderWordListCards();
+                const folders = getFolders();
+                const folder = Object.values(folders).find(f => f.name === targetFolderName);
+
+                if (folder) {
+                    // 获取拖拽卡片的 ID
+                    const lists = getWordLists();
+                    const dragCard = Object.values(lists).find(c => c.name === dragName);
+
+                    if (dragCard && dragCard.id) {
+                        // 添加卡片 ID 到文件夹
+                        folder.cards.push(dragCard.id);
+                        addOrUpdateFolder(targetFolderName, folder);
+
+                        // 从 layout 中移除卡片
+                        const newLayout = layout.filter((_, idx) => idx !== layoutIdx);
+                        saveLayout(newLayout);
+
+                        // 卡片已添加到文件夹，数据保留在数据库中
+                        console.log('[Drag] 卡片已添加到文件夹:', dragName);
+
+                        if (_renderWordListCards) _renderWordListCards();
+                    }
                 }
             } else {
                 // 两个卡片合并创建新文件夹
@@ -470,8 +489,8 @@ function startDrag(startEvent, draggedEl, workplace) {
             }
         } else {
             // 根据 DOM 顺序更新 layout
-            updateLayoutOrder(layout, grid);
-            saveLayout(layout);
+            const newLayout = updateLayoutOrder(layout, grid);
+            saveLayout(newLayout);
             // 重新渲染以同步 layoutIdx
             if (_renderWordListCards) _renderWordListCards();
         }
@@ -537,30 +556,27 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
         return;
     }
 
-    // 在目标位置创建文件夹
-    const newFolder = {
-        type: 'folder',
-        name: trimmedName,
-        items: [targetName, dragName]
-    };
+    // 获取所有单词表
+    const lists = getWordLists();
 
-    // 移除原来的两个卡片，添加新文件夹（按索引从大到小删除避免偏移）
-    const indicesToRemove = [layoutIdx, targetLayoutIdx].sort((a, b) => b - a);
-    indicesToRemove.forEach(idx => layout.items.splice(idx, 1));
-    layout.items.push(newFolder);
+    // 根据名称查找卡片 ID
+    const targetCard = Object.values(lists).find(c => c.name === targetName);
+    const dragCard = Object.values(lists).find(c => c.name === dragName);
 
-    // ===== 更新文件夹缓存 =====
-    // 将卡片名称转换为 ID
-    const cardIds = [targetName, dragName]
-        .map(name => getIdByName('cards', name))
-        .filter(id => id !== null);
+    if (!targetCard || !dragCard) {
+        console.error('[Drag] 找不到卡片:', targetName, dragName);
+        return;
+    }
 
-    // 创建文件夹数据对象
+    const targetCardId = targetCard.id;
+    const dragCardId = dragCard.id;
+
+    // 创建文件夹数据对象（后端格式）
     const now = new Date().toISOString();
     const folderData = {
         id: null,  // 新文件夹还没有服务器 ID
         name: trimmedName,
-        cards: cardIds,
+        cards: [targetCardId, dragCardId],  // 直接使用 ID 数组
         is_public: false,
         description: null,
         created: now,
@@ -570,8 +586,69 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
     // 添加到文件夹缓存
     addOrUpdateFolder(trimmedName, folderData);
     console.log('[Drag] 文件夹已添加到缓存:', trimmedName, folderData);
-    // ===== 更新文件夹缓存结束 =====
 
-    saveLayout(layout);
+    // 更新 layout：移除两个卡片，添加文件夹
+    // layout 是字符串数组：["card_1", "card_2", ...]
+    const newLayout = layout.filter((item, idx) => idx !== layoutIdx && idx !== targetLayoutIdx);
+
+    // 卡片已添加到文件夹，数据保留在数据库中
+    console.log('[Drag] 卡片已添加到文件夹:', targetName, dragName);
+
+    // 暂时使用临时标识，等同步后获取真实 ID
+    const tempFolderId = `folder_temp_${Date.now()}`;
+    newLayout.push(tempFolderId);
+
+    saveLayout(newLayout);
     if (_renderWordListCards) _renderWordListCards();
+
+    // 立即同步到服务器获取 ID
+    console.log('[Drag] 立即同步新文件夹到服务器...');
+    const syncResult = await syncLayoutToServer();
+    if (syncResult.success && syncResult.result && syncResult.result.folderIdMap) {
+        console.log('[Drag] 新文件夹同步成功，folderIdMap:', syncResult.result.folderIdMap);
+
+        // 从 folderIdMap 中获取真实的 folder ID
+        const realFolderId = syncResult.result.folderIdMap[trimmedName];
+
+        if (realFolderId) {
+            // 更新 layout：将临时标识替换为真实 ID
+            let currentLayout = getLayout();
+            currentLayout = currentLayout.map(item => {
+                if (item === tempFolderId) {
+                    return `folder_${realFolderId}`;
+                }
+                return item;
+            });
+
+            saveLayout(currentLayout);
+            console.log('[Drag] 布局已更新:', `${tempFolderId} -> folder_${realFolderId}`);
+
+            // 更新文件夹缓存中的 ID
+            const folders = getFolders();
+            if (folders[trimmedName]) {
+                folders[trimmedName].id = realFolderId;
+                addOrUpdateFolder(trimmedName, folders[trimmedName]);
+                console.log('[Drag] 文件夹缓存已更新 ID:', realFolderId);
+            }
+
+            // 添加调试日志
+            console.log('[Drag] 准备推送的 layout:', currentLayout);
+            console.log('[Drag] 准备推送的 folders:', folders);
+
+            // 再次推送修复后的 layout（直接使用 syncLayoutToCloud 避免 syncLayout 过滤）
+            const cardColors = getCardColors();
+            await syncLayoutToCloud(currentLayout, cardColors, folders);
+            console.log('[Drag] 修复后的布局已推送到服务器');
+
+            // 重新渲染界面
+            if (_renderWordListCards) {
+                _renderWordListCards();
+                console.log('[Drag] 界面已刷新');
+            }
+        } else {
+            console.error('[Drag] 未能从 folderIdMap 中获取文件夹 ID');
+        }
+    } else {
+        console.warn('[Drag] 新文件夹同步失败或未返回 folderIdMap:', syncResult.error);
+    }
 }

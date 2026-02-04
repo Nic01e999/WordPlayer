@@ -69,10 +69,8 @@ def set_folder_public():
 
 
 @public_api_bp.route('/folder/search', methods=['GET'])
-@require_auth
 def search_public_folders():
-    """搜索公开文件夹"""
-    user_id = g.user['id']
+    """搜索公开文件夹（未登录用户也可访问）"""
     try:
         query = request.args.get('q', '').strip()
         limit = int(request.args.get('limit', 50))
@@ -112,10 +110,8 @@ def search_public_folders():
 
 
 @public_api_bp.route('/folder/<int:folder_id>', methods=['GET'])
-@require_auth
 def get_public_folder(folder_id):
-    """获取公开文件夹详情"""
-    user_id = g.user['id']
+    """获取公开文件夹详情（未登录用户也可访问）"""
     try:
         # 获取文件夹
         folder = FolderRepository.get_by_id(folder_id)

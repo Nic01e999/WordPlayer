@@ -6,9 +6,9 @@
 import * as api from './api.js';
 import * as state from './state.js';
 import { pullFromCloud, pushToCloud } from './sync.js';
-import { setWordListsCache, clearWordListsCache, getCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache } from '../wordlist/storage.js';
+import { setWordListsCache, clearWordListsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache } from '../wordlist/storage.js';
 import { t } from '../i18n/index.js';
-import { getLayout, saveLayout } from '../wordlist/layout.js';
+import { getLayout, saveLayout, setLayout } from '../wordlist/layout.js';
 import { renderWordListCards } from '../wordlist/render.js';
 import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
 import { applySettings, clearSettings } from '../sync/settings.js';
@@ -397,7 +397,7 @@ async function syncAfterLogin() {
     // 执行本地数据迁移（如果需要）
     migrateLocalStorage();
 
-    // 从云端拉取数据（已经通过 adapter 转换为前端格式）
+    // 从云端拉取数据（直接使用后端格式）
     const cloudData = await pullFromCloud();
 
     if (cloudData.error) {
@@ -427,15 +427,15 @@ async function syncAfterLogin() {
     setPublicFoldersCache(cloudData.publicFolders || []);
     console.log('[Sync] 公开文件夹引用已更新:', (cloudData.publicFolders || []).length, '个');
 
-    // 同步布局配置（云端 -> 本地）
+    // 同步布局配置（云端 -> 内存）
     if (cloudData.layout) {
-        saveLayout(cloudData.layout);
+        setLayout(cloudData.layout);
         console.log('[Sync] 布局配置已更新');
     }
 
-    // 同步卡片颜色（云端 -> 本地）
+    // 同步卡片颜色（云端 -> 内存）
     if (cloudData.cardColors && Object.keys(cloudData.cardColors).length > 0) {
-        localStorage.setItem('cardColors', JSON.stringify(cloudData.cardColors));
+        setCardColors(cloudData.cardColors);
         console.log('[Sync] 卡片颜色已更新');
     }
 

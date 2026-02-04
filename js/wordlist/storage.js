@@ -106,18 +106,24 @@ export async function saveWordList(name) {
         });
 
         if (!response.ok) {
-            console.error('Failed to save wordlist:', response.status);
+            console.error('[Storage] 保存单词表失败:', response.status);
             return false;
         }
 
-        // 更新内存缓存
+        // 获取服务端返回的数据（包含卡片 ID）
+        const result = await response.json();
+        const cardId = result.id;
+
+        // 更新内存缓存，包含卡片 ID
         _wordlistsCache[name] = {
+            id: cardId,  // 添加 ID 字段
             name,
             words,
             created,
             updated: new Date().toISOString()
         };
 
+        console.log('[Storage] 单词表已保存，ID:', cardId, '名称:', name);
         return true;
     } catch (e) {
         console.error('Failed to save wordlist:', e);
@@ -276,22 +282,22 @@ export async function updateWordList(name) {
     }
 }
 
+// ============================================
+// 卡片颜色缓存（纯内存，不使用 localStorage）
+// ============================================
+
+let _cardColorsCache = {};
+
 /**
  * 获取所有卡片的自定义颜色
  */
 export function getCardColors() {
-    try {
-        const data = localStorage.getItem(CARD_COLORS_KEY);
-        return data ? JSON.parse(data) : {};
-    } catch (e) {
-        console.error('Failed to load card colors:', e);
-        return {};
-    }
+    return _cardColorsCache;
 }
 
 /**
  * 获取单个卡片的颜色
- * 优先从 wordlist.color 读取，如果没有则从 localStorage 的 cardColors 读取（兼容旧数据）
+ * 优先从 wordlist.color 读取，如果没有则从内存缓存读取
  */
 export function getCardColor(name) {
     // 优先从内存缓存的 wordlist.color 读取
@@ -299,34 +305,33 @@ export function getCardColor(name) {
         return _wordlistsCache[name].color;
     }
 
-    // 兼容旧数据：从 localStorage 的 cardColors 读取
-    const colors = getCardColors();
-    return colors[name] || null;
+    // 从颜色缓存读取
+    return _cardColorsCache[name] || null;
 }
 
 /**
  * 设置卡片颜色
  */
 export function setCardColor(name, colorId) {
-    try {
-        const colors = getCardColors();
-        if (colorId === 'original' || !colorId) {
-            delete colors[name];
-        } else {
-            colors[name] = colorId;
-        }
-        localStorage.setItem(CARD_COLORS_KEY, JSON.stringify(colors));
-
-        // 同时更新内存缓存中的 color 字段
-        if (_wordlistsCache[name]) {
-            _wordlistsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
-        }
-
-        return true;
-    } catch (e) {
-        console.error('Failed to save card color:', e);
-        return false;
+    if (colorId === 'original' || !colorId) {
+        delete _cardColorsCache[name];
+    } else {
+        _cardColorsCache[name] = colorId;
     }
+
+    // 同时更新内存缓存中的 color 字段
+    if (_wordlistsCache[name]) {
+        _wordlistsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
+    }
+
+    return true;
+}
+
+/**
+ * 批量设置卡片颜色（用于登录后同步）
+ */
+export function setCardColors(colors) {
+    _cardColorsCache = colors || {};
 }
 
 /**
@@ -363,6 +368,17 @@ export function removeFolder(name) {
 }
 
 /**
+ * 从内存缓存中删除单词表（不删除服务端数据）
+ * 用于将卡片移入文件夹时
+ */
+export function removeWordListFromCache(name) {
+    if (_wordlistsCache[name]) {
+        delete _wordlistsCache[name];
+        console.log('[Storage] 单词表已从缓存移除:', name);
+    }
+}
+
+/**
  * 获取单个文件夹
  */
 export function getFolder(name) {
@@ -395,4 +411,41 @@ export function getPublicFolders() {
  */
 export function clearPublicFoldersCache() {
     _publicFoldersCache = [];
+}
+
+/**
+ * 从所有文件夹中移除指定卡片的引用
+ * @param {number} cardId - 卡片 ID
+ * @returns {boolean} 是否有文件夹被更新
+ */
+export function removeCardFromAllFolders(cardId) {
+    const folders = getFolders();
+    let updated = false;
+
+    for (const folder of Object.values(folders)) {
+        if (folder.cards && folder.cards.includes(cardId)) {
+            folder.cards = folder.cards.filter(id => id !== cardId);
+            addOrUpdateFolder(folder.name, folder);
+            updated = true;
+            console.log(`[Storage] 从文件夹 ${folder.name} 中移除卡片 ID ${cardId}`);
+            console.log(`[Server] 从文件夹 ${folder.name} 中移除卡片 ID ${cardId}`);
+        }
+    }
+
+    return updated;
+}
+
+/**
+ * 检查卡片是否在任何文件夹中
+ * @param {number} cardId - 卡片 ID
+ * @returns {boolean} 是否在文件夹中
+ */
+export function isCardInAnyFolder(cardId) {
+    const folders = getFolders();
+    for (const folder of Object.values(folders)) {
+        if (folder.cards && folder.cards.includes(cardId)) {
+            return true;
+        }
+    }
+    return false;
 }

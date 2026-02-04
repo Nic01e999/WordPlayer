@@ -4,7 +4,7 @@
  */
 
 import { $, showView, escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor } from './storage.js';
+import { getWordLists, loadWordList, getCardColor, getFolders } from './storage.js';
 import { getLayout, deleteWordList, deleteFolder } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
@@ -143,7 +143,7 @@ export function renderWordListCards() {
     showView('homeView');
 
     const lists = getWordLists();
-    const layout = getLayout();
+    const layout = getLayout();  // 字符串数组：["card_1", "folder_2", "public_3"]
 
     // 重置事件委托标记
     resetEventFlags();
@@ -159,14 +159,33 @@ export function renderWordListCards() {
         return;
     }
 
+    // 建立 ID → 数据的映射
+    const cardById = {};
+    for (const card of Object.values(lists)) {
+        if (card.id) cardById[card.id] = card;
+    }
+
+    const folders = getFolders();
+    const folderById = {};
+    for (const folder of Object.values(folders)) {
+        if (folder.id) folderById[folder.id] = folder;
+    }
+
     // 渲染卡片和文件夹（CSS Grid 自动布局）
-    const cardsHtml = layout.items.map((item, idx) => {
-        if (item.type === 'card') {
-            const list = lists[item.name];
-            if (!list) return '';
-            return renderCard(list, idx);
-        } else if (item.type === 'folder') {
-            return renderFolder(item, lists, idx);
+    const cardsHtml = layout.map((item, idx) => {
+        if (item.startsWith('card_')) {
+            const cardId = parseInt(item.substring(5));
+            const card = cardById[cardId];
+            if (!card) return '';
+            return renderCard(card, idx);
+        } else if (item.startsWith('folder_')) {
+            const folderId = parseInt(item.substring(7));
+            const folder = folderById[folderId];
+            if (!folder) return '';
+            return renderFolder(folder, lists, idx);
+        } else if (item.startsWith('public_')) {
+            // TODO: 处理公开文件夹
+            return '';
         }
         return '';
     }).join('');
@@ -199,7 +218,11 @@ function renderCard(list, layoutIdx) {
     const [color1, color2] = generateGradient(list.name, customColor);
 
     return `
-        <div class="wordlist-card" data-name="${escapeHtml(list.name)}" data-layout-idx="${layoutIdx}" data-type="card">
+        <div class="wordlist-card"
+             data-card-id="${list.id}"
+             data-name="${escapeHtml(list.name)}"
+             data-layout-idx="${layoutIdx}"
+             data-type="card">
             <button class="wordlist-delete" data-name="${escapeHtml(list.name)}" title="Delete">&times;</button>
             <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
                 <span class="wordlist-icon-count">${wordCount}</span>
@@ -216,25 +239,24 @@ function renderFolder(folder, lists, layoutIdx) {
     // 检查是否为公开文件夹（提前检查，因为预览生成需要用到）
     const isPublic = folder.isPublic || false;
 
-    // 生成 2x2 迷你图标预览
-    const previewItems = folder.items.slice(0, 4).map(name => {
-        // 对于公开文件夹，不依赖 lists，直接基于卡片名称生成预览
-        if (isPublic) {
-            const customColor = getCardColor(name);
-            const [color1, color2] = generateGradient(name, customColor);
-            return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
-        }
+    // 建立 ID → 卡片的映射
+    const cardById = {};
+    for (const card of Object.values(lists)) {
+        if (card.id) cardById[card.id] = card;
+    }
 
-        // 对于普通文件夹，保持原有逻辑
-        const list = lists[name];
-        if (!list) return '<div class="wordlist-folder-mini"></div>';
-        const customColor = getCardColor(name);
-        const [color1, color2] = generateGradient(name, customColor);
+    // 生成 2x2 迷你图标预览（folder.cards 是 ID 数组）
+    const previewItems = folder.cards.slice(0, 4).map(cardId => {
+        const card = cardById[cardId];
+        if (!card) return '<div class="wordlist-folder-mini"></div>';
+
+        const customColor = getCardColor(card.name);
+        const [color1, color2] = generateGradient(card.name, customColor);
         return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
     }).join('');
 
     // 补全到 4 个空位
-    const emptySlots = Math.max(0, 4 - folder.items.length);
+    const emptySlots = Math.max(0, 4 - folder.cards.length);
     const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
 
     // 公开文件夹图标和所有者信息
@@ -254,6 +276,7 @@ function renderFolder(folder, lists, layoutIdx) {
 
     return `
         <div class="wordlist-folder ${isPublic ? 'public-folder' : ''}"
+             data-folder-id="${folder.id}"
              data-folder-name="${escapeHtml(folder.name)}"
              data-layout-idx="${layoutIdx}"
              data-type="folder"
