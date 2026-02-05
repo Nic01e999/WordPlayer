@@ -80,7 +80,9 @@ function generateFolderPreview(cards, cardById = null) {
         const card = cardById ? cardById[item] : item;
         if (!card) return '<div class="wordlist-folder-mini"></div>';
 
-        const customColor = getCardColor(card.name);
+        // 优先使用 card 对象中的 color（来自服务器，用于公开文件夹）
+        // 如果没有，则使用本地的颜色配置
+        const customColor = card.color || getCardColor(card.name);
         const [color1, color2] = generateGradient(card.name, customColor);
         return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
     }).join('');
@@ -881,6 +883,9 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
             saveLayout(layout);
             syncLayoutToServer();
             console.log('[Folder] 文件夹内卡片顺序已更新:', newOrder);
+
+            // 触发重新渲染，更新文件夹预览
+            if (_renderWordListCards) _renderWordListCards();
         }
     };
 

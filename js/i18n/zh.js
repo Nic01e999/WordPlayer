@@ -234,13 +234,14 @@ export default {
     searchPlaceholder: '搜索文件夹名称或作者邮箱...',
     publishFolder: '设为公开',
     unpublishFolder: '取消公开',
-    createCopy: '创建副本',
     publicFolderAdded: '已添加公开文件夹',
     folderPublished: '文件夹已设为公开',
     folderUnpublished: '文件夹已取消公开',
-    folderCopyCreated: '已创建副本',
     searchFailed: '搜索失败',
     addFailed: '添加失败',
     copyFailed: '复制失败',
-    words: '词'
+    words: '词',
+    searching: '搜索中...',
+    noResults: '暂无结果',
+    tryDifferentKeywords: '试试其他关键词吧'
 };

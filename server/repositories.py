@@ -559,7 +559,8 @@ class PublicFolderRepository:
                         if card:
                             preview_cards.append({
                                 'id': card['id'],
-                                'name': card['name']
+                                'name': card['name'],
+                                'color': card.get('color')  # 包含发布者的颜色配置
                             })
 
                 results.append({

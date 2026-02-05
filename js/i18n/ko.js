@@ -234,13 +234,14 @@ export default {
     searchPlaceholder: '폴더 이름 또는 작성자 이메일 검색...',
     publishFolder: '공개하기',
     unpublishFolder: '비공개하기',
-    createCopy: '복사본 만들기',
     publicFolderAdded: '공개 폴더가 추가되었습니다',
     folderPublished: '폴더가 공개되었습니다',
     folderUnpublished: '폴더가 비공개되었습니다',
-    folderCopyCreated: '복사본이 생성되었습니다',
     searchFailed: '검색 실패',
     addFailed: '추가 실패',
     copyFailed: '복사 실패',
-    words: '단어'
+    words: '단어',
+    searching: '검색 중...',
+    noResults: '결과 없음',
+    tryDifferentKeywords: '다른 키워드를 시도해보세요'
 };

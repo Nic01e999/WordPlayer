@@ -234,13 +234,14 @@ export default {
     searchPlaceholder: 'Search folder name or author email...',
     publishFolder: 'Make Public',
     unpublishFolder: 'Make Private',
-    createCopy: 'Create Copy',
     publicFolderAdded: 'Public folder added',
     folderPublished: 'Folder is now public',
     folderUnpublished: 'Folder is now private',
-    folderCopyCreated: 'Copy created',
     searchFailed: 'Search failed',
     addFailed: 'Add failed',
     copyFailed: 'Copy failed',
-    words: 'words'
+    words: 'words',
+    searching: 'Searching...',
+    noResults: 'No Results',
+    tryDifferentKeywords: 'Try different keywords'
 };

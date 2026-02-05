@@ -15,6 +15,10 @@ import { showToast } from '../utils.js';
 import { isJustInteracted } from './interactions.js';
 import { countWords, hexToRgba, generateGradient, generateFolderPreview } from './folder.js';
 
+// 待同步的文件夹公开状态变更（内存缓存）
+// 格式：{ folderName: isPublic }
+let pendingPublicStatusChanges = {};
+
 /**
  * 主题色配置 - 根据当前主题自动获取
  */
@@ -222,13 +226,17 @@ function renderFolder(folder, lists, layoutIdx) {
 
     // 公开文件夹图标和所有者信息
     // 区分发布者和添加者：
-    // - 发布者：有 isPublic 但没有 ownerEmail → 显示📂图标
-    // - 添加者：有 isPublic 和 ownerEmail → 显示🌐图标
+    // - 公开文件夹引用（有 ownerEmail）：一直显示 🌐
+    // - 所有者的文件夹（无 ownerEmail）：添加可切换的图标（通过 CSS 控制显示/隐藏）
     let publicIcon = '';
-    if (isPublic && !folder.ownerEmail) {
-        publicIcon = '<span class="folder-public-icon">📂</span>';  // 发布者显示📂
-    } else if (isPublic && folder.ownerEmail) {
-        publicIcon = '<span class="folder-public-icon">🌐</span>';  // 添加者显示🌐
+    // 公开文件夹引用：一直显示 🌐
+    if (isPublic && folder.ownerEmail) {
+        publicIcon = '<span class="folder-public-icon">🌐</span>';
+    }
+    // 所有者的文件夹：添加可切换的图标（通过 CSS 控制显示/隐藏）
+    else if (!folder.ownerEmail) {
+        const icon = isPublic ? '📂' : '📁';
+        publicIcon = `<span class="folder-public-icon folder-owner-toggle" data-folder-name="${escapeHtml(folder.name)}" data-is-public="${isPublic}">${icon}</span>`;
     }
 
     const ownerInfo = isPublic && folder.ownerEmail
@@ -300,6 +308,17 @@ function bindCardEvents(workplace) {
 
     grid.addEventListener('click', async (e) => {
         const dragState = _getDragState ? _getDragState() : null;
+
+        // 所有者文件夹的公开状态切换图标点击（优先级最高，先检查）
+        const toggleIcon = e.target.closest('.folder-owner-toggle');
+        if (toggleIcon) {
+            e.stopPropagation(); // 阻止事件冒泡
+            e.preventDefault(); // 阻止默认行为
+            const folderName = toggleIcon.dataset.folderName;
+            console.log(`[公开状态] 点击切换图标: ${folderName}`);
+            toggleFolderPublicStatus(folderName);
+            return; // 立即返回，不继续处理其他事件
+        }
 
         // 删除按钮
         const deleteBtn = e.target.closest('.wordlist-delete');
@@ -428,37 +447,12 @@ async function handleFolderContextMenu(folderElement, x, y) {
 
     const menuItems = [];
 
-    if (isPublic && publicFolderId) {
-        // 这是别人的公开文件夹
-        menuItems.push({
-            label: t('createCopy') || '创建副本',
-            icon: '📋',
-            action: () => handleCopyPublicFolder(publicFolderId, folderName)
-        });
-    } else {
-        // 这是自己的文件夹
-        // 检查是否已公开
-        const isPublished = await checkFolderPublicStatus(folderName);
+    // 移除公开/取消公开选项
+    // 现在通过编辑模式下的图标点击来切换状态
 
-        if (isPublished) {
-            menuItems.push({
-                label: t('unpublishFolder') || '取消公开',
-                icon: '🔒',
-                action: () => handleToggleFolderPublic(folderName, false)
-            });
-        } else {
-            menuItems.push({
-                label: t('publishFolder') || '设为公开',
-                icon: '🌐',
-                action: () => handleToggleFolderPublic(folderName, true)
-            });
-        }
-
-        menuItems.push({
-            label: t('createCopy') || '创建副本',
-            icon: '📋',
-            action: () => handleCopyOwnFolder(folderName)
-        });
+    // 如果没有菜单项，不显示菜单
+    if (menuItems.length === 0) {
+        return;
     }
 
     showContextMenu(menuItems, x, y);
@@ -489,6 +483,116 @@ async function checkFolderPublicStatus(folderName) {
         console.error('[右键菜单] 检查公开状态失败:', error);
         return false;
     }
+}
+
+/**
+ * 切换文件夹公开状态（仅更新本地状态）
+ */
+function toggleFolderPublicStatus(folderName) {
+    const folders = getFolders();
+    const folder = folders[folderName];
+    if (!folder) {
+        console.error(`[公开状态] 文件夹不存在: ${folderName}`);
+        return;
+    }
+
+    // 切换状态
+    const newStatus = !folder.is_public;
+    folder.is_public = newStatus;
+
+    // 更新缓存
+    addOrUpdateFolder(folderName, folder);
+
+    // 记录待同步的变更
+    pendingPublicStatusChanges[folderName] = newStatus;
+
+    console.log(`[公开状态] 本地切换: ${folderName}, is_public=${newStatus}`);
+    console.log(`[Server] 本地切换: ${folderName}, is_public=${newStatus}`);
+
+    // 重新渲染（更新图标）
+    renderWordListCards();
+}
+
+/**
+ * 同步所有待处理的公开状态变更到服务器
+ */
+export async function syncPendingPublicStatusChanges() {
+    if (Object.keys(pendingPublicStatusChanges).length === 0) {
+        console.log('[公开状态] 没有待同步的变更');
+        return;
+    }
+
+    const token = authToken;
+    if (!token) {
+        console.warn('[公开状态] 未登录，无法同步');
+        pendingPublicStatusChanges = {};
+        return;
+    }
+
+    console.log('[公开状态] 开始同步变更:', pendingPublicStatusChanges);
+    console.log('[Server] 开始同步变更:', pendingPublicStatusChanges);
+
+    // 批量同步
+    const promises = Object.entries(pendingPublicStatusChanges).map(async ([folderName, isPublic]) => {
+        try {
+            const response = await fetch('/api/public/folder/set', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    folderName,
+                    isPublic,
+                    description: ''
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`同步失败: ${folderName}`);
+            }
+
+            const data = await response.json();
+            console.log(`[公开状态] 同步成功: ${folderName}, is_public=${isPublic}`);
+            console.log(`[Server] 同步成功: ${folderName}, is_public=${isPublic}`);
+
+            // 更新 layout（如果服务器返回）
+            if (data.layout) {
+                saveLayout(data.layout);
+            }
+
+            return { success: true, folderName };
+        } catch (error) {
+            console.error(`[公开状态] 同步失败: ${folderName}`, error);
+            console.error(`[Server] 同步失败: ${folderName}`, error);
+            return { success: false, folderName, error };
+        }
+    });
+
+    const results = await Promise.all(promises);
+
+    // 清空待同步列表
+    pendingPublicStatusChanges = {};
+
+    // 检查是否有失败的
+    const failures = results.filter(r => !r.success);
+    if (failures.length > 0) {
+        showToast(`部分文件夹同步失败: ${failures.map(f => f.folderName).join(', ')}`, 'error');
+    } else {
+        console.log('[公开状态] 所有变更已同步');
+        console.log('[Server] 所有变更已同步');
+    }
+
+    // 重新渲染以确保 UI 一致
+    renderWordListCards();
+}
+
+/**
+ * 清空待同步的公开状态变更
+ */
+export function clearPendingPublicStatusChanges() {
+    pendingPublicStatusChanges = {};
+    console.log('[公开状态] 已清空待同步变更');
 }
 
 /**
@@ -562,63 +666,4 @@ async function handleToggleFolderPublic(folderName, isPublic) {
     }
 }
 
-/**
- * 复制公开文件夹
- */
-async function handleCopyPublicFolder(publicFolderId, originalName) {
-    try {
-        const token = authToken;
-        if (!token) {
-            showToast(t('pleaseLogin') || '请先登录', 'error');
-            return;
-        }
-
-        // 生成新文件夹名称
-        const newFolderName = `${originalName} (副本)`;
-
-        const response = await fetch('/api/public/folder/copy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                publicFolderId: parseInt(publicFolderId),
-                newFolderName
-            })
-        });
-
-        if (!response.ok) {
-            let errorMsg = '复制失败';
-            try {
-                const error = await response.json();
-                errorMsg = error.error || errorMsg;
-            } catch (e) {
-                // 无法解析 JSON，使用默认错误信息
-                console.error('[右键菜单] 无法解析错误响应:', e);
-            }
-            throw new Error(errorMsg);
-        }
-
-        const data = await response.json();
-
-        // 重新渲染主页
-        renderWordListCards();
-
-        showToast(t('folderCopyCreated') || '已创建副本', 'success');
-        console.log(`[右键菜单] 已创建公开文件夹副本: ${newFolderName}`);
-    } catch (error) {
-        console.error('[右键菜单] 复制公开文件夹失败:', error);
-        showToast(error.message || t('copyFailed') || '复制失败', 'error');
-    }
-}
-
-/**
- * 复制自己的文件夹
- */
-async function handleCopyOwnFolder(folderName) {
-    // TODO: 实现复制自己文件夹的逻辑
-    showToast('此功能即将推出', 'info');
-    console.log(`[右键菜单] 复制自己的文件夹: ${folderName}`);
-}
 

@@ -26,12 +26,14 @@ let globalTapHandlerInitialized = false;
 
 // 延迟绑定的函数引用
 let _renderWordListCards = null;
+let _syncPendingPublicStatusChanges = null;
 
 /**
  * 设置延迟绑定的函数
  */
 export function setDragDeps(deps) {
     _renderWordListCards = deps.renderWordListCards;
+    _syncPendingPublicStatusChanges = deps.syncPendingPublicStatusChanges;
 }
 
 /**
@@ -176,14 +178,19 @@ export async function exitEditMode() {
 
     currentWorkplace = null;
 
-    // 退出编辑模式时上传布局到服务端（仅在已登录时）
+    // 退出编辑模式时同步公开状态变更和布局到服务端（仅在已登录时）
     if (isLoggedIn()) {
-        console.log('[Drag] 退出编辑模式，开始保存布局...');
+        console.log('[Drag] 退出编辑模式，开始保存...');
 
         // 显示保存指示器
         showSavingIndicator();
 
-        // 等待保存完成
+        // 先同步公开状态变更
+        if (_syncPendingPublicStatusChanges) {
+            await _syncPendingPublicStatusChanges();
+        }
+
+        // 再同步布局
         const result = await syncLayoutToServer();
 
         // 隐藏指示器
@@ -191,10 +198,10 @@ export async function exitEditMode() {
 
         // 显示结果提示（仅保留错误提示）
         if (result.success) {
-            console.log('[Drag] 布局保存成功');
+            console.log('[Drag] 保存成功');
             // 移除toast提示以保持界面清爽
         } else if (result.error) {
-            console.error('[Drag] 布局保存失败:', result.error);
+            console.error('[Drag] 保存失败:', result.error);
             showToast(`保存失败: ${result.error}`, 'error', 10000);
         }
     } else {

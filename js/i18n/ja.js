@@ -234,13 +234,14 @@ export default {
     searchPlaceholder: 'フォルダ名または作成者のメールを検索...',
     publishFolder: '公開する',
     unpublishFolder: '非公開にする',
-    createCopy: 'コピーを作成',
     publicFolderAdded: '公開フォルダを追加しました',
     folderPublished: 'フォルダを公開しました',
     folderUnpublished: 'フォルダを非公開にしました',
-    folderCopyCreated: 'コピーを作成しました',
     searchFailed: '検索に失敗しました',
     addFailed: '追加に失敗しました',
     copyFailed: 'コピーに失敗しました',
-    words: '語'
+    words: '語',
+    searching: '検索中...',
+    noResults: '結果なし',
+    tryDifferentKeywords: '他のキーワードを試してください'
 };

@@ -6,7 +6,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--folder-overlay);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   z-index: 10000;
@@ -14,7 +14,7 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: 10vh;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.3s ease;
 }
 
 .public-search-overlay.show {
@@ -31,21 +31,29 @@
 }
 
 .public-search-container {
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 250, 255, 0.92) 100%);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  background: linear-gradient(135deg, var(--folder-view-bg-start) 0%, var(--folder-view-bg-end) 100%);
+  backdrop-filter: blur(33px) saturate(120%);
+  -webkit-backdrop-filter: blur(33px) saturate(120%);
   border-radius: 1.25rem;
   padding: 1.5rem;
   width: 90%;
   max-width: 600px;
   max-height: 70vh;
-  border: 1px solid rgba(255, 182, 193, 0.3);
-  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.15);
-  transform: scale(0.9) translateY(10px);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--border-pink-light);
+
+  /* 文件夹风格的发光阴影 */
+  box-shadow:
+    0 8px 32px var(--shadow-pink-light),
+    0 2px 8px var(--icon-shadow-light),
+    inset 0 1px 0 var(--icon-border-strong);
+
+  transform: scale(0.5) translateY(50px);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
 }
+
+
 
 .public-search-overlay.show .public-search-container {
   transform: scale(1) translateY(0);
@@ -53,24 +61,15 @@
 
 .public-search-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: right;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-.public-search-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 182, 193, 0.3);
+  background: var(--bg-container);
+  border: 1px solid var(--border-primary);
   border-radius: 0.5rem;
   width: 2rem;
   height: 2rem;
@@ -79,39 +78,96 @@
   justify-content: center;
   cursor: pointer;
   font-size: 1.25rem;
-  color: #666;
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  /* 玻璃效果 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* 多层阴影 */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 添加高光层 */
+.close-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  transform: scale(1.1);
+  background: var(--bg-hover);
+  color: var(--accent-primary);
+  transform: scale(1.1) rotate(90deg);
+  border-color: var(--accent-primary);
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.close-btn:hover::before {
+  opacity: 1;
+}
+
+.close-btn:active {
+  transform: scale(1.05) rotate(90deg);
 }
 
 .public-search-input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: none;
+  border: 1px solid var(--border-primary);
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 0 1px rgba(255, 182, 193, 0.2) inset,
-              0 2px 8px rgba(255, 105, 180, 0.08);
+  background: var(--bg-input);
+  color: var(--text-primary);
   margin-bottom: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+
+  /* 玻璃效果 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* 多层阴影 */
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .public-search-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.3) inset,
-              0 4px 12px rgba(255, 105, 180, 0.15);
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.95);
+
+  /* 增强的 focus 发光效果 */
+  box-shadow:
+    0 0 0 3px var(--accent-primary-alpha),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+
+  transform: translateY(-1px);
 }
 
 .public-search-input::placeholder {
-  color: #999;
+  color: var(--text-secondary);
 }
 
 .public-search-results {
@@ -122,39 +178,90 @@
 
 /* 自定义滚动条 */
 .public-search-results::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .public-search-results::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin: 4px 0;
 }
 
 .public-search-results::-webkit-scrollbar-thumb {
-  background: rgba(255, 182, 193, 0.5);
-  border-radius: 3px;
-  transition: background 0.2s ease;
+  background: var(--accent-primary-alpha);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+
+  /* 添加内发光 */
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 }
 
 .public-search-results::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 105, 180, 0.7);
+  background: var(--accent-primary);
+  box-shadow:
+    inset 0 0 6px rgba(0, 0, 0, 0.2),
+    0 0 6px var(--accent-primary-alpha);
 }
 
 .public-search-result-item {
   padding: 1rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--bg-container);
   margin-bottom: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 182, 193, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-primary);
+  position: relative;
+  overflow: hidden;
+
+  /* 玻璃效果 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* 多层阴影 */
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+
+  /* 淡入动画 */
+  animation: fade-in-up 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* 添加顶部高光 */
+.public-search-result-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .public-search-result-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
-  border-color: rgba(255, 105, 180, 0.3);
+  background: var(--bg-hover);
+  transform: translateY(-3px) scale(1.01);
+  border-color: var(--accent-primary);
+
+  /* 增强的 hover 阴影 */
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.public-search-result-item:hover::before {
+  opacity: 1;
 }
 
 .result-header {
@@ -168,7 +275,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -176,15 +283,32 @@
 
 .word-count {
   font-size: 0.875rem;
-  color: #666;
-  background: rgba(255, 182, 193, 0.2);
+  color: var(--text-secondary);
+  background: var(--accent-primary-alpha);
   padding: 0.25rem 0.5rem;
   border-radius: 0.5rem;
+
+  /* 玻璃效果 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  transition: all 0.2s ease;
+}
+
+.public-search-result-item:hover .word-count {
+  background: var(--accent-primary);
+  color: white;
+  transform: scale(1.05);
 }
 
 .result-owner {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -193,21 +317,37 @@
 
 .result-description {
   font-size: 0.875rem;
-  color: #888;
+  color: var(--text-tertiary);
   line-height: 1.4;
 }
 
 .no-results {
   text-align: center;
-  padding: 2rem;
-  color: #999;
-  font-size: 0.95rem;
+  padding: 60px 20px;
+}
+
+.no-results-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-results-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.no-results-hint {
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .search-loading {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -228,6 +368,48 @@
   }
 }
 
+/* 搜索图标脉动动画 */
+@keyframes search-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.public-search-input.searching::before {
+  content: '🔍';
+  position: absolute;
+  left: 12px;
+  animation: search-pulse 1.5s ease-in-out infinite;
+}
+
+/* 结果项淡入动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.public-search-result-item:nth-child(1) { animation-delay: 0s; }
+.public-search-result-item:nth-child(2) { animation-delay: 0.05s; }
+.public-search-result-item:nth-child(3) { animation-delay: 0.1s; }
+.public-search-result-item:nth-child(4) { animation-delay: 0.15s; }
+.public-search-result-item:nth-child(5) { animation-delay: 0.2s; }
+.public-search-result-item:nth-child(6) { animation-delay: 0.25s; }
+.public-search-result-item:nth-child(7) { animation-delay: 0.3s; }
+.public-search-result-item:nth-child(8) { animation-delay: 0.35s; }
+.public-search-result-item:nth-child(9) { animation-delay: 0.4s; }
+.public-search-result-item:nth-child(10) { animation-delay: 0.45s; }
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .public-search-container {
@@ -236,9 +418,6 @@
     max-height: 80vh;
   }
 
-  .public-search-header h3 {
-    font-size: 1.1rem;
-  }
 
   .public-search-input {
     font-size: 0.95rem;

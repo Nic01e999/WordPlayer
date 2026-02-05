@@ -14,7 +14,7 @@ import { getCurrentUser } from '../auth/state.js';
 // 导入子模块
 import { getWordLists, saveWordList, loadWordList, updateWordList, isWordListNameExists } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, deleteFolder } from './layout.js';
-import { renderWordListCards, setRenderDeps, resetEventFlags } from './render.js';
+import { renderWordListCards, setRenderDeps, resetEventFlags, syncPendingPublicStatusChanges } from './render.js';
 import {
     bindDragEvents, exitEditMode, isEditMode, setCurrentWorkplace,
     getDragState, enterEditMode, setDragDeps, resetDragEventFlags, initGlobalTapHandler
@@ -34,7 +34,8 @@ setRenderDeps({
 });
 
 setDragDeps({
-    renderWordListCards
+    renderWordListCards,
+    syncPendingPublicStatusChanges
 });
 
 setFolderDeps({

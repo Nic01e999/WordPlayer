@@ -57,7 +57,7 @@ export function initPublicSearch() {
 
     // 显示加载状态
     const resultsContainer = document.getElementById('publicSearchResults');
-    resultsContainer.innerHTML = '<div class="search-loading">搜索中</div>';
+    resultsContainer.innerHTML = `<div class="search-loading">${t('searching')}</div>`;
 
     searchTimeout = setTimeout(() => {
       performSearch(query);
@@ -144,7 +144,13 @@ function renderSearchResults(results) {
   }
 
   if (results.length === 0) {
-    resultsContainer.innerHTML = '<div class="no-results">暂无结果</div>';
+    resultsContainer.innerHTML = `
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <div class="no-results-text">${t('noResults')}</div>
+        <div class="no-results-hint">${t('tryDifferentKeywords')}</div>
+      </div>
+    `;
     return;
   }
 
