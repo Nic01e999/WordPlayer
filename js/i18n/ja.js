@@ -243,5 +243,6 @@ export default {
     words: '語',
     searching: '検索中...',
     noResults: '結果なし',
-    tryDifferentKeywords: '他のキーワードを試してください'
+    tryDifferentKeywords: '他のキーワードを試してください',
+    folderInvalid: '無効'
 };

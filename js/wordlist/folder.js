@@ -120,7 +120,8 @@ function generateFolderPages(validCards, lists, options = {}) {
         const cardsHtml = pageCards.map(name => {
             const list = lists[name];
             const wordCount = countWords(list.words);
-            const customColor = getCardColor(name);
+            // 优先使用 list.color（公开文件夹的颜色），否则使用本地缓存的颜色
+            const customColor = list.color || getCardColor(name);
             const [color1, color2] = generateGradient(name, customColor);
 
             const deleteBtn = showDelete
@@ -548,6 +549,28 @@ function markPublicFolderAsInvalid(refId) {
     }
 
     console.log(`[Folder] 标记公开文件夹引用为失效: ${refId}`);
+}
+
+/**
+ * 恢复公开文件夹引用的有效状态
+ * @param {number} refId - 公开文件夹引用ID
+ */
+function markPublicFolderAsValid(refId) {
+    // 在内存中恢复为有效状态
+    const publicFolders = getPublicFolders();
+    const folder = publicFolders.find(f => f.id === refId);
+    if (folder) {
+        folder.isInvalid = false;
+        setPublicFoldersCache(publicFolders);
+    }
+
+    // 重新渲染以移除失效样式
+    if (_renderWordListCards) {
+        _renderWordListCards();
+    }
+
+    console.log(`[Folder] 恢复公开文件夹引用为有效: ${refId}`);
+    console.log(`[Server] 恢复公开文件夹引用为有效: ${refId}`);
 }
 
 /**
@@ -1019,10 +1042,18 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
                 name: card.name,
                 words: card.words,
                 translations: card.translations,
-                wordInfo: card.wordInfo
+                wordInfo: card.wordInfo,
+                color: card.color  // 保存公开者设定的颜色
             };
             validCards.push(card.name);
         });
+
+        // 成功获取内容后，恢复失效状态（如果之前被标记为失效）
+        const publicFolders = getPublicFolders();
+        const folderRef = publicFolders.find(f => f.folder_id === folderId);
+        if (folderRef && folderRef.isInvalid) {
+            markPublicFolderAsValid(folderRef.id);
+        }
     } catch (error) {
         console.error('[Folder] 获取公开文件夹内容失败:', error);
         console.error('[Server] 获取公开文件夹内容失败:', error);

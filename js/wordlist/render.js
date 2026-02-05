@@ -280,6 +280,9 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
     // 生成 2x2 预览（使用统一的预览生成函数）
     const previewHtml = generateFolderPreview(previewCards);
 
+    // 生成失效标签（使用国际化）
+    const invalidBadge = isInvalid ? `<div class="folder-invalid-badge">${t('folderInvalid')}</div>` : '';
+
     return `
         <div class="wordlist-folder public-folder ${invalidClass}"
              data-public-ref-id="${publicFolderRef.id}"
@@ -289,6 +292,7 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
              data-type="public-folder"
              data-owner-email="${escapeHtml(ownerName)}">
             <button class="wordlist-delete" data-folder-name="${escapeHtml(displayName)}" title="Delete">&times;</button>
+            ${invalidBadge}
             <div class="wordlist-folder-icon">
                 <span class="folder-public-icon">${folderIcon}</span>
                 <div class="wordlist-folder-preview">${previewHtml}</div>

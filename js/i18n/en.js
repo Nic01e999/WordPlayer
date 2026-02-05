@@ -243,5 +243,6 @@ export default {
     words: 'words',
     searching: 'Searching...',
     noResults: 'No Results',
-    tryDifferentKeywords: 'Try different keywords'
+    tryDifferentKeywords: 'Try different keywords',
+    folderInvalid: 'Invalid'
 };

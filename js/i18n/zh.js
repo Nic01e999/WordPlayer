@@ -243,5 +243,6 @@ export default {
     words: '词',
     searching: '搜索中...',
     noResults: '暂无结果',
-    tryDifferentKeywords: '试试其他关键词吧'
+    tryDifferentKeywords: '试试其他关键词吧',
+    folderInvalid: '已失效'
 };

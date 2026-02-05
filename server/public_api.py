@@ -192,7 +192,8 @@ def get_public_folder_content(folder_id):
                 cards.append({
                     'id': card['id'],
                     'name': card['name'],
-                    'words': card['words'] or ''
+                    'words': card['words'] or '',
+                    'color': card.get('color')  # 包含发布者的颜色配置
                 })
 
         result = {

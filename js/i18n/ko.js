@@ -243,5 +243,6 @@ export default {
     words: '단어',
     searching: '검색 중...',
     noResults: '결과 없음',
-    tryDifferentKeywords: '다른 키워드를 시도해보세요'
+    tryDifferentKeywords: '다른 키워드를 시도해보세요',
+    folderInvalid: '무효'
 };

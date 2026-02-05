@@ -541,8 +541,8 @@
     position: relative;
 }
 
-.folder-invalid::after {
-    content: '已失效';
+/* 失效标签样式 - 文字内容由 JavaScript 动态添加 */
+.folder-invalid-badge {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -553,6 +553,7 @@
     font-size: 12px;
     font-weight: 500;
     z-index: 10;
+    pointer-events: none;
 }
 
 /* 失效文件夹禁用悬停效果 */
