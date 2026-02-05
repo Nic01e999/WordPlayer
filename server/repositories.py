@@ -511,7 +511,7 @@ class FolderRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT f.id, f.user_id, f.name, f.cards, f.description, f.created_at, u.email as owner_email
+                SELECT f.id, f.user_id, f.name, f.cards, f.description, f.created_at, f.is_public, u.email as owner_email
                 FROM folders f
                 JOIN users u ON f.user_id = u.id
                 WHERE f.is_public = TRUE AND (f.name LIKE ? OR f.description LIKE ?)
@@ -528,6 +528,7 @@ class FolderRepository:
                     'cards': json.loads(row['cards']),
                     'description': row['description'],
                     'created': row['created_at'],
+                    'is_public': bool(row['is_public']),
                     'owner_email': row['owner_email']
                 })
             return results
@@ -551,8 +552,16 @@ class PublicFolderRepository:
             for row in cursor.fetchall():
                 # 获取文件夹的前 4 张卡片用于预览
                 folder = FolderRepository.get_by_id(row['folder_id'])
+
+                # 检测文件夹是否仍然存在且公开
+                is_invalid = not folder or not folder.get('is_public', False)
+
+                if is_invalid:
+                    print(f"[公开文件夹] 检测到失效引用: display_name={row['display_name']}, folder_id={row['folder_id']}")
+                    print(f"[Server] 检测到失效引用: display_name={row['display_name']}, folder_id={row['folder_id']}")
+
                 preview_cards = []
-                if folder and folder.get('cards'):
+                if folder and folder.get('cards') and not is_invalid:
                     # 获取前 4 张卡片
                     for card_id in folder['cards'][:4]:
                         card = WordlistRepository.get_by_id(folder['user_id'], card_id)
@@ -570,7 +579,8 @@ class PublicFolderRepository:
                     'owner_name': row['owner_name'],
                     'display_name': row['display_name'],
                     'created': row['created_at'],
-                    'preview_cards': preview_cards  # 新增字段
+                    'preview_cards': preview_cards,  # 新增字段
+                    'isInvalid': is_invalid  # 新增失效标记
                 })
             return results
 

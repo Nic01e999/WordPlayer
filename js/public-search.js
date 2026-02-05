@@ -191,12 +191,15 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
 
     // 生成显示名称（只使用文件夹名称）
     let displayName = folderName;
-    let attempt = 1;
+    let attempt = 0;
     const maxAttempts = 10;
     let data = null;
 
     // 尝试添加，如果重名则自动添加序号
-    while (attempt <= maxAttempts) {
+    while (attempt < maxAttempts) {
+      const suffix = attempt === 0 ? '' : ` (${attempt})`;
+      displayName = `${folderName}${suffix}`;
+
       const response = await fetch('/api/public/folder/add', {
         method: 'POST',
         headers: {
@@ -216,7 +219,6 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
         const error = await response.json();
         if (error.error && error.error.includes('已存在同名文件夹')) {
           attempt++;
-          displayName = `${folderName} (${attempt})`;
           console.log(`[公开搜索] 文件夹重名，尝试新名称: ${displayName}`);
           console.log(`[Server] 文件夹重名，尝试新名称: ${displayName}`);
         } else {
@@ -225,7 +227,7 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
       }
     }
 
-    if (attempt > maxAttempts) {
+    if (attempt >= maxAttempts) {
       throw new Error('文件夹名称冲突次数过多，请手动重命名');
     }
 

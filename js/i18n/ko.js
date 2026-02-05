@@ -108,6 +108,8 @@ export default {
     delete: '삭제',
     edit: '편집',
     done: '완료',
+    deleteSuccess: '삭제 성공',
+    deleteFailed: '삭제 실패',
 
     // 단어 카드
     newFolder: '새 폴더',

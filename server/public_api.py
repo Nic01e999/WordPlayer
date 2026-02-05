@@ -88,15 +88,28 @@ def search_public_folders():
         # 搜索公开文件夹
         results = FolderRepository.search_public(query, limit)
 
-        # 计算单词数
+        # 计算单词数并过滤有效的公开文件夹
         formatted_results = []
         for folder in results:
+            # 验证文件夹仍然存在且公开
+            if not folder or not folder.get('is_public'):
+                print(f"[公开文件夹] 过滤已删除或非公开文件夹: {folder.get('name') if folder else 'None'}")
+                print(f"[Server] 过滤已删除或非公开文件夹: {folder.get('name') if folder else 'None'}")
+                continue
+
+            # 计算单词数
             word_count = 0
             for card_id in folder['cards']:
                 card = WordlistRepository.get_by_id(folder['user_id'], card_id)
                 if card and card['words']:
                     words = [w.strip() for w in card['words'].split('\n') if w.strip()]
                     word_count += len(words)
+
+            # 过滤空文件夹
+            if word_count == 0:
+                print(f"[公开文件夹] 过滤空文件夹: {folder['name']}")
+                print(f"[Server] 过滤空文件夹: {folder['name']}")
+                continue
 
             formatted_results.append({
                 'id': folder['id'],
@@ -108,10 +121,12 @@ def search_public_folders():
             })
 
         print(f"[公开文件夹] 搜索 '{query}' 返回 {len(formatted_results)} 个结果")
+        print(f"[Server] 搜索 '{query}' 返回 {len(formatted_results)} 个结果")
         return jsonify({'results': formatted_results})
 
     except Exception as e:
         print(f"[公开文件夹] 搜索失败: {e}")
+        print(f"[Server] 搜索失败: {e}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
@@ -288,16 +303,27 @@ def remove_public_folder():
         # 删除引用
         PublicFolderRepository.delete(user_id, display_name)
 
+        # 验证删除成功
+        verify = PublicFolderRepository.get_by_display_name(user_id, display_name)
+        if verify:
+            print(f"[公开文件夹] 警告：删除后仍能查询到引用 {display_name}")
+            print(f"[Server] 警告：删除后仍能查询到引用 {display_name}")
+        else:
+            print(f"[公开文件夹] 验证：引用 {display_name} 已成功删除")
+            print(f"[Server] 验证：引用 {display_name} 已成功删除")
+
         # 更新 layout
         layout = LayoutRepository.get_by_user(user_id) or []
         layout = [item for item in layout if item != f"public_{ref['id']}"]
         LayoutRepository.save(user_id, layout)
 
         print(f"[公开文件夹] 用户 {user_id} 移除公开文件夹 '{display_name}'")
+        print(f"[Server] 用户 {user_id} 移除公开文件夹 '{display_name}'")
         return jsonify({'success': True, 'layout': layout})
 
     except Exception as e:
         print(f"[公开文件夹] 移除失败: {e}")
+        print(f"[Server] 移除失败: {e}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 

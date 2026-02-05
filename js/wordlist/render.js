@@ -3,7 +3,7 @@
  * 渲染卡片和文件夹视图 - iOS SpringBoard 风格
  */
 
-import { $, showView, escapeHtml } from '../utils.js';
+import { $, showView, escapeHtml, showToast } from '../utils.js';
 import { getWordLists, loadWordList, getCardColor, getFolders, getPublicFolders, addOrUpdateFolder } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, deleteFolder, deletePublicFolderRef } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
@@ -11,7 +11,6 @@ import { showConfirm } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
 import { showContextMenu } from '../utils/context-menu.js';
 import { authToken } from '../auth/state.js';
-import { showToast } from '../utils.js';
 import { isJustInteracted } from './interactions.js';
 import { countWords, hexToRgba, generateGradient, generateFolderPreview } from './folder.js';
 
@@ -423,9 +422,27 @@ async function handleDeleteFolder(folderName) {
 async function handleDeletePublicFolderRef(refId, displayName) {
     const confirmed = await showConfirm(t('deleteFolder', { name: displayName }));
     if (confirmed) {
-        await deletePublicFolderRef(refId);
-        if (_exitEditMode) _exitEditMode();
-        renderWordListCards();
+        try {
+            await deletePublicFolderRef(refId, displayName);
+
+            // 删除成功后，先退出编辑模式
+            if (_exitEditMode) _exitEditMode();
+
+            // 然后重新渲染
+            renderWordListCards();
+
+            // 显示成功提示
+            showToast(t('deleteSuccess') || '删除成功', 'success');
+        } catch (error) {
+            console.error('[Render] 删除公开文件夹失败:', error);
+            console.error('[Server] 删除公开文件夹失败:', error);
+
+            // 显示错误提示
+            showToast(error.message || t('deleteFailed') || '删除失败', 'error');
+
+            // 即使失败也重新渲染，以恢复UI状态
+            renderWordListCards();
+        }
     }
 }
 

@@ -108,6 +108,8 @@ export default {
     delete: '削除',
     edit: '編集',
     done: '完了',
+    deleteSuccess: '削除成功',
+    deleteFailed: '削除失敗',
 
     // 単語カード
     newFolder: '新規フォルダ',

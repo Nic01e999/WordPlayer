@@ -3,7 +3,7 @@
  * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
-import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder } from './storage.js';
+import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder, getPublicFolders, setPublicFoldersCache } from './storage.js';
 import { syncLayoutToCloud } from '../auth/sync.js';
 import { authToken } from '../auth/state.js';
 
@@ -200,41 +200,66 @@ export async function deleteFolder(folderName) {
 /**
  * 删除公开文件夹引用
  */
-export async function deletePublicFolderRef(refId) {
-    console.log('[Layout] 删除公开文件夹引用:', refId);
-    console.log('[Server] 删除公开文件夹引用:', refId);
+export async function deletePublicFolderRef(refId, displayName) {
+    console.log('[Layout] 删除公开文件夹引用:', refId, displayName);
+    console.log('[Server] 删除公开文件夹引用:', refId, displayName);
+
+    // 先从缓存中移除（乐观更新）
+    const publicFolders = getPublicFolders();
+    const updatedFolders = publicFolders.filter(f => f.id !== refId);
+    setPublicFoldersCache(updatedFolders);
+    console.log('[Layout] 已从缓存中移除公开文件夹:', displayName);
+    console.log('[Server] 已从缓存中移除公开文件夹:', displayName);
 
     // 从 layout 中移除
     let layout = getLayout();
+    const originalLayout = [...layout]; // 备份原始layout
     layout = layout.filter(item => item !== `public_${refId}`);
     saveLayout(layout);
 
     // 调用服务器 API 删除引用
-    const token = authToken();
+    const token = authToken;
     if (token) {
         try {
             const response = await fetch('/api/public/folder/remove', {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ ref_id: refId })
+                body: JSON.stringify({ displayName: displayName })
             });
 
             if (!response.ok) {
                 console.error('[Layout] 删除公开文件夹引用失败:', response.status);
                 console.error('[Server] 删除公开文件夹引用失败:', response.status);
+
+                // 恢复缓存和layout
+                setPublicFoldersCache(publicFolders);
+                saveLayout(originalLayout);
+
+                throw new Error('删除失败，请重试');
             } else {
+                const data = await response.json();
                 console.log('[Layout] 公开文件夹引用已从服务器删除:', refId);
                 console.log('[Server] 公开文件夹引用已从服务器删除:', refId);
+
+                // 使用服务器返回的layout（如果有）
+                if (data.layout) {
+                    saveLayout(data.layout);
+                }
             }
         } catch (error) {
             console.error('[Layout] 删除公开文件夹引用时出错:', error);
             console.error('[Server] 删除公开文件夹引用时出错:', error);
+
+            // 恢复缓存和layout
+            setPublicFoldersCache(publicFolders);
+            saveLayout(originalLayout);
+
+            throw error; // 重新抛出错误，让调用者处理
         }
     }
 
-    // 同步布局到服务器
-    await syncLayoutToServer();
+    // 不需要再次同步到服务器，因为已经调用了API
 }

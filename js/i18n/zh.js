@@ -108,6 +108,8 @@ export default {
     delete: '删除',
     edit: '编辑',
     done: '完成',
+    deleteSuccess: '删除成功',
+    deleteFailed: '删除失败',
 
     // 单词卡
     newFolder: '新文件夹',

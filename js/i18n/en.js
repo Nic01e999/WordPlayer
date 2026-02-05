@@ -108,6 +108,8 @@ export default {
     delete: 'Delete',
     edit: 'Edit',
     done: 'Done',
+    deleteSuccess: 'Deleted successfully',
+    deleteFailed: 'Delete failed',
 
     // Word cards
     newFolder: 'New Folder',
