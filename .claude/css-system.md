@@ -8,7 +8,7 @@ css/
 ├── colors.css     # CSS 变量（4 色 × 2 模式 = 8 套主题）
 ├── base.css       # 基础样式
 ├── components.css # 通用组件
-├── home.css       # 主页（单词表卡片）
+├── home.css       # 主页（单词卡）
 ├── menu.css       # 顶部菜单栏
 ├── repeater.css   # 复读模式
 ├── dictation.css  # 听写模式
@@ -265,10 +265,10 @@ body {
 
 **文件路径**: `css/home.css`
 
-### 单词表卡片
+### 单词卡
 
 ```css
-.wordlist-card {
+.wordcard-card {
   background: var(--bg-card);
   border-radius: 12px;
   padding: 20px;
@@ -277,13 +277,13 @@ body {
   border: 2px solid transparent;
 }
 
-.wordlist-card:hover {
+.wordcard-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   border-color: var(--accent-primary);
 }
 
-.wordlist-card.dragging {
+.wordcard-card.dragging {
   opacity: 0.5;
   transform: scale(0.95);
 }
@@ -901,7 +901,7 @@ body {
     width: 100%;
   }
 
-  .wordlist-grid {
+  .wordcard-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 

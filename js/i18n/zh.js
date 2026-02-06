@@ -48,15 +48,15 @@ export default {
     interval: '间隔(毫秒)',
 
     // 单词列表
-    wordList: '单词列表',
+    wordcard: '单词列表',
     load: '加载',
     save: '保存',
     update: '更新',
     wordInputPlaceholder: '输入单词（用空格或换行分隔）',
     reloading: '重新加载中...',
-    emptyTitle: '暂无保存的单词表',
+    emptyTitle: '暂无保存的单词卡',
     emptyHint: '在侧边栏输入单词后点击保存',
-    promptName: '输入单词表名称：',
+    promptName: '输入单词卡名称：',
     nameExists: '名称 "{name}" 已存在，请使用其他名称',
     folderPromptName: '输入文件夹名称：',
     folderNameExists: '文件夹名称 "{name}" 已存在，请使用其他名称',
@@ -116,11 +116,11 @@ export default {
     rename: '重命名',
     enterName: '输入名称',
     folderName: '文件夹名称',
-    wordlistName: '单词表名称',
+    wordcardName: '单词卡名称',
 
     // 提示
-    pleaseLogin: '请先登录后再保存单词表',
-    pleaseLoginUpdate: '请先登录后再更新单词表',
+    pleaseLogin: '请先登录后再保存单词卡',
+    pleaseLoginUpdate: '请先登录后再更新单词卡',
     noWords: '没有单词',
     loadingTranslations: '翻译',
     loadingAudio: '音频',
@@ -232,7 +232,7 @@ export default {
     savedToDownload: '已保存到下载',
 
     // 公开文件夹
-    searchPublicFolders: '搜索公开单词表',
+    searchPublicFolders: '搜索公开单词卡',
     searchPlaceholder: '搜索文件夹名称或作者邮箱...',
     publishFolder: '设为公开',
     unpublishFolder: '取消公开',

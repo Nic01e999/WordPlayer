@@ -84,17 +84,17 @@
 
 
 /* ===== 空状态 ===== */
-.wordlist-empty {
+.wordcard-empty {
     text-align: center;
     padding: 2.5rem 1.25rem;
     color: var(--text-muted);
 }
 
-.wordlist-empty p {
+.wordcard-empty p {
     margin: 0.5rem 0;
 }
 
-.wordlist-empty .hint {
+.wordcard-empty .hint {
     font-size: 0.875rem;
     color: var(--text-placeholder);
 }
@@ -135,7 +135,7 @@
 /* ====================右半部分======================== */
 
 /* ===== iOS 风格网格（CSS Grid 自动布局）===== */
-.wordlist-grid {
+.wordcard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, clamp(4.75rem, 7.5vw, 5.625rem));
     gap: 1.75rem 1.25rem;
@@ -145,7 +145,7 @@
 }
 
 /* ===== iOS App 图标卡片 ===== */
-.wordlist-card {
+.wordcard-card {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -160,7 +160,7 @@
 }
 
 /* 图标区域 - 液态玻璃效果 */
-.wordlist-icon {
+.wordcard-icon {
     width: var(--icon-size);
     height: var(--icon-size);
     border-radius: var(--icon-radius);
@@ -182,7 +182,7 @@
 }
 
 /* 图标高光效果 */
-.wordlist-icon::before {
+.wordcard-icon::before {
     content: '';
     position: absolute;
     top: 0;
@@ -195,7 +195,7 @@
 }
 
 /* 单词数显示 */
-.wordlist-icon-count {
+.wordcard-icon-count {
     font-size: clamp(1.375rem, 2.2vw, 1.75rem);
     font-weight: 700;
     color: white;
@@ -204,7 +204,7 @@
 }
 
 /* 标签（名称） */
-.wordlist-label {
+.wordcard-label {
     margin-top: 0.375rem;
     font-size: clamp(0.625rem, 1vw, 0.6875rem);
     font-weight: 500;
@@ -221,7 +221,7 @@
 }
 
 /* 悬停效果 */
-.wordlist-card:hover .wordlist-icon {
+.wordcard-card:hover .wordcard-icon {
     transform: scale(1.05);
     border-color: var(--icon-border-medium);
     box-shadow:
@@ -232,13 +232,13 @@
 }
 
 /* 点击效果 */
-.wordlist-card:active .wordlist-icon {
+.wordcard-card:active .wordcard-icon {
     transform: scale(0.95);
     transition-duration: 0.1s;
 }
 
 /* ===== 删除按钮 ===== */
-.wordlist-delete {
+.wordcard-delete {
     display: none;
     position: absolute;
     top: -0.375rem;
@@ -260,27 +260,27 @@
     transition: transform 0.15s var(--ios-bounce);
 }
 
-.wordlist-delete:hover {
+.wordcard-delete:hover {
     transform: scale(1.15);
 }
 
 /* 编辑模式下显示删除按钮 */
-.wordlist-card.edit-mode .wordlist-delete,
-.wordlist-folder.edit-mode .wordlist-delete {
+.wordcard-card.edit-mode .wordcard-delete,
+.wordcard-folder.edit-mode .wordcard-delete {
     display: flex;
 }
 
 /* ===== 拖拽相关 ===== */
 
-.wordlist-card.dragging,
-.wordlist-folder.dragging {
+.wordcard-card.dragging,
+.wordcard-folder.dragging {
     opacity: 0;
     pointer-events: none;
 }
 
 /* 拖拽克隆 - 使用更高优先级确保 fixed 定位生效 */
-.drag-clone.wordlist-card,
-.drag-clone.wordlist-folder {
+.drag-clone.wordcard-card,
+.drag-clone.wordcard-folder {
     position: fixed !important;
     z-index: 10000;
     pointer-events: none;
@@ -293,8 +293,8 @@
     margin: 0;
 }
 
-.drag-clone .wordlist-icon,
-.drag-clone .wordlist-folder-icon {
+.drag-clone .wordcard-icon,
+.drag-clone .wordcard-folder-icon {
     transform: scale(1.1);
     box-shadow:
         0 10px 30px var(--drag-shadow-primary),
@@ -302,7 +302,7 @@
 }
 
 /* 文件夹克隆体需要实色背景（backdrop-filter 在 fixed 定位时失效） */
-.drag-clone.wordlist-folder .wordlist-folder-icon {
+.drag-clone.wordcard-folder .wordcard-folder-icon {
     background: var(--drag-folder-bg) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -315,30 +315,30 @@
     50% { rotate: 1.9deg; scale: 1; }
 }
 
-.wordlist-card.edit-mode,
-.wordlist-folder.edit-mode {
+.wordcard-card.edit-mode,
+.wordcard-folder.edit-mode {
     animation: jiggle 0.5s ease-in-out infinite;
 }
 
 /* 错开抖动，更自然 */
-.wordlist-card.edit-mode:nth-child(even),
-.wordlist-folder.edit-mode:nth-child(even) {
+.wordcard-card.edit-mode:nth-child(even),
+.wordcard-folder.edit-mode:nth-child(even) {
     animation-delay: 0.030s;
 }
 
-.wordlist-card.edit-mode:nth-child(3n),
-.wordlist-folder.edit-mode:nth-child(3n) {
+.wordcard-card.edit-mode:nth-child(3n),
+.wordcard-folder.edit-mode:nth-child(3n) {
     animation-delay: 0.08s;
 }
 
-.wordlist-card.edit-mode:nth-child(5n),
-.wordlist-folder.edit-mode:nth-child(5n) {
+.wordcard-card.edit-mode:nth-child(5n),
+.wordcard-folder.edit-mode:nth-child(5n) {
     animation-delay: 0.016s;
 }
 
 /* 拖动中的项目停止抖动（保持可见占位） */
-.wordlist-card.edit-mode.dragging,
-.wordlist-folder.edit-mode.dragging {
+.wordcard-card.edit-mode.dragging,
+.wordcard-folder.edit-mode.dragging {
     opacity: 0.3;
     animation: none;
 }
@@ -356,14 +356,14 @@
     }
 }
 
-.wordlist-card.drag-target .wordlist-icon,
-.wordlist-folder.drag-target .wordlist-folder-icon {
+.wordcard-card.drag-target .wordcard-icon,
+.wordcard-folder.drag-target .wordcard-folder-icon {
     animation: merge-pulse 0.5s ease-in-out infinite !important;
 }
 
 /* ===== iOS 风格文件夹 ===== */
 
-.wordlist-folder {
+.wordcard-folder {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -378,7 +378,7 @@
 }
 
 /* 文件夹图标区域 */
-.wordlist-folder-icon {
+.wordcard-folder-icon {
     width: var(--icon-size);
     height: var(--icon-size);
     border-radius: var(--icon-radius);
@@ -417,7 +417,7 @@
 }
 
 /* 编辑模式下显示所有者文件夹的公开状态图标 */
-.wordlist-folder.edit-mode .folder-owner-toggle {
+.wordcard-folder.edit-mode .folder-owner-toggle {
     display: block;
 }
 
@@ -455,7 +455,7 @@
 }
 
 /* 文件夹 2x2 预览网格 */
-.wordlist-folder-preview {
+.wordcard-folder-preview {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.1875rem;
@@ -464,18 +464,18 @@
 }
 
 /* 迷你图标预览 */
-.wordlist-folder-mini {
+.wordcard-folder-mini {
     border-radius: 0.375rem;
     box-shadow: 0 1px 2px var(--icon-mini-shadow);
 }
 
-.wordlist-folder-mini.empty {
+.wordcard-folder-mini.empty {
     background: var(--folder-empty-bg);
     box-shadow: none;
 }
 
 /* 文件夹悬停效果 */
-.wordlist-folder:hover .wordlist-folder-icon {
+.wordcard-folder:hover .wordcard-folder-icon {
     transform: scale(1.05);
     box-shadow:
         0 4px 8px var(--icon-shadow-strong),
@@ -484,13 +484,13 @@
 }
 
 /* 文件夹点击效果 */
-.wordlist-folder:active .wordlist-folder-icon {
+.wordcard-folder:active .wordcard-folder-icon {
     transform: scale(0.95);
     transition-duration: 0.1s;
 }
 
 /* 点击图标时不触发文件夹的按压效果 */
-.wordlist-folder:has(.folder-owner-toggle:active) .wordlist-folder-icon {
+.wordcard-folder:has(.folder-owner-toggle:active) .wordcard-folder-icon {
     transform: none;
 }
 
@@ -557,7 +557,7 @@
 }
 
 /* 失效文件夹禁用悬停效果 */
-.folder-invalid:hover .wordlist-folder-icon {
+.folder-invalid:hover .wordcard-folder-icon {
     transform: none;
     box-shadow:
         0 2px 4px var(--icon-shadow-light),
@@ -728,12 +728,12 @@
 }
 
 /* 文件夹内的卡片样式 */
-.folder-open-grid .wordlist-card {
+.folder-open-grid .wordcard-card {
     position: static;
     width: clamp(4.75rem, 7.5vw, 5.625rem);
 }
 
-.folder-open-grid .wordlist-icon {
+.folder-open-grid .wordcard-icon {
     width: var(--icon-size);
     height: var(--icon-size);
 }

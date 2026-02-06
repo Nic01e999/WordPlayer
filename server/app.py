@@ -155,14 +155,14 @@ if HAS_SOCKETIO:
 
         emit('layout:update', data, room=f"user_{user_id}", include_self=False)
 
-    @socketio.on('wordlist:update')
-    def handle_wordlist_update(data):
-        """处理单词表更新并广播给其他设备"""
+    @socketio.on('wordcard:update')
+    def handle_wordcard_update(data):
+        """处理单词卡更新并广播给其他设备"""
         user_id = connected_users.get(request.sid)
         if not user_id:
             return
 
-        emit('wordlist:update', data, room=f"user_{user_id}", include_self=False)
+        emit('wordcard:update', data, room=f"user_{user_id}", include_self=False)
 
 
 @app.route("/")

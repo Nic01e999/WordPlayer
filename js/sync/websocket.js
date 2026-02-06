@@ -5,7 +5,7 @@
 
 import { authToken, isLoggedIn } from '../auth/state.js';
 import { applySettings } from './settings.js';
-import { renderWordListCards } from '../wordlist/render.js';
+import { renderWordcardCards } from '../wordcard/render.js';
 
 // Socket.IO 客户端（需要加载 socket.io.js）
 let socket = null;
@@ -16,7 +16,7 @@ let isConnected = false;
 const eventListeners = {
     'settings:update': [],
     'layout:update': [],
-    'wordlist:update': [],
+    'wordcard:update': [],
     'connect': [],
     'disconnect': []
 };
@@ -90,17 +90,17 @@ export function initWebSocket(serverUrl = '') {
         // 布局更新
         socket.on('layout:update', (data) => {
             console.log('[WS] 收到布局更新:', data);
-            // 重新渲染单词表卡片
-            renderWordListCards();
+            // 重新渲染单词卡
+            renderWordcardCards();
             notifyListeners('layout:update', data);
         });
 
-        // 单词表更新
-        socket.on('wordlist:update', (data) => {
-            console.log('[WS] 收到单词表更新:', data);
+        // 单词卡更新
+        socket.on('wordcard:update', (data) => {
+            console.log('[WS] 收到单词卡更新:', data);
             // 重新渲染
-            renderWordListCards();
-            notifyListeners('wordlist:update', data);
+            renderWordcardCards();
+            notifyListeners('wordcard:update', data);
         });
 
     } catch (e) {
@@ -154,15 +154,15 @@ export function sendLayoutUpdate(layout, cardColors) {
 }
 
 /**
- * 发送单词表更新
+ * 发送单词卡更新
  * @param {string} action - 操作类型: 'create' | 'update' | 'delete'
- * @param {string} name - 单词表名称
+ * @param {string} name - 单词卡名称
  * @param {object} data - 附加数据
  */
-export function sendWordlistUpdate(action, name, data = {}) {
+export function sendWordcardUpdate(action, name, data = {}) {
     if (!socket || !isConnected) return;
 
-    socket.emit('wordlist:update', {
+    socket.emit('wordcard:update', {
         action,
         name,
         ...data,

@@ -258,7 +258,7 @@ async function playCurrentWord(myId) {
 **场景**:
 - 用户切换到听写模式
 - 用户点击停止按钮
-- 用户加载新的单词表
+- 用户加载新的单词卡
 
 ```javascript
 // 切换模式时
@@ -384,12 +384,12 @@ initWebSocket(serverUrl)
 socket.emit('connect', {auth: {token}})
     ↓
 pullFromCloud()
-    ├─ 拉取单词表
+    ├─ 拉取单词卡
     ├─ 拉取布局
     └─ 拉取设置
     ↓
 应用到 UI
-    ├─ renderWordListCards()
+    ├─ renderWordcardCards()
     ├─ applyLayout()
     └─ applySettings()
 ```
@@ -397,7 +397,7 @@ pullFromCloud()
 ### 推送流程
 
 **触发时机**:
-1. 保存单词表
+1. 保存单词卡
 2. 修改布局（拖拽、颜色）
 3. 修改设置
 
@@ -428,18 +428,18 @@ socket.on('settings:update', (data) => {
 
 socket.on('layout:update', (data) => {
   loadLayout();
-  renderWordListCards();
+  renderWordcardCards();
   showNotification('布局已同步');
 });
 
-socket.on('wordlist:update', (data) => {
+socket.on('wordcard:update', (data) => {
   if (data.action === 'save') {
-    saveWordlist(data.name, data.wordlist.words);
+    saveWordcard(data.name, data.wordcard.words);
   } else if (data.action === 'delete') {
-    deleteWordlist(data.name);
+    deleteWordcard(data.name);
   }
-  renderWordListCards();
-  showNotification('单词表已同步');
+  renderWordcardCards();
+  showNotification('单词卡已同步');
 });
 ```
 
@@ -467,7 +467,7 @@ BlobManager.create(blob, key)
     ↓
 Audio 对象播放
     ↓
-页面卸载或切换单词表
+页面卸载或切换单词卡
     ↓
 BlobManager.releaseAll()
     ↓
@@ -564,9 +564,9 @@ await promiseAllWithLimit(audioTasks, 6);
 
 ### localStorage 存储
 
-**单词表**:
+**单词卡**:
 ```javascript
-localStorage['wordlist-${name}'] = JSON.stringify({
+localStorage['wordcard-${name}'] = JSON.stringify({
   name,
   content,
   created: timestamp
@@ -575,7 +575,7 @@ localStorage['wordlist-${name}'] = JSON.stringify({
 
 **布局**:
 ```javascript
-localStorage['wordlist-layout'] = JSON.stringify([
+localStorage['wordcard-layout'] = JSON.stringify([
   {type: 'card', name: 'list1'},
   {type: 'folder', name: 'folder1', items: ['list2']}
 ]);
@@ -583,7 +583,7 @@ localStorage['wordlist-layout'] = JSON.stringify([
 
 **卡片颜色**:
 ```javascript
-localStorage['wordlist-card-colors'] = JSON.stringify({
+localStorage['wordcard-card-colors'] = JSON.stringify({
   'list1': 'pink',
   'list2': 'blue'
 });
@@ -606,7 +606,7 @@ localStorage['auth-token'] = token;
 
 ### 云端存储
 
-**数据库表**: `wordlists`, `user_layout`, `user_settings`
+**数据库表**: `wordcards`, `user_layout`, `user_settings`
 
 **同步策略**:
 - 登录时拉取云端数据

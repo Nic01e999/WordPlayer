@@ -7,9 +7,9 @@ import { authToken } from './auth/state.js';
 import { pullFromCloud } from './auth/index.js';
 import { showToast } from './utils.js';
 import { t } from './i18n/index.js';
-import { getLayout, saveLayout } from './wordlist/layout.js';
-import { renderWordListCards } from './wordlist/render.js';
-import { setPublicFoldersCache } from './wordlist/storage.js';
+import { getLayout, saveLayout } from './wordcard/layout.js';
+import { renderWordcardCards } from './wordcard/render.js';
+import { setPublicFoldersCache } from './wordcard/storage.js';
 
 let searchTimeout = null;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -255,7 +255,7 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
     }
 
     // 重新渲染主页
-    renderWordListCards();
+    renderWordcardCards();
 
     // 关闭搜索框
     closePublicSearch();

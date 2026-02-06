@@ -47,16 +47,16 @@ export default {
     repeat: 'リピート',
     interval: '間隔(ミリ秒)',
 
-    // 単語リスト
-    wordList: '単語リスト',
+    // 単語カード
+    wordcard: '単語カード',
     load: '読み込み',
     save: '保存',
     update: '更新',
     wordInputPlaceholder: '単語を入力（スペースまたは改行で区切る）',
     reloading: '再読み込み中...',
-    emptyTitle: '保存された単語リストがありません',
+    emptyTitle: '保存された単語カードがありません',
     emptyHint: 'サイドバーに単語を入力して保存をクリック',
-    promptName: '単語リスト名を入力：',
+    promptName: '単語カード名を入力：',
     nameExists: '名前「{name}」は既に存在します。別の名前を使用してください',
     folderPromptName: 'フォルダ名を入力：',
     folderNameExists: 'フォルダ名「{name}」は既に存在します。別の名前を使用してください',
@@ -116,11 +116,11 @@ export default {
     rename: '名前変更',
     enterName: '名前を入力',
     folderName: 'フォルダ名',
-    wordlistName: '単語リスト名',
+    wordcardName: '単語カード名',
 
     // ヒント
-    pleaseLogin: '単語リストを保存するにはログインしてください',
-    pleaseLoginUpdate: '単語リストを更新するにはログインしてください',
+    pleaseLogin: '単語カードを保存するにはログインしてください',
+    pleaseLoginUpdate: '単語カードを更新するにはログインしてください',
     noWords: '単語がありません',
     loadingTranslations: '翻訳',
     loadingAudio: 'オーディオ',

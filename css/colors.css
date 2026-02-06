@@ -313,7 +313,7 @@
     /* 警告背景 | .input-warning */
     --bg-warning-light: rgba(255, 200, 160, 0.2);
 
-    /* 错误背景轻 | .wordlist-delete:hover */
+    /* 错误背景轻 | .wordcard-delete:hover */
     --bg-error-light: rgba(200, 80, 80, 0.1);
 
     /* 错误背景中 | .folder-open-close:hover */
@@ -328,10 +328,10 @@
     /* 放置指示器边框 | .drop-indicator */
     --border-drop-indicator: rgba(255, 120, 160, 0.8);
 
-    /* 文件夹预览背景 | .wordlist-folder-preview-item */
+    /* 文件夹预览背景 | .wordcard-folder-preview-item */
     --bg-folder-preview: rgba(255, 200, 220, 0.2);
 
-    /* 文件夹预览边框 | .wordlist-folder-preview-item */
+    /* 文件夹预览边框 | .wordcard-folder-preview-item */
     --border-folder-preview: rgba(255, 180, 200, 0.3);
 
     /* }}} */
@@ -384,56 +384,56 @@
 
     /* {{{ 图标组 (icon-) */
 
-    /* 图标边框（轻）| home.css .wordlist-icon */
+    /* 图标边框（轻）| home.css .wordcard-icon */
     --icon-border-light: rgba(255, 255, 255, 0.35);
 
-    /* 图标边框（中）| home.css .wordlist-icon:hover */
+    /* 图标边框（中）| home.css .wordcard-icon:hover */
     --icon-border-medium: rgba(255, 255, 255, 0.5);
 
-    /* 图标边框（强）| home.css .wordlist-folder-icon:hover */
+    /* 图标边框（强）| home.css .wordcard-folder-icon:hover */
     --icon-border-strong: rgba(255, 255, 255, 0.6);
 
-    /* 图标高光渐变起点 | home.css .wordlist-icon::before */
+    /* 图标高光渐变起点 | home.css .wordcard-icon::before */
     --icon-highlight-start: rgba(255, 255, 255, 0.25);
 
-    /* 图标高光渐变终点 | home.css .wordlist-icon::before */
+    /* 图标高光渐变终点 | home.css .wordcard-icon::before */
     --icon-highlight-end: rgba(255, 255, 255, 0);
 
-    /* 图标阴影（轻）| home.css .wordlist-icon */
+    /* 图标阴影（轻）| home.css .wordcard-icon */
     --icon-shadow-light: rgba(0, 0, 0, 0.06);
 
-    /* 图标阴影（中轻）| home.css .wordlist-icon */
+    /* 图标阴影（中轻）| home.css .wordcard-icon */
     --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
 
-    /* 图标阴影（中）| home.css .wordlist-icon */
+    /* 图标阴影（中）| home.css .wordcard-icon */
     --icon-shadow-medium: rgba(0, 0, 0, 0.1);
 
-    /* 图标阴影（强）| home.css .wordlist-icon:hover */
+    /* 图标阴影（强）| home.css .wordcard-icon:hover */
     --icon-shadow-strong: rgba(0, 0, 0, 0.12);
 
-    /* 图标内阴影（上）| home.css .wordlist-icon */
+    /* 图标内阴影（上）| home.css .wordcard-icon */
     --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
 
-    /* 图标内阴影（下）| home.css .wordlist-icon */
+    /* 图标内阴影（下）| home.css .wordcard-icon */
     --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
 
-    /* 图标文字阴影 | home.css .wordlist-icon-count */
+    /* 图标文字阴影 | home.css .wordcard-icon-count */
     --icon-text-shadow: rgba(0, 0, 0, 0.2);
 
-    /* 迷你图标阴影 | home.css .wordlist-folder-mini */
+    /* 迷你图标阴影 | home.css .wordcard-folder-mini */
     --icon-mini-shadow: rgba(0, 0, 0, 0.1);
 
     /* }}} */
 
     /* {{{ 文件夹组 (folder-) */
 
-    /* 文件夹图标背景 | home.css .wordlist-folder-icon */
+    /* 文件夹图标背景 | home.css .wordcard-folder-icon */
     --folder-icon-bg: rgba(255, 255, 255, 0.65);
 
-    /* 文件夹图标边框 | home.css .wordlist-folder-icon */
+    /* 文件夹图标边框 | home.css .wordcard-folder-icon */
     --folder-icon-border: rgba(255, 255, 255, 0.5);
 
-    /* 文件夹空状态背景 | home.css .wordlist-folder-mini.empty */
+    /* 文件夹空状态背景 | home.css .wordcard-folder-mini.empty */
     --folder-empty-bg: rgba(200, 200, 200, 0.3);
 
     /* 文件夹展开遮罩 | home.css .folder-open-overlay */
@@ -467,17 +467,17 @@
     /* 拖拽克隆次要阴影 | home.css .drag-clone */
     --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
 
-    /* 拖拽文件夹实色背景 | home.css .drag-clone.wordlist-folder */
+    /* 拖拽文件夹实色背景 | home.css .drag-clone.wordcard-folder */
     --drag-folder-bg: rgba(245, 245, 245, 1);
 
     /* }}} */
 
     /* {{{ 删除按钮组 (delete-) */
 
-    /* 删除按钮背景 | home.css .wordlist-delete */
+    /* 删除按钮背景 | home.css .wordcard-delete */
     --delete-btn-bg: #cdcdcd;
 
-    /* 删除按钮阴影 | home.css .wordlist-delete */
+    /* 删除按钮阴影 | home.css .wordcard-delete */
     --delete-btn-shadow: rgba(0, 0, 0, 0.3);
 
     /* }}} */
@@ -2472,7 +2472,7 @@
  *   引用：components.css (.input-warning)
  *
  * --bg-error-light/medium: 错误背景（轻/中）
- *   引用：home.css (.wordlist-delete:hover), auth.css (.auth-error)
+ *   引用：home.css (.wordcard-delete:hover), auth.css (.auth-error)
  *
  * --bg-overlay-dark: 深色遮罩
  *   引用：home.css (.folder-open-overlay)
@@ -2484,10 +2484,10 @@
  *   引用：home.css (.drop-indicator)
  *
  * --bg-folder-preview: 文件夹预览背景
- *   引用：home.css (.wordlist-folder-preview-item)
+ *   引用：home.css (.wordcard-folder-preview-item)
  *
  * --border-folder-preview: 文件夹预览边框
- *   引用：home.css (.wordlist-folder-preview-item)
+ *   引用：home.css (.wordcard-folder-preview-item)
  *
  * === 新增变量组 ===
  *
@@ -2524,32 +2524,32 @@
  *
  * 【图标组 (icon-)】
  * --icon-border-light/medium/strong: 图标边框（轻/中/强）
- *   引用：home.css (.wordlist-icon, .wordlist-icon:hover)
+ *   引用：home.css (.wordcard-icon, .wordcard-icon:hover)
  *
  * --icon-highlight-start/end: 图标高光渐变
- *   引用：home.css (.wordlist-icon::before)
+ *   引用：home.css (.wordcard-icon::before)
  *
  * --icon-shadow-light/medium-light/medium/strong: 图标阴影
- *   引用：home.css (.wordlist-icon, .wordlist-icon:hover)
+ *   引用：home.css (.wordcard-icon, .wordcard-icon:hover)
  *
  * --icon-inner-shadow-top/bottom: 图标内阴影
- *   引用：home.css (.wordlist-icon)
+ *   引用：home.css (.wordcard-icon)
  *
  * --icon-text-shadow: 图标文字阴影
- *   引用：home.css (.wordlist-icon-count)
+ *   引用：home.css (.wordcard-icon-count)
  *
  * --icon-mini-shadow: 迷你图标阴影
- *   引用：home.css (.wordlist-folder-mini)
+ *   引用：home.css (.wordcard-folder-mini)
  *
  * 【文件夹组 (folder-)】
  * --folder-icon-bg: 文件夹图标背景
- *   引用：home.css (.wordlist-folder-icon)
+ *   引用：home.css (.wordcard-folder-icon)
  *
  * --folder-icon-border: 文件夹图标边框
- *   引用：home.css (.wordlist-folder-icon)
+ *   引用：home.css (.wordcard-folder-icon)
  *
  * --folder-empty-bg: 文件夹空状态背景
- *   引用：home.css (.wordlist-folder-mini.empty)
+ *   引用：home.css (.wordcard-folder-mini.empty)
  *
  * --folder-overlay: 文件夹展开遮罩
  *   引用：home.css (.folder-open-overlay)
@@ -2577,14 +2577,14 @@
  *   引用：home.css (.drag-clone)
  *
  * --drag-folder-bg: 拖拽文件夹实色背景
- *   引用：home.css (.drag-clone.wordlist-folder)
+ *   引用：home.css (.drag-clone.wordcard-folder)
  *
  * 【删除按钮组 (delete-)】
  * --delete-btn-bg: 删除按钮背景
- *   引用：home.css (.wordlist-delete)
+ *   引用：home.css (.wordcard-delete)
  *
  * --delete-btn-shadow: 删除按钮阴影
- *   引用：home.css (.wordlist-delete)
+ *   引用：home.css (.wordcard-delete)
  *
  * 【下拉菜单组 (dropdown-)】
  * --dropdown-bg-start/end: 下拉菜单背景渐变

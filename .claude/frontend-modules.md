@@ -19,7 +19,7 @@ app.js (入口)
 ├── sync/
 │   ├── settings.js (设置同步)
 │   └── websocket.js (WebSocket 客户端)
-├── wordlist/index.js (单词表管理)
+├── wordcard/index.js (单词卡管理)
 │   ├── storage.js, layout.js, render.js
 │   ├── drag.js, folder.js, colorpicker.js
 ├── repeater/index.js (复读模式)
@@ -65,8 +65,8 @@ export const preloadCache = {
   audioPartial: {}       // {text: count} 追踪每个单词已加载的音频数
 };
 
-// 已加载的单词表信息
-export let loadedWordList = {
+// 已加载的单词卡信息
+export let loadedWordcard = {
   name: null,
   originalContent: null  // 用于检测是否修改
 };
@@ -77,7 +77,7 @@ export let loadedWordList = {
 ```javascript
 export function setCurrentRepeaterState(state)
 export function setCurrentActiveMode(mode)
-export function setLoadedWordList(name, content)
+export function setLoadedWordcard(name, content)
 ```
 
 ---
@@ -397,20 +397,20 @@ export function makeDraggable(element)
 
 ---
 
-## 8. 单词表管理 (wordlist/)
+## 8. 单词卡管理 (wordcard/)
 
-**文件路径**: `js/wordlist/index.js`
+**文件路径**: `js/wordcard/index.js`
 
 ### 功能模块
 
 #### storage.js - 存储操作
 
 ```javascript
-export function saveWordlist(name, content)
-export function loadWordlist(name)
-export function deleteWordlist(name)
-export function getAllWordlists()
-export function renameWordlist(oldName, newName)
+export function saveWordcard(name, content)
+export function loadWordcard(name)
+export function deleteWordcard(name)
+export function getAllWordcards()
+export function renameWordcard(oldName, newName)
 ```
 
 #### layout.js - 布局持久化
@@ -431,7 +431,7 @@ export function setCardColor(name, color)
 #### render.js - 卡片渲染
 
 ```javascript
-export function renderWordListCards()
+export function renderWordcardCards()
 export function createCardElement(item)
 export function createFolderElement(item)
 ```
@@ -505,8 +505,8 @@ export async function resetPassword(email, code, newPassword)
 // 拉取云端数据
 export async function pullFromCloud()
 
-// 推送单词表
-export async function saveWordlistToCloud(name, content)
+// 推送单词卡
+export async function saveWordcardToCloud(name, content)
 
 // 推送布局
 export async function syncLayoutToCloud()
@@ -527,11 +527,11 @@ socket.on('settings:update', (data) => {
 });
 
 socket.on('layout:update', (data) => {
-  renderWordListCards();
+  renderWordcardCards();
 });
 
-socket.on('wordlist:update', (data) => {
-  renderWordListCards();
+socket.on('wordcard:update', (data) => {
+  renderWordcardCards();
 });
 ```
 

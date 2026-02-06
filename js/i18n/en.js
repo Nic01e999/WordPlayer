@@ -48,7 +48,7 @@ export default {
     interval: 'Interval(ms)',
 
     // Word list
-    wordList: 'Word List',
+    wordcard: 'Word List',
     load: 'Load',
     save: 'Save',
     update: 'Update',
@@ -56,7 +56,7 @@ export default {
     reloading: 'Reloading...',
     emptyTitle: 'No saved word lists',
     emptyHint: 'Enter words in the sidebar and click Save',
-    promptName: 'Enter wordlist name:',
+    promptName: 'Enter wordcard name:',
     nameExists: 'Name "{name}" already exists, please use another name',
     folderPromptName: 'Enter folder name:',
     folderNameExists: 'Folder name "{name}" already exists, please use another name',
@@ -116,7 +116,7 @@ export default {
     rename: 'Rename',
     enterName: 'Enter name',
     folderName: 'Folder name',
-    wordlistName: 'Wordlist name',
+    wordcardName: 'Wordcard name',
 
     // Tips
     pleaseLogin: 'Please login first to save word lists',

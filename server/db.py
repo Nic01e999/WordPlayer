@@ -78,9 +78,9 @@ def init_db():
         """)
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token)")
 
-        # 单词表（简化版：只存储单词文本和颜色）
+        # 单词卡（简化版：只存储单词文本和颜色）
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS wordlists (
+            CREATE TABLE IF NOT EXISTS wordcards (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
@@ -92,7 +92,7 @@ def init_db():
                 UNIQUE(user_id, name)
             )
         """)
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_wordlists_user_id ON wordlists(user_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_wordcards_user_id ON wordcards(user_id)")
 
         # 文件夹表（新增）
         cursor.execute("""

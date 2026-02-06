@@ -72,26 +72,26 @@ export function setActiveMode(mode) {
 }
 
 /**
- * 当前加载的单词表信息
+ * 当前加载的单词卡信息
  * 用于追踪编辑状态和支持 Update 功能
  */
-export let loadedWordList = {
+export let loadedWordcard = {
     name: null,
     originalContent: null
 };
 
 /**
- * 设置当前加载的单词表信息
+ * 设置当前加载的单词卡信息
  */
-export function setLoadedWordList(name, content) {
-    loadedWordList.name = name;
-    loadedWordList.originalContent = content;
+export function setLoadedWordcard(name, content) {
+    loadedWordcard.name = name;
+    loadedWordcard.originalContent = content;
 }
 
 /**
- * 清除当前加载的单词表信息
+ * 清除当前加载的单词卡信息
  */
-export function clearLoadedWordList() {
-    loadedWordList.name = null;
-    loadedWordList.originalContent = null;
+export function clearLoadedWordcard() {
+    loadedWordcard.name = null;
+    loadedWordcard.originalContent = null;
 }

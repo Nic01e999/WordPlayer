@@ -6,7 +6,7 @@
 from flask import Blueprint, request, jsonify, g
 from db import get_db
 from middleware import require_auth
-from repositories import FolderRepository, PublicFolderRepository, WordlistRepository, LayoutRepository, UserRepository
+from repositories import FolderRepository, PublicFolderRepository, WordcardRepository, LayoutRepository, UserRepository
 import json
 import traceback
 from datetime import datetime
@@ -50,7 +50,7 @@ def set_folder_public():
             # 计算单词数
             word_count = 0
             for card_id in folder['cards']:
-                card = WordlistRepository.get_by_id(user_id, card_id)
+                card = WordcardRepository.get_by_id(user_id, card_id)
                 if card and card['words']:
                     words = [w.strip() for w in card['words'].split('\n') if w.strip()]
                     word_count += len(words)
@@ -100,7 +100,7 @@ def search_public_folders():
             # 计算单词数
             word_count = 0
             for card_id in folder['cards']:
-                card = WordlistRepository.get_by_id(folder['user_id'], card_id)
+                card = WordcardRepository.get_by_id(folder['user_id'], card_id)
                 if card and card['words']:
                     words = [w.strip() for w in card['words'].split('\n') if w.strip()]
                     word_count += len(words)
@@ -151,7 +151,7 @@ def get_public_folder(folder_id):
         cards = []
         word_count = 0
         for card_id in folder['cards']:
-            card = WordlistRepository.get_by_id(folder['user_id'], card_id)
+            card = WordcardRepository.get_by_id(folder['user_id'], card_id)
             if card:
                 words = card['words'] or ''
                 word_list = [w.strip() for w in words.split('\n') if w.strip()]
@@ -202,7 +202,7 @@ def get_public_folder_content(folder_id):
         # 获取文件夹内的所有卡片
         cards = []
         for card_id in folder['cards']:
-            card = WordlistRepository.get_by_id(folder['user_id'], card_id)
+            card = WordcardRepository.get_by_id(folder['user_id'], card_id)
             if card:
                 cards.append({
                     'id': card['id'],
@@ -352,7 +352,7 @@ def check_folder_public_status():
             # 计算单词数
             word_count = 0
             for card_id in folder['cards']:
-                card = WordlistRepository.get_by_id(user_id, card_id)
+                card = WordcardRepository.get_by_id(user_id, card_id)
                 if card and card['words']:
                     words = [w.strip() for w in card['words'].split('\n') if w.strip()]
                     word_count += len(words)

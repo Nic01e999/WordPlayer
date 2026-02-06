@@ -21,7 +21,7 @@ import {
     initSettingsToggle,
     LANG_NAMES
 } from './utils.js';
-import { initWordListUI, goHome, renderWordListCards } from './wordlist/index.js';
+import { initWordcardUI, goHome, renderWordcardCards } from './wordcard/index.js';
 import { initTheme, applyTheme, getStoredTheme, setThemeChangeCallback } from './theme.js';
 import { initAuth, showLoginDialog, updateUserDisplay, refreshLoginDialog } from './auth.js';
 import { initI18n, setLocale, t, updatePageTexts } from './i18n/index.js';
@@ -265,7 +265,7 @@ function initLangSelectors() {
             updateUserDisplay();
             refreshLoginDialog();
             if (!window.currentActiveMode) {
-                renderWordListCards();
+                renderWordcardCards();
             }
 
             // 同步到服务端
@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initLangSelectors();
     initSettingsListeners();
     initPreloadListeners();
-    initWordListUI();
+    initWordcardUI();
     initSettingsToggle();  // 初始化设置面板点击切换功能
     initPublicSearch();    // 初始化公开文件夹搜索功能
 
@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 主题切换时重新渲染卡片（更新原色卡片）
     setThemeChangeCallback(() => {
         if (!window.currentActiveMode) {
-            renderWordListCards();
+            renderWordcardCards();
         }
     });
 
@@ -345,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateUserDisplay();
                 refreshLoginDialog();
                 if (!window.currentActiveMode) {
-                    renderWordListCards();
+                    renderWordcardCards();
                 }
             }
         }

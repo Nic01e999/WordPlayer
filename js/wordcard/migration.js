@@ -22,7 +22,7 @@ function needsMigration() {
 /**
  * 执行数据迁移
  * 主要任务：
- * 1. 将 cardColors 合并到 wordlists 中
+ * 1. 将 cardColors 合并到 wordcards 中
  * 2. 从 layout 中提取 folders 并独立存储
  * 3. 为文件夹中的卡片名称创建临时 ID 映射
  */
@@ -38,7 +38,7 @@ export function migrateLocalStorage() {
         // 备份旧数据
         backupOldData();
 
-        // 1. 迁移 cardColors 到 wordlists（如果 wordlists 存在于 localStorage）
+        // 1. 迁移 cardColors 到 wordcards（如果 wordcards 存在于 localStorage）
         migrateCardColors();
 
         // 2. 从 layout 中提取 folders
@@ -60,7 +60,7 @@ function backupOldData() {
     try {
         const backup = {
             cardColors: localStorage.getItem('cardColors'),
-            wordlist_layout: localStorage.getItem('wordlist_layout'),
+            wordcard_layout: localStorage.getItem('wordcard_layout'),
             timestamp: new Date().toISOString()
         };
         localStorage.setItem('migration_backup', JSON.stringify(backup));
@@ -71,9 +71,9 @@ function backupOldData() {
 }
 
 /**
- * 迁移 cardColors 到 wordlists
+ * 迁移 cardColors 到 wordcards
  * 注意：这里只处理 localStorage 中的数据（如果存在）
- * 实际上新版本不再使用 localStorage 存储 wordlists，而是从服务端拉取
+ * 实际上新版本不再使用 localStorage 存储 wordcards，而是从服务端拉取
  */
 function migrateCardColors() {
     try {
@@ -86,7 +86,7 @@ function migrateCardColors() {
         const cardColors = JSON.parse(cardColorsStr);
         console.log('[Migration] 找到 cardColors:', Object.keys(cardColors).length, '个颜色');
 
-        // 注意：新版本的 wordlists 存储在内存缓存中，不在 localStorage
+        // 注意：新版本的 wordcards 存储在内存缓存中，不在 localStorage
         // 这里只是保留 cardColors 用于后续同步到服务器
         // 实际的颜色合并会在登录后从服务器拉取数据时完成
 
@@ -101,7 +101,7 @@ function migrateCardColors() {
  */
 function migrateFolders() {
     try {
-        const layoutStr = localStorage.getItem('wordlist_layout');
+        const layoutStr = localStorage.getItem('wordcard_layout');
         if (!layoutStr) {
             console.log('[Migration] 没有找到 layout，跳过文件夹迁移');
             return;
@@ -155,8 +155,8 @@ export function restoreBackup() {
         if (backup.cardColors) {
             localStorage.setItem('cardColors', backup.cardColors);
         }
-        if (backup.wordlist_layout) {
-            localStorage.setItem('wordlist_layout', backup.wordlist_layout);
+        if (backup.wordcard_layout) {
+            localStorage.setItem('wordcard_layout', backup.wordcard_layout);
         }
 
         console.log('[Migration] 备份数据已恢复');

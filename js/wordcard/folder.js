@@ -3,8 +3,8 @@
  */
 
 import { escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder, getPublicFolders, setPublicFoldersCache, setWordListInCache } from './storage.js';
-import { getLayout, saveLayout, deleteWordList, isFolderNameExists, syncLayoutToServer } from './layout.js';
+import { getWordcards, loadWordcard, getCardColor, getFolders, addOrUpdateFolder, removeFolder, getPublicFolders, setPublicFoldersCache, setWordcardInCache } from './storage.js';
+import { getLayout, saveLayout, deleteWordcard, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showConfirm, showAlert } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
 import { t } from '../i18n/index.js';
@@ -18,13 +18,13 @@ import { bindPointerInteraction } from './interactions.js';
 const CARDS_PER_PAGE = 9;  // 3x3 网格
 
 // 延迟绑定的函数引用
-let _renderWordListCards = null;
+let _renderWordcardCards = null;
 
 /**
  * 设置延迟绑定的函数
  */
 export function setFolderDeps(deps) {
-    _renderWordListCards = deps.renderWordListCards;
+    _renderWordcardCards = deps.renderWordcardCards;
 }
 
 /**
@@ -78,17 +78,17 @@ function generateFolderPreview(cards, cardById = null) {
     const previewItems = previewCards.map(item => {
         // 支持两种输入：cardId 或 card 对象
         const card = cardById ? cardById[item] : item;
-        if (!card) return '<div class="wordlist-folder-mini"></div>';
+        if (!card) return '<div class="wordcard-folder-mini"></div>';
 
         // 优先使用 card 对象中的 color（来自服务器，用于公开文件夹）
         // 如果没有，则使用本地的颜色配置
         const customColor = card.color || getCardColor(card.name);
         const [color1, color2] = generateGradient(card.name, customColor);
-        return `<div class="wordlist-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
+        return `<div class="wordcard-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
     }).join('');
 
     const emptySlots = Math.max(0, 4 - previewCards.length);
-    const emptyHtml = '<div class="wordlist-folder-mini empty"></div>'.repeat(emptySlots);
+    const emptyHtml = '<div class="wordcard-folder-mini empty"></div>'.repeat(emptySlots);
 
     return previewItems + emptyHtml;
 }
@@ -125,7 +125,7 @@ function generateFolderPages(validCards, lists, options = {}) {
             const [color1, color2] = generateGradient(name, customColor);
 
             const deleteBtn = showDelete
-                ? `<button class="wordlist-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`
+                ? `<button class="wordcard-delete" data-name="${escapeHtml(name)}" title="Delete">&times;</button>`
                 : '';
 
             const readonlyClass = isReadonly ? 'readonly' : '';
@@ -137,12 +137,12 @@ function generateFolderPages(validCards, lists, options = {}) {
             }
 
             return `
-                <div class="wordlist-card ${readonlyClass}" data-id="${list.id || ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
+                <div class="wordcard-card ${readonlyClass}" data-id="${list.id || ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
                     ${deleteBtn}
-                    <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
-                        <span class="wordlist-icon-count">${wordCount}</span>
+                    <div class="wordcard-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
+                        <span class="wordcard-icon-count">${wordCount}</span>
                     </div>
-                    <div class="wordlist-label">${escapeHtml(name)}</div>
+                    <div class="wordcard-label">${escapeHtml(name)}</div>
                 </div>
             `;
         }).join('');
@@ -171,9 +171,9 @@ function generatePageDots(totalPages) {
  * @param {HTMLElement} overlay - 文件夹展开视图容器
  */
 function bindFolderCardClicks(overlay) {
-    overlay.querySelectorAll('.wordlist-card').forEach(card => {
+    overlay.querySelectorAll('.wordcard-card').forEach(card => {
         card.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('wordlist-delete')) return;
+            if (e.target.classList.contains('wordcard-delete')) return;
 
             // 检查是否在编辑模式
             if (isEditMode()) {
@@ -194,7 +194,7 @@ function bindFolderCardClicks(overlay) {
                 return;
             }
 
-            await loadWordList(cardId);
+            await loadWordcard(cardId);
         });
     });
 }
@@ -250,10 +250,10 @@ export async function openFolder(folderName) {
             validCards = [];
 
             // 先清除旧的公共卡片缓存
-            const allWordlists = getWordLists();
+            const allWordcards = getWordcards();
             content.cards.forEach(card => {
-                if (allWordlists[card.name]?.isPublic) {
-                    delete allWordlists[card.name];
+                if (allWordcards[card.name]?.isPublic) {
+                    delete allWordcards[card.name];
                     console.log('[Folder] 清除旧公共卡片缓存:', card.name);
                     console.log('[网页控制台] 清除旧公共卡片缓存:', card.name);
                 }
@@ -271,8 +271,8 @@ export async function openFolder(folderName) {
                 };
                 validCards.push(card.name);
 
-                // 将公共卡片添加到 _wordlistsCache，这样 loadWordList() 可以找到
-                setWordListInCache(card.name, {
+                // 将公共卡片添加到 _wordcardsCache，这样 loadWordcard() 可以找到
+                setWordcardInCache(card.name, {
                     id: card.id,
                     name: card.name,
                     words: card.words,
@@ -289,7 +289,7 @@ export async function openFolder(folderName) {
         }
     } else {
         // 自己的文件夹：使用 folder.cards (ID 数组)
-        lists = getWordLists();
+        lists = getWordcards();
 
         // 建立 ID → 卡片的映射
         const cardById = {};
@@ -355,7 +355,7 @@ export async function openFolder(folderName) {
     const inEditMode = isEditMode();
     if (inEditMode && !isPublic) {
         // 如果桌面在编辑模式，文件夹内卡片也抖动
-        overlay.querySelectorAll('.wordlist-card').forEach(card => {
+        overlay.querySelectorAll('.wordcard-card').forEach(card => {
             card.classList.add('edit-mode');
         });
     }
@@ -422,7 +422,7 @@ export async function openFolder(folderName) {
                         success = renameFolder(currentFolderName, newName);
                         if (success) {
                             currentFolderName = newName;
-                            if (_renderWordListCards) _renderWordListCards();
+                            if (_renderWordcardCards) _renderWordcardCards();
 
                             // 立即同步到云端
                             if (isLoggedIn()) {
@@ -477,7 +477,7 @@ export async function openFolder(folderName) {
 
                             success = true;
                             currentFolderName = newName;
-                            if (_renderWordListCards) _renderWordListCards();
+                            if (_renderWordcardCards) _renderWordcardCards();
 
                             console.log('[Folder] 公开文件夹重命名成功:', newName);
                         } catch (error) {
@@ -489,7 +489,7 @@ export async function openFolder(folderName) {
                         success = renameFolder(currentFolderName, newName);
                         if (success) {
                             currentFolderName = newName;
-                            if (_renderWordListCards) _renderWordListCards();
+                            if (_renderWordcardCards) _renderWordcardCards();
 
                             // 关键修复：立即同步到云端
                             if (isLoggedIn()) {
@@ -532,15 +532,15 @@ export async function openFolder(folderName) {
     // 文件夹内删除和拖拽（发布者可以操作，添加者不能操作）
     // 使用上面已声明的 isOwner 变量
     if (!isPublic || isOwner) {
-        overlay.querySelectorAll('.wordlist-delete').forEach(btn => {
+        overlay.querySelectorAll('.wordcard-delete').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const name = btn.dataset.name;
                 const confirmed = await showConfirm(t('deleteCard', { name }));
                 if (confirmed) {
-                    await deleteWordList(name);
+                    await deleteWordcard(name);
                     overlay.remove();
-                    if (_renderWordListCards) _renderWordListCards();
+                    if (_renderWordcardCards) _renderWordcardCards();
                 }
             });
         });
@@ -597,8 +597,8 @@ function markPublicFolderAsInvalid(refId) {
     }
 
     // 重新渲染以显示灰色状态
-    if (_renderWordListCards) {
-        _renderWordListCards();
+    if (_renderWordcardCards) {
+        _renderWordcardCards();
     }
 
     console.log(`[Folder] 标记公开文件夹引用为失效: ${refId}`);
@@ -618,8 +618,8 @@ function markPublicFolderAsValid(refId) {
     }
 
     // 重新渲染以移除失效样式
-    if (_renderWordListCards) {
-        _renderWordListCards();
+    if (_renderWordcardCards) {
+        _renderWordcardCards();
     }
 
     console.log(`[Folder] 恢复公开文件夹引用为有效: ${refId}`);
@@ -665,7 +665,7 @@ function bindFolderPagination(overlay, totalPages) {
     // 触摸/鼠标拖拽
     const onStart = (e) => {
         // 如果点击的是卡片或删除按钮，不启动拖拽
-        if (e.target.closest('.wordlist-card')) return;
+        if (e.target.closest('.wordcard-card')) return;
 
         isDragging = true;
         startX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -735,7 +735,7 @@ function bindFolderPagination(overlay, totalPages) {
 function bindFolderInteractions(overlay, folderName, view, container, pages) {
     const inEditMode = isEditMode();
 
-    overlay.querySelectorAll('.wordlist-card').forEach(card => {
+    overlay.querySelectorAll('.wordcard-card').forEach(card => {
         if (inEditMode) {
             // 编辑模式：拖拽排序（点击事件由 folder.js:241 的 click 监听器处理）
             bindPointerInteraction(card, {
@@ -751,14 +751,14 @@ function bindFolderInteractions(overlay, folderName, view, container, pages) {
                     console.log('[Folder] 文件夹内长按，进入编辑模式');
 
                     // 进入编辑模式
-                    const workplace = document.querySelector('#wordlistContent');
+                    const workplace = document.querySelector('#wordcardContent');
                     if (workplace) {
                         enterEditMode(workplace);
                     }
 
                     // 文件夹内卡片同步编辑模式
                     console.log('[Folder] 文件夹内同步编辑模式状态');
-                    overlay.querySelectorAll('.wordlist-card').forEach(c => {
+                    overlay.querySelectorAll('.wordcard-card').forEach(c => {
                         c.classList.add('edit-mode');
                     });
 
@@ -785,7 +785,7 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
 
     // 创建拖拽克隆
     const clone = card.cloneNode(true);
-    clone.className = 'wordlist-card drag-clone';
+    clone.className = 'wordcard-card drag-clone';
     const rect = card.getBoundingClientRect();
     clone.style.width = rect.width + 'px';
     clone.style.left = rect.left + 'px';
@@ -834,7 +834,7 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
 
             // 文件夹内排序：计算插入位置
             const currentPageEl = pages[currentPage];
-            const cardsInPage = Array.from(currentPageEl.querySelectorAll('.wordlist-card'));
+            const cardsInPage = Array.from(currentPageEl.querySelectorAll('.wordcard-card'));
             const insertIndex = calculateInsertIndexInFolder(e, cardsInPage, card);
 
             if (insertIndex !== -1) {
@@ -900,7 +900,7 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
         }
 
         // 获取卡片 ID
-        const lists = getWordLists();
+        const lists = getWordcards();
         const cardData = Object.values(lists).find(c => c.name === name);
         if (!cardData || !cardData.id) {
             console.error('[Folder] 卡片 ID 不存在:', name);
@@ -936,14 +936,14 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
 
             // 关闭文件夹
             overlay.remove();
-            if (_renderWordListCards) _renderWordListCards();
+            if (_renderWordcardCards) _renderWordcardCards();
         } else {
             // 在文件夹内：更新文件夹内卡片顺序
             console.log('[Folder] 更新文件夹内卡片顺序');
 
             const newOrder = [];
             pages.forEach(page => {
-                page.querySelectorAll('.wordlist-card').forEach(c => {
+                page.querySelectorAll('.wordcard-card').forEach(c => {
                     const cardName = c.dataset.name;
                     if (cardName) {
                         const card = Object.values(lists).find(l => l.name === cardName);
@@ -961,7 +961,7 @@ function startFolderCardDrag(startEvent, card, overlay, folderName, view, contai
             console.log('[Folder] 文件夹内卡片顺序已更新:', newOrder);
 
             // 触发重新渲染，更新文件夹预览
-            if (_renderWordListCards) _renderWordListCards();
+            if (_renderWordcardCards) _renderWordcardCards();
         }
     };
 
@@ -999,7 +999,7 @@ function calculateInsertIndexInFolder(e, cards, draggedCard) {
  * 文件夹内 DOM 重排（FLIP 动画）
  */
 function reorderFolderCards(pageEl, draggedCard, targetIdx) {
-    const cards = Array.from(pageEl.querySelectorAll('.wordlist-card'));
+    const cards = Array.from(pageEl.querySelectorAll('.wordcard-card'));
     const currentIdx = cards.indexOf(draggedCard);
 
     if (currentIdx === targetIdx || currentIdx === -1) return;
@@ -1102,8 +1102,8 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
             };
             validCards.push(card.name);
 
-            // ✅ 关键修复：将公共卡片添加到 _wordlistsCache，这样 loadWordList() 可以找到
-            setWordListInCache(card.name, {
+            // ✅ 关键修复：将公共卡片添加到 _wordcardsCache，这样 loadWordcard() 可以找到
+            setWordcardInCache(card.name, {
                 id: card.id,
                 name: card.name,
                 words: card.words,
@@ -1250,7 +1250,7 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
                     }
 
                     currentDisplayName = newName;
-                    if (_renderWordListCards) _renderWordListCards();
+                    if (_renderWordcardCards) _renderWordcardCards();
 
                     const newTitle = document.createElement('span');
                     newTitle.className = 'folder-open-title';

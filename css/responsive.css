@@ -110,7 +110,7 @@
 
 
     /* iOS 风格网格 - 手机适配 */
-    .wordlist-grid {
+    .wordcard-grid {
         padding: 1rem 0.75rem;
     }
     :root {
@@ -143,10 +143,10 @@
         font-size: 0.625rem;
     }
     /* 手机字体大幅放大 */
-    .wordlist-label {
+    .wordcard-label {
         font-size: 1rem;
     }
-    .wordlist-icon-count {
+    .wordcard-icon-count {
         font-size: 1.5rem;
     }
     .word-item strong {

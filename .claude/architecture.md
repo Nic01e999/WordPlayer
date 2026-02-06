@@ -9,7 +9,7 @@ server/
 ├── db.py            # SQLite 数据库连接和初始化
 ├── middleware.py    # 认证中间件 @require_auth
 ├── auth.py          # 用户认证 API（注册/登录/忘记密码）
-├── sync.py          # 数据同步 API（单词表/布局）
+├── sync.py          # 数据同步 API（单词卡/布局）
 ├── settings.py      # 用户设置 API
 ├── deepseek.py      # DeepSeek AI 单词信息 API
 ├── youdao.py        # 有道词典翻译 API（多语言）
@@ -24,7 +24,7 @@ server/
 - `/api/wordinfo/batch` - 批量获取单词信息（翻译、释义、例句、同义词）
 - `/api/youdao/*` - 有道翻译 API
 - `/api/tts` - 文本转语音
-- `/api/sync/*` - 数据同步（单词表、布局、设置）
+- `/api/sync/*` - 数据同步（单词卡、布局、设置）
 - `/api/settings` - 用户设置管理
 
 详细文档请参考：[backend-api.md](backend-api.md)
@@ -63,8 +63,8 @@ js/
 │   ├── settings.js     # 设置同步
 │   └── websocket.js    # WebSocket 客户端
 │
-├── wordlist/
-│   ├── index.js        # 单词表管理入口
+├── wordcard/
+│   ├── index.js        # 单词卡管理入口
 │   ├── storage.js      # localStorage 操作
 │   ├── layout.js       # 布局持久化
 │   ├── render.js       # 卡片渲染
@@ -104,7 +104,7 @@ css/
 ├── colors.css     # CSS 变量（主题颜色）
 ├── base.css       # 基础样式
 ├── components.css # 共享组件（按钮、状态颜色）
-├── home.css       # 主页视图（单词表卡片、文件夹、拖拽）
+├── home.css       # 主页视图（单词卡、文件夹、拖拽）
 ├── menu.css       # 顶部菜单和侧边栏
 ├── repeater.css   # 复读模式
 ├── dictation.css  # 听写模式
@@ -168,7 +168,7 @@ debouncedPreload (500ms 防抖)
 
 ### 同步流程
 
-- **登录时**: 拉取云端数据（单词表、布局、设置）
+- **登录时**: 拉取云端数据（单词卡、布局、设置）
 - **操作时**: 推送到云端
 - **WebSocket**: 实时同步多设备
 

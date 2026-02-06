@@ -1,5 +1,5 @@
 /**
- * 单词表拖拽系统模块 - iOS SpringBoard 风格
+ * 单词卡拖拽系统模块 - iOS SpringBoard 风格
  * 处理卡片和文件夹的拖拽排序（CSS Grid + DOM 重排）
  */
 
@@ -11,7 +11,7 @@ import { showSavingIndicator, hideSavingIndicator, showToast } from '../utils.js
 import { t } from '../i18n/index.js';
 import { bindPointerInteraction, isJustInteracted } from './interactions.js';
 import { isLoggedIn } from '../auth/state.js';
-import { addOrUpdateFolder, getWordLists, getFolders, getCardColors } from './storage.js';
+import { addOrUpdateFolder, getWordcards, getFolders, getCardColors } from './storage.js';
 
 // 拖拽状态
 let dragState = null;
@@ -25,14 +25,14 @@ let dragEventsInitialized = false;
 let globalTapHandlerInitialized = false;
 
 // 延迟绑定的函数引用
-let _renderWordListCards = null;
+let _renderWordcardCards = null;
 let _syncPendingPublicStatusChanges = null;
 
 /**
  * 设置延迟绑定的函数
  */
 export function setDragDeps(deps) {
-    _renderWordListCards = deps.renderWordListCards;
+    _renderWordcardCards = deps.renderWordcardCards;
     _syncPendingPublicStatusChanges = deps.syncPendingPublicStatusChanges;
 }
 
@@ -72,7 +72,7 @@ function handleGlobalTap(e) {
     if (e.target.closest('.color-picker-donut')) {
         return;
     }
-    if (e.target.closest('.wordlist-card, .wordlist-folder, .wordlist-delete')) {
+    if (e.target.closest('.wordcard-card, .wordcard-folder, .wordcard-delete')) {
         return;
     }
 
@@ -134,14 +134,14 @@ export function enterEditMode(workplace) {
     if (editMode) return;
     editMode = true;
     currentWorkplace = workplace;
-    const items = workplace.querySelectorAll('.wordlist-card, .wordlist-folder');
+    const items = workplace.querySelectorAll('.wordcard-card, .wordcard-folder');
     items.forEach(item => item.classList.add('edit-mode'));
 
     // 检查是否有打开的文件夹overlay
     const folderOverlay = document.querySelector('.folder-open-overlay');
     if (folderOverlay && !folderOverlay.querySelector('.readonly')) {
         // 给文件夹内的卡片也添加edit-mode
-        folderOverlay.querySelectorAll('.wordlist-card').forEach(card => {
+        folderOverlay.querySelectorAll('.wordcard-card').forEach(card => {
             card.classList.add('edit-mode');
         });
     }
@@ -162,7 +162,7 @@ export async function exitEditMode() {
     hideColorPicker();
 
     if (currentWorkplace) {
-        const items = currentWorkplace.querySelectorAll('.wordlist-card, .wordlist-folder');
+        const items = currentWorkplace.querySelectorAll('.wordcard-card, .wordcard-folder');
         items.forEach(item => {
             item.classList.remove('edit-mode');
         });
@@ -171,7 +171,7 @@ export async function exitEditMode() {
     // 移除文件夹内的edit-mode
     const folderOverlay = document.querySelector('.folder-open-overlay');
     if (folderOverlay) {
-        folderOverlay.querySelectorAll('.wordlist-card').forEach(card => {
+        folderOverlay.querySelectorAll('.wordcard-card').forEach(card => {
             card.classList.remove('edit-mode');
         });
     }
@@ -213,11 +213,11 @@ export async function exitEditMode() {
  * 绑定拖拽事件 - 使用统一交互管理
  */
 export function bindDragEvents(workplace) {
-    const grid = workplace.querySelector('.wordlist-grid');
+    const grid = workplace.querySelector('.wordcard-grid');
     if (!grid || dragEventsInitialized) return;
     dragEventsInitialized = true;
 
-    const items = workplace.querySelectorAll('.wordlist-card, .wordlist-folder');
+    const items = workplace.querySelectorAll('.wordcard-card, .wordcard-folder');
 
     items.forEach(item => {
         const isCard = item.dataset.type === 'card';
@@ -259,7 +259,7 @@ export function bindDragEvents(workplace) {
  * 根据鼠标位置计算插入索引
  */
 function calculateInsertIndex(e, grid, draggedEl) {
-    const items = Array.from(grid.querySelectorAll('.wordlist-card, .wordlist-folder'));
+    const items = Array.from(grid.querySelectorAll('.wordcard-card, .wordcard-folder'));
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
@@ -287,7 +287,7 @@ function calculateInsertIndex(e, grid, draggedEl) {
  * DOM 重排实现让位效果（FLIP 动画）
  */
 function reorderDOM(grid, draggedEl, targetIdx) {
-    const items = Array.from(grid.querySelectorAll('.wordlist-card, .wordlist-folder'));
+    const items = Array.from(grid.querySelectorAll('.wordcard-card, .wordcard-folder'));
     const currentIdx = items.indexOf(draggedEl);
 
     if (currentIdx === targetIdx || currentIdx === -1) return;
@@ -336,7 +336,7 @@ function reorderDOM(grid, draggedEl, targetIdx) {
  * @returns {Array<string>} 新的 layout 数组
  */
 function updateLayoutOrder(layout, grid) {
-    const items = Array.from(grid.querySelectorAll('.wordlist-card, .wordlist-folder'));
+    const items = Array.from(grid.querySelectorAll('.wordcard-card, .wordcard-folder'));
     const newLayout = [];
 
     items.forEach(el => {
@@ -372,14 +372,14 @@ function startDrag(startEvent, draggedEl, workplace) {
 
     draggedEl.classList.add('dragging');
 
-    const grid = workplace.querySelector('.wordlist-grid');
+    const grid = workplace.querySelector('.wordcard-grid');
 
     // 获取所有项目
-    const allItems = Array.from(grid.querySelectorAll('.wordlist-card, .wordlist-folder'));
+    const allItems = Array.from(grid.querySelectorAll('.wordcard-card, .wordcard-folder'));
 
     // 创建浮动克隆（fixed 定位跟随鼠标）
     const clone = draggedEl.cloneNode(true);
-    clone.className = (type === 'folder' ? 'wordlist-folder' : 'wordlist-card') + ' drag-clone';
+    clone.className = (type === 'folder' ? 'wordcard-folder' : 'wordcard-card') + ' drag-clone';
     clone.style.animation = 'none';
     clone.style.rotate = 'none';
     clone.style.scale = 'none';
@@ -493,7 +493,7 @@ function startDrag(startEvent, draggedEl, workplace) {
 
                 if (folder) {
                     // 获取拖拽卡片的 ID
-                    const lists = getWordLists();
+                    const lists = getWordcards();
                     const dragCard = Object.values(lists).find(c => c.name === dragName);
 
                     if (dragCard && dragCard.id) {
@@ -508,7 +508,7 @@ function startDrag(startEvent, draggedEl, workplace) {
                         // 卡片已添加到文件夹，数据保留在数据库中
                         console.log('[Drag] 卡片已添加到文件夹:', dragName);
 
-                        if (_renderWordListCards) _renderWordListCards();
+                        if (_renderWordcardCards) _renderWordcardCards();
                     }
                 }
             } else {
@@ -523,7 +523,7 @@ function startDrag(startEvent, draggedEl, workplace) {
             const newLayout = updateLayoutOrder(layout, grid);
             saveLayout(newLayout);
             // 重新渲染以同步 layoutIdx
-            if (_renderWordListCards) _renderWordListCards();
+            if (_renderWordcardCards) _renderWordcardCards();
         }
 
         setTimeout(() => {
@@ -550,7 +550,7 @@ function clearMergeState() {
 function getDropTarget(event, items, excludeEl) {
     for (const item of items) {
         if (item === excludeEl) continue;
-        const iconEl = item.querySelector('.wordlist-icon, .wordlist-folder-icon');
+        const iconEl = item.querySelector('.wordcard-icon, .wordcard-folder-icon');
         if (iconEl) {
             const iconRect = iconEl.getBoundingClientRect();
             if (event.clientX >= iconRect.left && event.clientX <= iconRect.right &&
@@ -563,7 +563,7 @@ function getDropTarget(event, items, excludeEl) {
 }
 
 function isOverCenter(event, target) {
-    const iconEl = target.querySelector('.wordlist-icon, .wordlist-folder-icon');
+    const iconEl = target.querySelector('.wordcard-icon, .wordcard-folder-icon');
     const rect = iconEl ? iconEl.getBoundingClientRect() : target.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -587,8 +587,8 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
         return;
     }
 
-    // 获取所有单词表
-    const lists = getWordLists();
+    // 获取所有单词卡
+    const lists = getWordcards();
 
     // 根据名称查找卡片 ID
     const targetCard = Object.values(lists).find(c => c.name === targetName);
@@ -630,7 +630,7 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
     newLayout.push(tempFolderId);
 
     saveLayout(newLayout);
-    if (_renderWordListCards) _renderWordListCards();
+    if (_renderWordcardCards) _renderWordcardCards();
 
     // 立即同步到服务器获取 ID
     console.log('[Drag] 立即同步新文件夹到服务器...');
@@ -672,8 +672,8 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
             console.log('[Drag] 修复后的布局已推送到服务器');
 
             // 重新渲染界面
-            if (_renderWordListCards) {
-                _renderWordListCards();
+            if (_renderWordcardCards) {
+                _renderWordcardCards();
                 console.log('[Drag] 界面已刷新');
             }
         } else {

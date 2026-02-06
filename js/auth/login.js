@@ -6,13 +6,13 @@
 import * as api from './api.js';
 import * as state from './state.js';
 import { pullFromCloud, pushToCloud } from './sync.js';
-import { setWordListsCache, clearWordListsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache, clearPublicCardCache } from '../wordlist/storage.js';
+import { setWordcardsCache, clearWordcardsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache, clearPublicCardCache } from '../wordcard/storage.js';
 import { t } from '../i18n/index.js';
-import { getLayout, saveLayout, setLayout } from '../wordlist/layout.js';
-import { renderWordListCards } from '../wordlist/render.js';
+import { getLayout, saveLayout, setLayout } from '../wordcard/layout.js';
+import { renderWordcardCards } from '../wordcard/render.js';
 import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
 import { applySettings, clearSettings } from '../sync/settings.js';
-import { migrateLocalStorage } from '../wordlist/migration.js';
+import { migrateLocalStorage } from '../wordcard/migration.js';
 
 let currentDialog = null;
 let currentMode = 'login'; // 'login' | 'register' | 'forgot' | 'reset'
@@ -420,9 +420,9 @@ async function syncAfterLogin() {
 
     console.log('[Sync] 云端数据拉取成功');
 
-    // 将云端单词表存入内存缓存
-    setWordListsCache(cloudData.wordlists || {});
-    console.log('[Sync] 单词表已更新:', Object.keys(cloudData.wordlists || {}).length, '个');
+    // 将云端单词卡存入内存缓存
+    setWordcardsCache(cloudData.wordcards || {});
+    console.log('[Sync] 单词卡已更新:', Object.keys(cloudData.wordcards || {}).length, '个');
 
     // 将文件夹存入内存缓存
     setFoldersCache(cloudData.folders || {});
@@ -459,12 +459,12 @@ async function syncAfterLogin() {
             layout: localLayout,
             cardColors: localCardColors,
             folders: {},
-            wordlists: {}
+            wordcards: {}
         });
     }
 
     // 刷新 UI
-    renderWordListCards();
+    renderWordcardCards();
     console.log('[Sync] UI 已刷新');
 
     // 初始化 WebSocket 连接（实时同步）
@@ -483,14 +483,14 @@ export async function doLogout() {
 
     await api.logout();
     state.clearAuth();
-    // 清空单词表缓存
-    clearWordListsCache();
+    // 清空单词卡缓存
+    clearWordcardsCache();
     // 清空文件夹缓存
     clearFoldersCache();
     // 清空公开文件夹缓存
     clearPublicFoldersCache();
     // 刷新 UI
-    renderWordListCards();
+    renderWordcardCards();
 }
 
 /**

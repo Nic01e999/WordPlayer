@@ -20,7 +20,7 @@ const MOVE_THRESHOLD = 5;         // 移动阈值（像素）
 export function bindPointerInteraction(element, callbacks) {
     element.addEventListener('pointerdown', (e) => {
         // 忽略删除按钮的点击
-        if (e.target.classList.contains('wordlist-delete')) return;
+        if (e.target.classList.contains('wordcard-delete')) return;
 
         // 只处理左键
         if (e.button !== 0) return;

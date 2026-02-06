@@ -1,10 +1,10 @@
 /**
- * 单词表模块入口
+ * 单词卡模块入口
  * 组合所有子模块并导出公共 API
  */
 
 import { $ } from '../utils.js';
-import { setActiveMode, setRepeaterState, preloadCache, loadedWordList, clearLoadedWordList } from '../state.js';
+import { setActiveMode, setRepeaterState, preloadCache, loadedWordcard, clearLoadedWordcard } from '../state.js';
 import { updatePreloadProgress } from '../preload.js';
 import { stopAudio } from '../audio.js';
 import { showPrompt, showAlert } from '../utils/dialog.js';
@@ -12,9 +12,9 @@ import { t } from '../i18n/index.js';
 import { getCurrentUser } from '../auth/state.js';
 
 // 导入子模块
-import { getWordLists, saveWordList, loadWordList, updateWordList, isWordListNameExists } from './storage.js';
-import { getLayout, saveLayout, deleteWordList, deleteFolder } from './layout.js';
-import { renderWordListCards, setRenderDeps, resetEventFlags, syncPendingPublicStatusChanges } from './render.js';
+import { getWordcards, saveWordcard, loadWordcard, updateWordcard, isWordcardNameExists } from './storage.js';
+import { getLayout, saveLayout, deleteWordcard, deleteFolder } from './layout.js';
+import { renderWordcardCards, setRenderDeps, resetEventFlags, syncPendingPublicStatusChanges } from './render.js';
 import {
     bindDragEvents, exitEditMode, isEditMode, setCurrentWorkplace,
     getDragState, enterEditMode, setDragDeps, resetDragEventFlags, initGlobalTapHandler
@@ -34,16 +34,16 @@ setRenderDeps({
 });
 
 setDragDeps({
-    renderWordListCards,
+    renderWordcardCards,
     syncPendingPublicStatusChanges
 });
 
 setFolderDeps({
-    renderWordListCards
+    renderWordcardCards
 });
 
 setColorPickerDeps({
-    renderWordListCards
+    renderWordcardCards
 });
 
 /**
@@ -66,13 +66,13 @@ export function goHome() {
     setRepeaterState(null);
     document.body.classList.remove('dictation-mode', 'repeater-mode');
 
-    renderWordListCards();
+    renderWordcardCards();
 }
 
 /**
- * 初始化单词表 UI
+ * 初始化单词卡 UI
  */
-export function initWordListUI() {
+export function initWordcardUI() {
     const saveBtn = $("saveListBtn");
     const updateBtn = $("updateListBtn");
     const wordInput = $("wordInput");
@@ -83,20 +83,20 @@ export function initWordListUI() {
     // Save 按钮
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
-            const defaultName = `wordlist-${new Date().toISOString().slice(0, 10)}`;
+            const defaultName = `wordcard-${new Date().toISOString().slice(0, 10)}`;
             const name = await showPrompt(t('promptName'), defaultName);
             if (!name || !name.trim()) return;
 
             const trimmedName = name.trim();
-            if (isWordListNameExists(trimmedName)) {
+            if (isWordcardNameExists(trimmedName)) {
                 await showAlert(t('nameExists', { name: trimmedName }));
                 return;
             }
 
-            if (await saveWordList(trimmedName)) {
-                clearLoadedWordList();
+            if (await saveWordcard(trimmedName)) {
+                clearLoadedWordcard();
                 hideUpdateButton();
-                renderWordListCards();
+                renderWordcardCards();
             }
         });
     }
@@ -104,10 +104,10 @@ export function initWordListUI() {
     // Update 按钮
     if (updateBtn) {
         updateBtn.addEventListener('click', async () => {
-            if (!loadedWordList.name) return;
-            if (await updateWordList(loadedWordList.name)) {
+            if (!loadedWordcard.name) return;
+            if (await updateWordcard(loadedWordcard.name)) {
                 hideUpdateButton();
-                renderWordListCards();
+                renderWordcardCards();
             }
         });
     }
@@ -117,7 +117,7 @@ export function initWordListUI() {
         wordInput.addEventListener('input', checkUpdateButtonVisibility);
     }
 
-    renderWordListCards();
+    renderWordcardCards();
 }
 
 /**
@@ -129,9 +129,9 @@ function checkUpdateButtonVisibility() {
 
     const currentContent = $("wordInput")?.value || '';
 
-    if (loadedWordList.name &&
-        loadedWordList.originalContent !== null &&
-        currentContent !== loadedWordList.originalContent) {
+    if (loadedWordcard.name &&
+        loadedWordcard.originalContent !== null &&
+        currentContent !== loadedWordcard.originalContent) {
         updateBtn.style.display = 'inline-block';
     } else {
         updateBtn.style.display = 'none';
@@ -148,10 +148,10 @@ function hideUpdateButton() {
 
 // 导出公共 API
 export {
-    getWordLists,
-    saveWordList,
-    updateWordList,
-    loadWordList,
-    deleteWordList,
-    renderWordListCards
+    getWordcards,
+    saveWordcard,
+    updateWordcard,
+    loadWordcard,
+    deleteWordcard,
+    renderWordcardCards
 };

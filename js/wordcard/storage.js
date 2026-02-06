@@ -1,11 +1,11 @@
 /**
- * 单词表存储模块
- * 纯服务端存储，不再使用 localStorage 存储单词表数据
+ * 单词卡存储模块
+ * 纯服务端存储，不再使用 localStorage 存储单词卡数据
  */
 
 import { $, detectLanguageFromInput, setTargetLang, updateAccentSelectorVisibility } from '../utils.js';
 import { t } from '../i18n/index.js';
-import { preloadCache, setLoadedWordList } from '../state.js';
+import { preloadCache, setLoadedWordcard } from '../state.js';
 import { startPreload } from '../preload.js';
 import { API_BASE } from '../api.js';
 import { isLoggedIn, getAuthHeader } from '../auth/state.js';
@@ -14,11 +14,11 @@ import { showLoginDialog } from '../auth/login.js';
 const CARD_COLORS_KEY = 'cardColors';  // 保留用于数据迁移
 const FOLDERS_KEY = 'folders';
 
-// 内存缓存：存储从服务端拉取的单词表列表
-let _wordlistsCache = {};
+// 内存缓存：存储从服务端拉取的单词卡列表
+let _wordcardsCache = {};
 
-// 内存缓存：按 ID 索引单词表（性能优化）
-let _wordlistsCacheById = {};
+// 内存缓存：按 ID 索引单词卡（性能优化）
+let _wordcardsCacheById = {};
 
 // 内存缓存：存储文件夹数据
 let _foldersCache = {};
@@ -27,12 +27,12 @@ let _foldersCache = {};
 let _publicFoldersCache = [];
 
 /**
- * 从服务端拉取所有单词表
- * @returns {Promise<object>} 单词表对象 { name: { name, words, created, updated }, ... }
+ * 从服务端拉取所有单词卡
+ * @returns {Promise<object>} 单词卡对象 { name: { name, words, created, updated }, ... }
  */
-export async function fetchWordLists() {
+export async function fetchWordcards() {
     if (!isLoggedIn()) {
-        _wordlistsCache = {};
+        _wordcardsCache = {};
         return {};
     }
 
@@ -43,74 +43,74 @@ export async function fetchWordLists() {
         });
 
         if (!response.ok) {
-            console.error('Failed to fetch wordlists:', response.status);
-            return _wordlistsCache;
+            console.error('Failed to fetch wordcards:', response.status);
+            return _wordcardsCache;
         }
 
         const data = await response.json();
-        _wordlistsCache = data.wordlists || {};
-        return _wordlistsCache;
+        _wordcardsCache = data.wordcards || {};
+        return _wordcardsCache;
     } catch (e) {
-        console.error('Failed to fetch wordlists:', e);
-        return _wordlistsCache;
+        console.error('Failed to fetch wordcards:', e);
+        return _wordcardsCache;
     }
 }
 
 /**
- * 获取所有单词表（从内存缓存）
- * 注意：调用前需要先调用 fetchWordLists() 从服务端拉取
+ * 获取所有单词卡（从内存缓存）
+ * 注意：调用前需要先调用 fetchWordcards() 从服务端拉取
  */
-export function getWordLists() {
-    return _wordlistsCache;
+export function getWordcards() {
+    return _wordcardsCache;
 }
 
 /**
- * 设置单词表缓存（用于登录后同步）
+ * 设置单词卡缓存（用于登录后同步）
  */
-export function setWordListsCache(wordlists) {
-    _wordlistsCache = wordlists || {};
+export function setWordcardsCache(wordcards) {
+    _wordcardsCache = wordcards || {};
 
     // 重建 ID 索引
-    _wordlistsCacheById = {};
-    for (const [name, data] of Object.entries(_wordlistsCache)) {
+    _wordcardsCacheById = {};
+    for (const [name, data] of Object.entries(_wordcardsCache)) {
         if (data && data.id) {
-            _wordlistsCacheById[data.id] = data;
+            _wordcardsCacheById[data.id] = data;
         }
     }
 }
 
 /**
- * 通过 ID 获取单词表（快速查找）
- * @param {number} id - 单词表 ID
- * @returns {object|null} 单词表数据或 null
+ * 通过 ID 获取单词卡（快速查找）
+ * @param {number} id - 单词卡 ID
+ * @returns {object|null} 单词卡数据或 null
  */
-export function getWordListById(id) {
-    return _wordlistsCacheById[id] || null;
+export function getWordcardById(id) {
+    return _wordcardsCacheById[id] || null;
 }
 
 /**
- * 设置单个单词表到缓存（用于公共文件夹卡片）
- * @param {string} name - 单词表名称
- * @param {object} data - 单词表数据 { id, name, words, color, isPublic, ... }
+ * 设置单个单词卡到缓存（用于公共文件夹卡片）
+ * @param {string} name - 单词卡名称
+ * @param {object} data - 单词卡数据 { id, name, words, color, isPublic, ... }
  */
-export function setWordListInCache(name, data) {
-    _wordlistsCache[name] = data;
+export function setWordcardInCache(name, data) {
+    _wordcardsCache[name] = data;
 
     // 同时维护 ID 索引（性能优化）
     if (data && data.id) {
-        _wordlistsCacheById[data.id] = data;
-        console.log('[Storage] setWordListInCache:', name, 'ID:', data.id, '公共卡片:', data.isPublic);
+        _wordcardsCacheById[data.id] = data;
+        console.log('[Storage] setWordcardInCache:', name, 'ID:', data.id, '公共卡片:', data.isPublic);
     } else {
-        console.log('[Storage] setWordListInCache:', name, '公共卡片:', data.isPublic, '警告: 无 ID');
+        console.log('[Storage] setWordcardInCache:', name, '公共卡片:', data.isPublic, '警告: 无 ID');
     }
 }
 
 /**
- * 清空单词表缓存（用于登出）
+ * 清空单词卡缓存（用于登出）
  */
-export function clearWordListsCache() {
-    _wordlistsCache = {};
-    _wordlistsCacheById = {};  // 同时清空 ID 索引
+export function clearWordcardsCache() {
+    _wordcardsCache = {};
+    _wordcardsCacheById = {};  // 同时清空 ID 索引
 }
 
 /**
@@ -119,13 +119,13 @@ export function clearWordListsCache() {
  */
 export function clearPublicCardCache() {
     // 遍历缓存，删除所有标记为 isPublic 的卡片
-    for (const [name, data] of Object.entries(_wordlistsCache)) {
+    for (const [name, data] of Object.entries(_wordcardsCache)) {
         if (data && data.isPublic) {
-            delete _wordlistsCache[name];
+            delete _wordcardsCache[name];
 
             // 同时从 ID 索引中删除
             if (data.id) {
-                delete _wordlistsCacheById[data.id];
+                delete _wordcardsCacheById[data.id];
             }
 
             console.log('[Storage] 清除公共卡片缓存:', name);
@@ -135,10 +135,10 @@ export function clearPublicCardCache() {
 }
 
 /**
- * 保存单词表到服务端
+ * 保存单词卡到服务端
  * @returns {Promise<boolean>} 是否成功
  */
-export async function saveWordList(name) {
+export async function saveWordcard(name) {
     const words = $("wordInput").value.trim();
     if (!words) return false;
 
@@ -147,11 +147,11 @@ export async function saveWordList(name) {
         return false;
     }
 
-    const existingList = _wordlistsCache[name];
+    const existingList = _wordcardsCache[name];
     const created = existingList?.created || new Date().toISOString();
 
     try {
-        const response = await fetch(`${API_BASE}/api/sync/wordlist`, {
+        const response = await fetch(`${API_BASE}/api/sync/wordcard`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ export async function saveWordList(name) {
         });
 
         if (!response.ok) {
-            console.error('[Storage] 保存单词表失败:', response.status);
+            console.error('[Storage] 保存单词卡失败:', response.status);
             return false;
         }
 
@@ -174,7 +174,7 @@ export async function saveWordList(name) {
         const cardId = result.id;
 
         // 更新内存缓存，包含卡片 ID
-        _wordlistsCache[name] = {
+        _wordcardsCache[name] = {
             id: cardId,  // 添加 ID 字段
             name,
             words,
@@ -182,32 +182,32 @@ export async function saveWordList(name) {
             updated: new Date().toISOString()
         };
 
-        console.log('[Storage] 单词表已保存，ID:', cardId, '名称:', name);
+        console.log('[Storage] 单词卡已保存，ID:', cardId, '名称:', name);
         return true;
     } catch (e) {
-        console.error('Failed to save wordlist:', e);
+        console.error('Failed to save wordcard:', e);
         return false;
     }
 }
 
 /**
- * 删除单词表
+ * 删除单词卡
  * @param {number} cardId - 卡片 ID
  * @returns {Promise<boolean>} 是否成功
  */
-export async function removeWordListFromStorage(cardId) {
+export async function removeWordcardFromStorage(cardId) {
     if (!cardId) {
-        console.error('[Storage] removeWordListFromStorage 失败: 缺少 ID');
+        console.error('[Storage] removeWordcardFromStorage 失败: 缺少 ID');
         return false;
     }
 
     if (!isLoggedIn()) {
         // 未登录时只从内存缓存删除
-        delete _wordlistsCacheById[cardId];
+        delete _wordcardsCacheById[cardId];
         // 从名称索引中查找并删除
-        for (const [name, data] of Object.entries(_wordlistsCache)) {
+        for (const [name, data] of Object.entries(_wordcardsCache)) {
             if (data.id === cardId) {
-                delete _wordlistsCache[name];
+                delete _wordcardsCache[name];
                 break;
             }
         }
@@ -215,10 +215,10 @@ export async function removeWordListFromStorage(cardId) {
     }
 
     try {
-        console.log('[Storage] 通过ID删除单词表:', cardId);
-        console.log('[网页控制台] 通过ID删除单词表:', cardId);
+        console.log('[Storage] 通过ID删除单词卡:', cardId);
+        console.log('[网页控制台] 通过ID删除单词卡:', cardId);
 
-        const response = await fetch(`${API_BASE}/api/sync/wordlist/by-id/${cardId}`, {
+        const response = await fetch(`${API_BASE}/api/sync/wordcard/by-id/${cardId}`, {
             method: 'DELETE',
             headers: getAuthHeader()
         });
@@ -229,10 +229,10 @@ export async function removeWordListFromStorage(cardId) {
         }
 
         // 更新缓存
-        delete _wordlistsCacheById[cardId];
-        for (const [name, data] of Object.entries(_wordlistsCache)) {
+        delete _wordcardsCacheById[cardId];
+        for (const [name, data] of Object.entries(_wordcardsCache)) {
             if (data.id === cardId) {
-                delete _wordlistsCache[name];
+                delete _wordcardsCache[name];
                 break;
             }
         }
@@ -245,45 +245,45 @@ export async function removeWordListFromStorage(cardId) {
 }
 
 /**
- * 批量删除多个单词表
+ * 批量删除多个单词卡
  * @param {Array<number>} cardIds - 卡片 ID 数组
  * @returns {Promise<boolean>} 是否全部成功
  */
-export async function removeWordListsFromStorage(cardIds) {
+export async function removeWordcardsFromStorage(cardIds) {
     const results = await Promise.all(
-        cardIds.map(id => removeWordListFromStorage(id))
+        cardIds.map(id => removeWordcardFromStorage(id))
     );
     return results.every(r => r);
 }
 
 /**
- * 检查单词表名称是否已存在
+ * 检查单词卡名称是否已存在
  */
-export function isWordListNameExists(name) {
-    return name in _wordlistsCache;
+export function isWordcardNameExists(name) {
+    return name in _wordcardsCache;
 }
 
 /**
- * 加载单词表到 textarea
- * @param {number} cardId - 单词表 ID
+ * 加载单词卡到 textarea
+ * @param {number} cardId - 单词卡 ID
  * @returns {Promise<boolean>} 是否成功
  */
-export async function loadWordList(cardId) {
+export async function loadWordcard(cardId) {
     if (!cardId) {
-        console.error('[Storage] loadWordList 失败: 缺少 ID');
+        console.error('[Storage] loadWordcard 失败: 缺少 ID');
         return false;
     }
 
     // 通过 ID 查找
-    const list = _wordlistsCacheById[cardId];
+    const list = _wordcardsCacheById[cardId];
 
     if (!list) {
-        console.error('[Storage] loadWordList 失败，缓存中找不到 ID:', cardId);
+        console.error('[Storage] loadWordcard 失败，缓存中找不到 ID:', cardId);
         return false;
     }
 
     const name = list.name;
-    console.log('[Storage] loadWordList 通过ID加载:', name, 'ID:', cardId);
+    console.log('[Storage] loadWordcard 通过ID加载:', name, 'ID:', cardId);
 
     // 重置预加载缓存
     preloadCache.loadId++;
@@ -293,7 +293,7 @@ export async function loadWordList(cardId) {
 
     // 设置 textarea 内容
     $("wordInput").value = list.words;
-    setLoadedWordList(name, list.words);
+    setLoadedWordcard(name, list.words);
 
     // 自动检测语言
     const detected = detectLanguageFromInput(list.words);
@@ -308,14 +308,14 @@ export async function loadWordList(cardId) {
 }
 
 /**
- * 更新已存在的单词表
+ * 更新已存在的单词卡
  * @returns {Promise<boolean>} 是否成功
  */
-export async function updateWordList(name) {
+export async function updateWordcard(name) {
     const words = $("wordInput").value.trim();
     if (!words || !name) return false;
 
-    if (!_wordlistsCache[name]) return false;
+    if (!_wordcardsCache[name]) return false;
 
     if (!isLoggedIn()) {
         showLoginDialog();
@@ -323,16 +323,16 @@ export async function updateWordList(name) {
     }
 
     // 获取当前颜色配置和 ID
-    const existingData = _wordlistsCache[name] || {};
+    const existingData = _wordcardsCache[name] || {};
     const color = existingData.color || null;
-    const created = _wordlistsCache[name].created;
+    const created = _wordcardsCache[name].created;
     const cardId = existingData.id;  // 读取 ID
 
-    console.log('[Storage] 更新单词表，ID:', cardId, '颜色:', color);
-    console.log('[网页控制台] 更新单词表，ID:', cardId, '颜色:', color);
+    console.log('[Storage] 更新单词卡，ID:', cardId, '颜色:', color);
+    console.log('[网页控制台] 更新单词卡，ID:', cardId, '颜色:', color);
 
     try {
-        const response = await fetch(`${API_BASE}/api/sync/wordlist`, {
+        const response = await fetch(`${API_BASE}/api/sync/wordcard`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -348,7 +348,7 @@ export async function updateWordList(name) {
         });
 
         if (!response.ok) {
-            console.error('[Storage] 更新单词表失败:', response.status);
+            console.error('[Storage] 更新单词卡失败:', response.status);
             return false;
         }
 
@@ -357,7 +357,7 @@ export async function updateWordList(name) {
         const resultId = data.id;
 
         // 更新内存缓存（同时更新双索引）
-        _wordlistsCache[name] = {
+        _wordcardsCache[name] = {
             id: resultId || cardId || existingData.id,
             name,
             words,
@@ -368,11 +368,11 @@ export async function updateWordList(name) {
 
         // 更新 ID 索引
         if (resultId || cardId) {
-            _wordlistsCacheById[resultId || cardId] = _wordlistsCache[name];
+            _wordcardsCacheById[resultId || cardId] = _wordcardsCache[name];
         }
 
-        console.log('[Storage] 保存单词表成功:', name, 'ID:', resultId);
-        setLoadedWordList(name, words);
+        console.log('[Storage] 保存单词卡成功:', name, 'ID:', resultId);
+        setLoadedWordcard(name, words);
         return true;
     } catch (e) {
         console.error('[Storage] 更新失败:', e);
@@ -395,12 +395,12 @@ export function getCardColors() {
 
 /**
  * 获取单个卡片的颜色
- * 优先从 wordlist.color 读取，如果没有则从内存缓存读取
+ * 优先从 wordcard.color 读取，如果没有则从内存缓存读取
  */
 export function getCardColor(name) {
-    // 优先从内存缓存的 wordlist.color 读取
-    if (_wordlistsCache[name] && _wordlistsCache[name].color) {
-        return _wordlistsCache[name].color;
+    // 优先从内存缓存的 wordcard.color 读取
+    if (_wordcardsCache[name] && _wordcardsCache[name].color) {
+        return _wordcardsCache[name].color;
     }
 
     // 从颜色缓存读取
@@ -418,8 +418,8 @@ export function setCardColor(name, colorId) {
     }
 
     // 同时更新内存缓存中的 color 字段
-    if (_wordlistsCache[name]) {
-        _wordlistsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
+    if (_wordcardsCache[name]) {
+        _wordcardsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
     }
 
     return true;
@@ -466,19 +466,19 @@ export function removeFolder(name) {
 }
 
 /**
- * 从内存缓存中删除单词表（不删除服务端数据）
+ * 从内存缓存中删除单词卡（不删除服务端数据）
  * 用于将卡片移入文件夹时
  */
-export function removeWordListFromCache(name) {
-    if (_wordlistsCache[name]) {
+export function removeWordcardFromCache(name) {
+    if (_wordcardsCache[name]) {
         // 同时从 ID 索引中删除
-        const id = _wordlistsCache[name].id;
+        const id = _wordcardsCache[name].id;
         if (id) {
-            delete _wordlistsCacheById[id];
+            delete _wordcardsCacheById[id];
         }
 
-        delete _wordlistsCache[name];
-        console.log('[Storage] 单词表已从缓存移除:', name);
+        delete _wordcardsCache[name];
+        console.log('[Storage] 单词卡已从缓存移除:', name);
     }
 }
 

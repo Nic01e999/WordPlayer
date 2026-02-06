@@ -9,7 +9,7 @@ server/
 ├── db.py            # SQLite 数据库连接和初始化
 ├── middleware.py    # 认证中间件 @require_auth
 ├── auth.py          # 用户认证 API（注册/登录/忘记密码）
-├── sync.py          # 数据同步 API（单词表/布局）
+├── sync.py          # 数据同步 API（单词卡/布局）
 ├── settings.py      # 用户设置 API
 ├── deepseek.py      # DeepSeek AI 单词信息 API
 ├── youdao.py        # 有道词典翻译 API（多语言）
@@ -286,7 +286,7 @@ def is_sentence(text):
 **响应**:
 ```json
 {
-  "wordlists": [
+  "wordcards": [
     {
       "name": "IELTS Vocabulary",
       "words": ["abandon", "ability"],
@@ -312,17 +312,17 @@ def is_sentence(text):
 
 **功能**: 推送本地数据到云端
 
-#### GET `/api/sync/wordlist/<name>`
+#### GET `/api/sync/wordcard/<name>`
 
-**功能**: 获取单个单词表
+**功能**: 获取单个单词卡
 
-#### POST `/api/sync/wordlist`
+#### POST `/api/sync/wordcard`
 
-**功能**: 保存单词表
+**功能**: 保存单词卡
 
-#### DELETE `/api/sync/wordlist/<name>`
+#### DELETE `/api/sync/wordcard/<name>`
 
-**功能**: 删除单词表
+**功能**: 删除单词卡
 
 ### 数据存储
 
@@ -434,9 +434,9 @@ def handle_connect(auth):
 
 **触发时机**: 用户修改布局
 
-#### `wordlist:update`
+#### `wordcard:update`
 
-**触发时机**: 用户保存/删除单词表
+**触发时机**: 用户保存/删除单词卡
 
 ### 房间机制
 
@@ -475,10 +475,10 @@ CREATE TABLE sessions (
 );
 ```
 
-#### wordlists - 单词表
+#### wordcards - 单词卡
 
 ```sql
-CREATE TABLE wordlists (
+CREATE TABLE wordcards (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
   name TEXT NOT NULL,

@@ -83,7 +83,7 @@ body::before {
     margin-bottom: 13.5rem;
 }
 
-#wordlistContent {
+#wordcardContent {
     flex: 1;
     min-width: 0;
 }

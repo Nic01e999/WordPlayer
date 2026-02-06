@@ -21,7 +21,7 @@ export {
     disconnectWebSocket,
     sendSettingsUpdate,
     sendLayoutUpdate,
-    sendWordlistUpdate,
+    sendWordcardUpdate,
     isWebSocketConnected,
     onWebSocketEvent
 } from './websocket.js';

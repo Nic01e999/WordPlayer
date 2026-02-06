@@ -147,23 +147,23 @@ class ResetCodeRepository:
             cursor.execute("UPDATE reset_codes SET used = TRUE WHERE id = ?", (code_id,))
 
 
-class WordlistRepository:
-    """单词表数据访问"""
+class WordcardRepository:
+    """单词卡数据访问"""
 
     @staticmethod
     def get_all_by_user(user_id: int) -> Dict[str, Dict[str, Any]]:
-        """获取用户的所有单词表"""
+        """获取用户的所有单词卡"""
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT id, name, words, color, created_at, updated_at
-                FROM wordlists
+                FROM wordcards
                 WHERE user_id = ?
             """, (user_id,))
 
-            wordlists = {}
+            wordcards = {}
             for row in cursor.fetchall():
-                wordlists[row['name']] = {
+                wordcards[row['name']] = {
                     'id': row['id'],
                     'name': row['name'],
                     'words': row['words'],
@@ -171,16 +171,16 @@ class WordlistRepository:
                     'created': row['created_at'],
                     'updated': row['updated_at']
                 }
-            return wordlists
+            return wordcards
 
     @staticmethod
     def get_by_id(user_id: int, card_id: int) -> Optional[Dict[str, Any]]:
-        """根据ID获取单词表"""
+        """根据ID获取单词卡"""
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT id, name, words, color, created_at, updated_at
-                FROM wordlists
+                FROM wordcards
                 WHERE user_id = ? AND id = ?
             """, (user_id, card_id))
 
@@ -203,7 +203,7 @@ class WordlistRepository:
              created: Optional[str] = None,
              card_id: Optional[int] = None) -> int:
         """
-        保存单词表（插入或更新），返回卡片ID
+        保存单词卡（插入或更新），返回卡片ID
         必须提供 card_id
         """
         if not card_id:
@@ -216,7 +216,7 @@ class WordlistRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO wordlists (id, user_id, name, words, color, created_at, updated_at)
+                INSERT INTO wordcards (id, user_id, name, words, color, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name,
@@ -230,11 +230,11 @@ class WordlistRepository:
 
     @staticmethod
     def delete_by_id(user_id: int, card_id: int) -> None:
-        """通过 ID 删除单词表"""
+        """通过 ID 删除单词卡"""
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM wordlists WHERE user_id = ? AND id = ?",
+                "DELETE FROM wordcards WHERE user_id = ? AND id = ?",
                 (user_id, card_id)
             )
 
@@ -539,7 +539,7 @@ class PublicFolderRepository:
                 if folder and folder.get('cards') and not is_invalid:
                     # 获取前 4 张卡片
                     for card_id in folder['cards'][:4]:
-                        card = WordlistRepository.get_by_id(folder['user_id'], card_id)
+                        card = WordcardRepository.get_by_id(folder['user_id'], card_id)
                         if card:
                             preview_cards.append({
                                 'id': card['id'],

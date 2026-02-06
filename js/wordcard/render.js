@@ -1,11 +1,11 @@
 /**
- * 单词表渲染模块
+ * 单词卡渲染模块
  * 渲染卡片和文件夹视图 - iOS SpringBoard 风格
  */
 
 import { $, showView, escapeHtml, showToast } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor, getFolders, getPublicFolders, addOrUpdateFolder } from './storage.js';
-import { getLayout, saveLayout, deleteWordList, deleteFolder, deletePublicFolderRef } from './layout.js';
+import { getWordcards, loadWordcard, getCardColor, getFolders, getPublicFolders, addOrUpdateFolder } from './storage.js';
+import { getLayout, saveLayout, deleteWordcard, deleteFolder, deletePublicFolderRef } from './layout.js';
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
@@ -98,16 +98,16 @@ function formatDate(isoString) {
 }
 
 /**
- * 渲染单词表卡片
+ * 渲染单词卡
  */
-export function renderWordListCards() {
-    const content = $("wordlistContent");
+export function renderWordcardCards() {
+    const content = $("wordcardContent");
     if (!content) return;
     if (window.currentActiveMode) return;
 
     showView('homeView');
 
-    const lists = getWordLists();
+    const lists = getWordcards();
     const layout = getLayout();  // 字符串数组：["card_1", "folder_2", "public_3"]
 
     // 重置事件委托标记
@@ -116,7 +116,7 @@ export function renderWordListCards() {
 
     if (Object.keys(lists).length === 0) {
         content.innerHTML = `
-            <div class="wordlist-empty">
+            <div class="wordcard-empty">
                 <p>${t('emptyTitle')}</p>
                 <p class="hint">${t('emptyHint')}</p>
             </div>
@@ -164,7 +164,7 @@ export function renderWordListCards() {
         return '';
     }).join('');
 
-    content.innerHTML = `<div class="wordlist-grid">${cardsHtml}</div>`;
+    content.innerHTML = `<div class="wordcard-grid">${cardsHtml}</div>`;
 
     bindCardEvents(content);
     if (_bindDragEvents) _bindDragEvents(content);
@@ -172,7 +172,7 @@ export function renderWordListCards() {
     // 如果还在编辑模式，重新应用到新渲染的元素
     if (_isEditMode && _isEditMode()) {
         if (_setCurrentWorkplace) _setCurrentWorkplace(content);
-        const items = content.querySelectorAll('.wordlist-card, .wordlist-folder');
+        const items = content.querySelectorAll('.wordcard-card, .wordcard-folder');
         items.forEach(item => {
             // 强制重启动画，避免动画状态不同步
             item.style.animation = 'none';
@@ -192,16 +192,16 @@ function renderCard(list, layoutIdx) {
     const [color1, color2] = generateGradient(list.name, customColor);
 
     return `
-        <div class="wordlist-card"
+        <div class="wordcard-card"
              data-card-id="${list.id}"
              data-name="${escapeHtml(list.name)}"
              data-layout-idx="${layoutIdx}"
              data-type="card">
-            <button class="wordlist-delete" data-name="${escapeHtml(list.name)}" title="Delete">&times;</button>
-            <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
-                <span class="wordlist-icon-count">${wordCount}</span>
+            <button class="wordcard-delete" data-name="${escapeHtml(list.name)}" title="Delete">&times;</button>
+            <div class="wordcard-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
+                <span class="wordcard-icon-count">${wordCount}</span>
             </div>
-            <div class="wordlist-label">${escapeHtml(list.name)}</div>
+            <div class="wordcard-label">${escapeHtml(list.name)}</div>
         </div>
     `;
 }
@@ -242,18 +242,18 @@ function renderFolder(folder, lists, layoutIdx) {
         : '';
 
     return `
-        <div class="wordlist-folder ${isPublic ? 'public-folder' : ''}"
+        <div class="wordcard-folder ${isPublic ? 'public-folder' : ''}"
              data-folder-id="${folder.id}"
              data-folder-name="${escapeHtml(folder.name)}"
              data-layout-idx="${layoutIdx}"
              data-type="folder"
              ${isPublic ? `data-public-folder-id="${folder.publicFolderId || ''}"` : ''}>
-            <button class="wordlist-delete" data-folder-name="${escapeHtml(folder.name)}" title="Delete">&times;</button>
-            <div class="wordlist-folder-icon">
+            <button class="wordcard-delete" data-folder-name="${escapeHtml(folder.name)}" title="Delete">&times;</button>
+            <div class="wordcard-folder-icon">
                 ${publicIcon}
-                <div class="wordlist-folder-preview">${previewHtml}</div>
+                <div class="wordcard-folder-preview">${previewHtml}</div>
             </div>
-            <div class="wordlist-label">${escapeHtml(folder.name)}</div>
+            <div class="wordcard-label">${escapeHtml(folder.name)}</div>
             ${ownerInfo}
         </div>
     `;
@@ -282,20 +282,20 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
     const invalidBadge = isInvalid ? `<div class="folder-invalid-badge">${t('folderInvalid')}</div>` : '';
 
     return `
-        <div class="wordlist-folder public-folder ${invalidClass}"
+        <div class="wordcard-folder public-folder ${invalidClass}"
              data-public-ref-id="${publicFolderRef.id}"
              data-folder-id="${publicFolderRef.folder_id}"
              data-folder-name="${escapeHtml(displayName)}"
              data-layout-idx="${layoutIdx}"
              data-type="public-folder"
              data-owner-email="${escapeHtml(ownerName)}">
-            <button class="wordlist-delete" data-folder-name="${escapeHtml(displayName)}" title="Delete">&times;</button>
+            <button class="wordcard-delete" data-folder-name="${escapeHtml(displayName)}" title="Delete">&times;</button>
             ${invalidBadge}
-            <div class="wordlist-folder-icon">
+            <div class="wordcard-folder-icon">
                 <span class="folder-public-icon">${folderIcon}</span>
-                <div class="wordlist-folder-preview">${previewHtml}</div>
+                <div class="wordcard-folder-preview">${previewHtml}</div>
             </div>
-            <div class="wordlist-label">${escapeHtml(displayName)}</div>
+            <div class="wordcard-label">${escapeHtml(displayName)}</div>
         </div>
     `;
 }
@@ -304,7 +304,7 @@ function renderPublicFolder(publicFolderRef, layoutIdx) {
  * 绑定卡片事件（使用事件委托）
  */
 function bindCardEvents(workplace) {
-    const grid = workplace.querySelector('.wordlist-grid');
+    const grid = workplace.querySelector('.wordcard-grid');
     if (!grid || cardEventsInitialized) return;
     cardEventsInitialized = true;
 
@@ -323,14 +323,14 @@ function bindCardEvents(workplace) {
         }
 
         // 删除按钮
-        const deleteBtn = e.target.closest('.wordlist-delete');
+        const deleteBtn = e.target.closest('.wordcard-delete');
         if (deleteBtn) {
             e.stopPropagation();
             const name = deleteBtn.dataset.name;
             const folderName = deleteBtn.dataset.folderName;
 
             // 检查是否为公开文件夹引用
-            const parentFolder = deleteBtn.closest('.wordlist-folder');
+            const parentFolder = deleteBtn.closest('.wordcard-folder');
             if (parentFolder && parentFolder.dataset.type === 'public-folder') {
                 // 删除公开文件夹引用
                 const refId = parentFolder.dataset.publicRefId;
@@ -344,7 +344,7 @@ function bindCardEvents(workplace) {
         }
 
         // 卡片点击
-        const card = e.target.closest('.wordlist-card');
+        const card = e.target.closest('.wordcard-card');
         if (card) {
             if (dragState?.didDrag) return;
             if (_isEditMode && _isEditMode()) return;
@@ -355,12 +355,12 @@ function bindCardEvents(workplace) {
                 return;
             }
 
-            await loadWordList(cardId);
+            await loadWordcard(cardId);
             return;
         }
 
         // 文件夹点击
-        const folder = e.target.closest('.wordlist-folder');
+        const folder = e.target.closest('.wordcard-folder');
         if (folder) {
             if (dragState?.didDrag) return;
 
@@ -404,7 +404,7 @@ async function handleDeleteFolder(folderName) {
     if (confirmed) {
         await deleteFolder(folderName);
         if (_exitEditMode) _exitEditMode();
-        renderWordListCards();
+        renderWordcardCards();
     }
 }
 
@@ -421,7 +421,7 @@ async function handleDeletePublicFolderRef(refId, displayName) {
             if (_exitEditMode) _exitEditMode();
 
             // 然后重新渲染
-            renderWordListCards();
+            renderWordcardCards();
 
             // 显示成功提示
             showToast(t('deleteSuccess') || '删除成功', 'success');
@@ -433,7 +433,7 @@ async function handleDeletePublicFolderRef(refId, displayName) {
             showToast(error.message || t('deleteFailed') || '删除失败', 'error');
 
             // 即使失败也重新渲染，以恢复UI状态
-            renderWordListCards();
+            renderWordcardCards();
         }
     }
 }
@@ -444,9 +444,9 @@ async function handleDeletePublicFolderRef(refId, displayName) {
 async function handleDeleteCard(name) {
     const confirmed = await showConfirm(t('deleteCard', { name }));
     if (confirmed) {
-        await deleteWordList(name);
+        await deleteWordcard(name);
         if (_exitEditMode) _exitEditMode();
-        renderWordListCards();
+        renderWordcardCards();
     }
 }
 
@@ -475,7 +475,7 @@ function toggleFolderPublicStatus(folderName) {
     console.log(`[Server] 本地切换: ${folderName}, is_public=${newStatus}`);
 
     // 重新渲染（更新图标）
-    renderWordListCards();
+    renderWordcardCards();
 }
 
 /**
@@ -549,7 +549,7 @@ export async function syncPendingPublicStatusChanges() {
     }
 
     // 重新渲染以确保 UI 一致
-    renderWordListCards();
+    renderWordcardCards();
 }
 
 /**

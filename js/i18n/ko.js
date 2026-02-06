@@ -48,7 +48,7 @@ export default {
     interval: '간격(ms)',
 
     // 단어 목록
-    wordList: '단어 목록',
+    wordcard: '단어 목록',
     load: '로드',
     save: '저장',
     update: '업데이트',
@@ -116,7 +116,7 @@ export default {
     rename: '이름 변경',
     enterName: '이름 입력',
     folderName: '폴더 이름',
-    wordlistName: '단어장 이름',
+    wordcardName: '단어장 이름',
 
     // 팁
     pleaseLogin: '단어장을 저장하려면 먼저 로그인하세요',

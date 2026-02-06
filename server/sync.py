@@ -1,6 +1,6 @@
 """
 数据同步 API 模块
-提供单词表和布局配置的云同步功能
+提供单词卡和布局配置的云同步功能
 """
 
 from datetime import datetime
@@ -9,7 +9,7 @@ from flask import Blueprint, request, jsonify, g
 
 from middleware import require_auth
 from settings import get_user_settings
-from repositories import WordlistRepository, LayoutRepository, FolderRepository, PublicFolderRepository
+from repositories import WordcardRepository, LayoutRepository, FolderRepository, PublicFolderRepository
 
 sync_bp = Blueprint('sync', __name__)
 
@@ -20,13 +20,13 @@ def pull_data():
     """
     拉取云端数据（只返回单词文本，不返回翻译数据）
     请求头: Authorization: Bearer <token>
-    响应: { wordlists: {...}, layout: {...}, cardColors: {...} }
+    响应: { wordcards: {...}, layout: {...}, cardColors: {...} }
     """
     user_id = g.user['id']
 
     try:
-        # 获取所有单词表
-        wordlists = WordlistRepository.get_all_by_user(user_id)
+        # 获取所有单词卡
+        wordcards = WordcardRepository.get_all_by_user(user_id)
 
         # 获取布局配置
         layout = LayoutRepository.get_by_user(user_id)
@@ -39,9 +39,9 @@ def pull_data():
         # 获取公开文件夹引用
         publicFolders = PublicFolderRepository.get_all_by_user(user_id)
 
-        # 从 wordlists 中提取 cardColors
+        # 从 wordcards 中提取 cardColors
         card_colors = {}
-        for name, wl in wordlists.items():
+        for name, wl in wordcards.items():
             if 'color' in wl and wl['color']:
                 card_colors[name] = wl['color']
 
@@ -49,10 +49,10 @@ def pull_data():
         settings = get_user_settings(user_id)
 
         print(f"[Sync] 用户 {user_id} 拉取数据成功")
-        print(f"[Sync] wordlists: {len(wordlists)}, folders: {len(folders)}, publicFolders: {len(publicFolders)}, layout: {len(layout)}")
+        print(f"[Sync] wordcards: {len(wordcards)}, folders: {len(folders)}, publicFolders: {len(publicFolders)}, layout: {len(layout)}")
 
         return jsonify({
-            'wordlists': wordlists,
+            'wordcards': wordcards,
             'folders': folders,
             'publicFolders': publicFolders,
             'layout': layout,
@@ -72,27 +72,27 @@ def push_data():
     """
     推送本地数据到云端（只存储单词文本）
     请求头: Authorization: Bearer <token>
-    请求体: { wordlists: {...}, layout: {...}, cardColors: {...} }
+    请求体: { wordcards: {...}, layout: {...}, cardColors: {...} }
     响应: { success: true }
     """
     user_id = g.user['id']
     data = request.get_json() or {}
 
-    wordlists = data.get('wordlists', {})
+    wordcards = data.get('wordcards', {})
     layout = data.get('layout')
     card_colors = data.get('cardColors', {})
     folders = data.get('folders', {})
 
     print(f"[Sync] 用户 {user_id} 推送数据")
-    print(f"[Sync] wordlists: {len(wordlists)}, folders: {len(folders)}")
+    print(f"[Sync] wordcards: {len(wordcards)}, folders: {len(folders)}")
 
     try:
-        # 同步单词表
-        for name, wl in wordlists.items():
+        # 同步单词卡
+        for name, wl in wordcards.items():
             created = wl.get('created', datetime.now().isoformat())
             color = wl.get('color')
             card_id = wl.get('id')  # 读取 ID
-            WordlistRepository.save(user_id, name, wl.get('words', ''), color, created, card_id)
+            WordcardRepository.save(user_id, name, wl.get('words', ''), color, created, card_id)
 
         # 同步文件夹（前端格式直接使用），并收集 ID 映射
         folder_id_map = {}
@@ -130,37 +130,37 @@ def push_data():
         return jsonify({'error': '同步失败，请稍后重试'}), 500
 
 
-@sync_bp.route("/api/sync/wordlist/by-id/<int:card_id>", methods=["DELETE"])
+@sync_bp.route("/api/sync/wordcard/by-id/<int:card_id>", methods=["DELETE"])
 @require_auth
-def delete_wordlist_by_id(card_id):
+def delete_wordcard_by_id(card_id):
     """
-    通过 ID 删除单词表
+    通过 ID 删除单词卡
     请求头: Authorization: Bearer <token>
     响应: { success: true } 或 { error: "..." }
     """
     user_id = g.user['id']
 
     # 验证卡片存在且属于当前用户
-    card = WordlistRepository.get_by_id(user_id, card_id)
+    card = WordcardRepository.get_by_id(user_id, card_id)
     if not card:
-        print(f"[Sync] 删除失败: 单词表不存在，ID={card_id}, 用户={user_id}")
-        print(f"[服务器控制台] 删除失败: 单词表不存在，ID={card_id}")
-        return jsonify({'error': '单词表不存在'}), 404
+        print(f"[Sync] 删除失败: 单词卡不存在，ID={card_id}, 用户={user_id}")
+        print(f"[服务器控制台] 删除失败: 单词卡不存在，ID={card_id}")
+        return jsonify({'error': '单词卡不存在'}), 404
 
     # 删除
-    WordlistRepository.delete_by_id(user_id, card_id)
+    WordcardRepository.delete_by_id(user_id, card_id)
 
-    print(f"[Sync] 通过ID删除单词表: ID={card_id}, 用户={user_id}")
-    print(f"[服务器控制台] 通过ID删除单词表: ID={card_id}")
+    print(f"[Sync] 通过ID删除单词卡: ID={card_id}, 用户={user_id}")
+    print(f"[服务器控制台] 通过ID删除单词卡: ID={card_id}")
 
     return jsonify({'success': True})
 
 
-@sync_bp.route("/api/sync/wordlist", methods=["POST"])
+@sync_bp.route("/api/sync/wordcard", methods=["POST"])
 @require_auth
-def save_single_wordlist():
+def save_single_wordcard():
     """
-    保存/更新单个单词表
+    保存/更新单个单词卡
     支持通过 ID 定位（可重命名）或通过名称定位（向后兼容）
     请求头: Authorization: Bearer <token>
     请求体: { name: "...", words: "...", color: "...", id: <card_id> }
@@ -171,7 +171,7 @@ def save_single_wordlist():
 
     name = data.get('name')
     if not name:
-        return jsonify({'error': '单词表名称不能为空'}), 400
+        return jsonify({'error': '单词卡名称不能为空'}), 400
 
     words = data.get('words', '')
     color = data.get('color')  # 读取颜色字段
@@ -179,10 +179,10 @@ def save_single_wordlist():
     card_id = data.get('id')  # 读取 ID（如果提供）
 
     # 保存并获取卡片 ID（传递 card_id 参数）
-    result_id = WordlistRepository.save(user_id, name, words, color, created, card_id)
+    result_id = WordcardRepository.save(user_id, name, words, color, created, card_id)
 
-    print(f"[Sync] 保存单词表: 名称={name}, ID={result_id}, 颜色={color}, 使用ID定位={bool(card_id)}")
-    print(f"[服务器控制台] 保存单词表: {name}, ID: {result_id}, 使用ID定位: {bool(card_id)}")
+    print(f"[Sync] 保存单词卡: 名称={name}, ID={result_id}, 颜色={color}, 使用ID定位={bool(card_id)}")
+    print(f"[服务器控制台] 保存单词卡: {name}, ID: {result_id}, 使用ID定位: {bool(card_id)}")
 
     # 返回卡片 ID
     return jsonify({'success': True, 'id': result_id})

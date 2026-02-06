@@ -53,7 +53,7 @@ def delete_all_users():
             'reset_codes',          # 独立表
             'user_settings',        # 依赖 users
             'layout',               # 依赖 users
-            'wordlists',            # 依赖 users
+            'wordcards',            # 依赖 users
             'users'                 # 最后删除
         ]
 
@@ -91,7 +91,7 @@ def delete_all_users():
                             'reset_codes',        
                             'user_settings',       
                             'layout',               
-                            'wordlists',          
+                            'wordcards',          
                             'users'                
                            )""")
             print(f"✓ 已重置自增 ID")

@@ -8,7 +8,7 @@ import { getAuthHeader, isLoggedIn, setSyncStatus } from './state.js';
 
 /**
  * 从云端拉取数据
- * @returns {Promise<{wordlists?: object, layout?: array, cardColors?: object, folders?: object, publicFolders?: array, error?: string}>}
+ * @returns {Promise<{wordcards?: object, layout?: array, cardColors?: object, folders?: object, publicFolders?: array, error?: string}>}
  */
 export async function pullFromCloud() {
     if (!isLoggedIn()) {
@@ -111,5 +111,5 @@ export async function syncLayoutToCloud(layout, cardColors, folders = {}) {
         return { success: true };
     }
 
-    return pushToCloud({ layout, cardColors, folders, wordlists: {} });
+    return pushToCloud({ layout, cardColors, folders, wordcards: {} });
 }

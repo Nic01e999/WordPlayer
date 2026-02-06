@@ -1,9 +1,9 @@
 /**
- * 单词表布局管理模块
+ * 单词卡布局管理模块
  * 管理卡片和文件夹的排列顺序（CSS Grid 自动布局）
  */
 
-import { getWordLists, removeWordListFromStorage, removeWordListsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder, getPublicFolders, setPublicFoldersCache } from './storage.js';
+import { getWordcards, removeWordcardFromStorage, removeWordcardsFromStorage, getCardColors, getFolders, removeFolder, removeCardFromAllFolders, isCardInAnyFolder, getPublicFolders, setPublicFoldersCache } from './storage.js';
 import { syncLayoutToCloud } from '../auth/sync.js';
 import { authToken } from '../auth/state.js';
 
@@ -45,7 +45,7 @@ export function setLayout(layout) {
  * @returns {Array<string>} 字符串数组，如 ["card_1", "card_2"]
  */
 function buildDefaultLayout() {
-    const lists = getWordLists();
+    const lists = getWordcards();
     const entries = Object.values(lists).sort((a, b) =>
         new Date(b.updated || b.created) - new Date(a.updated || a.created)
     );
@@ -55,12 +55,12 @@ function buildDefaultLayout() {
 }
 
 /**
- * 同步 layout 和实际 wordlists（处理新增/删除的列表）
+ * 同步 layout 和实际 wordcards（处理新增/删除的列表）
  * @param {Array<string>} layout 字符串数组
  * @returns {Array<string>} 同步后的字符串数组
  */
 function syncLayout(layout) {
-    const lists = getWordLists();
+    const lists = getWordcards();
     const folders = getFolders();
 
     // 建立 ID 集合
@@ -111,22 +111,22 @@ function syncLayout(layout) {
 }
 
 /**
- * 删除单词表（同时更新 storage 和 layout）
+ * 删除单词卡（同时更新 storage 和 layout）
  */
-export async function deleteWordList(name) {
+export async function deleteWordcard(name) {
     // 先获取卡片信息（删除前）
-    const lists = getWordLists();
+    const lists = getWordcards();
     const card = Object.values(lists).find(c => c.name === name);
 
     if (!card) return false;
 
     if (!card.id) {
-        console.error('[Layout] deleteWordList 失败: 卡片缺少 ID');
+        console.error('[Layout] deleteWordcard 失败: 卡片缺少 ID');
         return false;
     }
 
     // 删除服务器数据（使用 ID）
-    await removeWordListFromStorage(card.id);
+    await removeWordcardFromStorage(card.id);
 
     // 从 layout 中移除
     let layout = getLayout();
@@ -166,15 +166,15 @@ export async function syncLayoutToServer() {
 }
 
 /**
- * 删除文件夹（同时删除其中的所有单词表）
+ * 删除文件夹（同时删除其中的所有单词卡）
  */
 export async function deleteFolder(folderName) {
     const folders = getFolders();
     const folder = Object.values(folders).find(f => f.name === folderName);
 
     if (folder) {
-        // 删除文件夹中的所有单词表（直接使用 ID）
-        await removeWordListsFromStorage(folder.cards);
+        // 删除文件夹中的所有单词卡（直接使用 ID）
+        await removeWordcardsFromStorage(folder.cards);
 
         // 从 layout 中移除文件夹
         let layout = getLayout();

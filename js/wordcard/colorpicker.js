@@ -9,13 +9,13 @@ import { syncLayoutToServer } from './layout.js';
 
 let currentPicker = null;
 let currentCardName = null;
-let _renderWordListCards = null;
+let _renderWordcardCards = null;
 
 /**
  * 设置延迟绑定的函数
  */
 export function setColorPickerDeps(deps) {
-    _renderWordListCards = deps.renderWordListCards;
+    _renderWordcardCards = deps.renderWordcardCards;
 }
 
 /**
@@ -99,7 +99,7 @@ export function showColorPicker(cardElement) {
     picker.className = 'color-picker-donut';
 
     // 获取卡片位置
-    const iconElement = cardElement.querySelector('.wordlist-icon');
+    const iconElement = cardElement.querySelector('.wordcard-icon');
     if (!iconElement) {
         console.warn('Color picker: icon element not found');
         return;
@@ -220,8 +220,8 @@ async function selectColor(cardName, colorId, cardElement) {
     hideColorPicker();
 
     // 重新渲染以更新文件夹预览
-    if (_renderWordListCards) {
-        _renderWordListCards();
+    if (_renderWordcardCards) {
+        _renderWordcardCards();
     }
 
     // 同步颜色到服务器
@@ -233,7 +233,7 @@ async function selectColor(cardName, colorId, cardElement) {
  * 更新卡片颜色（不重新渲染整个列表）
  */
 function updateCardColor(cardElement, cardName, colorId) {
-    const iconElement = cardElement.querySelector('.wordlist-icon');
+    const iconElement = cardElement.querySelector('.wordcard-icon');
     if (!iconElement) return;
 
     let colors;
