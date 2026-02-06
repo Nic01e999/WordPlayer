@@ -130,8 +130,14 @@ function generateFolderPages(validCards, lists, options = {}) {
 
             const readonlyClass = isReadonly ? 'readonly' : '';
 
+            // 保护性检查：确保 list.id 存在
+            if (!list.id) {
+                console.error('[Folder] 卡片缺少 ID:', name, 'list:', list);
+                console.error('[网页控制台] 卡片缺少 ID:', name);
+            }
+
             return `
-                <div class="wordlist-card ${readonlyClass}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
+                <div class="wordlist-card ${readonlyClass}" data-id="${list.id || ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
                     ${deleteBtn}
                     <div class="wordlist-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
                         <span class="wordlist-icon-count">${wordCount}</span>
@@ -179,7 +185,17 @@ function bindFolderCardClicks(overlay) {
 
             // 非编辑模式：关闭文件夹并加载单词卡
             overlay.remove();
-            await loadWordList(card.dataset.name);
+            const cardId = parseInt(card.dataset.id, 10);
+
+            // 检查 cardId 是否有效
+            if (isNaN(cardId) || !cardId) {
+                console.error('[Folder] 无效的卡片 ID:', card.dataset.id, '卡片名称:', card.dataset.name);
+                console.error('[网页控制台] 无效的卡片 ID，尝试使用名称加载');
+                // 回退到使用名称加载
+                await loadWordList(card.dataset.name);
+            } else {
+                await loadWordList(cardId, { useId: true });
+            }
         });
     });
 }
@@ -234,9 +250,21 @@ export async function openFolder(folderName) {
             lists = {};
             validCards = [];
 
+            // 先清除旧的公共卡片缓存
+            const allWordlists = getWordLists();
+            content.cards.forEach(card => {
+                if (allWordlists[card.name]?.isPublic) {
+                    delete allWordlists[card.name];
+                    console.log('[Folder] 清除旧公共卡片缓存:', card.name);
+                    console.log('[网页控制台] 清除旧公共卡片缓存:', card.name);
+                }
+            });
+
             // 将 API 返回的卡片转换为 lists 格式，并添加到缓存
             content.cards.forEach(card => {
+                console.log('[Folder] 公共卡片数据:', card.name, 'ID:', card.id);
                 lists[card.name] = {
+                    id: card.id,  // ✅ 添加 ID
                     name: card.name,
                     words: card.words,
                     translations: card.translations,
@@ -267,16 +295,26 @@ export async function openFolder(folderName) {
         // 建立 ID → 卡片的映射
         const cardById = {};
         for (const card of Object.values(lists)) {
-            if (card.id) cardById[card.id] = card;
+            if (card.id) {
+                cardById[card.id] = card;
+            } else {
+                console.warn('[Folder] 卡片缺少 ID:', card.name);
+                console.warn('[网页控制台] 卡片缺少 ID:', card.name);
+            }
         }
 
         // 根据 ID 数组获取卡片名称
         validCards = folder.cards
             .map(cardId => {
                 const card = cardById[cardId];
+                if (!card) {
+                    console.warn('[Folder] 找不到 ID 对应的卡片:', cardId);
+                }
                 return card ? card.name : null;
             })
             .filter(name => name !== null);
+
+        console.log('[Folder] 自己的文件夹，有效卡片:', validCards.length, '个');
     }
 
     // 计算总页数
@@ -528,7 +566,10 @@ async function fetchPublicFolderContent(publicFolderId) {
     const response = await fetch(`/api/public/folder/${publicFolderId}/content`, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',  // 强制不使用缓存
+            'Pragma': 'no-cache',
+            'Expires': '0'
         }
     });
 
@@ -1051,7 +1092,9 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
 
         // 将 API 返回的卡片转换为 lists 格式
         content.cards.forEach(card => {
+            console.log('[Folder] 公共文件夹引用卡片:', card.name, 'ID:', card.id);
             lists[card.name] = {
+                id: card.id,  // ✅ 添加 ID
                 name: card.name,
                 words: card.words,
                 translations: card.translations,
@@ -1059,6 +1102,15 @@ export async function openPublicFolderRef(folderId, displayName, ownerEmail) {
                 color: card.color  // 保存公开者设定的颜色
             };
             validCards.push(card.name);
+
+            // ✅ 关键修复：将公共卡片添加到 _wordlistsCache，这样 loadWordList() 可以找到
+            setWordListInCache(card.name, {
+                id: card.id,
+                name: card.name,
+                words: card.words,
+                color: card.color,
+                isPublic: true  // 标记为公共卡片
+            });
         });
 
         // 成功获取内容后，恢复失效状态（如果之前被标记为失效）

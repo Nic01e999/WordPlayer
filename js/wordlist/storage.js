@@ -86,6 +86,21 @@ export function clearWordListsCache() {
 }
 
 /**
+ * 清除公共卡片缓存
+ * 刷新页面时调用，确保公共文件夹内容是最新的
+ */
+export function clearPublicCardCache() {
+    // 遍历缓存，删除所有标记为 isPublic 的卡片
+    for (const [name, data] of Object.entries(_wordlistsCache)) {
+        if (data && data.isPublic) {
+            delete _wordlistsCache[name];
+            console.log('[Storage] 清除公共卡片缓存:', name);
+            console.log('[网页控制台] 清除公共卡片缓存:', name);
+        }
+    }
+}
+
+/**
  * 保存单词表到服务端
  * @returns {Promise<boolean>} 是否成功
  */
@@ -192,40 +207,66 @@ export function isWordListNameExists(name) {
 
 /**
  * 加载单词表到 textarea
+ * @param {string|number} nameOrId - 单词表名称或 ID
+ * @param {Object} options - 选项 { useId: boolean }
  * @returns {Promise<boolean>} 是否成功
  */
-export async function loadWordList(name) {
-    // 优先从缓存获取
-    let list = _wordlistsCache[name];
+export async function loadWordList(nameOrId, options = {}) {
+    const { useId = false } = options;
+    let list = null;
+    let name = null;
 
-    if (list) {
-        console.log('[Storage] loadWordList 从缓存加载:', name, '公共卡片:', list.isPublic);
-    }
+    if (useId) {
+        // 通过 ID 查找（文件夹内卡片）
+        const id = nameOrId;
+        list = Object.values(_wordlistsCache).find(item => item.id === id);
 
-    // 如果缓存中没有且已登录，尝试从服务端获取
-    if (!list && isLoggedIn()) {
-        try {
-            const response = await fetch(`${API_BASE}/api/sync/wordlist/${encodeURIComponent(name)}`, {
-                method: 'GET',
-                headers: getAuthHeader()
-            });
-
-            if (response.ok) {
-                list = await response.json();
-                // 更新缓存
-                _wordlistsCache[name] = list;
-                console.log('[Storage] loadWordList 从服务端加载:', name);
-            } else {
-                console.error('[Storage] loadWordList 从服务端加载失败:', response.status);
-            }
-        } catch (e) {
-            console.error('[Storage] Failed to load wordlist from server:', e);
+        if (!list) {
+            console.error('[Storage] loadWordList 失败，缓存中找不到 ID:', id);
+            console.error('[网页控制台] 公共卡片缓存已清除，请重新打开文件夹');
+            return false;
         }
-    }
 
-    if (!list) {
-        console.error('[Storage] loadWordList 失败，找不到单词表:', name);
-        return false;
+        name = list.name;
+        console.log('[Storage] loadWordList 通过ID加载:', name, 'ID:', id, '公共卡片:', list.isPublic);
+        console.log('[网页控制台] loadWordList 通过ID加载:', name, 'ID:', id, '公共卡片:', list.isPublic);
+    } else {
+        // 通过名称查找（桌面卡片，向后兼容）
+        name = nameOrId;
+        list = _wordlistsCache[name];
+
+        if (list) {
+            console.log('[Storage] loadWordList 从缓存加载:', name, '公共卡片:', list.isPublic);
+        }
+
+        // 如果缓存中没有且已登录，尝试从服务端获取
+        if (!list && isLoggedIn()) {
+            try {
+                const response = await fetch(`${API_BASE}/api/sync/wordlist/${encodeURIComponent(name)}`, {
+                    method: 'GET',
+                    headers: getAuthHeader()
+                });
+
+                if (response.ok) {
+                    list = await response.json();
+                    // 更新缓存
+                    _wordlistsCache[name] = list;
+                    console.log('[Storage] loadWordList 从服务端加载:', name);
+                } else {
+                    console.error('[Storage] loadWordList 从服务端加载失败:', response.status);
+                }
+            } catch (e) {
+                console.error('[Storage] Failed to load wordlist from server:', e);
+            }
+        }
+
+        if (!list) {
+            console.error('[Storage] loadWordList 失败，找不到单词表:', name);
+            return false;
+        }
+
+        console.log('[Storage] loadWordList 通过名称加载:', name, '公共卡片:', list.isPublic);
+        console.log('[网页控制台] loadWordList 通过名称加载:', name, '公共卡片:', list.isPublic);
     }
 
     // 重置预加载缓存
@@ -265,7 +306,13 @@ export async function updateWordList(name) {
         return false;
     }
 
+    // 获取当前颜色配置
+    const existingData = _wordlistsCache[name] || {};
+    const color = existingData.color || null;
     const created = _wordlistsCache[name].created;
+
+    console.log('[Storage] 更新单词表，颜色:', color);
+    console.log('[网页控制台] 更新单词表，颜色:', color);
 
     try {
         const response = await fetch(`${API_BASE}/api/sync/wordlist`, {
@@ -277,7 +324,8 @@ export async function updateWordList(name) {
             body: JSON.stringify({
                 name,
                 words,
-                created
+                created,
+                color  // 添加颜色字段
             })
         });
 

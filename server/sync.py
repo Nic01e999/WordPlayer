@@ -171,7 +171,7 @@ def save_single_wordlist():
     """
     保存单个单词表（只存储单词文本，不存储翻译数据）
     请求头: Authorization: Bearer <token>
-    请求体: { name: "...", words: "..." }
+    请求体: { name: "...", words: "...", color: "..." }
     响应: { success: true, id: <card_id> }
     """
     user_id = g.user['id']
@@ -182,12 +182,14 @@ def save_single_wordlist():
         return jsonify({'error': '单词表名称不能为空'}), 400
 
     words = data.get('words', '')
+    color = data.get('color')  # 读取颜色字段
     created = data.get('created', datetime.now().isoformat())
 
-    # 保存并获取卡片 ID
-    card_id = WordlistRepository.save(user_id, name, words, created)
+    # 保存并获取卡片 ID（传递 color 参数）
+    card_id = WordlistRepository.save(user_id, name, words, color, created)
 
-    print(f"[Sync] 保存单词表成功: {name}, ID: {card_id}")
+    print(f"[Sync] 保存单词表成功: {name}, ID: {card_id}, 颜色: {color}")
+    print(f"[服务器控制台] 保存单词表成功: {name}, ID: {card_id}, 颜色: {color}")
 
     # 返回卡片 ID
     return jsonify({'success': True, 'id': card_id})

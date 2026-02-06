@@ -6,7 +6,7 @@
 import * as api from './api.js';
 import * as state from './state.js';
 import { pullFromCloud, pushToCloud } from './sync.js';
-import { setWordListsCache, clearWordListsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache } from '../wordlist/storage.js';
+import { setWordListsCache, clearWordListsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache, clearPublicCardCache } from '../wordlist/storage.js';
 import { t } from '../i18n/index.js';
 import { getLayout, saveLayout, setLayout } from '../wordlist/layout.js';
 import { renderWordListCards } from '../wordlist/render.js';
@@ -393,6 +393,11 @@ function getSubmitButtonText() {
  */
 async function syncAfterLogin() {
     console.log('[Sync] 开始从云端拉取数据...');
+
+    // 不再清除公共卡片缓存，通过 ID 加载可以避免冲突
+    // clearPublicCardCache();
+    // console.log('[Auth] 清除公共卡片缓存');
+    // console.log('[网页控制台] 清除公共卡片缓存');
 
     // 执行本地数据迁移（如果需要）
     migrateLocalStorage();
