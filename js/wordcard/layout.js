@@ -74,11 +74,20 @@ function syncLayout(layout) {
         if (folder.id) folderIds.add(folder.id);
     }
 
-    // 过滤掉不存在的项
+    // 过滤掉不存在的项和公开卡片
     const validLayout = layout.filter(item => {
         if (item.startsWith('card_')) {
             const cardId = parseInt(item.substring(5));
-            return cardIds.has(cardId);
+            if (!cardIds.has(cardId)) {
+                return false;  // 卡片不存在，移除
+            }
+            // 【修复】检查是否为公开卡片
+            const card = Object.values(lists).find(c => c.id === cardId);
+            if (card && card.isPublic === true) {
+                console.log(`[Layout] 从 layout 移除公开卡片: card_${cardId}`);
+                return false;  // 公开卡片不应该在 layout 中，移除
+            }
+            return true;
         } else if (item.startsWith('folder_')) {
             // 保留临时文件夹 ID（folder_temp_*）
             if (item.startsWith('folder_temp_')) {
@@ -102,8 +111,36 @@ function syncLayout(layout) {
     }
 
     for (const cardId of cardIds) {
-        if (!layoutCardIds.has(cardId) && !isCardInAnyFolder(cardId)) {
+        const inLayout = layoutCardIds.has(cardId);
+        const inFolder = isCardInAnyFolder(cardId);
+
+        // 【修复】检查卡片是否为公开文件夹的卡片
+        const card = Object.values(lists).find(c => c.id === cardId);
+        const isPublicCard = card && card.isPublic === true;
+
+        if (isPublicCard) {
+            // 公开文件夹的卡片不应该出现在用户的桌面 layout 中，跳过
+            console.log(`[Layout] 跳过公开卡片: card_${cardId}`);
+            continue;
+        }
+
+        if (!inLayout && !inFolder) {
+            // 卡片不在 layout 中，也不在任何文件夹中，添加到 layout
+            console.log(`[Layout] syncLayout 添加缺失卡片: card_${cardId}`);
             validLayout.push(`card_${cardId}`);
+        } else if (inLayout && inFolder) {
+            // ⚠️ 检测到卡片同时在 layout 和文件夹中（不应该发生）
+            // 【自动修复】从 layout 中移除重复的卡片（卡片应该只在文件夹中）
+            console.warn(`[Layout] ⚠️ 数据不一致: card_${cardId} 同时在 layout 和文件夹中，自动修复中...`);
+            console.warn(`[网页控制台] ⚠️ 数据不一致: card_${cardId} 同时在 layout 和文件夹中，自动修复中...`);
+
+            // 从 validLayout 中移除这个卡片
+            const cardKey = `card_${cardId}`;
+            const filteredLayout = validLayout.filter(item => item !== cardKey);
+            validLayout.length = 0;  // 清空数组
+            validLayout.push(...filteredLayout);  // 重新填充
+            console.log(`[Layout] ✅ 已从 layout 移除重复卡片: ${cardKey}`);
+            console.log(`[网页控制台] ✅ 已从 layout 移除重复卡片: ${cardKey}`);
         }
     }
 

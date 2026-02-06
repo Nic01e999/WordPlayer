@@ -620,7 +620,12 @@ async function createNewFolder(layout, layoutIdx, targetLayoutIdx, targetName, d
 
     // 更新 layout：移除两个卡片，添加文件夹
     // layout 是字符串数组：["card_1", "card_2", ...]
-    const newLayout = layout.filter((item, idx) => idx !== layoutIdx && idx !== targetLayoutIdx);
+    // 【修复】按卡片 ID 删除（而非索引），确保删除正确的卡片
+    const targetCardKey = `card_${targetCardId}`;
+    const dragCardKey = `card_${dragCardId}`;
+    const newLayout = layout.filter(item => item !== targetCardKey && item !== dragCardKey);
+    console.log(`[Drag] 从 layout 移除卡片: ${targetCardKey}, ${dragCardKey}`);
+    console.log(`[网页控制台] 从 layout 移除卡片: ${targetCardKey}, ${dragCardKey}`);
 
     // 卡片已添加到文件夹，数据保留在数据库中
     console.log('[Drag] 卡片已添加到文件夹:', targetName, dragName);

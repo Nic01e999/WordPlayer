@@ -596,12 +596,21 @@ function markPublicFolderAsInvalid(refId) {
         setPublicFoldersCache(publicFolders);
     }
 
-    // 重新渲染以显示灰色状态
-    if (_renderWordcardCards) {
-        _renderWordcardCards();
+    // 检查是否有打开的 overlay
+    const folderOverlay = document.querySelector('.folder-open-overlay');
+
+    if (folderOverlay) {
+        // 如果有 overlay，只更新样式，不触发全局渲染
+        updatePublicFolderStyle(refId, true);
+    } else {
+        // 如果没有 overlay，保持原有行为
+        if (_renderWordcardCards) {
+            _renderWordcardCards();
+        }
     }
 
     console.log(`[Folder] 标记公开文件夹引用为失效: ${refId}`);
+    console.log(`[网页控制台] 标记公开文件夹引用为失效: ${refId}`);
 }
 
 /**
@@ -617,13 +626,64 @@ function markPublicFolderAsValid(refId) {
         setPublicFoldersCache(publicFolders);
     }
 
-    // 重新渲染以移除失效样式
-    if (_renderWordcardCards) {
-        _renderWordcardCards();
+    // 检查是否有打开的 overlay
+    const folderOverlay = document.querySelector('.folder-open-overlay');
+
+    if (folderOverlay) {
+        // 如果有 overlay，只更新样式，不触发全局渲染
+        updatePublicFolderStyle(refId, false);
+    } else {
+        // 如果没有 overlay，保持原有行为
+        if (_renderWordcardCards) {
+            _renderWordcardCards();
+        }
     }
 
     console.log(`[Folder] 恢复公开文件夹引用为有效: ${refId}`);
     console.log(`[Server] 恢复公开文件夹引用为有效: ${refId}`);
+}
+
+/**
+ * 更新公开文件夹引用的样式（不触发全局渲染）
+ * @param {number} refId - 公开文件夹引用ID
+ * @param {boolean} isInvalid - 是否为失效状态
+ */
+function updatePublicFolderStyle(refId, isInvalid) {
+    // 查找桌面上对应的公开文件夹元素
+    const folderElement = document.querySelector(
+        `#wordcardContent .public-folder[data-public-ref-id="${refId}"]`
+    );
+
+    if (!folderElement) {
+        console.warn(`[Folder] 未找到公开文件夹元素: refId=${refId}`);
+        console.warn(`[网页控制台] 未找到公开文件夹元素: refId=${refId}`);
+        return;
+    }
+
+    if (isInvalid) {
+        // 添加失效样式
+        folderElement.classList.add('folder-invalid');
+
+        // 添加失效标签（如果不存在）
+        if (!folderElement.querySelector('.folder-invalid-badge')) {
+            const badge = document.createElement('div');
+            badge.className = 'folder-invalid-badge';
+            badge.textContent = t('folderInvalid'); // 使用国际化文本
+            folderElement.insertBefore(badge, folderElement.firstChild);
+        }
+    } else {
+        // 移除失效样式
+        folderElement.classList.remove('folder-invalid');
+
+        // 移除失效标签
+        const badge = folderElement.querySelector('.folder-invalid-badge');
+        if (badge) {
+            badge.remove();
+        }
+    }
+
+    console.log(`[Folder] 更新公开文件夹样式: refId=${refId}, isInvalid=${isInvalid}`);
+    console.log(`[网页控制台] 更新公开文件夹样式: refId=${refId}, isInvalid=${isInvalid}`);
 }
 
 /**
