@@ -382,6 +382,8 @@ export async function updateWordcard(name) {
 
 // ============================================
 // 卡片颜色缓存（纯内存，不使用 localStorage）
+// 键是单词卡 ID（数字），值是颜色 ID（字符串）
+// 格式：{3: "cyan", 5: "purple"}
 // ============================================
 
 let _cardColorsCache = {};
@@ -396,30 +398,37 @@ export function getCardColors() {
 /**
  * 获取单个卡片的颜色
  * 优先从 wordcard.color 读取，如果没有则从内存缓存读取
+ * @param {number} id - 单词卡 ID
  */
-export function getCardColor(name) {
-    // 优先从内存缓存的 wordcard.color 读取
-    if (_wordcardsCache[name] && _wordcardsCache[name].color) {
-        return _wordcardsCache[name].color;
+export function getCardColor(id) {
+    // 从 wordcards 缓存中查找（wordcards 缓存的键是 name，需要遍历）
+    for (const card of Object.values(_wordcardsCache)) {
+        if (card.id === id && card.color) {
+            return card.color;
+        }
     }
-
-    // 从颜色缓存读取
-    return _cardColorsCache[name] || null;
+    // 从颜色缓存读取（键是 ID）
+    return _cardColorsCache[id] || null;
 }
 
 /**
  * 设置卡片颜色
+ * @param {number} id - 单词卡 ID
+ * @param {string} colorId - 颜色 ID
  */
-export function setCardColor(name, colorId) {
+export function setCardColor(id, colorId) {
     if (colorId === 'original' || !colorId) {
-        delete _cardColorsCache[name];
+        delete _cardColorsCache[id];
     } else {
-        _cardColorsCache[name] = colorId;
+        _cardColorsCache[id] = colorId;
     }
 
-    // 同时更新内存缓存中的 color 字段
-    if (_wordcardsCache[name]) {
-        _wordcardsCache[name].color = colorId === 'original' || !colorId ? null : colorId;
+    // 更新 wordcards 缓存中对应卡片的 color 字段
+    for (const card of Object.values(_wordcardsCache)) {
+        if (card.id === id) {
+            card.color = colorId === 'original' || !colorId ? null : colorId;
+            break;
+        }
     }
 
     return true;

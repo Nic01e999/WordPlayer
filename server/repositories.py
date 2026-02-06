@@ -203,28 +203,41 @@ class WordcardRepository:
              created: Optional[str] = None,
              card_id: Optional[int] = None) -> int:
         """
-        保存单词卡（插入或更新），返回卡片ID
-        必须提供 card_id
+        保存单词卡（智能新建/更新）
+        - 如果提供 card_id：按 ID 更新（允许重命名）
+        - 如果不提供 card_id：按 (user_id, name) 新建或覆盖
         """
-        if not card_id:
-            raise ValueError("card_id is required")
-
         if created is None:
             created = datetime.now().isoformat()
         updated = datetime.now().isoformat()
 
         with get_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO wordcards (id, user_id, name, words, color, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET
-                    name = excluded.name,
-                    words = excluded.words,
-                    color = excluded.color,
-                    updated_at = excluded.updated_at
-                RETURNING id
-            """, (card_id, user_id, name, words, color, created, updated))
+
+            if card_id:
+                # 场景 1：更新现有卡片（按 ID 定位，允许重命名）
+                cursor.execute("""
+                    INSERT INTO wordcards (id, user_id, name, words, color, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(id) DO UPDATE SET
+                        name = excluded.name,
+                        words = excluded.words,
+                        color = excluded.color,
+                        updated_at = excluded.updated_at
+                    RETURNING id
+                """, (card_id, user_id, name, words, color, created, updated))
+            else:
+                # 场景 2：新建卡片（按 user_id+name 定位，ID 自动生成）
+                cursor.execute("""
+                    INSERT INTO wordcards (user_id, name, words, color, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(user_id, name) DO UPDATE SET
+                        words = excluded.words,
+                        color = excluded.color,
+                        updated_at = excluded.updated_at
+                    RETURNING id
+                """, (user_id, name, words, color, created, updated))
+
             result = cursor.fetchone()
             return result['id'] if result else card_id
 

@@ -82,7 +82,7 @@ function generateFolderPreview(cards, cardById = null) {
 
         // 优先使用 card 对象中的 color（来自服务器，用于公开文件夹）
         // 如果没有，则使用本地的颜色配置
-        const customColor = card.color || getCardColor(card.name);
+        const customColor = card.color || getCardColor(card.id);
         const [color1, color2] = generateGradient(card.name, customColor);
         return `<div class="wordcard-folder-mini" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)"></div>`;
     }).join('');
@@ -121,7 +121,7 @@ function generateFolderPages(validCards, lists, options = {}) {
             const list = lists[name];
             const wordCount = countWords(list.words);
             // 优先使用 list.color（公开文件夹的颜色），否则使用本地缓存的颜色
-            const customColor = list.color || getCardColor(name);
+            const customColor = list.color || getCardColor(list.id);
             const [color1, color2] = generateGradient(name, customColor);
 
             const deleteBtn = showDelete

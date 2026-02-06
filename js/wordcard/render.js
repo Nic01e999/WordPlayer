@@ -188,7 +188,7 @@ export function renderWordcardCards() {
  */
 function renderCard(list, layoutIdx) {
     const wordCount = countWords(list.words);
-    const customColor = getCardColor(list.name);
+    const customColor = getCardColor(list.id);
     const [color1, color2] = generateGradient(list.name, customColor);
 
     return `

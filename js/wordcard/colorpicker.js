@@ -8,7 +8,7 @@ import { setCardColor, getCardColor } from './storage.js';
 import { syncLayoutToServer } from './layout.js';
 
 let currentPicker = null;
-let currentCardName = null;
+let currentCardId = null;
 let _renderWordcardCards = null;
 
 /**
@@ -88,11 +88,11 @@ function generateSegmentPath(index, total, innerRadius = 35, outerRadius = 50) {
 export function showColorPicker(cardElement) {
     hideColorPicker();
 
-    const cardName = cardElement.dataset.name;
-    if (!cardName) return;
+    const cardId = parseInt(cardElement.dataset.cardId, 10);
+    if (!cardId) return;
 
-    currentCardName = cardName;
-    const currentColor = getCardColor(cardName);
+    currentCardId = cardId;
+    const currentColor = getCardColor(cardId);
 
     // 创建选择器容器
     const picker = document.createElement('div');
@@ -137,7 +137,7 @@ export function showColorPicker(cardElement) {
         // 点击选择颜色
         segment.addEventListener('click', (e) => {
             e.stopPropagation();
-            selectColor(cardName, colorConfig.id, cardElement);
+            selectColor(cardId, colorConfig.id, cardElement);
         });
 
         picker.appendChild(segment);
@@ -204,17 +204,17 @@ export function hideColorPicker() {
             }
         }, 150);
     }
-    currentCardName = null;
+    currentCardId = null;
 }
 
 /**
  * 选择颜色
  */
-async function selectColor(cardName, colorId, cardElement) {
-    setCardColor(cardName, colorId);
+async function selectColor(cardId, colorId, cardElement) {
+    setCardColor(cardId, colorId);
 
     // 更新当前卡片的背景色
-    updateCardColor(cardElement, cardName, colorId);
+    updateCardColor(cardElement, cardId, colorId);
 
     // 隐藏选择器
     hideColorPicker();
@@ -232,7 +232,7 @@ async function selectColor(cardName, colorId, cardElement) {
 /**
  * 更新卡片颜色（不重新渲染整个列表）
  */
-function updateCardColor(cardElement, cardName, colorId) {
+function updateCardColor(cardElement, cardId, colorId) {
     const iconElement = cardElement.querySelector('.wordcard-icon');
     if (!iconElement) return;
 

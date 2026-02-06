@@ -20,7 +20,7 @@ def pull_data():
     """
     拉取云端数据（只返回单词文本，不返回翻译数据）
     请求头: Authorization: Bearer <token>
-    响应: { wordcards: {...}, layout: {...}, cardColors: {...} }
+    响应: { wordcards: {...}, layout: {...}, cardColors: {id: color, ...} }
     """
     user_id = g.user['id']
 
@@ -39,11 +39,11 @@ def pull_data():
         # 获取公开文件夹引用
         publicFolders = PublicFolderRepository.get_all_by_user(user_id)
 
-        # 从 wordcards 中提取 cardColors
+        # 从 wordcards 中提取 cardColors（键是单词卡 ID）
         card_colors = {}
         for name, wl in wordcards.items():
-            if 'color' in wl and wl['color']:
-                card_colors[name] = wl['color']
+            if 'color' in wl and wl['color'] and 'id' in wl:
+                card_colors[wl['id']] = wl['color']  # 键是 ID
 
         # 获取用户设置
         settings = get_user_settings(user_id)
@@ -72,7 +72,7 @@ def push_data():
     """
     推送本地数据到云端（只存储单词文本）
     请求头: Authorization: Bearer <token>
-    请求体: { wordcards: {...}, layout: {...}, cardColors: {...} }
+    请求体: { wordcards: {...}, layout: {...}, cardColors: {id: color, ...} }
     响应: { success: true }
     """
     user_id = g.user['id']
@@ -93,6 +93,44 @@ def push_data():
             color = wl.get('color')
             card_id = wl.get('id')  # 读取 ID
             WordcardRepository.save(user_id, name, wl.get('words', ''), color, created, card_id)
+
+        # 【新增】同步 cardColors 到数据库（按 ID 更新）
+        # 当用户只修改颜色时，前端会推送 cardColors: {id: colorId}
+        if card_colors:
+            print(f"[Sync] 同步 cardColors: {len(card_colors)} 个颜色")
+            print(f"[服务器控制台] 同步 cardColors: {len(card_colors)} 个颜色")
+
+            # 获取已通过 wordcards 更新的卡片 ID（避免重复更新）
+            updated_card_ids = set()
+            for name, wl in wordcards.items():
+                if 'id' in wl:
+                    updated_card_ids.add(wl['id'])
+
+            for card_id_str, color_id in card_colors.items():
+                card_id = int(card_id_str)  # 前端传来的可能是字符串
+
+                # 如果已通过 wordcards 更新，跳过
+                if card_id in updated_card_ids:
+                    print(f"[Sync] 跳过已更新的卡片: ID={card_id}")
+                    continue
+
+                # 查询该卡片
+                card = WordcardRepository.get_by_id(user_id, card_id)
+                if card:
+                    # 更新颜色（保留原有的 words、name、created）
+                    WordcardRepository.save(
+                        user_id=user_id,
+                        name=card['name'],
+                        words=card['words'],
+                        color=color_id,
+                        created=card.get('created'),
+                        card_id=card_id
+                    )
+                    print(f"[Sync] 更新单词卡颜色: ID={card_id} -> {color_id}")
+                    print(f"[服务器控制台] 更新单词卡颜色: ID={card_id} -> {color_id}")
+                else:
+                    print(f"[Sync] 警告: 单词卡 ID={card_id} 不存在，无法更新颜色")
+                    print(f"[服务器控制台] 警告: 单词卡 ID={card_id} 不存在，无法更新颜色")
 
         # 同步文件夹（前端格式直接使用），并收集 ID 映射
         folder_id_map = {}
