@@ -91,7 +91,8 @@ def push_data():
         for name, wl in wordlists.items():
             created = wl.get('created', datetime.now().isoformat())
             color = wl.get('color')
-            WordlistRepository.save(user_id, name, wl.get('words', ''), color, created)
+            card_id = wl.get('id')  # 读取 ID
+            WordlistRepository.save(user_id, name, wl.get('words', ''), color, created, card_id)
 
         # 同步文件夹（前端格式直接使用），并收集 ID 映射
         folder_id_map = {}
@@ -103,12 +104,6 @@ def push_data():
             folder_id = FolderRepository.save(user_id, name, cards, is_public, description, created)
             folder_id_map[name] = folder_id
             print(f"[Sync] 保存文件夹: {name}, id: {folder_id}, cards: {cards}, is_public: {is_public}")
-
-        # 处理 cardColors（在保存完 wordlists 和 folders 之后）
-        for name, color in card_colors.items():
-            if color:  # 只处理非空颜色
-                WordlistRepository.update_color(user_id, name, color)
-                print(f"[Sync] 更新单词表颜色: {name}, color: {color}")
 
         # 同步布局配置
         if layout is not None:
@@ -135,33 +130,29 @@ def push_data():
         return jsonify({'error': '同步失败，请稍后重试'}), 500
 
 
-@sync_bp.route("/api/sync/wordlist/<name>", methods=["GET"])
+@sync_bp.route("/api/sync/wordlist/by-id/<int:card_id>", methods=["DELETE"])
 @require_auth
-def get_wordlist(name):
+def delete_wordlist_by_id(card_id):
     """
-    获取单个单词表
+    通过 ID 删除单词表
     请求头: Authorization: Bearer <token>
-    响应: { name, words, created, updated } 或 { error: "..." }
+    响应: { success: true } 或 { error: "..." }
     """
     user_id = g.user['id']
 
-    wordlist = WordlistRepository.get_by_name(user_id, name)
-    if not wordlist:
+    # 验证卡片存在且属于当前用户
+    card = WordlistRepository.get_by_id(user_id, card_id)
+    if not card:
+        print(f"[Sync] 删除失败: 单词表不存在，ID={card_id}, 用户={user_id}")
+        print(f"[服务器控制台] 删除失败: 单词表不存在，ID={card_id}")
         return jsonify({'error': '单词表不存在'}), 404
 
-    return jsonify(wordlist)
+    # 删除
+    WordlistRepository.delete_by_id(user_id, card_id)
 
+    print(f"[Sync] 通过ID删除单词表: ID={card_id}, 用户={user_id}")
+    print(f"[服务器控制台] 通过ID删除单词表: ID={card_id}")
 
-@sync_bp.route("/api/sync/wordlist/<name>", methods=["DELETE"])
-@require_auth
-def delete_wordlist(name):
-    """
-    删除云端单词表
-    请求头: Authorization: Bearer <token>
-    响应: { success: true }
-    """
-    user_id = g.user['id']
-    WordlistRepository.delete(user_id, name)
     return jsonify({'success': True})
 
 
@@ -169,9 +160,10 @@ def delete_wordlist(name):
 @require_auth
 def save_single_wordlist():
     """
-    保存单个单词表（只存储单词文本，不存储翻译数据）
+    保存/更新单个单词表
+    支持通过 ID 定位（可重命名）或通过名称定位（向后兼容）
     请求头: Authorization: Bearer <token>
-    请求体: { name: "...", words: "...", color: "..." }
+    请求体: { name: "...", words: "...", color: "...", id: <card_id> }
     响应: { success: true, id: <card_id> }
     """
     user_id = g.user['id']
@@ -184,12 +176,13 @@ def save_single_wordlist():
     words = data.get('words', '')
     color = data.get('color')  # 读取颜色字段
     created = data.get('created', datetime.now().isoformat())
+    card_id = data.get('id')  # 读取 ID（如果提供）
 
-    # 保存并获取卡片 ID（传递 color 参数）
-    card_id = WordlistRepository.save(user_id, name, words, color, created)
+    # 保存并获取卡片 ID（传递 card_id 参数）
+    result_id = WordlistRepository.save(user_id, name, words, color, created, card_id)
 
-    print(f"[Sync] 保存单词表成功: {name}, ID: {card_id}, 颜色: {color}")
-    print(f"[服务器控制台] 保存单词表成功: {name}, ID: {card_id}, 颜色: {color}")
+    print(f"[Sync] 保存单词表: 名称={name}, ID={result_id}, 颜色={color}, 使用ID定位={bool(card_id)}")
+    print(f"[服务器控制台] 保存单词表: {name}, ID: {result_id}, 使用ID定位: {bool(card_id)}")
 
     # 返回卡片 ID
-    return jsonify({'success': True, 'id': card_id})
+    return jsonify({'success': True, 'id': result_id})

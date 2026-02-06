@@ -174,30 +174,6 @@ class WordlistRepository:
             return wordlists
 
     @staticmethod
-    def get_by_name(user_id: int, name: str) -> Optional[Dict[str, Any]]:
-        """获取单个单词表"""
-        with get_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT id, name, words, color, created_at, updated_at
-                FROM wordlists
-                WHERE user_id = ? AND name = ?
-            """, (user_id, name))
-
-            row = cursor.fetchone()
-            if not row:
-                return None
-
-            return {
-                'id': row['id'],
-                'name': row['name'],
-                'words': row['words'],
-                'color': row['color'],
-                'created': row['created_at'],
-                'updated': row['updated_at']
-            }
-
-    @staticmethod
     def get_by_id(user_id: int, card_id: int) -> Optional[Dict[str, Any]]:
         """根据ID获取单词表"""
         with get_db() as conn:
@@ -222,8 +198,17 @@ class WordlistRepository:
             }
 
     @staticmethod
-    def save(user_id: int, name: str, words: str, color: str = None, created: str = None) -> int:
-        """保存单词表（插入或更新），返回卡片ID"""
+    def save(user_id: int, name: str, words: str,
+             color: Optional[str] = None,
+             created: Optional[str] = None,
+             card_id: Optional[int] = None) -> int:
+        """
+        保存单词表（插入或更新），返回卡片ID
+        必须提供 card_id
+        """
+        if not card_id:
+            raise ValueError("card_id is required")
+
         if created is None:
             created = datetime.now().isoformat()
         updated = datetime.now().isoformat()
@@ -231,36 +216,26 @@ class WordlistRepository:
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO wordlists (user_id, name, words, color, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(user_id, name) DO UPDATE SET
+                INSERT INTO wordlists (id, user_id, name, words, color, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    name = excluded.name,
                     words = excluded.words,
                     color = excluded.color,
                     updated_at = excluded.updated_at
                 RETURNING id
-            """, (user_id, name, words, color, created, updated))
+            """, (card_id, user_id, name, words, color, created, updated))
             result = cursor.fetchone()
-            return result['id'] if result else None
+            return result['id'] if result else card_id
 
     @staticmethod
-    def update_color(user_id: int, name: str, color: str) -> None:
-        """更新单词表颜色"""
-        with get_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                UPDATE wordlists
-                SET color = ?, updated_at = ?
-                WHERE user_id = ? AND name = ?
-            """, (color, datetime.now().isoformat(), user_id, name))
-
-    @staticmethod
-    def delete(user_id: int, name: str) -> None:
-        """删除单词表"""
+    def delete_by_id(user_id: int, card_id: int) -> None:
+        """通过 ID 删除单词表"""
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "DELETE FROM wordlists WHERE user_id = ? AND name = ?",
-                (user_id, name)
+                "DELETE FROM wordlists WHERE user_id = ? AND id = ?",
+                (user_id, card_id)
             )
 
 

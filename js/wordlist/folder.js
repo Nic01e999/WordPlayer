@@ -190,12 +190,11 @@ function bindFolderCardClicks(overlay) {
             // 检查 cardId 是否有效
             if (isNaN(cardId) || !cardId) {
                 console.error('[Folder] 无效的卡片 ID:', card.dataset.id, '卡片名称:', card.dataset.name);
-                console.error('[网页控制台] 无效的卡片 ID，尝试使用名称加载');
-                // 回退到使用名称加载
-                await loadWordList(card.dataset.name);
-            } else {
-                await loadWordList(cardId, { useId: true });
+                console.error('[网页控制台] 无效的卡片 ID，无法加载');
+                return;
             }
+
+            await loadWordList(cardId);
         });
     });
 }

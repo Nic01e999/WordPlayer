@@ -120,24 +120,27 @@ export async function deleteWordList(name) {
 
     if (!card) return false;
 
-    // 删除服务器数据
-    await removeWordListFromStorage(name);
+    if (!card.id) {
+        console.error('[Layout] deleteWordList 失败: 卡片缺少 ID');
+        return false;
+    }
+
+    // 删除服务器数据（使用 ID）
+    await removeWordListFromStorage(card.id);
 
     // 从 layout 中移除
-    if (card.id) {
-        let layout = getLayout();
-        layout = layout.filter(item => item !== `card_${card.id}`);
-        saveLayout(layout);
+    let layout = getLayout();
+    layout = layout.filter(item => item !== `card_${card.id}`);
+    saveLayout(layout);
 
-        // 从所有文件夹中移除引用
-        const foldersUpdated = removeCardFromAllFolders(card.id);
+    // 从所有文件夹中移除引用
+    const foldersUpdated = removeCardFromAllFolders(card.id);
 
-        // 如果更新了文件夹，同步到服务器
-        if (foldersUpdated) {
-            await syncLayoutToServer();
-            console.log('[Layout] 文件夹更新已同步到服务器');
-            console.log('[Server] 文件夹更新已同步到服务器');
-        }
+    // 如果更新了文件夹，同步到服务器
+    if (foldersUpdated) {
+        await syncLayoutToServer();
+        console.log('[Layout] 文件夹更新已同步到服务器');
+        console.log('[Server] 文件夹更新已同步到服务器');
     }
 
     return true;
@@ -170,16 +173,8 @@ export async function deleteFolder(folderName) {
     const folder = Object.values(folders).find(f => f.name === folderName);
 
     if (folder) {
-        // 删除文件夹中的所有单词表（根据 ID 查找名称）
-        const lists = getWordLists();
-        const cardNames = folder.cards
-            .map(cardId => {
-                const card = Object.values(lists).find(c => c.id === cardId);
-                return card ? card.name : null;
-            })
-            .filter(name => name !== null);
-
-        await removeWordListsFromStorage(cardNames);
+        // 删除文件夹中的所有单词表（直接使用 ID）
+        await removeWordListsFromStorage(folder.cards);
 
         // 从 layout 中移除文件夹
         let layout = getLayout();

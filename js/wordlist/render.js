@@ -348,7 +348,14 @@ function bindCardEvents(workplace) {
         if (card) {
             if (dragState?.didDrag) return;
             if (_isEditMode && _isEditMode()) return;
-            await loadWordList(card.dataset.name);
+
+            const cardId = parseInt(card.dataset.cardId, 10);
+            if (!cardId || isNaN(cardId)) {
+                console.error('[Render] 卡片缺少有效ID，无法加载');
+                return;
+            }
+
+            await loadWordList(cardId);
             return;
         }
 
