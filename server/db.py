@@ -154,6 +154,7 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE,
+                UNIQUE(user_id, folder_id),
                 UNIQUE(user_id, display_name)
             )
         """)

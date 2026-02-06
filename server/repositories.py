@@ -597,6 +597,30 @@ class PublicFolderRepository:
             }
 
     @staticmethod
+    def get_by_folder_id(user_id: int, folder_id: int) -> Optional[Dict[str, Any]]:
+        """根据 folder_id 获取公开文件夹引用"""
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, folder_id, owner_id, owner_name, display_name, created_at
+                FROM public_folders
+                WHERE user_id = ? AND folder_id = ?
+            """, (user_id, folder_id))
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            return {
+                'id': row['id'],
+                'folder_id': row['folder_id'],
+                'owner_id': row['owner_id'],
+                'owner_name': row['owner_name'],
+                'display_name': row['display_name'],
+                'created': row['created_at']
+            }
+
+    @staticmethod
     def add(user_id: int, folder_id: int, owner_id: int, owner_name: str, display_name: str) -> int:
         """添加公开文件夹引用"""
         with get_db() as conn:

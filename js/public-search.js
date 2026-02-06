@@ -9,7 +9,7 @@ import { showToast } from './utils.js';
 import { t } from './i18n/index.js';
 import { getLayout, saveLayout } from './wordcard/layout.js';
 import { renderWordcardCards } from './wordcard/render.js';
-import { setPublicFoldersCache } from './wordcard/storage.js';
+import { setPublicFoldersCache, getPublicFolders } from './wordcard/storage.js';
 
 let searchTimeout = null;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -189,85 +189,115 @@ async function handleAddPublicFolder(folderId, folderName, ownerEmail) {
       return;
     }
 
-    // 生成显示名称（只使用文件夹名称）
-    let displayName = folderName;
-    let attempt = 0;
-    const maxAttempts = 10;
-    let data = null;
+    // 步骤1：检查本地缓存是否已引用
+    const publicFolders = getPublicFolders();
+    const existingRef = publicFolders.find(ref => ref.folder_id === folderId);
 
-    // 尝试添加，如果重名则自动添加序号
-    while (attempt < maxAttempts) {
-      const suffix = attempt === 0 ? '' : ` (${attempt})`;
-      displayName = `${folderName}${suffix}`;
+    if (existingRef) {
+      console.log('[公开搜索] 检测到已引用该文件夹（本地缓存）:', existingRef.display_name);
+      console.log('[网页控制台] 检测到已引用该文件夹（本地缓存）:', existingRef.display_name);
 
-      const response = await fetch('/api/public/folder/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          folderId: folderId,
-          displayName: displayName
-        })
-      });
+      closePublicSearch();
+      showToast(`你已经引用过这个文件夹了："${existingRef.display_name}"`, 'info', 3000);
 
-      if (response.ok) {
-        data = await response.json();
-        break;
+      setTimeout(() => {
+        openExistingPublicFolder(existingRef.display_name);
+      }, 500);
+
+      return;
+    }
+
+    // 步骤2：尝试添加（后端也会检查）
+    const displayName = folderName;  // 不再添加序号
+
+    const response = await fetch('/api/public/folder/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        folderId: folderId,
+        displayName: displayName
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data.layout) {
+        saveLayout(data.layout);
+        console.log('[公开搜索] 使用返回的 layout 更新本地存储');
+      }
+
+      console.log('[公开搜索] 调用 pullFromCloud() 更新公开文件夹缓存');
+      console.log('[Server] 调用 pullFromCloud() 更新公开文件夹缓存');
+      const syncResult = await pullFromCloud();
+      if (syncResult.publicFolders) {
+        setPublicFoldersCache(syncResult.publicFolders);
+        console.log('[公开搜索] 公开文件夹缓存已更新');
+        console.log('[Server] 公开文件夹缓存已更新');
+      } else if (syncResult.error) {
+        console.warn('[公开搜索] 更新缓存失败:', syncResult.error);
+        console.warn('[Server] 更新缓存失败:', syncResult.error);
+      }
+
+      renderWordcardCards();
+      closePublicSearch();
+      showToast(t('publicFolderAdded') || '已添加公开文件夹', 'success');
+      console.log(`[公开搜索] 添加公开文件夹成功: ${displayName}`);
+
+      // 添加成功后，自动打开新添加的文件夹
+      setTimeout(() => {
+        openExistingPublicFolder(displayName);
+      }, 500);
+
+    } else {
+      // 处理错误响应
+      const error = await response.json();
+
+      if (response.status === 409 && error.error === 'DUPLICATE_REFERENCE') {
+        console.log('[公开搜索] 检测到已引用该文件夹（后端返回）');
+        console.log('[网页控制台] 检测到已引用该文件夹（后端返回）');
+
+        closePublicSearch();
+
+        const existingDisplayName = error.existingRef?.display_name || folderName;
+        showToast(`你已经引用过这个文件夹了："${existingDisplayName}"`, 'info', 3000);
+
+        setTimeout(() => {
+          openExistingPublicFolder(existingDisplayName);
+        }, 500);
       } else {
-        const error = await response.json();
-        if (error.error && error.error.includes('已存在同名文件夹')) {
-          attempt++;
-          console.log(`[公开搜索] 文件夹重名，尝试新名称: ${displayName}`);
-          console.log(`[Server] 文件夹重名，尝试新名称: ${displayName}`);
-        } else {
-          throw new Error(error.error || '添加失败');
-        }
+        throw new Error(error.error || error.message || '添加失败');
       }
     }
 
-    if (attempt >= maxAttempts) {
-      throw new Error('文件夹名称冲突次数过多，请手动重命名');
-    }
-
-    if (!data) {
-      throw new Error('添加失败');
-    }
-
-    // 优先使用返回的 layout 更新本地存储
-    if (data.layout) {
-      saveLayout(data.layout);
-      console.log('[公开搜索] 使用返回的 layout 更新本地存储');
-    }
-
-    // 调用 pullFromCloud() 更新 publicFolders 缓存
-    console.log('[公开搜索] 调用 pullFromCloud() 更新公开文件夹缓存');
-    console.log('[Server] 调用 pullFromCloud() 更新公开文件夹缓存');
-    const syncResult = await pullFromCloud();
-    if (syncResult.publicFolders) {
-      setPublicFoldersCache(syncResult.publicFolders);  // 关键：更新缓存
-      console.log('[公开搜索] 公开文件夹缓存已更新');
-      console.log('[Server] 公开文件夹缓存已更新');
-    } else if (syncResult.error) {
-      console.warn('[公开搜索] 更新缓存失败:', syncResult.error);
-      console.warn('[Server] 更新缓存失败:', syncResult.error);
-    }
-
-    // 重新渲染主页
-    renderWordcardCards();
-
-    // 关闭搜索框
-    closePublicSearch();
-
-    // 显示成功提示
-    showToast(t('publicFolderAdded') || '已添加公开文件夹', 'success');
-
-    console.log(`[公开搜索] 添加公开文件夹成功: ${displayName}`);
   } catch (error) {
     console.error('[公开搜索] 添加失败:', error);
     showToast(error.message || t('addFailed') || '添加失败', 'error');
   }
+}
+
+/**
+ * 打开已存在的公开文件夹
+ */
+function openExistingPublicFolder(displayName) {
+  const publicFolders = getPublicFolders();
+  const folderRef = publicFolders.find(ref => ref.display_name === displayName);
+
+  if (!folderRef) {
+    console.warn('[公开搜索] 未找到公开文件夹引用:', displayName);
+    return;
+  }
+
+  import('./wordcard/folder.js').then(module => {
+    module.openPublicFolderRef(
+      folderRef.folder_id,
+      folderRef.display_name,
+      folderRef.owner_name
+    );
+  });
 }
 
 /**

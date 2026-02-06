@@ -246,6 +246,20 @@ def add_public_folder():
         if not folder_id or not display_name:
             return jsonify({'error': '参数不完整'}), 400
 
+        # 检查是否已引用过这个 folder_id
+        existing_ref = PublicFolderRepository.get_by_folder_id(user_id, folder_id)
+        if existing_ref:
+            print(f"[公开文件夹] 用户 {user_id} 尝试重复引用 folder_id: {folder_id}")
+            print(f"[Server] 用户 {user_id} 尝试重复引用 folder_id: {folder_id}")
+            return jsonify({
+                'error': 'DUPLICATE_REFERENCE',
+                'message': '你已经引用过这个文件夹了',
+                'existingRef': {
+                    'id': existing_ref['id'],
+                    'display_name': existing_ref['display_name']
+                }
+            }), 409  # 409 Conflict
+
         # 获取公开文件夹
         folder = FolderRepository.get_by_id(folder_id)
         if not folder or not folder['is_public']:
