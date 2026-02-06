@@ -7,7 +7,7 @@ import * as api from './api.js';
 import * as state from './state.js';
 import { pullFromCloud, pushToCloud } from './sync.js';
 import { setWordcardsCache, clearWordcardsCache, getCardColors, setCardColors, setFoldersCache, clearFoldersCache, setPublicFoldersCache, clearPublicFoldersCache, clearPublicCardCache } from '../wordcard/storage.js';
-import { t } from '../i18n/index.js';
+import { t, getLocale } from '../i18n/index.js';
 import { getLayout, saveLayout, setLayout } from '../wordcard/layout.js';
 import { renderWordcardCards } from '../wordcard/render.js';
 import { initWebSocket, disconnectWebSocket } from '../sync/websocket.js';
@@ -167,6 +167,10 @@ function getDialogContent() {
                         <div class="auth-dialog-subtitle">${t('resetSubtitle', { email: resetEmail })}</div>
                     </div>
                     <div class="auth-form">
+                        <div class="auth-info-tip" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 12px; color: #3b82f6; line-height: 1.6;">
+                            <div style="font-weight: 500; margin-bottom: 4px;">📧 ${t('checkEmail') || '请检查您的邮箱'}</div>
+                            <div style="opacity: 0.9;">${t('checkSpamFolder') || '如果未收到邮件，请检查垃圾邮件文件夹'}</div>
+                        </div>
                         <div class="auth-input-group">
                             <input type="text" class="auth-input auth-code-input" id="authCode" placeholder="${t('verificationCode')}" maxlength="6" autocomplete="one-time-code">
                         </div>
@@ -251,7 +255,7 @@ function bindEvents(overlay) {
                     break;
 
                 case 'forgot':
-                    result = await api.forgotPassword(email);
+                    result = await api.forgotPassword(email, getLocale());
                     if (result.success) {
                         resetEmail = email;
                         currentMode = 'reset';
@@ -304,8 +308,23 @@ function bindEvents(overlay) {
 
             try {
                 // 调用发送验证码 API
-                const result = await api.forgotPassword(email);
+                const result = await api.forgotPassword(email, getLocale());
                 if (result.success) {
+                    // 添加垃圾邮箱提示
+                    let tipDiv = overlay.querySelector('.auth-info-tip');
+                    if (!tipDiv) {
+                        tipDiv = document.createElement('div');
+                        tipDiv.className = 'auth-info-tip';
+                        tipDiv.style.cssText = 'background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 12px; color: #3b82f6; line-height: 1.6;';
+                        tipDiv.innerHTML = `
+                            <div style="font-weight: 500; margin-bottom: 4px;">📧 ${t('checkEmail') || '请检查您的邮箱'}</div>
+                            <div style="opacity: 0.9;">${t('checkSpamFolder') || '如果未收到邮件，请检查垃圾邮件文件夹'}</div>
+                        `;
+                        // 插入到第一个 input-group 之前
+                        const firstInputGroup = overlay.querySelector('.auth-input-group');
+                        firstInputGroup.parentNode.insertBefore(tipDiv, firstInputGroup);
+                    }
+
                     // 开始倒计时
                     countdown = 60;
                     const timer = setInterval(() => {

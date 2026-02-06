@@ -96,6 +96,8 @@ export default {
     operationFailed: '작업에 실패했습니다. 나중에 다시 시도하세요',
     networkError: '네트워크 오류, 나중에 다시 시도하세요',
     syncData: '데이터 동기화',
+    checkEmail: '이메일을 확인하세요',
+    checkSpamFolder: '이메일을 받지 못한 경우 스팸 폴더를 확인하세요',
 
     // 메시지
     loading: '로딩 중...',

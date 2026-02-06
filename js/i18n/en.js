@@ -96,6 +96,8 @@ export default {
     operationFailed: 'Operation failed, please try again later',
     networkError: 'Network error, please try again later',
     syncData: 'Sync Data',
+    checkEmail: 'Please check your email',
+    checkSpamFolder: 'If you haven\'t received the email, please check your spam folder',
 
     // Messages
     loading: 'Loading...',

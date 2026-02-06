@@ -96,6 +96,8 @@ export default {
     operationFailed: '操作に失敗しました。後でもう一度お試しください',
     networkError: 'ネットワークエラー、後でもう一度お試しください',
     syncData: 'データを同期',
+    checkEmail: 'メールをご確認ください',
+    checkSpamFolder: 'メールが届いていない場合は、迷惑メールフォルダをご確認ください',
 
     // メッセージ
     loading: '読み込み中...',

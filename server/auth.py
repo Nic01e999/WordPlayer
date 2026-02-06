@@ -117,11 +117,16 @@ def get_current_user():
 def forgot_password():
     """
     发送密码重置验证码
-    请求: { "email": "..." }
+    请求: { "email": "...", "lang": "en" }
     响应: { "success": true }
     """
     data = request.get_json() or {}
     email = data.get('email', '').strip().lower()
+    lang = data.get('lang', 'en')  # 默认英文
+
+    # 验证语言代码
+    if lang not in ['zh', 'en', 'ja', 'ko']:
+        lang = 'en'
 
     if not validate_email(email):
         return jsonify({'error': '邮箱格式不正确'}), 400
@@ -139,8 +144,8 @@ def forgot_password():
     expires_at = calculate_expiry(minutes=Config.CODE_EXPIRE_MINUTES)
     ResetCodeRepository.create(email, code, expires_at)
 
-    # 发送邮件
-    if not send_reset_code(email, code):
+    # 发送邮件（传递语言参数）
+    if not send_reset_code(email, code, lang):
         return jsonify({'error': '发送验证码失败，请稍后重试'}), 500
 
     return jsonify({'success': True})

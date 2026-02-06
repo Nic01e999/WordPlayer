@@ -49,10 +49,11 @@ export async function getCurrentUser() {
 /**
  * 发送密码重置验证码
  * @param {string} email 邮箱
+ * @param {string} lang 语言代码 (zh, en, ja, ko)
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function forgotPassword(email) {
-    return apiPost('/api/auth/forgot-password', { email }, { auth: false });
+export async function forgotPassword(email, lang = 'en') {
+    return apiPost('/api/auth/forgot-password', { email, lang }, { auth: false });
 }
 
 /**

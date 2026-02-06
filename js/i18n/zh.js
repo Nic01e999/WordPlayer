@@ -96,6 +96,8 @@ export default {
     operationFailed: '操作失败，请稍后重试',
     networkError: '网络错误，请稍后重试',
     syncData: '同步数据',
+    checkEmail: '请检查您的邮箱',
+    checkSpamFolder: '如果未收到邮件，请检查垃圾邮件文件夹',
 
     // 消息
     loading: '加载中...',
