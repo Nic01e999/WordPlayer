@@ -137,7 +137,7 @@ function generateFolderPages(validCards, lists, options = {}) {
             }
 
             return `
-                <div class="wordcard-card ${readonlyClass}" data-id="${list.id || ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
+                <div class="wordcard-card ${readonlyClass}" data-card-id="${list.id || ''}" data-name="${escapeHtml(name)}" data-in-folder="${escapeHtml(folderName)}">
                     ${deleteBtn}
                     <div class="wordcard-icon" style="background: linear-gradient(135deg, ${color1} 0%, ${color2} 100%)">
                         <span class="wordcard-icon-count">${wordCount}</span>
@@ -185,11 +185,11 @@ function bindFolderCardClicks(overlay) {
 
             // 非编辑模式：关闭文件夹并加载单词卡
             overlay.remove();
-            const cardId = parseInt(card.dataset.id, 10);
+            const cardId = parseInt(card.dataset.cardId, 10);
 
             // 检查 cardId 是否有效
             if (isNaN(cardId) || !cardId) {
-                console.error('[Folder] 无效的卡片 ID:', card.dataset.id, '卡片名称:', card.dataset.name);
+                console.error('[Folder] 无效的卡片 ID:', card.dataset.cardId, '卡片名称:', card.dataset.name);
                 console.error('[网页控制台] 无效的卡片 ID，无法加载');
                 return;
             }
