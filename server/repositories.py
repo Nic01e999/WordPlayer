@@ -224,8 +224,12 @@ class WordcardRepository:
                         words = excluded.words,
                         color = excluded.color,
                         updated_at = excluded.updated_at
-                    RETURNING id
                 """, (card_id, user_id, name, words, color, created, updated))
+
+                # 查询返回 ID
+                cursor.execute("SELECT id FROM wordcards WHERE id = ?", (card_id,))
+                result = cursor.fetchone()
+                return result['id'] if result else card_id
             else:
                 # 场景 2：新建卡片（按 user_id+name 定位，ID 自动生成）
                 cursor.execute("""
@@ -235,11 +239,12 @@ class WordcardRepository:
                         words = excluded.words,
                         color = excluded.color,
                         updated_at = excluded.updated_at
-                    RETURNING id
                 """, (user_id, name, words, color, created, updated))
 
-            result = cursor.fetchone()
-            return result['id'] if result else card_id
+                # 查询返回 ID
+                cursor.execute("SELECT id FROM wordcards WHERE user_id = ? AND name = ?", (user_id, name))
+                result = cursor.fetchone()
+                return result['id'] if result else None
 
     @staticmethod
     def delete_by_id(user_id: int, card_id: int) -> None:
@@ -467,8 +472,10 @@ class FolderRepository:
                     is_public = excluded.is_public,
                     description = excluded.description,
                     updated_at = excluded.updated_at
-                RETURNING id
             """, (user_id, name, json.dumps(cards), is_public, description, created, updated))
+
+            # 查询返回 ID
+            cursor.execute("SELECT id FROM folders WHERE user_id = ? AND name = ?", (user_id, name))
             result = cursor.fetchone()
             return result['id'] if result else None
 
@@ -628,10 +635,10 @@ class PublicFolderRepository:
             cursor.execute("""
                 INSERT INTO public_folders (user_id, folder_id, owner_id, owner_name, display_name)
                 VALUES (?, ?, ?, ?, ?)
-                RETURNING id
             """, (user_id, folder_id, owner_id, owner_name, display_name))
-            result = cursor.fetchone()
-            return result['id'] if result else None
+
+            # 使用 lastrowid（普通 INSERT 可靠）
+            return cursor.lastrowid
 
     @staticmethod
     def update_display_name(user_id: int, old_name: str, new_name: str) -> None:
