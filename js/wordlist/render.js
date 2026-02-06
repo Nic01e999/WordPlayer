@@ -9,7 +9,6 @@ import { getLayout, saveLayout, deleteWordList, deleteFolder, deletePublicFolder
 import { resetDragEventFlags } from './drag.js';
 import { showConfirm } from '../utils/dialog.js';
 import { t } from '../i18n/index.js';
-import { showContextMenu } from '../utils/context-menu.js';
 import { authToken } from '../auth/state.js';
 import { isJustInteracted } from './interactions.js';
 import { countWords, hexToRgba, generateGradient, generateFolderPreview } from './folder.js';
@@ -388,20 +387,6 @@ function bindCardEvents(workplace) {
             if (_exitEditMode) _exitEditMode();
         }
     });
-
-    // 添加右键菜单事件
-    grid.addEventListener('contextmenu', (e) => {
-        // 只在非编辑模式下显示右键菜单
-        if (_isEditMode && _isEditMode()) return;
-
-        const folder = e.target.closest('.wordlist-folder');
-        if (folder) {
-            e.preventDefault();
-            e.stopPropagation();
-            handleFolderContextMenu(folder, e.clientX, e.clientY);
-            return;
-        }
-    });
 }
 
 /**
@@ -455,54 +440,6 @@ async function handleDeleteCard(name) {
         await deleteWordList(name);
         if (_exitEditMode) _exitEditMode();
         renderWordListCards();
-    }
-}
-
-/**
- * 处理文件夹右键菜单
- */
-async function handleFolderContextMenu(folderElement, x, y) {
-    const folderName = folderElement.dataset.folderName;
-    const isPublic = folderElement.classList.contains('public-folder');
-    const publicFolderId = folderElement.dataset.publicFolderId;
-
-    const menuItems = [];
-
-    // 移除公开/取消公开选项
-    // 现在通过编辑模式下的图标点击来切换状态
-
-    // 如果没有菜单项，不显示菜单
-    if (menuItems.length === 0) {
-        return;
-    }
-
-    showContextMenu(menuItems, x, y);
-}
-
-/**
- * 检查文件夹是否已公开
- */
-async function checkFolderPublicStatus(folderName) {
-    try {
-        const token = authToken;
-        if (!token) return false;
-
-        const response = await fetch('/api/public/folder/check', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ folderName })
-        });
-
-        if (!response.ok) return false;
-
-        const data = await response.json();
-        return data.isPublic || false;
-    } catch (error) {
-        console.error('[右键菜单] 检查公开状态失败:', error);
-        return false;
     }
 }
 
@@ -615,76 +552,4 @@ export function clearPendingPublicStatusChanges() {
     pendingPublicStatusChanges = {};
     console.log('[公开状态] 已清空待同步变更');
 }
-
-/**
- * 切换文件夹公开状态
- */
-async function handleToggleFolderPublic(folderName, isPublic) {
-    try {
-        const token = authToken;
-        if (!token) {
-            showToast(t('pleaseLogin') || '请先登录', 'error');
-            return;
-        }
-
-        const response = await fetch('/api/public/folder/set', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                folderName,
-                isPublic,
-                description: ''
-            })
-        });
-
-        if (!response.ok) {
-            let errorMsg = '操作失败';
-            try {
-                const error = await response.json();
-                errorMsg = error.error || errorMsg;
-            } catch (e) {
-                // 无法解析 JSON，使用默认错误信息
-                console.error('[右键菜单] 无法解析错误响应:', e);
-            }
-            throw new Error(errorMsg);
-        }
-
-        const data = await response.json();
-        console.log('[右键菜单] 服务器返回数据:', data);
-
-        // 更新文件夹缓存中的 is_public 状态
-        const folders = getFolders();
-        const folder = folders[folderName];
-        if (folder) {
-            folder.is_public = isPublic;
-            addOrUpdateFolder(folderName, folder);
-            console.log(`[右键菜单] 已更新文件夹缓存: ${folderName}, is_public=${isPublic}`);
-        }
-
-        // 如果返回了 layout，更新本地存储并重新渲染
-        if (data.layout) {
-            console.log('[右键菜单] 收到 layout，准备更新:', data.layout);
-            saveLayout(data.layout);
-            renderWordListCards();
-            console.log('[右键菜单] 已更新 layout 并重新渲染');
-        } else {
-            console.warn('[右键菜单] 服务器未返回 layout，无法刷新UI');
-        }
-
-        if (isPublic) {
-            showToast(t('folderPublished') || '文件夹已设为公开', 'success');
-            console.log(`[右键菜单] 文件夹 "${folderName}" 已设为公开 (ID: ${data.publicFolderId})`);
-        } else {
-            showToast(t('folderUnpublished') || '文件夹已取消公开', 'success');
-            console.log(`[右键菜单] 文件夹 "${folderName}" 已取消公开`);
-        }
-    } catch (error) {
-        console.error('[右键菜单] 切换公开状态失败:', error);
-        showToast(error.message || t('operationFailed') || '操作失败', 'error');
-    }
-}
-
 

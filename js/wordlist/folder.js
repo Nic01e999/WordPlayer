@@ -3,7 +3,7 @@
  */
 
 import { escapeHtml } from '../utils.js';
-import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder, getPublicFolders, setPublicFoldersCache } from './storage.js';
+import { getWordLists, loadWordList, getCardColor, getFolders, addOrUpdateFolder, removeFolder, getPublicFolders, setPublicFoldersCache, setWordListInCache } from './storage.js';
 import { getLayout, saveLayout, deleteWordList, isFolderNameExists, syncLayoutToServer } from './layout.js';
 import { showConfirm, showAlert } from '../utils/dialog.js';
 import { CARD_COLORS, getCurrentThemeColors } from './render.js';
@@ -229,10 +229,12 @@ export async function openFolder(folderName) {
         // 公开文件夹：从 API 获取实时内容
         try {
             const content = await fetchPublicFolderContent(publicFolderId);
+            console.log('[Folder] fetchPublicFolderContent 返回:', content);
+
             lists = {};
             validCards = [];
 
-            // 将 API 返回的卡片转换为 lists 格式
+            // 将 API 返回的卡片转换为 lists 格式，并添加到缓存
             content.cards.forEach(card => {
                 lists[card.name] = {
                     name: card.name,
@@ -241,7 +243,18 @@ export async function openFolder(folderName) {
                     wordInfo: card.wordInfo
                 };
                 validCards.push(card.name);
+
+                // 将公共卡片添加到 _wordlistsCache，这样 loadWordList() 可以找到
+                setWordListInCache(card.name, {
+                    id: card.id,
+                    name: card.name,
+                    words: card.words,
+                    color: card.color,
+                    isPublic: true  // 标记为公共卡片
+                });
             });
+
+            console.log('[Folder] 已将', content.cards.length, '个公共卡片添加到缓存');
         } catch (error) {
             console.error('[文件夹] 获取公开文件夹内容失败:', error);
             showToast(t('loadFailed') || '加载失败', 'error');

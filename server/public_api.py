@@ -218,10 +218,17 @@ def get_public_folder_content(folder_id):
         }
 
         print(f"[公开文件夹] 获取文件夹实时内容 ID: {folder_id}")
-        return jsonify(result)
+        print(f"[Server] 获取文件夹实时内容 ID: {folder_id}")
+
+        # 添加缓存控制头，防止浏览器缓存旧内容
+        response = jsonify(result)
+        response.headers['Cache-Control'] = 'no-cache, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        return response
 
     except Exception as e:
         print(f"[公开文件夹] 获取实时内容失败: {e}")
+        print(f"[Server] 获取实时内容失败: {e}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 

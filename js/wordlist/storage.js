@@ -69,6 +69,16 @@ export function setWordListsCache(wordlists) {
 }
 
 /**
+ * 设置单个单词表到缓存（用于公共文件夹卡片）
+ * @param {string} name - 单词表名称
+ * @param {object} data - 单词表数据 { id, name, words, color, isPublic, ... }
+ */
+export function setWordListInCache(name, data) {
+    _wordlistsCache[name] = data;
+    console.log('[Storage] setWordListInCache:', name, '公共卡片:', data.isPublic);
+}
+
+/**
  * 清空单词表缓存（用于登出）
  */
 export function clearWordListsCache() {
@@ -188,6 +198,10 @@ export async function loadWordList(name) {
     // 优先从缓存获取
     let list = _wordlistsCache[name];
 
+    if (list) {
+        console.log('[Storage] loadWordList 从缓存加载:', name, '公共卡片:', list.isPublic);
+    }
+
     // 如果缓存中没有且已登录，尝试从服务端获取
     if (!list && isLoggedIn()) {
         try {
@@ -200,13 +214,19 @@ export async function loadWordList(name) {
                 list = await response.json();
                 // 更新缓存
                 _wordlistsCache[name] = list;
+                console.log('[Storage] loadWordList 从服务端加载:', name);
+            } else {
+                console.error('[Storage] loadWordList 从服务端加载失败:', response.status);
             }
         } catch (e) {
-            console.error('Failed to load wordlist from server:', e);
+            console.error('[Storage] Failed to load wordlist from server:', e);
         }
     }
 
-    if (!list) return false;
+    if (!list) {
+        console.error('[Storage] loadWordList 失败，找不到单词表:', name);
+        return false;
+    }
 
     // 重置预加载缓存
     preloadCache.loadId++;
@@ -262,18 +282,26 @@ export async function updateWordList(name) {
         });
 
         if (!response.ok) {
-            console.error('Failed to update wordlist:', response.status);
+            console.error('[Storage] 更新单词表失败:', response.status);
             return false;
         }
 
-        // 更新内存缓存
+        // 解析响应获取卡片 ID
+        const data = await response.json();
+        const cardId = data.id;
+
+        // 更新内存缓存，保留原有的 color 和 id
+        const existingData = _wordlistsCache[name] || {};
         _wordlistsCache[name] = {
+            id: cardId || existingData.id,  // 使用新 ID 或保留原有 ID
             name,
             words,
+            color: existingData.color,  // 保留颜色
             created,
             updated: new Date().toISOString()
         };
 
+        console.log('[Storage] 保存单词表成功:', name, 'ID:', cardId);
         setLoadedWordList(name, words);
         return true;
     } catch (e) {
