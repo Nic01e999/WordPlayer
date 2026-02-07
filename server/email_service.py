@@ -65,6 +65,7 @@ def send_reset_code(email: str, code: str, lang: str = 'en') -> bool:
     print(f"\n[Email] 开始发送验证码到 {email}", flush=True)
     print(f"[Email] SMTP_USER 配置: {'已配置' if Config.SMTP_USER else '未配置'}", flush=True)
     print(f"[Email] SMTP_PASSWORD 配置: {'已配置' if Config.SMTP_PASSWORD else '未配置'}", flush=True)
+    print(f"[Email] 验证码: {code}", flush=True)
 
     # 生成时间戳，降低邮件重复率
     now = datetime.now()

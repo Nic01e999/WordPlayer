@@ -10,6 +10,7 @@ from flask import Blueprint, request, jsonify, g
 from middleware import require_auth
 from settings import get_user_settings
 from repositories import WordcardRepository, LayoutRepository, FolderRepository, PublicFolderRepository
+from db import get_db
 
 sync_bp = Blueprint('sync', __name__)
 
@@ -132,8 +133,35 @@ def push_data():
                     print(f"[Sync] 警告: 单词卡 ID={card_id} 不存在，无法更新颜色")
                     print(f"[服务器控制台] 警告: 单词卡 ID={card_id} 不存在，无法更新颜色")
 
-        # 同步文件夹（前端格式直接使用），并收集 ID 映射
+        # 同步文件夹
         folder_id_map = {}
+
+        # 步骤1: 检测并处理重命名（通过 ID 匹配）
+        db_folders = FolderRepository.get_all_by_user(user_id)
+        client_folder_ids_to_data = {}  # {id: folder_data}
+        for name, folder in folders.items():
+            if 'id' in folder:
+                client_folder_ids_to_data[folder['id']] = folder
+
+        # 检测重命名：ID 相同但名称不同
+        for db_name, db_folder in db_folders.items():
+            db_id = db_folder['id']
+            if db_id in client_folder_ids_to_data:
+                client_folder = client_folder_ids_to_data[db_id]
+                new_name = client_folder['name']
+                if new_name != db_name:
+                    # 重命名：直接 UPDATE 名称字段（保留 ID）
+                    with get_db() as conn:
+                        cursor = conn.cursor()
+                        cursor.execute("""
+                            UPDATE folders
+                            SET name = ?, updated_at = ?
+                            WHERE user_id = ? AND id = ?
+                        """, (new_name, datetime.now().isoformat(), user_id, db_id))
+                    print(f"[Sync] 检测到重命名: '{db_name}' -> '{new_name}' (ID={db_id})")
+                    print(f"[服务器控制台] 检测到重命名: '{db_name}' -> '{new_name}' (ID={db_id})")
+
+        # 步骤2: 保存所有文件夹（更新 cards、is_public 等其他字段）
         for name, folder in folders.items():
             cards = folder.get('cards', [])  # 已经是 ID 数组
             is_public = folder.get('is_public', False)
@@ -142,6 +170,17 @@ def push_data():
             folder_id = FolderRepository.save(user_id, name, cards, is_public, description, created)
             folder_id_map[name] = folder_id
             print(f"[Sync] 保存文件夹: {name}, id: {folder_id}, cards: {cards}, is_public: {is_public}")
+
+        # 步骤3: 清理真正孤立的文件夹（不在前端数据中，且 ID 不匹配）
+        db_folders_after = FolderRepository.get_all_by_user(user_id)
+        client_folder_ids = set(f.get('id') for f in folders.values() if f.get('id'))
+        client_folder_names = set(folders.keys())
+
+        for db_name, db_folder in db_folders_after.items():
+            if db_name not in client_folder_names and db_folder['id'] not in client_folder_ids:
+                FolderRepository.delete(user_id, db_name)
+                print(f"[Sync] 已删除孤立文件夹: {db_name} (ID={db_folder['id']})")
+                print(f"[服务器控制台] 已删除孤立文件夹: {db_name} (ID={db_folder['id']})")
 
         # 同步布局配置
         if layout is not None:
