@@ -7,9 +7,21 @@ import { t } from './i18n/index.js';
 // 后端API地址（自动检测）
 // - 通过 Flask 直接访问 (port 5001) → 用相对路径
 // - 通过 cloudflared 隧道访问 (trycloudflare.com) → 用相对路径
-// - 通过 Live Server 等其他方式访问 → 指向 5001 端口
+// - 通过反向代理访问（无端口号或标准端口 80/443） → 用相对路径
+// - 通过 Live Server 等其他方式访问 → 使用当前协议 + 5001 端口
 const isDirectAccess = location.port === "5001" || location.hostname.includes("trycloudflare.com");
-export const API_BASE = isDirectAccess ? "" : `http://${location.hostname}:5001`;
+const isBehindProxy = !location.port || location.port === "80" || location.port === "443";
+export const API_BASE = (isDirectAccess || isBehindProxy) ? "" : `${location.protocol}//${location.hostname}:5001`;
+
+// 调试日志：输出 API 配置信息
+console.log('[API Config]', {
+    protocol: location.protocol,
+    hostname: location.hostname,
+    port: location.port,
+    isDirectAccess,
+    isBehindProxy,
+    API_BASE: API_BASE || '(相对路径)'
+});
 
 /**
  * 根据 HTTP 状态码生成错误消息

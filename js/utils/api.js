@@ -7,9 +7,21 @@ import { t } from '../i18n/index.js';
 
 // 智能检测 API 基础 URL
 // - 如果直接访问 5001 端口或通过 Cloudflare tunnel，使用相对路径
-// - 否则显式指定 5001 端口
+// - 如果通过反向代理（无端口号或标准端口 80/443），使用相对路径
+// - 否则使用当前协议 + 5001 端口
 const isDirectAccess = location.port === "5001" || location.hostname.includes("trycloudflare.com");
-const API_BASE = isDirectAccess ? "" : `http://${location.hostname}:5001`;
+const isBehindProxy = !location.port || location.port === "80" || location.port === "443";
+const API_BASE = (isDirectAccess || isBehindProxy) ? "" : `${location.protocol}//${location.hostname}:5001`;
+
+// 调试日志：输出 API 配置信息
+console.log('[API Request Config]', {
+    protocol: location.protocol,
+    hostname: location.hostname,
+    port: location.port,
+    isDirectAccess,
+    isBehindProxy,
+    API_BASE: API_BASE || '(相对路径)'
+});
 
 /**
  * 获取认证请求头
