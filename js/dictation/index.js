@@ -13,7 +13,7 @@ import { checkFirstTime } from '../guide.js';
 import {
     showPopup, closePopup, play, submit,
     updateWorkplace, showResults, playPause,
-    setQuizDeps
+    setQuizDeps, clearSavedPopupPosition
 } from './quiz.js';
 
 // Repeater 引用（解决循环依赖）
@@ -129,6 +129,9 @@ export class Dictation {
     }
 
     static switchToDictation() {
+        // 清除保存的弹窗位置
+        clearSavedPopupPosition();
+
         if (window.currentActiveMode === "dictation") {
             this.startDictation();
             return;

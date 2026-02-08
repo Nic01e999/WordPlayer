@@ -11,7 +11,7 @@
 }
 
 /* 小屏幕 / 平板 (700px - 899px) */
-@media (min-width: 700px) and (max-width: 899px) {
+/* @media (min-width: 700px) and (max-width: 899px) {
     #menu {
         padding: 0.75rem 0.9375rem;
         gap: 1.25rem;
@@ -25,17 +25,13 @@
     .settings-trigger {
         right: 5%;
     }
-    /* 平板屏幕 - 调整 setting-container 的 padding */
     .setting-container {
         padding-right: 5%;
     }
-    /* 平板屏幕 - 调整 sidebar 宽度范围 */
     .setting-container .sidebar {
         min-width: 11rem;
         max-width: 13.75rem;
-        /* 移除滚动属性，让整个 sidebar 在容器中滚动 */
     }
-    /* 听写模式 - 平板适配 */
     body.dictation-mode #dictationWorkplace {
         padding: 1.25rem 1.25rem 1.25rem 2.5rem;
         margin: 0.5rem;
@@ -48,7 +44,7 @@
         height: 2.8125rem;
         font-size: 0.75rem;
     }
-}
+} */
 
 /* 手机屏幕 */
 @media (max-width: 700px) {
@@ -78,7 +74,6 @@
         overflow-y: auto;
     }
     .setting-container .sidebar {
-        width: 60vw;
         min-width: auto;
         max-width: 60vw;
         right: -2.1875rem;

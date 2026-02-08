@@ -171,6 +171,13 @@ def index():
     return send_file(os.path.join(BASE_DIR, "index.html"))
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """提供网站图标"""
+    favicon_path = os.path.join(BASE_DIR, "assets", "images", "pin.png")
+    return send_file(favicon_path, mimetype='image/png')
+
+
 @app.route("/<path:filename>")
 def static_files(filename):
     """提供静态文件（js, css, assets），带安全限制"""

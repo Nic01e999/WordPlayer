@@ -34,6 +34,9 @@ let lastDictationResult = null;
 // 拖拽处理器
 let dragHandler = null;
 
+// 保存弹窗位置（同一 session 内保持）
+let savedPopupPosition = null;
+
 export function setQuizDeps(deps) {
     _getState = deps.getState;
     _setState = deps.setState;
@@ -119,9 +122,46 @@ export function showPopup() {
     if (handle) {
         popup.style.position = 'absolute';
         popup.style.transform = 'rotate(-1deg)';
+
+        // 恢复上次拖拽的位置
+        if (savedPopupPosition) {
+            popup.style.left = `${savedPopupPosition.left}px`;
+            popup.style.top = `${savedPopupPosition.top}px`;
+        }
+
+        // 计算当前窗口内的拖拽边界
+        const calcBounds = () => {
+            const rect = popup.getBoundingClientRect();
+            return {
+                minX: 0,
+                minY: 0,
+                maxX: window.innerWidth - rect.width,
+                maxY: window.innerHeight - rect.height
+            };
+        };
+
         dragHandler = createPositionDragger(popup, handle, {
+            bounds: calcBounds(),
+
             onStart: () => popup.classList.add('dragging'),
-            onEnd: () => popup.classList.remove('dragging')
+
+            onEnd: () => {
+                popup.classList.remove('dragging');
+
+                // 保存当前位置
+                const rect = popup.getBoundingClientRect();
+                savedPopupPosition = {
+                    left: rect.left,
+                    top: rect.top
+                };
+            }
+        });
+
+        // 窗口变化时更新拖拽范围
+        window.addEventListener('resize', () => {
+            if (dragHandler) {
+                dragHandler.bounds = calcBounds();
+            }
         });
     }
 
@@ -144,6 +184,13 @@ export function closePopup() {
         dragHandler = null;
     }
     $("dictationPopup")?.remove();
+}
+
+/**
+ * 清除保存的弹窗位置（模式切换时调用）
+ */
+export function clearSavedPopupPosition() {
+    savedPopupPosition = null;
 }
 
 export function play() {
