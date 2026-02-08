@@ -68,6 +68,7 @@ body::before {
 /*================ 主页视图 - flex row 布局 ==============*/
 #homeView.active {
     display: flex;
+    position: relative; /* 为绝对定位的备案信息提供定位上下文 */
 }
 
 /* 单词输入区域 - 主页左侧 */

@@ -14,7 +14,7 @@
     </head>
     <body>
         <div id="menu">
-            <button id="home-btn" onclick="goHome()" data-i18n="homeBtn">🎧 word player</button>
+            <button id="home-btn" onclick="goHome()" data-i18n="homeBtn">word player</button>
             <div id="mode-btn">
                 <button id="dictation-btn" onclick="Dictation.switchToDictation()" data-i18n="dictation">Dictation</button>
                 <button id="repeater-btn" onclick="Repeater.switchToRepeater()" data-i18n="repeater">Repeater</button>
@@ -133,6 +133,12 @@
                     <textarea id="wordInput" wrap="off" data-i18n="wordInputPlaceholder" data-i18n-attr="placeholder" placeholder="Enter words (separated by spaces or newlines)">apple</textarea>
                 </div>
                 <div id="wordcardContent"></div>
+                <!-- 备案信息 -->
+                <div class="icp-filing">
+                    <a href="http://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+                        粤ICP备2026014875号-1
+                    </a>
+                </div>
             </div>
 
             <!-- 复读模式视图 -->
