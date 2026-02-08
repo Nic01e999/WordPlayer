@@ -85,6 +85,10 @@
         margin-bottom: 30rem;
         /* 移除滚动属性，让整个 sidebar 在容器中滚动 */
     }
+    #wordSection{
+        width: 45vw;
+    }
+
     /* ========================= */
     .container {
         margin-bottom: -20rem;
@@ -106,7 +110,9 @@
     body.repeater-mode #repeaterView {
         height: calc(100vh - 4rem); /* 折叠状态：菜单完全隐藏，只留 0.5rem 缓冲 */
     }
-
+    .word-info{
+        margin-bottom: 0rem;
+    }
 
 
     /* iOS 风格网格 - 手机适配 */
