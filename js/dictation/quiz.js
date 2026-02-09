@@ -267,7 +267,7 @@ export function updateWorkplace() {
             }
 
             const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">${s.entries[i].word} - ${formatTranslation(s.entries[i].definition || preloadCache.translations[s.entries[i].word] || '')}</span>`
+                ? `<br><span class="correct">${s.entries[i].word} :<br>${formatTranslation(s.entries[i].definition || preloadCache.translations[s.entries[i].word] || '')}</span>`
                 : '';
 
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
