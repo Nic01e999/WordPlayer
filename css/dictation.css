@@ -10,10 +10,10 @@ body.dictation-mode #dictationWorkplace {
         /* 左侧装订线 */
         linear-gradient(90deg,
             transparent 0px,
-            var(--bg-pink-subtle) 2px,
+            var(--bg-themesubtle) 2px,
             transparent 3px,
             transparent 30px,
-            var(--shadow-pink-light) 31px,
+            var(--shadow-themelight) 31px,
             transparent 32px,
             transparent 100px,
             var(--accent-line) 101px,
@@ -174,7 +174,7 @@ body.dictation-mode #dictationWorkplace::after {
     opacity: 0.9;
     box-shadow:
         5px 8px 25px var(--shadow-brown-medium),
-        0 0 0 2px var(--shadow-pink-strong);
+        0 0 0 2px var(--shadow-themestrong);
     transition: none;
 }
 
@@ -226,7 +226,7 @@ body.dictation-mode #dictationWorkplace::after {
 
 /* 声音按钮悬停状态 */
 .btn-sound:hover, .btn-pause:hover {
-    box-shadow: 0 4px 15px var(--shadow-pink-strong);
+    box-shadow: 0 4px 15px var(--shadow-themestrong);
     transform: translateY(-2px);
     background: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
 }
@@ -426,10 +426,10 @@ body.dictation-mode #dictationWorkplace::after {
         /* 左侧装订线 */
         linear-gradient(90deg,
             transparent 0px,
-            var(--bg-pink-subtle) 2px,
+            var(--bg-themesubtle) 2px,
             transparent 3px,
             transparent 30px,
-            var(--shadow-pink-light) 31px,
+            var(--shadow-themelight) 31px,
             transparent 32px,
             transparent 100px,
             var(--accent-line) 101px,

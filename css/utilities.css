@@ -103,7 +103,7 @@
 .input-focus:focus {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow: 0 0 10px var(--bg-pink-subtle);
+    box-shadow: 0 0 10px var(--bg-themesubtle);
 }
 
 /* ===================================

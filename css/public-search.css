@@ -39,11 +39,11 @@
   width: 90%;
   max-width: 600px;
   max-height: 70vh;
-  border: 1px solid var(--border-pink-light);
+  border: 1px solid var(--border-themelight);
 
   /* 文件夹风格的发光阴影 */
   box-shadow:
-    0 8px 32px var(--shadow-pink-light),
+    0 8px 32px var(--shadow-themelight),
     0 2px 8px var(--icon-shadow-light),
     inset 0 1px 0 var(--icon-border-strong);
 

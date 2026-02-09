@@ -14,11 +14,11 @@
     height: 3.75rem;
     background: linear-gradient(90deg,
         transparent 0%,
-        var(--bg-pink-overlay) 20%,
-        var(--bg-pink-subtle) 80%,
+        var(--bg-themeoverlay) 20%,
+        var(--bg-themesubtle) 80%,
         transparent 100%);
-    border-top: 1px solid var(--border-pink-strong);
-    border-bottom: 1px solid var(--border-pink-strong);
+    border-top: 1px solid var(--border-themestrong);
+    border-bottom: 1px solid var(--border-themestrong);
     pointer-events: none;
     z-index: 10;
     display: flex;
@@ -64,8 +64,8 @@
     font-size: 5rem;
     background: linear-gradient(90deg,
         transparent 0%,
-        var(--bg-pink-overlay-light) 20%,
-        var(--bg-pink-subtle) 80%,
+        var(--bg-themeoverlay-light) 20%,
+        var(--bg-themesubtle) 80%,
         transparent 100%);
     color: var(--text-active);
 }
@@ -97,9 +97,9 @@
     padding: 1.875rem 2.5rem;
     margin-bottom: 5rem;
     background: var(--bg-container);
-    border: 1px solid var(--border-pink-light);
+    border: 1px solid var(--border-themelight);
     border-radius: 1.25rem;
-    box-shadow: 0 4px 20px var(--shadow-pink-light);
+    box-shadow: 0 4px 20px var(--shadow-themelight);
     flex: 1;
     min-height: 0;
     overflow-y: hidden;
@@ -121,7 +121,7 @@
     font-family: 'Cormorant Garamond', 'Georgia', serif;
     font-size: clamp(3rem, 3vw, 4rem);
     padding: 5rem 5rem ;
-    border: 5px dashed var(--border-pink-light);
+    border: 5px dashed var(--border-themelight);
     border-radius: 3rem;
     color: var(--text-secondary);
     margin-top: 0.5rem;
@@ -190,7 +190,7 @@
 .pos-translations .simple-translation {
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px dashed var(--border-pink-light);
+    border-top: 1px dashed var(--border-themelight);
     color: var(--text-muted);
     font-size: 0.875rem;
     text-align: center;
@@ -205,7 +205,7 @@
     padding: 0;
     background: var(--white-medium);
     border-radius: 0.75rem;
-    border: 1px solid var(--border-pink-light);
+    border: 1px solid var(--border-themelight);
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     overflow: auto;
@@ -231,7 +231,7 @@
 }
 
 .apple-slider:focus-visible .apple-slider-thumb {
-    box-shadow: 0 0 0 3px var(--shadow-pink-strong), 0 2px 8px var(--shadow-pink-medium);
+    box-shadow: 0 0 0 3px var(--shadow-themestrong), 0 2px 8px var(--shadow-thememedium);
 }
 
 /* 节点标签行 */
@@ -289,7 +289,7 @@
     border-radius: 50%;
     background: var(--accent-primary);
     border: 2px solid white;
-    box-shadow: 0 1px 3px var(--shadow-pink-medium);
+    box-shadow: 0 1px 3px var(--shadow-thememedium);
     pointer-events: none;
 }
 
@@ -303,7 +303,7 @@
     border-radius: 50%;
     background: white;
     border: 2px solid var(--accent-primary);
-    box-shadow: 0 2px 8px var(--shadow-pink-medium);
+    box-shadow: 0 2px 8px var(--shadow-thememedium);
     cursor: grab;
     transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
                 box-shadow 0.2s,
@@ -312,12 +312,12 @@
 }
 
 .apple-slider-thumb:hover {
-    box-shadow: 0 3px 12px var(--shadow-pink-strong);
+    box-shadow: 0 3px 12px var(--shadow-themestrong);
 }
 
 .apple-slider-thumb.dragging {
     cursor: grabbing;
-    box-shadow: 0 4px 16px var(--shadow-pink-strong);
+    box-shadow: 0 4px 16px var(--shadow-themestrong);
     transform: translate(-50%, -50%) scale(1.15);
     transition: box-shadow 0.2s, transform 0.1s;
 }
@@ -516,7 +516,7 @@
 }
 
 .example-sentence.clickable-text:hover {
-    background: var(--bg-pink-overlay-light);
+    background: var(--bg-themeoverlay-light);
     border-left-color: var(--text-accent);
 }
 
@@ -525,7 +525,7 @@
 }
 
 .example-sentence.clickable-text.playing {
-    background: var(--bg-pink-subtle);
+    background: var(--bg-themesubtle);
     border-left-width: 4px;
 }
 
@@ -539,7 +539,7 @@
 }
 
 .clickable-word:hover {
-    background: var(--bg-pink-overlay-light);
+    background: var(--bg-themeoverlay-light);
     transform: translateY(-1px);
 }
 
@@ -548,7 +548,7 @@
 }
 
 .clickable-word.playing {
-    background: var(--bg-pink-subtle);
+    background: var(--bg-themesubtle);
     box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
@@ -651,7 +651,7 @@ body.repeater-mode #repeaterView {
 }
 
 .difficulty-item:hover {
-    background: var(--bg-pink-overlay-light);
+    background: var(--bg-themeoverlay-light);
     transform: translateX(2px);
 }
 
@@ -806,7 +806,7 @@ body.repeater-mode #repeaterView {
     border-radius: 8px;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    border: 0.2rem dashed var(--border-pink-light);
+    border: 0.2rem dashed var(--border-themelight);
     border-radius: 3rem;
 
     

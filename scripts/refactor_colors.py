@@ -403,8 +403,8 @@ def write_output(output_file, global_vars, light_vars, dark_vars, themes, lines,
     --transition-slow: 0.5s ease;
 
     /* 常用阴影 */
-    --shadow-sm: 0 2px 8px var(--shadow-pink-medium);
-    --shadow-md: 0 4px 15px var(--shadow-pink-strong);
+    --shadow-sm: 0 2px 8px var(--shadow-thememedium);
+    --shadow-md: 0 4px 15px var(--shadow-themestrong);
     --shadow-lg: 0 8px 24px var(--shadow-large);
 }
 """)

@@ -80,7 +80,7 @@
 
 /* 声音按钮悬停状态 */
 .btn-sound:hover, .btn-pause:hover {
-    box-shadow: 0 4px 15px var(--shadow-pink-strong);
+    box-shadow: 0 4px 15px var(--shadow-themestrong);
     transform: translateY(-2px);
     background: linear-gradient(135deg, var(--btn-hover-start) 0%, var(--btn-hover-end) 100%);
 }
@@ -174,9 +174,9 @@
     padding: 1.5rem 1.75rem;
     min-width: 17.5rem;
     max-width: 22.5rem;
-    border: 1px solid var(--border-pink-light);
+    border: 1px solid var(--border-themelight);
     box-shadow:
-        0 8px 32px var(--shadow-pink-light),
+        0 8px 32px var(--shadow-themelight),
         0 2px 8px var(--icon-shadow-light),
         inset 0 1px 0 var(--icon-border-strong);
     transform: scale(0.9) translateY(10px);
@@ -208,22 +208,21 @@
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: none;
+    border: 1px solid var(--input-border-light, rgba(0, 0, 0, 0.1));
     border-radius: 0.75rem;
     background: var(--input-bg-light);
-    box-shadow:
-        0 0 0 1px var(--input-shadow-outer) inset,
-        0 2px 4px var(--input-shadow-inner) inset;
+    box-shadow: 0 2px 4px var(--input-shadow-inner) inset;
     outline: none;
     margin-bottom: 1.25rem;
-    transition: box-shadow 0.2s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .glass-dialog-input:focus {
+    border-color: var(--glow-pink);
     box-shadow:
-        0 0 0 2px var(--glow-pink),
-        0 0 0 1px var(--border-pink-medium) inset;
+        0 0 0 3px rgba(255, 182, 193, 0.2),
+        0 2px 4px var(--input-shadow-inner) inset;
 }
 
 .glass-dialog-buttons {
@@ -264,9 +263,9 @@
 /* 深色主题适配 */
 [data-theme-mode="dark"] .glass-dialog {
     background: linear-gradient(135deg, var(--glass-bg-light-start) 0%, var(--glass-bg-light-end) 100%);
-    border: 1px solid var(--border-pink-light);
+    border: 1px solid var(--border-themelight);
     box-shadow:
-        0 8px 32px var(--shadow-pink-light),
+        0 8px 32px var(--shadow-themelight),
         0 2px 8px var(--icon-shadow-medium),
         inset 0 1px 0 var(--icon-inner-shadow-top);
 }
@@ -289,7 +288,7 @@
 [data-theme-mode="dark"] .glass-dialog-input:focus {
     box-shadow:
         0 0 0 2px var(--glow-pink),
-        0 0 0 1px var(--border-pink-medium) inset;
+        0 0 0 1px var(--border-thememedium) inset;
 }
 
 [data-theme-mode="dark"] .glass-dialog-btn {

@@ -187,7 +187,7 @@
     background: var(--bg-container);
     background-color: var(--readonly-bg-textarea);
     cursor: not-allowed;
-    border: 1px solid var(--border-pink-light);
+    border: 1px solid var(--border-themelight);
     color: var(--text-secondary);
     opacity: 0.85;
 }
@@ -198,6 +198,6 @@
 
 #wordInput.readonly-public:focus {
     outline: none;
-    border-color: var(--border-pink-light);
+    border-color: var(--border-themelight);
 }
 

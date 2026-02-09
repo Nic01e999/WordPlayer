@@ -118,7 +118,7 @@
  --shadow-soft: 柔和阴影
    引用：通用阴影
 
- --shadow-pink-light/medium/strong: 粉色阴影（轻/中/强）
+ --shadow-themelight/medium/strong: 粉色阴影（轻/中/强）
    引用：menu.css (.menu-bar), components.css (.repeater-container)
 
  --shadow-brown/brown-medium: 棕色阴影
@@ -128,7 +128,7 @@
    引用：menu.css (#menu button)
 
 # 【边框组 (border-)】
- --border-pink-light/medium/strong: 粉色边框（轻/中/强）
+ --border-themelight/medium/strong: 粉色边框（轻/中/强）
    引用：components.css (.repeater-container), menu.css (input)
 
  --border-menu: 菜单边框
@@ -144,13 +144,13 @@
    引用：dictation.css (.results-box::after)
 
 # 【背景透明色组】
- --bg-pink-dot: 圆点图案
+ --bg-themedot: 圆点图案
    引用：base.css (body::before)
 
- --bg-pink-overlay/overlay-light: 粉色遮罩
+ --bg-themeoverlay/overlay-light: 粉色遮罩
    引用：dictation.css (.scroll-container)
 
- --bg-pink-subtle: 粉色微背景
+ --bg-themesubtle: 粉色微背景
    引用：repeater.css (.current-word)
 
  --bg-slider-track: 滑块轨道
