@@ -2,21 +2,398 @@
  * 颜色配置文件 - 集中管理所有颜色变量
  * 使用语义化命名，方便理解和维护
  *
- * 文件结构：
- * 1. 全局通用变量（所有主题共享）
- * 2. 浅色模式通用变量
- * 3. 深色模式通用变量
- * 4. 粉色浅色主题（默认）
- * 5. 各颜色主题特定变量
- * 6. 通用工具变量
- *
  * 注释格式：命名原因 | 使用位置
  */
 
-/* ==================================================
- * 1. 全局通用变量（所有主题共享）
- * ================================================== */
 :root {
+    /* {{{ 文字颜色 (text-) */
+
+    /* 主要文字 | 页面标题 h1, 菜单按钮悬停 */
+    --text-primary: #8b5a5a;
+
+    /* 次要文字 | 设置面板标签 */
+    --text-secondary: #9c7a7a;
+
+    /* 淡化/静音文字 | .hint, textarea placeholder */
+    --text-muted: #c9a8a8;
+
+    /* 深色文字 | 听写输入框, 答题文字 */
+    --text-dark: #5a4a4a;
+
+    /* 激活状态 | 当前播放单词 .current-word */
+    --text-active: #8b6060;
+
+    /* 标签文字 | 设置面板 input/select/textarea */
+    --text-label: #8b6f6f;
+
+    /* 按钮文字 | .btn-pause */
+    --text-button: #6b4f4f;
+
+    /* 菜单按钮文字 | #menu button 默认状态 */
+    --text-menu-btn: #a07070;
+
+    /* 强调文字 | 设置面板标题, .word-en */
+    --text-accent: #c48b8b;
+
+    /* 统计文字 | .stat-item */
+    --text-stat: #6b5a5a;
+
+    /* 计数文字 | .play-count */
+    --text-count: #d4a5a5;
+
+    /* 占位符 | placeholder */
+    --text-placeholder: #c9b8b8;
+
+    /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+
+    /* 页面渐变起点 | body */
+    --bg-page-start: #fff5f5;
+
+    /* 页面渐变中点 | body */
+    --bg-page-mid: #fef6f0;
+
+    /* 页面渐变终点 | body */
+    --bg-page-end: #fff8f5;
+
+    /* 容器背景 | .repeater-container */
+    --bg-container: #fffafa;
+
+    /* 菜单栏渐变起点 | .menu-bar */
+    --bg-menu-start: #ffd6e0;
+
+    /* 菜单栏渐变终点 | .menu-bar */
+    --bg-menu-end: #ffccd5;
+
+    /* 输入框背景 | sidebar input/select */
+    --bg-input: #fff9f9;
+
+    /* 纸张渐变起点 | .results-box */
+    --bg-paper-start: #fffef8;
+
+    /* 纸张渐变中点 | .results-box */
+    --bg-paper-mid: #fdf8f0;
+
+    /* 纸张渐变终点 | .results-box */
+    --bg-paper-end: #faf5eb;
+
+    /* 弹窗渐变起点 | .dictation-popup */
+    --bg-popup-start: #fffef5;
+
+    /* 弹窗渐变终点 | .dictation-popup */
+    --bg-popup-end: #fff9f0;
+
+    /* 滚动区域中间色 | .scroll-container */
+    --bg-scroll-mid: #fff5f5;
+
+    /* }}} */
+
+    /* {{{ 强调色 (accent-) */
+
+    /* 主强调色 | 焦点边框, 按钮边框 */
+    --accent-primary: #ffb6c1;
+
+    /* 次强调色 | 渐变背景, 按钮背景 */
+    --accent-secondary: #ffd1dc;
+
+    /* 棕色强调 | 强调文字, 标题装饰 */
+    --accent-brown: #c48b8b;
+
+    /* 装订线 | .results-box::before */
+    --accent-line: rgb(223, 151, 162);
+
+    /* 发光粉色 | .results-box h3 border */
+    --glow-pink: rgba(255, 182, 193, 0.6);
+
+    /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
+
+    /* 成功/正确答案 | .result-attempts .correct span */
+    --status-success: #7f82d1;
+
+    /* 正确(批改红) | .correct */
+    --status-correct: #74b093;
+
+    /* 错误 | .failed */
+    --status-error: #c06565;
+
+    /* 警告 | .warning */
+    --status-warning: #cc7a22;
+
+    /* 分数显示 | .score-display */
+    --status-score: #e25555;
+
+    /* 翻译错误 | .translation-error */
+    --status-translate-error: #c0392b;
+
+    /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
+
+    /* 播放按钮渐变起点 | .btn-play */
+    --btn-play-start: #d4edda;
+
+    /* 播放按钮渐变终点 | .btn-play */
+    --btn-play-end: #c3e6cb;
+
+    /* 播放按钮悬停起点 | .btn-play:hover */
+    --btn-play-hover-start: #e2f3e6;
+
+    /* 播放按钮悬停终点 | .btn-play:hover */
+    --btn-play-hover-end: #d4edda;
+
+    /* 播放按钮文字 | .btn-play */
+    --btn-play-text: #4a7c59;
+
+    /* 暂停按钮渐变起点 | .btn-pause, .btn-sound */
+    --btn-pause-start: #ffd1dc;
+
+    /* 暂停按钮渐变终点 | .btn-pause, .btn-sound */
+    --btn-pause-end: #ffb6c1;
+
+    /* 悬停渐变起点 | .btn-sound:hover, .btn-pause:hover */
+    --btn-hover-start: #ffe4e9;
+
+    /* 悬停渐变终点 | .btn-sound:hover, .btn-pause:hover */
+    --btn-hover-end: #ffd1dc;
+
+    /* 重试按钮渐变起点 | .retry-btn */
+    --btn-retry-start: #fff5e6;
+
+    /* 重试按钮渐变终点 | .retry-btn */
+    --btn-retry-end: #ffe8cc;
+
+    /* 重试按钮悬停起点 | .retry-btn:hover */
+    --btn-retry-hover-start: #fff0d9;
+
+    /* 重试按钮悬停终点 | .retry-btn:hover */
+    --btn-retry-hover-end: #ffd9b3;
+
+    /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
+
+    /* 柔和阴影 | 通用 */
+    --shadow-soft: rgba(0, 0, 0, 0.05);
+
+    /* 粉色轻阴影 | .repeater-container */
+    --shadow-pink-light: rgba(255, 182, 193, 0.15);
+
+    /* 粉色中等阴影 | .menu-bar */
+    --shadow-pink-medium: rgba(255, 182, 193, 0.25);
+
+    /* 粉色强阴影 | .btn-sound:hover */
+    --shadow-pink-strong: rgba(255, 182, 193, 0.4);
+
+    /* 棕色轻阴影 | 容器内阴影 */
+    --shadow-brown: rgba(139, 111, 111, 0.1);
+
+    /* 棕色中等阴影 | 容器内阴影 */
+    --shadow-brown-medium: rgba(139, 111, 111, 0.15);
+
+    /* 菜单按钮阴影 | #menu button */
+    --shadow-menu-btn: rgba(180, 140, 150, 0.15);
+
+    /* 菜单按钮悬停阴影 | #menu button:hover */
+    --shadow-menu-btn-hover: rgba(200, 150, 160, 0.55);
+
+    /* }}} */
+
+    /* {{{ 边框 (border-) */
+
+    /* 粉色轻边框 | .repeater-container */
+    --border-pink-light: rgba(255, 182, 193, 0.4);
+
+    /* 粉色中等边框 | sidebar input */
+    --border-pink-medium: rgba(255, 182, 193, 0.5);
+
+    /* 粉色强边框 | 焦点状态 */
+    --border-pink-strong: rgba(255, 182, 193, 0.6);
+
+    /* 菜单边框 | .menu-bar 底边框 */
+    --border-menu: rgba(255, 150, 170, 0.4);
+
+    /* 纸张边框 | .results-box */
+    --border-paper: rgba(200, 180, 170, 0.3);
+
+    /* 纸张中等边框 | .results-box */
+    --border-paper-medium: rgba(200, 180, 170, 0.4);
+
+    /* 白色边框 | 内发光 */
+    --border-white: rgba(255, 255, 255, 0.5);
+
+    /* 白色强边框 | 强内发光 */
+    --border-white-strong: rgba(255, 255, 255, 0.7);
+
+    /* 印章边框 | .results-box::after */
+    --border-stamp: rgba(200, 80, 80, 0.5);
+
+    /* }}} */
+
+    /* {{{ 背景透明色 */
+
+    /* 圆点图案 | body::before */
+    --bg-pink-dot: rgba(255, 182, 193, 0.327);
+
+    /* 粉色遮罩 | .scroll-container 渐变 */
+    --bg-pink-overlay: rgba(255, 209, 220, 0.3);
+
+    /* 粉色轻遮罩 | 渐变 */
+    --bg-pink-overlay-light: rgba(255, 209, 220, 0.25);
+
+    /* 粉色微背景 | .current-word 背景 */
+    --bg-pink-subtle: rgba(255, 182, 193, 0.3);
+
+    /* 滑块轨道 | .apple-slider-track */
+    --bg-slider-track: rgba(255, 182, 193, 0.3);
+
+    /* 纸张横线 | .results-box 横线 */
+    --bg-paper-line: rgba(200, 180, 170, 0.2);
+
+    /* 纸张中等横线 | .results-box 横线 */
+    --bg-paper-line-medium: rgba(200, 180, 170, 0.25);
+
+    /* 印章背景 | .results-box::after 文字 */
+    --bg-stamp: rgba(200, 80, 80, 0.6);
+
+    /* }}} */
+
+    /* {{{ 白色系 (white-) */
+
+    /* 纯白 | 基础白色 */
+    --white-pure: #ffffff;
+
+    /* 30%白 | 轻透明 */
+    --white-soft: rgba(255, 255, 255, 0.3);
+
+    /* 50%白 | 中透明 */
+    --white-medium: rgba(255, 255, 255, 0.5);
+
+    /* 80%白 | 强透明 */
+    --white-strong: rgba(255, 255, 255, 0.8);
+
+    /* 按钮白 | #menu button 背景 */
+    --white-button: rgba(255, 255, 255, 0.9);
+
+    /* 按钮微粉白 | #menu button 渐变 */
+    --white-button-soft: rgba(255, 248, 250, 0.85);
+
+    /* 按钮悬停白 | #menu button:hover */
+    --white-button-hover: rgba(255, 255, 255, 0.95);
+
+    /* 按钮悬停微粉白 | #menu button:hover 渐变 */
+    --white-button-hover-soft: rgba(255, 240, 245, 0.9);
+
+    /* }}} */
+
+    /* {{{ 图片滤镜 (filter-) */
+
+    /* 色相旋转角度 | 用于给黑白图片上色 */
+    --filter-hue: 330deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* }}} */
+
+    /* {{{ 折角颜色 (fold-) */
+
+    /* 折角浅色 | 纸张折角外层 */
+    --bg-fold-light: rgba(230, 210, 200, 0.85);
+
+    /* 折角深色 | 纸张折角内层 */
+    --bg-fold-dark: rgba(210, 190, 180, 0.95);
+
+    /* 折角阴影 | 纸张折角投影 */
+    --shadow-fold: rgba(139, 111, 111, 0.15);
+
+    /* }}} */
+
+    /* {{{ 功能性颜色 (func-) */
+
+    /* 播放按钮边框 | .btn-play */
+    --border-play: rgba(195, 230, 203, 0.6);
+
+    /* 播放按钮悬停阴影 | .btn-play:hover */
+    --shadow-play-hover: rgba(195, 230, 203, 0.4);
+
+    /* 暂停按钮边框 | .btn-pause */
+    --border-pause: rgba(255, 200, 160, 0.6);
+
+    /* 警告背景 | .input-warning */
+    --bg-warning-light: rgba(255, 200, 160, 0.2);
+
+    /* 错误背景轻 | .wordcard-delete:hover */
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+
+    /* 错误背景中 | .folder-open-close:hover */
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+
+    /* 深色遮罩 | .folder-open-overlay */
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+
+    /* 大阴影 | .drag-clone, .folder-open-view */
+    --shadow-large: rgba(0, 0, 0, 0.2);
+
+    /* 放置指示器边框 | .drop-indicator */
+    --border-drop-indicator: rgba(255, 120, 160, 0.8);
+
+    /* 文件夹预览背景 | .wordcard-folder-preview-item */
+    --bg-folder-preview: rgba(255, 200, 220, 0.2);
+
+    /* 文件夹预览边框 | .wordcard-folder-preview-item */
+    --border-folder-preview: rgba(255, 180, 200, 0.3);
+
+    /* }}} */
+
+    /* {{{ 玻璃态效果组 (glass-) */
+
+    /* 玻璃弹窗背景渐变起点 | components.css .glass-dialog */
+    --glass-bg-light-start: rgba(255, 255, 255, 0.7);
+
+    /* 玻璃弹窗背景渐变终点 | components.css .glass-dialog */
+    --glass-bg-light-end: rgba(255, 255, 255, 0.55);
+
+    /* 玻璃遮罩背景 | components.css .glass-overlay */
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+
+    /* 输入框背景（浅色主题）| auth.css .auth-input, components.css .glass-dialog-input */
+    --input-bg-light: rgba(255, 255, 255, 0.6);
+
+    /* 输入框外阴影 | auth.css, components.css */
+    --input-shadow-outer: rgba(0, 0, 0, 0.08);
+
+    /* 输入框内阴影 | auth.css, components.css */
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+
+    /* 次要按钮背景 | auth.css .auth-btn-secondary, components.css .glass-dialog-btn */
+    --button-secondary-bg: rgba(0, 0, 0, 0.06);
+
+    /* 次要按钮悬停 | auth.css, components.css */
+    --button-secondary-hover: rgba(0, 0, 0, 0.1);
+
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+
+    /* 用户信息卡片背景 | auth.css .user-info */
+    --card-user-bg: rgba(255, 255, 255, 0.5);
+
+    /* 用户信息卡片悬停 | auth.css .user-info:hover */
+    --card-user-hover: rgba(255, 255, 255, 0.7);
+
+    /* }}} */
+
     /* {{{ 图标组 (icon-) */
 
     /* 图标边框（轻）| home.css .wordcard-icon */
@@ -74,6 +451,12 @@
     /* 文件夹展开遮罩 | home.css .folder-open-overlay */
     --folder-overlay: rgba(0, 0, 0, 0.15);
 
+    /* 文件夹展开视图背景起点 | home.css .folder-open-view */
+    --folder-view-bg-start: rgba(255, 255, 255, 0.7);
+
+    /* 文件夹展开视图背景终点 | home.css .folder-open-view */
+    --folder-view-bg-end: rgba(255, 255, 255, 0.55);
+
     /* 文件夹标题背景 | home.css .folder-open-title */
     --folder-title-bg: rgba(255, 255, 255, 0.7);
 
@@ -111,6 +494,19 @@
 
     /* }}} */
 
+    /* {{{ 下拉菜单组 (dropdown-) */
+
+    /* 下拉菜单背景起点 | auth.css .user-dropdown */
+    --dropdown-bg-start: rgba(255, 255, 255, 0.9);
+
+    /* 下拉菜单背景终点 | auth.css .user-dropdown */
+    --dropdown-bg-end: rgba(255, 255, 255, 0.8);
+
+    /* 下拉菜单项悬停 | auth.css .user-dropdown-item:hover */
+    --dropdown-item-hover: rgba(0, 0, 0, 0.05);
+
+    /* }}} */
+
     /* {{{ Toast 提示组 (toast-) */
 
     /* Toast 错误背景 | components.css .toast */
@@ -131,7 +527,7 @@
 
     /* }}} */
 
-    /* {{{ 其他全局变量 */
+    /* {{{ 加载指示器组 (loading-) */
 
     /* 加载动画边框 | home.css .btn-load.loading::after */
     --loading-border: rgba(0, 0, 0, 0.2);
@@ -139,322 +535,49 @@
     /* 预加载指示器文字 | menu.css #preloadIndicator */
     --loading-text: #888;
 
+    /* 预加载弹窗背景起点 | home.css .preload-indicator-popup */
+    --loading-popup-bg-start: rgba(255, 255, 255, 0.9);
+
+    /* 预加载弹窗背景终点 | home.css .preload-indicator-popup */
+    --loading-popup-bg-end: rgba(255, 255, 255, 0.8);
+
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+
     /* 分段控制背景 | menu.css .segmented-control */
     --segmented-bg: rgba(0, 0, 0, 0.05);
+
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+
+    /* 对话框标题文字 | auth.css, components.css */
+    --dialog-text-title: #1a1a1a;
+
+    /* 对话框消息文字 | components.css .glass-dialog-message */
+    --dialog-text-message: #333;
+
+    /* }}} */
+
+    /* {{{ 无效文本组 (invalid-) */
+
+    /* }}} */
+
+    /* {{{ 分隔线组 (divider-) */
 
     /* 分隔线颜色 | auth.css .auth-divider-line */
     --divider-line: rgba(0, 0, 0, 0.1);
 
     /* }}} */
-}
-
-/* ==================================================
- * 2. 浅色模式通用变量
- * ================================================== */
-[data-theme-mode="light"] {
-    /* {{ 组 */
-    /* 玻璃弹窗背景渐变起点 | components.css .glass-dialog */
-    --glass-bg-light-start: rgba(255, 255, 255, 0.7);
-    /* 玻璃弹窗背景渐变终点 | components.css .glass-dialog */
-    --glass-bg-light-end: rgba(255, 255, 255, 0.55);
-    /* 玻璃遮罩背景 | components.css .glass-overlay */
-    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
-    /* 输入框背景（浅色主题）| auth.css .auth-input, components.css .glass-dialog-input */
-    --input-bg-light: rgba(255, 255, 255, 0.6);
-    /* 输入框外阴影 | auth.css, components.css */
-    --input-shadow-outer: rgba(0, 0, 0, 0.08);
-    /* 输入框内阴影 | auth.css, components.css */
-    --input-shadow-inner: rgba(0, 0, 0, 0.04);
-    /* 次要按钮背景 | auth.css .auth-btn-secondary, components.css .glass-dialog-btn */
-    --button-secondary-bg: rgba(0, 0, 0, 0.06);
-    /* 次要按钮悬停 | auth.css, components.css */
-    --button-secondary-hover: rgba(0, 0, 0, 0.1);
-    /* 用户信息卡片背景 | auth.css .user-info */
-    --card-user-bg: rgba(255, 255, 255, 0.5);
-    /* 用户信息卡片悬停 | auth.css .user-info:hover */
-    --card-user-hover: rgba(255, 255, 255, 0.7);
-    /* 文件夹展开视图背景起点 | home.css .folder-open-view */
-    --folder-view-bg-start: rgba(255, 255, 255, 0.7);
-    /* 文件夹展开视图背景终点 | home.css .folder-open-view */
-    --folder-view-bg-end: rgba(255, 255, 255, 0.55);
-    /* 下拉菜单背景起点 | auth.css .user-dropdown */
-    --dropdown-bg-start: rgba(255, 255, 255, 0.9);
-    /* 下拉菜单背景终点 | auth.css .user-dropdown */
-    --dropdown-bg-end: rgba(255, 255, 255, 0.8);
-    /* 下拉菜单项悬停 | auth.css .user-dropdown-item:hover */
-    --dropdown-item-hover: rgba(0, 0, 0, 0.05);
-    /* 预加载弹窗背景起点 | home.css .preload-indicator-popup */
-    --loading-popup-bg-start: rgba(255, 255, 255, 0.9);
-    /* 预加载弹窗背景终点 | home.css .preload-indicator-popup */
-    --loading-popup-bg-end: rgba(255, 255, 255, 0.8);
-    /* 对话框标题文字 | auth.css, components.css */
-    --dialog-text-title: #1a1a1a;
-    /* 对话框消息文字 | components.css .glass-dialog-message */
-    --dialog-text-message: #333;
-    /* 白色边框 | 内发光 */
-    --border-white: rgba(255, 255, 255, 0.5);
-    /* 白色强边框 | 强内发光 */
-    --border-white-strong: rgba(255, 255, 255, 0.7);
-    /* 50%白 | 中透明 */
-    --white-medium: rgba(255, 255, 255, 0.5);
-    /* 80%白 | 强透明 */
-    --white-strong: rgba(255, 255, 255, 0.8);
-    /* }}} */
 
 }
-
-/* ==================================================
- * 3. 深色模式通用变量
- * ================================================== */
-[data-theme-mode="dark"] {
-    /* {{ 组 */
-    --glass-bg-light-start: rgba(40, 40, 45, 0.75);
-    --glass-bg-light-end: rgba(30, 30, 35, 0.65);
-    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
-    /* }}} */
-    --input-bg-light: rgba(255, 255, 255, 0.1);
-    --input-shadow-outer: rgba(255, 255, 255, 0.1);
-    --input-shadow-inner: rgba(0, 0, 0, 0.04);
-    /* }}} */
-    --button-secondary-bg: rgba(255, 255, 255, 0.1);
-    --button-secondary-hover: rgba(255, 255, 255, 0.15);
-    /* }}} */
-    --card-user-bg: rgba(255, 255, 255, 0.1);
-    --card-user-hover: rgba(255, 255, 255, 0.15);
-    --folder-view-bg-start: rgba(40, 40, 45, 0.75);
-    --folder-view-bg-end: rgba(30, 30, 35, 0.65);
-    /* }}} */
-    --dropdown-bg-start: rgba(40, 40, 45, 0.95);
-    --dropdown-bg-end: rgba(30, 30, 35, 0.9);
-    --dropdown-item-hover: rgba(255, 255, 255, 0.05);
-    --loading-popup-bg-start: rgba(40, 40, 45, 0.9);
-    --loading-popup-bg-end: rgba(30, 30, 35, 0.85);
-    /* }}} */
-    --dialog-text-title: #fff;
-    --dialog-text-message: rgba(255, 255, 255, 0.85);
-    /* }}} */
-    --dark-folder-border-bottom: rgba(255, 255, 255, 0.1);
-    --dark-folder-close-bg: rgba(255, 255, 255, 0.1);
-    --dark-folder-close-hover: rgba(255, 255, 255, 0.15);
-    --dark-button-load-start: rgba(255, 255, 255, 0.1);
-    --dark-button-load-end: rgba(255, 255, 255, 0.08);
-    --dark-button-load-hover-start: rgba(255, 255, 255, 0.15);
-    --dark-button-load-hover-end: rgba(255, 255, 255, 0.12);
-    --dark-button-load-border: rgba(255, 255, 255, 0.1);
-    --dark-button-load-text: rgba(255, 255, 255, 0.8);
-    --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
-    --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
-    --dark-loading-text: rgba(255, 255, 255, 0.8);
-    /* }}} */
-
-}
-
-/* ==================================================
- * 4. 粉色浅色主题（默认）
- * ================================================== */
-:root {
-    /* {{{ 组 */
-    /* 主要文字 | 页面标题 h1, 菜单按钮悬停 */
-    --text-primary: #8b5a5a;
-    /* 次要文字 | 设置面板标签 */
-    --text-secondary: #9c7a7a;
-    /* 淡化/静音文字 | .hint, textarea placeholder */
-    --text-muted: #c9a8a8;
-    /* 深色文字 | 听写输入框, 答题文字 */
-    --text-dark: #5a4a4a;
-    /* 激活状态 | 当前播放单词 .current-word */
-    --text-active: #8b6060;
-    /* 标签文字 | 设置面板 input/select/textarea */
-    --text-label: #8b6f6f;
-    /* 按钮文字 | .btn-pause */
-    --text-button: #6b4f4f;
-    /* 菜单按钮文字 | #menu button 默认状态 */
-    --text-menu-btn: #a07070;
-    /* 强调文字 | 设置面板标题, .word-en */
-    --text-accent: #c48b8b;
-    /* 统计文字 | .stat-item */
-    --text-stat: #6b5a5a;
-    /* 计数文字 | .play-count */
-    --text-count: #d4a5a5;
-    /* 占位符 | placeholder */
-    --text-placeholder: #c9b8b8;
-    /* 页面渐变起点 | body */
-    --bg-page-start: #fff5f5;
-    /* 页面渐变中点 | body */
-    --bg-page-mid: #fef6f0;
-    /* 页面渐变终点 | body */
-    --bg-page-end: #fff8f5;
-    /* 容器背景 | .repeater-container */
-    --bg-container: #fffafa;
-    /* 菜单栏渐变起点 | .menu-bar */
-    --bg-menu-start: #ffd6e0;
-    /* 菜单栏渐变终点 | .menu-bar */
-    --bg-menu-end: #ffccd5;
-    /* 输入框背景 | sidebar input/select */
-    --bg-input: #fff9f9;
-    /* 纸张渐变起点 | .results-box */
-    --bg-paper-start: #fffef8;
-    /* 纸张渐变中点 | .results-box */
-    --bg-paper-mid: #fdf8f0;
-    /* 纸张渐变终点 | .results-box */
-    --bg-paper-end: #faf5eb;
-    /* 弹窗渐变起点 | .dictation-popup */
-    --bg-popup-start: #fffef5;
-    /* 弹窗渐变终点 | .dictation-popup */
-    --bg-popup-end: #fff9f0;
-    /* 滚动区域中间色 | .scroll-container */
-    --bg-scroll-mid: #fff5f5;
-    /* 主强调色 | 焦点边框, 按钮边框 */
-    --accent-primary: #ffb6c1;
-    /* 次强调色 | 渐变背景, 按钮背景 */
-    --accent-secondary: #ffd1dc;
-    /* 棕色强调 | 强调文字, 标题装饰 */
-    --accent-brown: #c48b8b;
-    /* 装订线 | .results-box::before */
-    --accent-line: rgb(223, 151, 162);
-    /* 发光粉色 | .results-box h3 border */
-    --glow-pink: rgba(255, 182, 193, 0.6);
-    /* 成功/正确答案 | .result-attempts .correct span */
-    --status-success: #7f82d1;
-    /* 正确(批改红) | .correct */
-    --status-correct: #74b093;
-    /* 错误 | .failed */
-    --status-error: #c06565;
-    /* 警告 | .warning */
-    --status-warning: #cc7a22;
-    /* 分数显示 | .score-display */
-    --status-score: #e25555;
-    /* 翻译错误 | .translation-error */
-    --status-translate-error: #c0392b;
-    /* 播放按钮渐变起点 | .btn-play */
-    --btn-play-start: #d4edda;
-    /* 播放按钮渐变终点 | .btn-play */
-    --btn-play-end: #c3e6cb;
-    /* 播放按钮悬停起点 | .btn-play:hover */
-    --btn-play-hover-start: #e2f3e6;
-    /* 播放按钮悬停终点 | .btn-play:hover */
-    --btn-play-hover-end: #d4edda;
-    /* 播放按钮文字 | .btn-play */
-    --btn-play-text: #4a7c59;
-    /* 暂停按钮渐变起点 | .btn-pause, .btn-sound */
-    --btn-pause-start: #ffd1dc;
-    /* 暂停按钮渐变终点 | .btn-pause, .btn-sound */
-    --btn-pause-end: #ffb6c1;
-    /* 悬停渐变起点 | .btn-sound:hover, .btn-pause:hover */
-    --btn-hover-start: #ffe4e9;
-    /* 悬停渐变终点 | .btn-sound:hover, .btn-pause:hover */
-    --btn-hover-end: #ffd1dc;
-    /* 重试按钮渐变起点 | .retry-btn */
-    --btn-retry-start: #fff5e6;
-    /* 重试按钮渐变终点 | .retry-btn */
-    --btn-retry-end: #ffe8cc;
-    /* 重试按钮悬停起点 | .retry-btn:hover */
-    --btn-retry-hover-start: #fff0d9;
-    /* 重试按钮悬停终点 | .retry-btn:hover */
-    --btn-retry-hover-end: #ffd9b3;
-    /* 柔和阴影 | 通用 */
-    --shadow-soft: rgba(0, 0, 0, 0.05);
-    /* 粉色轻阴影 | .repeater-container */
-    --shadow-pink-light: rgba(255, 182, 193, 0.15);
-    /* 粉色中等阴影 | .menu-bar */
-    --shadow-pink-medium: rgba(255, 182, 193, 0.25);
-    /* 粉色强阴影 | .btn-sound:hover */
-    --shadow-pink-strong: rgba(255, 182, 193, 0.4);
-    /* 棕色轻阴影 | 容器内阴影 */
-    --shadow-brown: rgba(139, 111, 111, 0.1);
-    /* 棕色中等阴影 | 容器内阴影 */
-    --shadow-brown-medium: rgba(139, 111, 111, 0.15);
-    /* 菜单按钮阴影 | #menu button */
-    --shadow-menu-btn: rgba(180, 140, 150, 0.15);
-    /* 菜单按钮悬停阴影 | #menu button:hover */
-    --shadow-menu-btn-hover: rgba(200, 150, 160, 0.55);
-    /* 粉色轻边框 | .repeater-container */
-    --border-pink-light: rgba(255, 182, 193, 0.4);
-    /* 粉色中等边框 | sidebar input */
-    --border-pink-medium: rgba(255, 182, 193, 0.5);
-    /* 粉色强边框 | 焦点状态 */
-    --border-pink-strong: rgba(255, 182, 193, 0.6);
-    /* 菜单边框 | .menu-bar 底边框 */
-    --border-menu: rgba(255, 150, 170, 0.4);
-    /* 纸张边框 | .results-box */
-    --border-paper: rgba(200, 180, 170, 0.3);
-    /* 纸张中等边框 | .results-box */
-    --border-paper-medium: rgba(200, 180, 170, 0.4);
-    /* 印章边框 | .results-box::after */
-    --border-stamp: rgba(200, 80, 80, 0.5);
-    /* 圆点图案 | body::before */
-    --bg-pink-dot: rgba(255, 182, 193, 0.327);
-    /* 粉色遮罩 | .scroll-container 渐变 */
-    --bg-pink-overlay: rgba(255, 209, 220, 0.3);
-    /* 粉色轻遮罩 | 渐变 */
-    --bg-pink-overlay-light: rgba(255, 209, 220, 0.25);
-    /* 粉色微背景 | .current-word 背景 */
-    --bg-pink-subtle: rgba(255, 182, 193, 0.3);
-    /* 滑块轨道 | .apple-slider-track */
-    --bg-slider-track: rgba(255, 182, 193, 0.3);
-    /* 纸张横线 | .results-box 横线 */
-    --bg-paper-line: rgba(200, 180, 170, 0.2);
-    /* 纸张中等横线 | .results-box 横线 */
-    --bg-paper-line-medium: rgba(200, 180, 170, 0.25);
-    /* 印章背景 | .results-box::after 文字 */
-    --bg-stamp: rgba(200, 80, 80, 0.6);
-    /* 纯白 | 基础白色 */
-    --white-pure: #ffffff;
-    /* 30%白 | 轻透明 */
-    --white-soft: rgba(255, 255, 255, 0.3);
-    /* 按钮白 | #menu button 背景 */
-    --white-button: rgba(255, 255, 255, 0.9);
-    /* 按钮微粉白 | #menu button 渐变 */
-    --white-button-soft: rgba(255, 248, 250, 0.85);
-    /* 按钮悬停白 | #menu button:hover */
-    --white-button-hover: rgba(255, 255, 255, 0.95);
-    /* 按钮悬停微粉白 | #menu button:hover 渐变 */
-    --white-button-hover-soft: rgba(255, 240, 245, 0.9);
-    /* 色相旋转角度 | 用于给黑白图片上色 */
-    --filter-hue: 330deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
-    /* 折角浅色 | 纸张折角外层 */
-    --bg-fold-light: rgba(230, 210, 200, 0.85);
-    /* 折角深色 | 纸张折角内层 */
-    --bg-fold-dark: rgba(210, 190, 180, 0.95);
-    /* 折角阴影 | 纸张折角投影 */
-    --shadow-fold: rgba(139, 111, 111, 0.15);
-    /* 播放按钮边框 | .btn-play */
-    --border-play: rgba(195, 230, 203, 0.6);
-    /* 播放按钮悬停阴影 | .btn-play:hover */
-    --shadow-play-hover: rgba(195, 230, 203, 0.4);
-    /* 暂停按钮边框 | .btn-pause */
-    --border-pause: rgba(255, 200, 160, 0.6);
-    /* 警告背景 | .input-warning */
-    --bg-warning-light: rgba(255, 200, 160, 0.2);
-    /* 错误背景轻 | .wordcard-delete:hover */
-    --bg-error-light: rgba(200, 80, 80, 0.1);
-    /* 错误背景中 | .folder-open-close:hover */
-    --bg-error-medium: rgba(200, 80, 80, 0.2);
-    /* 深色遮罩 | .folder-open-overlay */
-    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
-    /* 大阴影 | .drag-clone, .folder-open-view */
-    --shadow-large: rgba(0, 0, 0, 0.2);
-    /* 放置指示器边框 | .drop-indicator */
-    --border-drop-indicator: rgba(255, 120, 160, 0.8);
-    /* 文件夹预览背景 | .wordcard-folder-preview-item */
-    --bg-folder-preview: rgba(255, 200, 220, 0.2);
-    /* 文件夹预览边框 | .wordcard-folder-preview-item */
-    --border-folder-preview: rgba(255, 180, 200, 0.3);
-    /* }}} */
-
-}
-
-/* ==================================================
- * 5. 各颜色主题特定变量
- * ================================================== */
 
 /* ===================================
  * 粉色深色主题 (Pink Dark Theme)
  * =================================== */
 [data-theme-color="pink"][data-theme-mode="dark"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #e8c0c8;
     --text-secondary: #d4a0a8;
     --text-muted: #a07078;
@@ -468,6 +591,8 @@
     --text-count: #d49098;
     --text-placeholder: #906068;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #2f1a1f;
     --bg-page-mid: #281618;
     --bg-page-end: #2a1a1c;
@@ -482,17 +607,23 @@
     --bg-popup-end: #2a1a1e;
     --bg-scroll-mid: #2a1a1e;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #ff8fa0;
     --accent-secondary: #e87888;
     --accent-brown: #d4909a;
     --accent-line: rgb(220, 120, 140);
     --glow-pink: rgba(255, 143, 160, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #ff8fa0;
     --status-translate-error: #e85555;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #4a2a32;
     --btn-play-end: #42242c;
     --btn-play-hover-start: #5a3a42;
@@ -507,6 +638,8 @@
     --btn-retry-hover-start: #4a4a3f;
     --btn-retry-hover-end: #3f3f34;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --shadow-pink-light: rgba(255, 143, 160, 0.15);
     --shadow-pink-medium: rgba(255, 143, 160, 0.25);
@@ -516,6 +649,8 @@
     --shadow-menu-btn: rgba(180, 100, 120, 0.2);
     --shadow-menu-btn-hover: rgba(220, 120, 140, 0.4);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(255, 143, 160, 0.3);
     --border-pink-medium: rgba(255, 143, 160, 0.4);
     --border-pink-strong: rgba(255, 143, 160, 0.5);
@@ -526,6 +661,8 @@
     --border-white-strong: rgba(255, 255, 255, 0.25);
     --border-stamp: rgba(255, 143, 160, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(255, 143, 160, 0.15);
     --bg-pink-overlay: rgba(255, 143, 160, 0.15);
     --bg-pink-overlay-light: rgba(255, 143, 160, 0.1);
@@ -535,6 +672,8 @@
     --bg-paper-line-medium: rgba(140, 80, 100, 0.25);
     --bg-stamp: rgba(255, 143, 160, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #351e23;
     --white-soft: rgba(53, 30, 35, 0.3);
     --white-medium: rgba(53, 30, 35, 0.5);
@@ -544,10 +683,14 @@
     --white-button-hover: rgba(63, 40, 45, 0.95);
     --white-button-hover-soft: rgba(68, 45, 50, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(80, 50, 60, 0.85);
     --bg-fold-dark: rgba(100, 65, 75, 0.95);
     --shadow-fold: rgba(200, 150, 160, 0.2);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(100, 180, 120, 0.6);
     --shadow-play-hover: rgba(100, 180, 120, 0.4);
     --border-pause: rgba(200, 120, 100, 0.6);
@@ -559,19 +702,134 @@
     --border-drop-indicator: rgba(255, 143, 160, 0.8);
     --bg-folder-preview: rgba(255, 143, 160, 0.15);
     --border-folder-preview: rgba(255, 143, 160, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 330deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 330deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(40, 40, 45, 0.75);
+    --glass-bg-light-end: rgba(30, 30, 35, 0.65);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.1);
+    --input-shadow-outer: rgba(255, 255, 255, 0.1);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(255, 255, 255, 0.1);
+    --button-secondary-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.1);
+    --card-user-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(40, 40, 45, 0.75);
+    --folder-view-bg-end: rgba(30, 30, 35, 0.65);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(40, 40, 45, 0.95);
+    --dropdown-bg-end: rgba(30, 30, 35, 0.9);
+    --dropdown-item-hover: rgba(255, 255, 255, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(40, 40, 45, 0.9);
+    --loading-popup-bg-end: rgba(30, 30, 35, 0.85);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #fff;
+    --dialog-text-message: rgba(255, 255, 255, 0.85);
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 深色主题特有变量 */
+    --dark-folder-border-bottom: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-bg: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-hover: rgba(255, 255, 255, 0.15);
+    --dark-button-load-start: rgba(255, 255, 255, 0.1);
+    --dark-button-load-end: rgba(255, 255, 255, 0.08);
+    --dark-button-load-hover-start: rgba(255, 255, 255, 0.15);
+    --dark-button-load-hover-end: rgba(255, 255, 255, 0.12);
+    --dark-button-load-border: rgba(255, 255, 255, 0.1);
+    --dark-button-load-text: rgba(255, 255, 255, 0.8);
+    --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
+    --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
+    --dark-loading-text: rgba(255, 255, 255, 0.8);
+    /* }}} */
 }
 
 /* ===================================
  * 绿色浅色主题 (Green Light Theme)
  * =================================== */
 [data-theme-color="green"][data-theme-mode="light"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #5a8b5a;
     --text-secondary: #7a9c7a;
     --text-muted: #a8c9a8;
@@ -585,6 +843,8 @@
     --text-count: #a5d4a5;
     --text-placeholder: #b8c9b8;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #f5fff5;
     --bg-page-mid: #f0fef0;
     --bg-page-end: #f5fff8;
@@ -599,17 +859,23 @@
     --bg-popup-end: #f0fff0;
     --bg-scroll-mid: #f5fff5;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #97bb91;
     --accent-secondary: #ade3ba;
     --accent-brown: #b5c5b5;
     --accent-line: rgb(135, 182, 146);
     --glow-pink: rgba(173, 222, 175, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #50c878;
     --status-translate-error: #c0392b;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #d4edda;
     --btn-play-end: #c3e6cb;
     --btn-play-hover-start: #e2f3e6;
@@ -624,6 +890,8 @@
     --btn-retry-hover-start: #fff0d9;
     --btn-retry-hover-end: #ffd9b3;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.05);
     --shadow-pink-light: rgba(80, 200, 120, 0.15);
     --shadow-pink-medium: rgba(80, 200, 120, 0.25);
@@ -633,14 +901,20 @@
     --shadow-menu-btn: rgba(140, 180, 150, 0.15);
     --shadow-menu-btn-hover: rgba(150, 200, 160, 0.55);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(80, 200, 120, 0.4);
     --border-pink-medium: rgba(80, 200, 120, 0.5);
     --border-pink-strong: rgba(80, 200, 120, 0.6);
     --border-menu: rgba(80, 180, 100, 0.4);
     --border-paper: rgba(170, 200, 180, 0.3);
     --border-paper-medium: rgba(170, 200, 180, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
     --border-stamp: rgba(80, 200, 80, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(80, 200, 120, 0.327);
     --bg-pink-overlay: rgba(120, 220, 150, 0.3);
     --bg-pink-overlay-light: rgba(120, 220, 150, 0.25);
@@ -650,17 +924,25 @@
     --bg-paper-line-medium: rgba(170, 200, 180, 0.25);
     --bg-stamp: rgba(80, 200, 80, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #ffffff;
     --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
     --white-button: rgba(255, 255, 255, 0.9);
     --white-button-soft: rgba(248, 255, 250, 0.85);
     --white-button-hover: rgba(255, 255, 255, 0.95);
     --white-button-hover-soft: rgba(240, 255, 245, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(200, 220, 200, 0.85);
     --bg-fold-dark: rgba(180, 200, 180, 0.95);
     --shadow-fold: rgba(111, 139, 111, 0.15);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(80, 200, 120, 0.6);
     --shadow-play-hover: rgba(80, 200, 120, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -672,19 +954,120 @@
     --border-drop-indicator: rgba(80, 200, 120, 0.8);
     --bg-folder-preview: rgba(80, 200, 120, 0.15);
     --border-folder-preview: rgba(80, 200, 120, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 120deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 120deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(255, 255, 255, 0.7);
+    --glass-bg-light-end: rgba(255, 255, 255, 0.55);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.6);
+    --input-shadow-outer: rgba(0, 0, 0, 0.08);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(0, 0, 0, 0.06);
+    --button-secondary-hover: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.5);
+    --card-user-hover: rgba(255, 255, 255, 0.7);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(255, 255, 255, 0.7);
+    --folder-view-bg-end: rgba(255, 255, 255, 0.55);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(255, 255, 255, 0.9);
+    --dropdown-bg-end: rgba(255, 255, 255, 0.8);
+    --dropdown-item-hover: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(255, 255, 255, 0.9);
+    --loading-popup-bg-end: rgba(255, 255, 255, 0.8);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #1a1a1a;
+    --dialog-text-message: #333;
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
 }
 
 /* ===================================
  * 绿色深色主题 (Green Dark Theme)
+ * 森林绿/翡翠色系
  * =================================== */
 [data-theme-color="green"][data-theme-mode="dark"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #a8d5ba;
     --text-secondary: #7ab892;
     --text-muted: #5a8a6a;
@@ -698,6 +1081,8 @@
     --text-count: #6ab88a;
     --text-placeholder: #4a7a5a;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #1a2f1a;
     --bg-page-mid: #162816;
     --bg-page-end: #1a2a1a;
@@ -712,17 +1097,23 @@
     --bg-popup-end: #1a2a1a;
     --bg-scroll-mid: #1a2a1a;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #50c878;
     --accent-secondary: #3da862;
     --accent-brown: #6ab88a;
     --accent-line: rgb(80, 160, 100);
     --glow-pink: rgba(80, 200, 120, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #50c878;
     --status-translate-error: #e85555;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #2a4a2a;
     --btn-play-end: #234523;
     --btn-play-hover-start: #3a5a3a;
@@ -737,6 +1128,8 @@
     --btn-retry-hover-start: #4a4a3f;
     --btn-retry-hover-end: #3f3f34;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --shadow-pink-light: rgba(80, 200, 120, 0.15);
     --shadow-pink-medium: rgba(80, 200, 120, 0.25);
@@ -746,6 +1139,8 @@
     --shadow-menu-btn: rgba(80, 140, 100, 0.2);
     --shadow-menu-btn-hover: rgba(100, 180, 120, 0.4);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(80, 200, 120, 0.3);
     --border-pink-medium: rgba(80, 200, 120, 0.4);
     --border-pink-strong: rgba(80, 200, 120, 0.5);
@@ -756,6 +1151,8 @@
     --border-white-strong: rgba(255, 255, 255, 0.25);
     --border-stamp: rgba(80, 200, 120, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(80, 200, 120, 0.15);
     --bg-pink-overlay: rgba(80, 200, 120, 0.15);
     --bg-pink-overlay-light: rgba(80, 200, 120, 0.1);
@@ -765,6 +1162,8 @@
     --bg-paper-line-medium: rgba(80, 120, 80, 0.25);
     --bg-stamp: rgba(80, 200, 120, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 (dark mode uses dark backgrounds) */
     --white-pure: #1e331e;
     --white-soft: rgba(30, 51, 30, 0.3);
     --white-medium: rgba(30, 51, 30, 0.5);
@@ -774,10 +1173,14 @@
     --white-button-hover: rgba(40, 61, 40, 0.95);
     --white-button-hover-soft: rgba(45, 66, 45, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(50, 80, 55, 0.85);
     --bg-fold-dark: rgba(65, 100, 70, 0.95);
     --shadow-fold: rgba(100, 180, 120, 0.2);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(80, 200, 120, 0.6);
     --shadow-play-hover: rgba(80, 200, 120, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -789,19 +1192,134 @@
     --border-drop-indicator: rgba(80, 200, 120, 0.8);
     --bg-folder-preview: rgba(80, 200, 120, 0.15);
     --border-folder-preview: rgba(80, 200, 120, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 120deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 120deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(40, 40, 45, 0.75);
+    --glass-bg-light-end: rgba(30, 30, 35, 0.65);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.1);
+    --input-shadow-outer: rgba(255, 255, 255, 0.1);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(255, 255, 255, 0.1);
+    --button-secondary-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.1);
+    --card-user-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(40, 40, 45, 0.75);
+    --folder-view-bg-end: rgba(30, 30, 35, 0.65);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(40, 40, 45, 0.95);
+    --dropdown-bg-end: rgba(30, 30, 35, 0.9);
+    --dropdown-item-hover: rgba(255, 255, 255, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(40, 40, 45, 0.9);
+    --loading-popup-bg-end: rgba(30, 30, 35, 0.85);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #fff;
+    --dialog-text-message: rgba(255, 255, 255, 0.85);
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 深色主题特有变量 */
+    --dark-folder-border-bottom: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-bg: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-hover: rgba(255, 255, 255, 0.15);
+    --dark-button-load-start: rgba(255, 255, 255, 0.1);
+    --dark-button-load-end: rgba(255, 255, 255, 0.08);
+    --dark-button-load-hover-start: rgba(255, 255, 255, 0.15);
+    --dark-button-load-hover-end: rgba(255, 255, 255, 0.12);
+    --dark-button-load-border: rgba(255, 255, 255, 0.1);
+    --dark-button-load-text: rgba(255, 255, 255, 0.8);
+    --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
+    --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
+    --dark-loading-text: rgba(255, 255, 255, 0.8);
+    /* }}} */
 }
 
 /* ===================================
  * 蓝色浅色主题 (Blue Light Theme)
  * =================================== */
 [data-theme-color="blue"][data-theme-mode="light"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #5a6a8b;
     --text-secondary: #7a8a9c;
     --text-muted: #a8b8c9;
@@ -815,6 +1333,9 @@
     --text-count: #a5c5e5;
     --text-placeholder: #b8c8d8;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
+    
     --bg-page-start: #f5f8ff;
     --bg-page-mid: #f0f6fe;
     --bg-page-end: #f5faff;
@@ -829,17 +1350,23 @@
     --bg-popup-end: #f0f8ff;
     --bg-scroll-mid: #f5f8ff;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #83b0e2;
     --accent-secondary: #a8d8f8;
     --accent-brown: #8bb4d4;
     --accent-line: rgb(100, 160, 220);
     --glow-pink: rgba(77, 166, 255, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #4da6ff;
     --status-translate-error: #c0392b;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #d4e8ed;
     --btn-play-end: #c3dde6;
     --btn-play-hover-start: #e2f0f6;
@@ -854,6 +1381,8 @@
     --btn-retry-hover-start: #fff0d9;
     --btn-retry-hover-end: #ffd9b3;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.05);
     --shadow-pink-light: rgba(77, 166, 255, 0.15);
     --shadow-pink-medium: rgba(77, 166, 255, 0.25);
@@ -863,14 +1392,20 @@
     --shadow-menu-btn: rgba(140, 170, 200, 0.15);
     --shadow-menu-btn-hover: rgba(150, 180, 220, 0.55);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(77, 166, 255, 0.4);
     --border-pink-medium: rgba(77, 166, 255, 0.5);
     --border-pink-strong: rgba(77, 166, 255, 0.6);
     --border-menu: rgba(77, 150, 220, 0.4);
     --border-paper: rgba(170, 190, 210, 0.3);
     --border-paper-medium: rgba(170, 190, 210, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
     --border-stamp: rgba(77, 166, 255, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(77, 166, 255, 0.327);
     --bg-pink-overlay: rgba(120, 180, 240, 0.3);
     --bg-pink-overlay-light: rgba(120, 180, 240, 0.25);
@@ -880,17 +1415,25 @@
     --bg-paper-line-medium: rgba(170, 190, 210, 0.25);
     --bg-stamp: rgba(77, 166, 255, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #ffffff;
     --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
     --white-button: rgba(255, 255, 255, 0.9);
     --white-button-soft: rgba(248, 252, 255, 0.85);
     --white-button-hover: rgba(255, 255, 255, 0.95);
     --white-button-hover-soft: rgba(240, 248, 255, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(200, 210, 230, 0.85);
     --bg-fold-dark: rgba(180, 190, 210, 0.95);
     --shadow-fold: rgba(111, 130, 150, 0.15);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(77, 166, 255, 0.6);
     --shadow-play-hover: rgba(77, 166, 255, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -902,19 +1445,120 @@
     --border-drop-indicator: rgba(77, 166, 255, 0.8);
     --bg-folder-preview: rgba(77, 166, 255, 0.15);
     --border-folder-preview: rgba(77, 166, 255, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 210deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 210deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(255, 255, 255, 0.7);
+    --glass-bg-light-end: rgba(255, 255, 255, 0.55);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.6);
+    --input-shadow-outer: rgba(0, 0, 0, 0.08);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(0, 0, 0, 0.06);
+    --button-secondary-hover: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.5);
+    --card-user-hover: rgba(255, 255, 255, 0.7);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(255, 255, 255, 0.7);
+    --folder-view-bg-end: rgba(255, 255, 255, 0.55);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(255, 255, 255, 0.9);
+    --dropdown-bg-end: rgba(255, 255, 255, 0.8);
+    --dropdown-item-hover: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(255, 255, 255, 0.9);
+    --loading-popup-bg-end: rgba(255, 255, 255, 0.8);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #1a1a1a;
+    --dialog-text-message: #333;
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
 }
 
 /* ===================================
  * 蓝色深色主题 (Blue Dark Theme)
+ * 海洋蓝/钢蓝色系
  * =================================== */
 [data-theme-color="blue"][data-theme-mode="dark"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #9ec5e8;
     --text-secondary: #7aa8d4;
     --text-muted: #5a88b4;
@@ -928,6 +1572,8 @@
     --text-count: #6aaae4;
     --text-placeholder: #4a78a4;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #1a2530;
     --bg-page-mid: #162028;
     --bg-page-end: #1a2328;
@@ -942,17 +1588,23 @@
     --bg-popup-end: #1a262e;
     --bg-scroll-mid: #1a2630;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #4da6ff;
     --accent-secondary: #3d96ef;
     --accent-brown: #6ab0e8;
     --accent-line: rgb(77, 150, 220);
     --glow-pink: rgba(77, 166, 255, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #4da6ff;
     --status-translate-error: #e85555;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #2a4552;
     --btn-play-end: #23404a;
     --btn-play-hover-start: #3a5562;
@@ -967,6 +1619,8 @@
     --btn-retry-hover-start: #4a4a3f;
     --btn-retry-hover-end: #3f3f34;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --shadow-pink-light: rgba(77, 166, 255, 0.15);
     --shadow-pink-medium: rgba(77, 166, 255, 0.25);
@@ -976,6 +1630,8 @@
     --shadow-menu-btn: rgba(70, 130, 180, 0.2);
     --shadow-menu-btn-hover: rgba(90, 160, 220, 0.4);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(77, 166, 255, 0.3);
     --border-pink-medium: rgba(77, 166, 255, 0.4);
     --border-pink-strong: rgba(77, 166, 255, 0.5);
@@ -986,6 +1642,8 @@
     --border-white-strong: rgba(255, 255, 255, 0.25);
     --border-stamp: rgba(77, 166, 255, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(77, 166, 255, 0.15);
     --bg-pink-overlay: rgba(77, 166, 255, 0.15);
     --bg-pink-overlay-light: rgba(77, 166, 255, 0.1);
@@ -995,6 +1653,8 @@
     --bg-paper-line-medium: rgba(60, 100, 140, 0.25);
     --bg-stamp: rgba(77, 166, 255, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #1e2a35;
     --white-soft: rgba(30, 42, 53, 0.3);
     --white-medium: rgba(30, 42, 53, 0.5);
@@ -1004,10 +1664,14 @@
     --white-button-hover: rgba(40, 52, 63, 0.95);
     --white-button-hover-soft: rgba(45, 57, 68, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(50, 65, 85, 0.85);
     --bg-fold-dark: rgba(65, 85, 105, 0.95);
     --shadow-fold: rgba(77, 150, 220, 0.2);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(77, 166, 255, 0.6);
     --shadow-play-hover: rgba(77, 166, 255, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -1019,19 +1683,134 @@
     --border-drop-indicator: rgba(77, 166, 255, 0.8);
     --bg-folder-preview: rgba(77, 166, 255, 0.15);
     --border-folder-preview: rgba(77, 166, 255, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 210deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 210deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(40, 40, 45, 0.75);
+    --glass-bg-light-end: rgba(30, 30, 35, 0.65);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.1);
+    --input-shadow-outer: rgba(255, 255, 255, 0.1);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(255, 255, 255, 0.1);
+    --button-secondary-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.1);
+    --card-user-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(40, 40, 45, 0.75);
+    --folder-view-bg-end: rgba(30, 30, 35, 0.65);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(40, 40, 45, 0.95);
+    --dropdown-bg-end: rgba(30, 30, 35, 0.9);
+    --dropdown-item-hover: rgba(255, 255, 255, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(40, 40, 45, 0.9);
+    --loading-popup-bg-end: rgba(30, 30, 35, 0.85);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #fff;
+    --dialog-text-message: rgba(255, 255, 255, 0.85);
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 深色主题特有变量 */
+    --dark-folder-border-bottom: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-bg: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-hover: rgba(255, 255, 255, 0.15);
+    --dark-button-load-start: rgba(255, 255, 255, 0.1);
+    --dark-button-load-end: rgba(255, 255, 255, 0.08);
+    --dark-button-load-hover-start: rgba(255, 255, 255, 0.15);
+    --dark-button-load-hover-end: rgba(255, 255, 255, 0.12);
+    --dark-button-load-border: rgba(255, 255, 255, 0.1);
+    --dark-button-load-text: rgba(255, 255, 255, 0.8);
+    --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
+    --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
+    --dark-loading-text: rgba(255, 255, 255, 0.8);
+    /* }}} */
 }
 
 /* ===================================
  * 紫色浅色主题 (Purple Light Theme)
  * =================================== */
 [data-theme-color="purple"][data-theme-mode="light"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #6a5a8b;
     --text-secondary: #8a7a9c;
     --text-muted: #b8a8c9;
@@ -1045,6 +1824,8 @@
     --text-count: #c5a5e5;
     --text-placeholder: #c8b8d8;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #f8f5ff;
     --bg-page-mid: #f6f0fe;
     --bg-page-end: #faf5ff;
@@ -1059,17 +1840,23 @@
     --bg-popup-end: #f8f0ff;
     --bg-scroll-mid: #f8f5ff;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #c598d6;
     --accent-secondary: #d8a8f8;
     --accent-brown: #b48bd4;
     --accent-line: rgb(160, 100, 220);
     --glow-pink: rgba(168, 85, 247, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #c55555;
     --status-warning: #cc7a22;
     --status-score: #a855f7;
     --status-translate-error: #c0392b;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #e4d8ed;
     --btn-play-end: #d8cce6;
     --btn-play-hover-start: #f0e6f6;
@@ -1084,6 +1871,8 @@
     --btn-retry-hover-start: #fff0d9;
     --btn-retry-hover-end: #ffd9b3;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.05);
     --shadow-pink-light: rgba(168, 85, 247, 0.15);
     --shadow-pink-medium: rgba(168, 85, 247, 0.25);
@@ -1093,14 +1882,20 @@
     --shadow-menu-btn: rgba(170, 140, 200, 0.15);
     --shadow-menu-btn-hover: rgba(180, 150, 220, 0.55);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(168, 85, 247, 0.4);
     --border-pink-medium: rgba(168, 85, 247, 0.5);
     --border-pink-strong: rgba(168, 85, 247, 0.6);
     --border-menu: rgba(150, 80, 220, 0.4);
     --border-paper: rgba(190, 170, 210, 0.3);
     --border-paper-medium: rgba(190, 170, 210, 0.4);
+    --border-white: rgba(255, 255, 255, 0.5);
+    --border-white-strong: rgba(255, 255, 255, 0.7);
     --border-stamp: rgba(168, 85, 247, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(168, 85, 247, 0.327);
     --bg-pink-overlay: rgba(180, 120, 240, 0.3);
     --bg-pink-overlay-light: rgba(180, 120, 240, 0.25);
@@ -1110,17 +1905,25 @@
     --bg-paper-line-medium: rgba(190, 170, 210, 0.25);
     --bg-stamp: rgba(168, 85, 247, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #ffffff;
     --white-soft: rgba(255, 255, 255, 0.3);
+    --white-medium: rgba(255, 255, 255, 0.5);
+    --white-strong: rgba(255, 255, 255, 0.8);
     --white-button: rgba(255, 255, 255, 0.9);
     --white-button-soft: rgba(252, 248, 255, 0.85);
     --white-button-hover: rgba(255, 255, 255, 0.95);
     --white-button-hover-soft: rgba(248, 240, 255, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(220, 200, 230, 0.85);
     --bg-fold-dark: rgba(200, 180, 210, 0.95);
     --shadow-fold: rgba(130, 111, 150, 0.15);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(168, 85, 247, 0.6);
     --shadow-play-hover: rgba(168, 85, 247, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -1132,19 +1935,120 @@
     --border-drop-indicator: rgba(168, 85, 247, 0.8);
     --bg-folder-preview: rgba(168, 85, 247, 0.15);
     --border-folder-preview: rgba(168, 85, 247, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 270deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 270deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(255, 255, 255, 0.7);
+    --glass-bg-light-end: rgba(255, 255, 255, 0.55);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.6);
+    --input-shadow-outer: rgba(0, 0, 0, 0.08);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(0, 0, 0, 0.06);
+    --button-secondary-hover: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.5);
+    --card-user-hover: rgba(255, 255, 255, 0.7);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(255, 255, 255, 0.7);
+    --folder-view-bg-end: rgba(255, 255, 255, 0.55);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(255, 255, 255, 0.9);
+    --dropdown-bg-end: rgba(255, 255, 255, 0.8);
+    --dropdown-item-hover: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(255, 255, 255, 0.9);
+    --loading-popup-bg-end: rgba(255, 255, 255, 0.8);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #1a1a1a;
+    --dialog-text-message: #333;
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
 }
 
 /* ===================================
  * 紫色深色主题 (Purple Dark Theme)
+ * 皇家紫/紫水晶色系
  * =================================== */
 [data-theme-color="purple"][data-theme-mode="dark"] {
-    /* {{{ 组 */
+    /* {{{ 文字颜色 (text-) */
     --text-primary: #c9b8e8;
     --text-secondary: #a898d4;
     --text-muted: #8878b4;
@@ -1158,6 +2062,8 @@
     --text-count: #9a8ae4;
     --text-placeholder: #7868a4;
     /* }}} */
+
+    /* {{{ 背景颜色 (bg-) */
     --bg-page-start: #1f1a2f;
     --bg-page-mid: #1a1628;
     --bg-page-end: #1e1a2a;
@@ -1172,17 +2078,23 @@
     --bg-popup-end: #211a2e;
     --bg-scroll-mid: #201a2a;
     /* }}} */
+
+    /* {{{ 强调色 (accent-) */
     --accent-primary: #a855f7;
     --accent-secondary: #9645e7;
     --accent-brown: #b070e8;
     --accent-line: rgb(150, 80, 200);
     --glow-pink: rgba(168, 85, 247, 0.6);
     /* }}} */
+
+    /* {{{ 状态颜色 (status-) */
     --status-error: #e85555;
     --status-warning: #e8a040;
     --status-score: #a855f7;
     --status-translate-error: #e85555;
     /* }}} */
+
+    /* {{{ 按钮颜色 (btn-) */
     --btn-play-start: #352a52;
     --btn-play-end: #2e254a;
     --btn-play-hover-start: #453a62;
@@ -1197,6 +2109,8 @@
     --btn-retry-hover-start: #4a4a3f;
     --btn-retry-hover-end: #3f3f34;
     /* }}} */
+
+    /* {{{ 阴影 (shadow-) */
     --shadow-soft: rgba(0, 0, 0, 0.3);
     --shadow-pink-light: rgba(168, 85, 247, 0.15);
     --shadow-pink-medium: rgba(168, 85, 247, 0.25);
@@ -1206,6 +2120,8 @@
     --shadow-menu-btn: rgba(130, 70, 180, 0.2);
     --shadow-menu-btn-hover: rgba(160, 90, 220, 0.4);
     /* }}} */
+
+    /* {{{ 边框 (border-) */
     --border-pink-light: rgba(168, 85, 247, 0.3);
     --border-pink-medium: rgba(168, 85, 247, 0.4);
     --border-pink-strong: rgba(168, 85, 247, 0.5);
@@ -1216,6 +2132,8 @@
     --border-white-strong: rgba(255, 255, 255, 0.25);
     --border-stamp: rgba(168, 85, 247, 0.5);
     /* }}} */
+
+    /* {{{ 背景透明色 */
     --bg-pink-dot: rgba(168, 85, 247, 0.15);
     --bg-pink-overlay: rgba(168, 85, 247, 0.15);
     --bg-pink-overlay-light: rgba(168, 85, 247, 0.1);
@@ -1225,6 +2143,8 @@
     --bg-paper-line-medium: rgba(100, 60, 140, 0.25);
     --bg-stamp: rgba(168, 85, 247, 0.6);
     /* }}} */
+
+    /* {{{ 白色系 */
     --white-pure: #252035;
     --white-soft: rgba(37, 32, 53, 0.3);
     --white-medium: rgba(37, 32, 53, 0.5);
@@ -1234,10 +2154,14 @@
     --white-button-hover: rgba(47, 42, 63, 0.95);
     --white-button-hover-soft: rgba(52, 47, 68, 0.9);
     /* }}} */
+
+    /* {{{ 折角颜色 */
     --bg-fold-light: rgba(55, 45, 75, 0.85);
     --bg-fold-dark: rgba(75, 60, 100, 0.95);
     --shadow-fold: rgba(150, 80, 200, 0.2);
     /* }}} */
+
+    /* {{{ 功能性颜色 */
     --border-play: rgba(168, 85, 247, 0.6);
     --shadow-play-hover: rgba(168, 85, 247, 0.4);
     --border-pause: rgba(200, 160, 100, 0.6);
@@ -1249,25 +2173,132 @@
     --border-drop-indicator: rgba(168, 85, 247, 0.8);
     --bg-folder-preview: rgba(168, 85, 247, 0.15);
     --border-folder-preview: rgba(168, 85, 247, 0.25);
-    /* 图片滤镜色相 */
-    --filter-hue: 270deg;
-    /* 饱和度 | 用于调整图片色彩鲜艳度 */
-    --filter-saturate: 100%;
-    /* 过渡时间 */
-    --transition-fast: 0.2s ease;
-    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s ease;
-    /* 常用阴影 */
-    --shadow-sm: 0 2px 8px var(--shadow-pink-medium);
-    --shadow-md: 0 4px 15px var(--shadow-pink-strong);
-    --shadow-lg: 0 8px 24px var(--shadow-large);
     /* }}} */
 
+    /* 图片滤镜色相 */
+    --filter-hue: 270deg;
+
+    /* 饱和度 | 用于调整图片色彩鲜艳度 */
+    --filter-saturate: 100%;
+
+    /* {{{ 玻璃态效果组 (glass-) */
+    --glass-bg-light-start: rgba(40, 40, 45, 0.75);
+    --glass-bg-light-end: rgba(30, 30, 35, 0.65);
+    --glass-overlay-bg: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 输入框组 (input-) */
+    --input-bg-light: rgba(255, 255, 255, 0.1);
+    --input-shadow-outer: rgba(255, 255, 255, 0.1);
+    --input-shadow-inner: rgba(0, 0, 0, 0.04);
+    /* }}} */
+
+    /* {{{ 按钮组 (button-) */
+    --button-secondary-bg: rgba(255, 255, 255, 0.1);
+    --button-secondary-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 卡片组 (card-) */
+    --card-user-bg: rgba(255, 255, 255, 0.1);
+    --card-user-hover: rgba(255, 255, 255, 0.15);
+    /* }}} */
+
+    /* {{{ 图标组 (icon-) */
+    --icon-border-light: rgba(255, 255, 255, 0.35);
+    --icon-border-medium: rgba(255, 255, 255, 0.5);
+    --icon-border-strong: rgba(255, 255, 255, 0.6);
+    --icon-highlight-start: rgba(255, 255, 255, 0.25);
+    --icon-highlight-end: rgba(255, 255, 255, 0);
+    --icon-shadow-light: rgba(0, 0, 0, 0.06);
+    --icon-shadow-medium-light: rgba(0, 0, 0, 0.08);
+    --icon-shadow-medium: rgba(0, 0, 0, 0.1);
+    --icon-shadow-strong: rgba(0, 0, 0, 0.12);
+    --icon-inner-shadow-top: rgba(255, 255, 255, 0.4);
+    --icon-inner-shadow-bottom: rgba(0, 0, 0, 0.05);
+    --icon-text-shadow: rgba(0, 0, 0, 0.2);
+    --icon-mini-shadow: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 文件夹组 (folder-) */
+    --folder-icon-bg: rgba(255, 255, 255, 0.65);
+    --folder-icon-border: rgba(255, 255, 255, 0.5);
+    --folder-empty-bg: rgba(200, 200, 200, 0.3);
+    --folder-overlay: rgba(0, 0, 0, 0.15);
+    --folder-view-bg-start: rgba(40, 40, 45, 0.75);
+    --folder-view-bg-end: rgba(30, 30, 35, 0.65);
+    --folder-title-bg: rgba(255, 255, 255, 0.7);
+    --folder-title-input-bg: rgba(255, 255, 255, 0.9);
+    --folder-title-shadow: rgba(0, 0, 0, 0.08);
+    --folder-title-input-shadow: rgba(0, 0, 0, 0.12);
+    /* }}} */
+
+    /* {{{ 拖拽组 (drag-) */
+    --drag-shadow-primary: rgba(0, 0, 0, 0.25);
+    --drag-shadow-secondary: rgba(0, 0, 0, 0.15);
+    --drag-folder-bg: rgba(245, 245, 245, 1);
+    /* }}} */
+
+    /* {{{ 删除按钮组 (delete-) */
+    --delete-btn-bg: #cdcdcd;
+    --delete-btn-shadow: rgba(0, 0, 0, 0.3);
+    /* }}} */
+
+    /* {{{ 下拉菜单组 (dropdown-) */
+    --dropdown-bg-start: rgba(40, 40, 45, 0.95);
+    --dropdown-bg-end: rgba(30, 30, 35, 0.9);
+    --dropdown-item-hover: rgba(255, 255, 255, 0.05);
+    /* }}} */
+
+    /* {{{ Toast 提示组 (toast-) */
+    --toast-error-bg: rgba(255, 59, 48, 0.95);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+    /* }}} */
+
+    /* {{{ 颜色选择器组 (picker-) */
+    --picker-marker-shadow: rgba(0, 0, 0, 0.3);
+    --picker-original-shadow: rgba(0, 0, 0, 0.4);
+    /* }}} */
+
+    /* {{{ 加载指示器组 (loading-) */
+    --loading-border: rgba(0, 0, 0, 0.2);
+    --loading-text: #888;
+    --loading-popup-bg-start: rgba(40, 40, 45, 0.9);
+    --loading-popup-bg-end: rgba(30, 30, 35, 0.85);
+    /* }}} */
+
+    /* {{{ 分段控制组 (segmented-) */
+    --segmented-bg: rgba(0, 0, 0, 0.05);
+    /* }}} */
+
+    /* {{{ 对话框文字组 (dialog-text-) */
+    --dialog-text-title: #fff;
+    --dialog-text-message: rgba(255, 255, 255, 0.85);
+    /* }}} */
+
+
+    /* {{{ 分隔线组 (divider-) */
+    --divider-line: rgba(0, 0, 0, 0.1);
+    /* }}} */
+
+    /* {{{ 深色主题特有变量 */
+    --dark-folder-border-bottom: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-bg: rgba(255, 255, 255, 0.1);
+    --dark-folder-close-hover: rgba(255, 255, 255, 0.15);
+    --dark-button-load-start: rgba(255, 255, 255, 0.1);
+    --dark-button-load-end: rgba(255, 255, 255, 0.08);
+    --dark-button-load-hover-start: rgba(255, 255, 255, 0.15);
+    --dark-button-load-hover-end: rgba(255, 255, 255, 0.12);
+    --dark-button-load-border: rgba(255, 255, 255, 0.1);
+    --dark-button-load-text: rgba(255, 255, 255, 0.8);
+    --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
+    --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
+    --dark-loading-text: rgba(255, 255, 255, 0.8);
+    /* }}} */
 }
 
-/* ==================================================
- * 6. 通用工具变量 (Utility Variables)
- * ================================================== */
+/* ===================================
+ * 通用工具变量 (Utility Variables)
+ * =================================== */
 :root {
     /* 过渡时间 */
     --transition-fast: 0.2s ease;
