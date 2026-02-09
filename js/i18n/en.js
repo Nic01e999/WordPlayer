@@ -52,6 +52,7 @@ export default {
     load: 'Load',
     save: 'Save',
     update: 'Update',
+    clearInput: 'Clear',
     wordInputPlaceholder: 'Enter words (separated by spaces or newlines)',
     reloading: 'Reloading...',
     emptyTitle: 'No saved word lists',

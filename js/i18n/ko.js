@@ -52,6 +52,7 @@ export default {
     load: '로드',
     save: '저장',
     update: '업데이트',
+    clearInput: '지우기',
     wordInputPlaceholder: '단어 입력 (공백 또는 줄바꿈으로 구분)',
     reloading: '다시 로드 중...',
     emptyTitle: '저장된 단어장이 없습니다',

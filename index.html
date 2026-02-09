@@ -131,7 +131,10 @@
                         <button id="updateListBtn" class="btn-update-list" data-i18n="update" style="display: none;">Update</button>
 
                     </h3>
-                    <textarea id="wordInput" wrap="off" data-i18n="wordInputPlaceholder" data-i18n-attr="placeholder" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+                    <div class="word-input-wrapper">
+                        <textarea id="wordInput" wrap="off" data-i18n="wordInputPlaceholder" data-i18n-attr="placeholder" placeholder="Enter words (separated by spaces or newlines)"></textarea>
+                        <button id="clearInputBtn" class="btn-clear-input" data-i18n="clearInput" data-i18n-attr="title" title="Clear">×</button>
+                    </div>
                 </div>
                 <div id="wordcardContent"></div>
                 <!-- 备案信息 -->

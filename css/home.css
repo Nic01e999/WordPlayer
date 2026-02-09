@@ -59,12 +59,21 @@
     gap: 0.5rem;
 }
 
+/* wordInput 包裹容器 */
+.word-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
 #wordSection textarea {
     font-family: 'Cormorant Garamond', 'Georgia', serif;
     flex: 1;
     width: 100%;
     min-height: 0;
     padding: 0.75rem;
+    padding-right: 2.5rem; /* 为清空按钮留出空间 */
     border: 1px solid var(--border-pink-light);
     border-radius: 0.75rem;
     background: var(--bg-container);
@@ -80,6 +89,49 @@
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 15px var(--shadow-pink-light);
+}
+
+/* 清空按钮 */
+.btn-clear-input {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 1px solid var(--border-pink-light);
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px var(--shadow-pink-light);
+    opacity: 0.6;
+}
+
+.btn-clear-input:hover {
+    opacity: 1;
+    background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
+    color: var(--text-primary);
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px var(--shadow-pink-light);
+}
+
+.btn-clear-input:active {
+    transform: scale(0.95);
+}
+
+/* 只读模式下，清空按钮更明显 */
+#wordInput.readonly-public ~ .btn-clear-input {
+    opacity: 0.9;
+    border-color: var(--border-pink-medium);
 }
 
 
@@ -1093,5 +1145,14 @@
         font-size: 0.75rem;
         padding: 0.5rem 1rem;
         bottom: 0.5rem;
+    }
+
+    /* 移动端清空按钮稍大一些，方便点击 */
+    .btn-clear-input {
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 1.5rem;
+        top: 0.4rem;
+        right: 0.4rem;
     }
 }

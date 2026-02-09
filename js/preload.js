@@ -452,6 +452,42 @@ export function initPreloadListeners() {
         });
     }
 
+    // 清空按钮点击事件
+    const clearInputBtn = $("clearInputBtn");
+    if (clearInputBtn && wordInput) {
+        clearInputBtn.addEventListener("click", () => {
+            console.log('[Clear] 清空按钮被点击');
+            console.log('[Server] 清空按钮被点击');
+
+            // 1. 清空 wordInput 内容
+            wordInput.value = '';
+
+            // 2. 移除只读状态（如果存在）
+            if (wordInput.classList.contains('readonly-public')) {
+                wordInput.classList.remove('readonly-public');
+                wordInput.removeAttribute('readonly');
+                console.log('[Clear] 已移除只读状态，用户可以重新输入');
+                console.log('[Server] 已移除只读状态，用户可以重新输入');
+            }
+
+            // 3. 恢复 Save 按钮状态
+            const saveBtn = $("saveListBtn");
+            if (saveBtn) {
+                saveBtn.textContent = t('save');
+                saveBtn.removeAttribute('data-is-copy-mode');
+                console.log('[Clear] Save 按钮已恢复为"保存"状态');
+                console.log('[Server] Save 按钮已恢复为"保存"状态');
+            }
+
+            // 4. 清理缓存（类似 Shift+Click Load 的效果）
+            startPreload(true);
+
+            // 5. 日志记录
+            console.log('[Clear] wordInput 内容已清空，缓存已清理');
+            console.log('[Server] wordInput 内容已清空，缓存已清理');
+        });
+    }
+
     // 延迟隐藏逻辑：鼠标移开后 1 秒隐藏
     let hideTimer = null;
     if (container) {

@@ -52,6 +52,7 @@ export default {
     load: '読み込み',
     save: '保存',
     update: '更新',
+    clearInput: 'クリア',
     wordInputPlaceholder: '単語を入力（スペースまたは改行で区切る）',
     reloading: '再読み込み中...',
     emptyTitle: '保存された単語カードがありません',
