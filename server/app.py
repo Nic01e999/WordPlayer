@@ -165,6 +165,12 @@ if HAS_SOCKETIO:
         emit('wordcard:update', data, room=f"user_{user_id}", include_self=False)
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """提供 favicon（ICO 格式）"""
+    return send_file(os.path.join(BASE_DIR, "favicon.ico"), mimetype='image/x-icon')
+
+
 @app.route("/")
 def index():
     """提供主页"""
