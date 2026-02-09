@@ -304,7 +304,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 监听设置变更（从服务端同步时更新 UI）
-    onSettingsChange((settings) => {
+    onSettingsChange((settings, changedKeys = []) => {
+        console.log('[设置变更] changedKeys:', changedKeys);
+
         // 更新目标语言内部状态
         // 注意：只有在没有输入内容时才应用 target_lang，避免覆盖自动检测的语言
         if (settings.target_lang) {
@@ -394,11 +396,15 @@ document.addEventListener("DOMContentLoaded", () => {
             'interval_ms', 'retry_count', 'dictate_provide', 'dictate_write', 'accent'
         ];
 
-        const hasPlaybackChange = playbackSettings.some(key => settings[key] !== undefined);
+        // 只检查真正变化的键，而不是检查对象中是否存在这些键
+        const hasPlaybackChange = changedKeys.some(key => playbackSettings.includes(key));
 
         if (hasPlaybackChange) {
+            console.log('[设置变更] 检测到播放相关设置变化，刷新当前模式');
             // 立即刷新当前模式以应用新设置
             refreshCurrentMode();
+        } else {
+            console.log('[设置变更] 未检测到播放相关设置变化，不刷新模式');
         }
     });
 });

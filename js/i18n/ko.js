@@ -177,6 +177,9 @@ export default {
     generating: '생성 중...',
     copySuccess: '클립보드에 복사되었습니다!',
     copyFailed: '복사 실패',
+    retryFailed: '틀린 단어 재시도',
+    retryComplete: '{num}번째 재시도 완료',
+    retryRound: '{num}번째 재시도',
 
     // 반복 모드
     playCount: '재생 {current}/{total}',

@@ -177,6 +177,9 @@ export default {
     generating: 'Generating...',
     copySuccess: 'Copied to clipboard!',
     copyFailed: 'Copy failed',
+    retryFailed: 'Retry Failed Words',
+    retryComplete: 'Retry Round {num} Complete',
+    retryRound: 'Retry Round {num}',
 
     // Repeater mode
     playCount: 'Play {current}/{total}',

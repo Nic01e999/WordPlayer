@@ -177,6 +177,9 @@ export default {
     generating: '生成中...',
     copySuccess: 'クリップボードにコピーしました！',
     copyFailed: 'コピー失敗',
+    retryFailed: '間違えた単語を再試行',
+    retryComplete: '第 {num} 回再試行完了',
+    retryRound: '第 {num} 回再試行',
 
     // リピーターモード
     playCount: '再生 {current}/{total}',

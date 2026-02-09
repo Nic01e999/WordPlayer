@@ -52,9 +52,22 @@ export function getSetting(key, defaultValue = null) {
  * @param {*} value - 设置值（当第一个参数是键时）
  */
 export function updateLocalSettings(keyOrSettings, value) {
+    // 记录变化的键
+    const changedKeys = [];
+
     if (typeof keyOrSettings === 'object') {
+        // 批量更新：记录所有变化的键
+        for (const key in keyOrSettings) {
+            if (userSettings[key] !== keyOrSettings[key]) {
+                changedKeys.push(key);
+            }
+        }
         Object.assign(userSettings, keyOrSettings);
     } else {
+        // 单个更新
+        if (userSettings[keyOrSettings] !== value) {
+            changedKeys.push(keyOrSettings);
+        }
         userSettings[keyOrSettings] = value;
     }
 
@@ -63,8 +76,8 @@ export function updateLocalSettings(keyOrSettings, value) {
         setLocale(userSettings.ui_lang);
     }
 
-    // 通知监听者
-    notifyListeners();
+    // 通知监听者（传入变化的键）
+    notifyListeners(changedKeys);
 }
 
 /**
@@ -79,9 +92,19 @@ export async function loadSettingsFromServer() {
     const data = await apiGet('/api/settings');
 
     if (data.settings) {
-        userSettings = { ...DEFAULT_SETTINGS, ...data.settings };
+        // 记录所有变化的键
+        const changedKeys = [];
+        const newSettings = { ...DEFAULT_SETTINGS, ...data.settings };
+
+        for (const key in newSettings) {
+            if (userSettings[key] !== newSettings[key]) {
+                changedKeys.push(key);
+            }
+        }
+
+        userSettings = newSettings;
         setLocale(userSettings.ui_lang);
-        notifyListeners();
+        notifyListeners(changedKeys);
         return { success: true, settings: userSettings };
     }
 
@@ -133,9 +156,17 @@ export async function saveSettingsToServer(settings) {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function resetSettings() {
+    // 记录所有变化的键
+    const changedKeys = [];
+    for (const key in DEFAULT_SETTINGS) {
+        if (userSettings[key] !== DEFAULT_SETTINGS[key]) {
+            changedKeys.push(key);
+        }
+    }
+
     userSettings = { ...DEFAULT_SETTINGS };
     setLocale(DEFAULT_SETTINGS.ui_lang);
-    notifyListeners();
+    notifyListeners(changedKeys);
 
     if (!isLoggedIn()) {
         return { success: true };
@@ -151,9 +182,19 @@ export async function resetSettings() {
 export function applySettings(settings) {
     if (!settings) return;
 
-    userSettings = { ...DEFAULT_SETTINGS, ...settings };
+    // 记录所有变化的键
+    const changedKeys = [];
+    const newSettings = { ...DEFAULT_SETTINGS, ...settings };
+
+    for (const key in newSettings) {
+        if (userSettings[key] !== newSettings[key]) {
+            changedKeys.push(key);
+        }
+    }
+
+    userSettings = newSettings;
     setLocale(userSettings.ui_lang);
-    notifyListeners();
+    notifyListeners(changedKeys);
 }
 
 /**
@@ -171,11 +212,12 @@ export function onSettingsChange(callback) {
 
 /**
  * 通知所有监听者
+ * @param {Array<string>} changedKeys - 变化的设置键列表
  */
-function notifyListeners() {
+function notifyListeners(changedKeys = []) {
     listeners.forEach(callback => {
         try {
-            callback(userSettings);
+            callback(userSettings, changedKeys);
         } catch (e) {
             console.error('Settings change callback error:', e);
         }

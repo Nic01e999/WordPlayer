@@ -642,3 +642,22 @@ export function initSettingsToggle() {
 
     console.log('设置面板点击切换功能已初始化');
 }
+
+/**
+ * 将单词条目列表更新到 textarea
+ * @param {Array} entries - 单词条目数组 [{word, definition}, ...]
+ */
+export function updateTextareaFromEntries(entries) {
+    const textarea = $("wordInput");
+    if (!textarea) {
+        console.warn('[updateTextareaFromEntries] 未找到 textarea');
+        return;
+    }
+
+    const text = entries
+        .map(e => e.definition ? `${e.word}:${e.definition}` : e.word)
+        .join('\n');
+
+    textarea.value = text;
+    console.log('[updateTextareaFromEntries] 已更新 textarea，单词数:', entries.length);
+}

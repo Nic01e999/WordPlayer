@@ -3,10 +3,10 @@
  */
 
 import { preloadCache } from '../state.js';
-import { $, logToWorkplace, escapeHtml } from '../utils.js';
+import { $, logToWorkplace, escapeHtml, updateTextareaFromEntries } from '../utils.js';
 import { stopAudio, speakWord, updatePlayPauseBtn } from '../audio.js';
 import { createPositionDragger } from '../utils/drag.js';
-import { t } from '../i18n/index.js';
+import { t, onLocaleChange } from '../i18n/index.js';
 
 /**
  * 格式化翻译文本：转换换行符并限制显示行数
@@ -41,6 +41,13 @@ export function setQuizDeps(deps) {
     _getState = deps.getState;
     _setState = deps.setState;
 }
+
+// 注册语言变更监听器
+onLocaleChange(() => {
+    console.log('[Quiz] 检测到语言变更，刷新动态元素');
+    refreshPopupLanguage();
+    refreshResultsLanguage();
+});
 
 export function showPopup() {
     const s = _getState?.();
@@ -246,7 +253,8 @@ export function updateWorkplace() {
     const wp = $("dictationWorkplace");
     if (!wp || !s) return;
 
-    wp.innerHTML = s.attempts.map((attempts, i) => {
+    // 生成当前轮次的 HTML（原有逻辑）
+    const currentRoundHTML = s.attempts.map((attempts, i) => {
         if (!attempts.length) return '';  // 只显示已答题目
 
         const result = s.results[i];
@@ -283,11 +291,103 @@ export function updateWorkplace() {
                 </div>`;
     }).join('');
 
+    // 如果有快照，先恢复快照，再追加当前内容
+    if (s.workplaceSnapshot) {
+        console.log('[updateWorkplace] 恢复快照 + 追加新内容');
+        wp.innerHTML = s.workplaceSnapshot + currentRoundHTML;
+    } else {
+        // 首次听写，直接设置
+        console.log('[updateWorkplace] 首次听写，直接设置内容');
+        wp.innerHTML = currentRoundHTML;
+    }
+
+    // 滚动到底部
     setTimeout(() => {
         const view = document.getElementById("dictationView");
         if (view) {
             view.scrollTop = view.scrollHeight;
         }
+    }, 50);
+}
+
+/**
+ * 计算听写统计数据
+ */
+function calculateStatistics(state) {
+    let correct = 0, warning = 0, failed = 0;
+    state.results.forEach((r, i) => {
+        if (r?.status === "correct" && state.attempts[i].length === 1) {
+            correct++;
+        } else if (r?.status === "correct") {
+            warning++;
+        } else if (r?.status === "failed") {
+            failed++;
+        }
+    });
+    return { correct, warning, failed };
+}
+
+/**
+ * 保存当前轮次到历史记录
+ */
+function saveRoundToHistory(state) {
+    const { correct, warning, failed } = calculateStatistics(state);
+    const score = ((correct + warning * 0.5) / state.entries.length * 100).toFixed(1);
+
+    if (!state.retryHistory) {
+        state.retryHistory = [];
+    }
+
+    state.retryHistory.push({
+        round: state.currentRound,
+        roundType: state.currentRound === 0 ? 'initial' : 'retry',
+        entries: JSON.parse(JSON.stringify(state.entries)),
+        attempts: JSON.parse(JSON.stringify(state.attempts)),
+        results: JSON.parse(JSON.stringify(state.results)),
+        speakTexts: [...state.speakTexts],
+        provideTexts: [...state.provideTexts],
+        expectTexts: [...state.expectTexts],
+        isCustomWord: [...state.isCustomWord],
+        dictateProvide: state.dictateProvide,
+        dictateWrite: state.dictateWrite,
+        timestamp: Date.now(),
+        statistics: { correct, warning, failed, score }
+    });
+}
+
+/**
+ * 获取错误单词的索引列表
+ */
+function getFailedIndices(state) {
+    return state.results
+        .map((r, i) => {
+            const isFailed = r?.status === 'failed';
+            const isWarning = state.attempts[i].length > 1;
+            return (isFailed || isWarning) ? i : -1;
+        })
+        .filter(i => i !== -1);
+}
+
+/**
+ * 在仿真纸上添加重试分隔线
+ */
+function addRetryDivider(roundNumber) {
+    const wp = document.getElementById("dictationWorkplace");
+    if (!wp) return;
+
+    const divider = document.createElement('div');
+    divider.className = 'retry-divider';
+    divider.innerHTML = `
+        <div class="retry-divider-line"></div>
+        <div class="retry-divider-text">${t('retryRound', { num: roundNumber })}</div>
+        <div class="retry-divider-line"></div>
+    `;
+    wp.appendChild(divider);
+
+    // 自动滚动到底部
+    setTimeout(() => {
+        const view = document.getElementById("dictationView");
+        if (view) view.scrollTop = view.scrollHeight;
     }, 50);
 }
 
@@ -297,51 +397,109 @@ export function showResults() {
 
     if (!s) return;
 
-    let correct = 0;
-    let warning = 0;
-    let failed = 0;
+    // 保存当前轮次到历史
+    saveRoundToHistory(s);
 
-    s.results.forEach((r, i) => {
-        if (r?.status === "correct" && s.attempts[i].length === 1) {
-            correct++;
-        } else if (r?.status === "correct") {
-            warning++;
-        } else if (r?.status === "failed") {
-            failed++;
-        }
-    });
-
+    const { correct, warning, failed } = calculateStatistics(s);
     const score = ((correct + warning * 0.5) / s.entries.length * 100).toFixed(1);
 
-    // 保存结果数据供分享使用（深拷贝）
+    // 判断是否有错误
+    const hasErrors = failed > 0 || warning > 0;
+
+    // 根据轮次生成标题
+    const titleKey = s.currentRound === 0 ? 'dictationComplete' : 'retryComplete';
+    const titleParams = s.currentRound === 0 ? {} : { num: s.currentRound };
+
+    // 保存完整结果供分享使用
     lastDictationResult = {
-        state: JSON.parse(JSON.stringify(s)),
-        score,
-        correct,
-        warning,
-        failed
+        retryHistory: s.retryHistory || [],
+        currentRound: s.currentRound || 0
     };
 
     logToWorkplace(`
-        <div class="results-box">
-            <h3>${t('dictationComplete')}</h3>
+        <div class="results-box" data-round="${s.currentRound}">
+            <h3>${t(titleKey, titleParams)}</h3>
             <p><strong>${t('score')}: ${score}</strong></p>
             <p>${t('firstTryCorrect')}: ${correct}</p>
             <p>${t('multipleTries')}: ${warning}</p>
             <p>${t('failed')}: ${failed}</p>
-            <button id="shareResultBtn" class="share-btn">${t('shareResult')}</button>
+            <div class="results-actions">
+                ${hasErrors ? `<button id="retryFailedBtn" class="retry-btn">${t('retryFailed')}</button>` : ''}
+                <button id="shareResultBtn" class="share-btn">${t('shareResult')}</button>
+            </div>
         </div>
     `);
 
-    // 绑定分享按钮事件
+    // 绑定按钮事件
     setTimeout(() => {
-        const btn = document.getElementById('shareResultBtn');
-        if (btn) {
-            btn.addEventListener('click', () => shareResult(lastDictationResult));
+        const retryBtn = document.getElementById('retryFailedBtn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', startRetry);
+        }
+
+        const shareBtn = document.getElementById('shareResultBtn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', () => shareResult(lastDictationResult));
         }
     }, 100);
 
-    _setState?.(null);
+    // 不清空 state，保留历史记录以支持多轮重试
+    // _setState?.(null);
+}
+
+/**
+ * 开始错题重听
+ */
+export function startRetry() {
+    const s = _getState?.();
+    if (!s) return;
+
+    // 删除当前 results-box 的按钮（因为要开始新一轮了）
+    const currentResultsBox = document.querySelector('.results-box:last-of-type');
+    if (currentResultsBox) {
+        const actionsContainer = currentResultsBox.querySelector('.results-actions');
+        if (actionsContainer) {
+            actionsContainer.remove();
+            console.log('[startRetry] 已删除当前结果框的按钮');
+        }
+    }
+
+    // 获取错误单词的索引
+    const failedIndices = getFailedIndices(s);
+    if (failedIndices.length === 0) return;
+
+    // 获取错误的单词条目
+    const failedEntries = failedIndices.map(i => s.entries[i]);
+
+    // 更新 textarea 显示错题集
+    updateTextareaFromEntries(failedEntries);
+
+    // 保存当前 workplace 的完整内容（在添加分隔线之前）
+    const wp = document.getElementById("dictationWorkplace");
+    if (wp) {
+        s.workplaceSnapshot = wp.innerHTML;
+        console.log('[startRetry] 已保存 workplace 快照');
+    }
+
+    // 添加分隔线
+    addRetryDivider(s.currentRound + 1);
+
+    // 构建新的 state（只包含错误单词）
+    s.entries = failedEntries;  // 直接使用 failedEntries
+    s.speakTexts = failedIndices.map(i => s.speakTexts[i]);
+    s.provideTexts = failedIndices.map(i => s.provideTexts[i]);
+    s.expectTexts = failedIndices.map(i => s.expectTexts[i]);
+    s.isCustomWord = failedIndices.map(i => s.isCustomWord[i]);
+
+    // 重置状态
+    s.currentIndex = 0;
+    s.attempts = s.entries.map(() => []);
+    s.results = s.entries.map(() => null);
+    s.currentRound++;
+    s.isPaused = false;
+
+    // 开始新一轮听写
+    showPopup();
 }
 
 export function playPause() {
@@ -373,16 +531,14 @@ async function shareResult(result) {
     const btn = document.getElementById('shareResultBtn');
     if (!btn) return;
 
-    const { state, score, correct, warning, failed } = result;
-
     // 显示加载状态
     const originalText = btn.textContent;
     btn.textContent = t('generating');
     btn.disabled = true;
 
     try {
-        // 1. 创建隐藏的长图容器
-        const container = createShareContainer(state, score, correct, warning, failed);
+        // 1. 创建隐藏的长图容器（包含所有轮次）
+        const container = createShareContainerWithRetries(result);
         document.body.appendChild(container);
 
         // 2. 等待字体和样式加载
@@ -496,7 +652,7 @@ function createShareContainer(state, score, correct, warning, failed) {
             }
 
             const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">${state.entries[i].word} - ${formatTranslation(state.entries[i].definition || preloadCache.translations[state.entries[i].word] || '')}</span>`
+                ? `<br><span class="correct">${state.entries[i].word} :<br>${formatTranslation(state.entries[i].definition || preloadCache.translations[state.entries[i].word] || '')}</span>`
                 : '';
 
             return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
@@ -535,4 +691,193 @@ function createShareContainer(state, score, correct, warning, failed) {
     `;
 
     return container;
+}
+
+/**
+ * 生成单个轮次的详细记录 HTML
+ */
+function generateRoundDetails(round) {
+    return round.attempts.map((attempts, i) => {
+        if (!attempts.length) return '';
+
+        const result = round.results[i];
+        const rows = attempts.map((a, j) => {
+            const isLast = j === attempts.length - 1;
+            let symbol, cls;
+
+            if (a.isCorrect) {
+                symbol = "";
+                cls = "correct";
+            } else if (isLast && result?.status === "failed") {
+                symbol = "X";
+                cls = "failed";
+            } else {
+                symbol = "!";
+                cls = "warning";
+            }
+
+            const extra = (isLast && result?.status === "failed")
+                ? `<br><span class="correct">${round.entries[i].word} :<br>${formatTranslation(round.entries[i].definition || preloadCache.translations[round.entries[i].word] || '')}</span>`
+                : '';
+
+            return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
+        }).join('');
+
+        const provideText = round.provideTexts[i];
+        const isCustom = round.isCustomWord[i];
+        const shouldShowProvide = isCustom && (round.dictateProvide !== round.dictateWrite);
+
+        return `
+            <div class="result-item">
+                <span class="result-index">${i + 1}.</span>
+                ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
+                <div class="result-attempts">${rows}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 创建包含多轮重试记录的分享容器
+ */
+function createShareContainerWithRetries(result) {
+    const container = document.createElement('div');
+    container.id = 'shareContainer';
+    container.className = 'share-container';
+
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // 标题
+    let html = `
+        <div class="share-header">
+            <h2>${t('dictationRecord')}</h2>
+            <p class="share-timestamp">${timestamp}</p>
+        </div>
+    `;
+
+    // 遍历所有轮次
+    const history = result.retryHistory || [];
+    history.forEach((round, index) => {
+        const isFirstRound = index === 0;
+        const titleKey = isFirstRound ? 'dictationComplete' : 'retryComplete';
+        const titleParams = isFirstRound ? {} : { num: index };
+
+        // 添加分隔线（第二轮及之后）
+        if (!isFirstRound) {
+            html += `
+                <div class="share-retry-divider">
+                    <div class="retry-divider-line"></div>
+                    <div class="retry-divider-text">${t('retryRound', { num: index })}</div>
+                    <div class="retry-divider-line"></div>
+                </div>
+            `;
+        }
+
+        // 汇总信息
+        html += `
+            <div class="share-summary">
+                <h3>${t(titleKey, titleParams)}</h3>
+                <div class="share-score">${t('score')}: ${round.statistics.score}</div>
+                <div class="share-stats">
+                    <span>${t('firstTryCorrect')}: ${round.statistics.correct}</span>
+                    <span>${t('multipleTries')}: ${round.statistics.warning}</span>
+                    <span>${t('failed')}: ${round.statistics.failed}</span>
+                </div>
+            </div>
+        `;
+
+        // 详细记录
+        const detailsHTML = generateRoundDetails(round);
+        html += `<div class="share-details">${detailsHTML}</div>`;
+    });
+
+    container.innerHTML = html;
+    return container;
+}
+
+/**
+ * 刷新答题弹窗的语言文本
+ */
+function refreshPopupLanguage() {
+    const popup = document.getElementById('dictationPopup');
+    if (!popup) return;
+
+    const s = _getState?.();
+    if (!s) return;
+
+    const i = s.currentIndex;
+    const retries = s.attempts[i]?.length || 0;
+    const isCustom = s.isCustomWord[i];
+
+    // 更新标题
+    const provideText = s.provideTexts[i];
+    let titleHtml;
+    if (isCustom && s.dictateProvide !== s.dictateWrite) {
+        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
+    } else {
+        titleHtml = t('wordNum', { num: i + 1 });
+    }
+    const titleEl = popup.querySelector('h3');
+    if (titleEl) titleEl.innerHTML = titleHtml;
+
+    // 更新"尝试次数"文本
+    const writeHint = isCustom
+        ? (s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
+        : t('writeWord');
+    const retryInfo = popup.querySelector('#retryInfo');
+    if (retryInfo) {
+        retryInfo.textContent = `${t('attempts')}: ${retries}/${s.maxRetry} \u00a0\u00a0  ${writeHint}`;
+    }
+
+    // 更新输入框placeholder
+    const input = popup.querySelector('#dictationInput');
+    if (input) {
+        input.placeholder = t('typeWordPlaceholder');
+    }
+
+    console.log('[refreshPopupLanguage] 答题弹窗语言已更新');
+}
+
+/**
+ * 刷新结果框的语言文本
+ */
+function refreshResultsLanguage() {
+    const resultsBoxes = document.querySelectorAll('.results-box');
+    if (resultsBoxes.length === 0) return;
+
+    const s = _getState?.();
+    if (!s || !s.retryHistory) return;
+
+    resultsBoxes.forEach((box, boxIndex) => {
+        const round = parseInt(box.getAttribute('data-round') || '0');
+        const history = s.retryHistory[boxIndex];
+
+        if (!history) return;
+
+        const { correct, warning, failed, score } = history.statistics;
+        const hasErrors = failed > 0 || warning > 0;
+
+        // 更新标题
+        const titleKey = round === 0 ? 'dictationComplete' : 'retryComplete';
+        const titleParams = round === 0 ? {} : { num: round };
+        const titleEl = box.querySelector('h3');
+        if (titleEl) titleEl.textContent = t(titleKey, titleParams);
+
+        // 更新统计信息
+        const paragraphs = box.querySelectorAll('p');
+        if (paragraphs[0]) paragraphs[0].innerHTML = `<strong>${t('score')}: ${score}</strong>`;
+        if (paragraphs[1]) paragraphs[1].textContent = `${t('firstTryCorrect')}: ${correct}`;
+        if (paragraphs[2]) paragraphs[2].textContent = `${t('multipleTries')}: ${warning}`;
+        if (paragraphs[3]) paragraphs[3].textContent = `${t('failed')}: ${failed}`;
+
+        // 更新按钮文本
+        const retryBtn = box.querySelector('.retry-btn');
+        if (retryBtn) retryBtn.textContent = t('retryFailed');
+
+        const shareBtn = box.querySelector('.share-btn');
+        if (shareBtn) shareBtn.textContent = t('shareResult');
+    });
+
+    console.log('[refreshResultsLanguage] 结果框语言已更新');
 }

@@ -328,7 +328,7 @@ body.dictation-mode #dictationWorkplace::after {
         linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
 
     border: 1px solid var(--border-paper-medium);
-    border-radius: 0.3125rem;
+    border-radius: 0.5rem;
     box-shadow:
         3px 4px 15px var(--shadow-brown),
         inset 0 1px 0 var(--white-strong);
@@ -389,14 +389,13 @@ body.dictation-mode #dictationWorkplace::after {
 
 /* 分享按钮 */
 .share-btn {
-    margin-top: 1.25rem;
-    padding: 0.625rem 1.875rem;
+    padding: 0.5rem 1.5rem;
     font-family: 'Caveat', cursive;
     font-size: 1.125rem;
     color: var(--text-dark);
     background: linear-gradient(180deg, var(--bg-paper-start) 0%, var(--bg-paper-mid) 100%);
     border: 2px solid var(--border-paper-medium);
-    border-radius: 0.3125rem;
+    border-radius: 3rem;
     cursor: pointer;
     transition: all 0.3s;
     box-shadow: 2px 2px 5px var(--shadow-brown);
@@ -565,4 +564,132 @@ body.dictation-mode #dictationWorkplace::after {
 
 .share-details .failed {
     color: var(--status-error);
+}
+
+/* ===== 错题重听功能样式 ===== */
+
+/* 重试分隔线 */
+.retry-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem 0;
+    padding: 1rem 0;
+}
+
+.retry-divider-line {
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--accent-primary) 0px,
+        var(--accent-primary) 10px,
+        transparent 10px,
+        transparent 15px
+    );
+    opacity: 0.6;
+}
+
+.retry-divider-text {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1rem;
+    color: var(--text-accent);
+    padding: 0 1rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+    white-space: nowrap;
+}
+
+/* 结果操作按钮组 */
+.results-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+/* 重试按钮：放在中间列，自动居中 */
+.retry-btn {
+    grid-column: 3;
+}
+
+/* 分享按钮：放在右侧列，靠右对齐 */
+.share-btn {
+    grid-column: 4;
+    justify-self: end;
+}
+
+/* 当只有分享按钮时（全对的情况），使用flex居中显示 */
+.results-actions:has(.share-btn:only-child) {
+    display: flex;
+    justify-content: center;
+}
+
+/* 移动端响应式：小屏幕下恢复单列布局 */
+@media (max-width: 700px) {
+    .results-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .retry-btn,
+    .share-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+/* 重试按钮样式 */
+.retry-btn {
+    padding: 0.625rem 1.5rem;
+    font-family: 'Caveat', cursive;
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    background: linear-gradient(180deg, var(--btn-retry-start) 0%, var(--btn-retry-end) 100%);
+    border: 2px solid var(--border-paper-medium);
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 2px 5px var(--shadow-brown);
+}
+
+.retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 8px var(--shadow-brown-medium);
+    background: linear-gradient(180deg, var(--btn-retry-hover-start) 0%, var(--btn-retry-hover-end) 100%);
+}
+
+.retry-btn:active {
+    transform: translateY(0);
+    box-shadow: 1px 1px 3px var(--shadow-brown);
+}
+
+/* 分享长图中的分隔线 */
+.share-retry-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0;
+    padding: 0.75rem 0;
+}
+
+.share-retry-divider .retry-divider-line {
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--accent-primary) 0px,
+        var(--accent-primary) 8px,
+        transparent 8px,
+        transparent 12px
+    );
+    opacity: 0.5;
+}
+
+.share-retry-divider .retry-divider-text {
+    font-size: 0.875rem;
+    padding: 0 0.75rem;
+    letter-spacing: 0.05rem;
 }

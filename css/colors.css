@@ -159,6 +159,18 @@
     /* 悬停渐变终点 | .btn-sound:hover, .btn-pause:hover */
     --btn-hover-end: #ffd1dc;
 
+    /* 重试按钮渐变起点 | .retry-btn */
+    --btn-retry-start: #fff5e6;
+
+    /* 重试按钮渐变终点 | .retry-btn */
+    --btn-retry-end: #ffe8cc;
+
+    /* 重试按钮悬停起点 | .retry-btn:hover */
+    --btn-retry-hover-start: #fff0d9;
+
+    /* 重试按钮悬停终点 | .retry-btn:hover */
+    --btn-retry-hover-end: #ffd9b3;
+
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -621,6 +633,10 @@
     --btn-pause-end: #42222a;
     --btn-hover-start: #5a3842;
     --btn-hover-end: #4a2832;
+    --btn-retry-start: #3a3a2f;
+    --btn-retry-end: #2f2f24;
+    --btn-retry-hover-start: #4a4a3f;
+    --btn-retry-hover-end: #3f3f34;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -869,6 +885,10 @@
     --btn-pause-end: #b6e8c1;
     --btn-hover-start: #e4f9e9;
     --btn-hover-end: #d1f0d8;
+    --btn-retry-start: #fff5e6;
+    --btn-retry-end: #ffe8cc;
+    --btn-retry-hover-start: #fff0d9;
+    --btn-retry-hover-end: #ffd9b3;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -1103,6 +1123,10 @@
     --btn-pause-end: #234523;
     --btn-hover-start: #3a5a3a;
     --btn-hover-end: #2a4a2a;
+    --btn-retry-start: #3a3a2f;
+    --btn-retry-end: #2f2f24;
+    --btn-retry-hover-start: #4a4a3f;
+    --btn-retry-hover-end: #3f3f34;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -1352,6 +1376,10 @@
     --btn-pause-end: #b6d8f0;
     --btn-hover-start: #e4f3fc;
     --btn-hover-end: #d1e8f8;
+    --btn-retry-start: #fff5e6;
+    --btn-retry-end: #ffe8cc;
+    --btn-retry-hover-start: #fff0d9;
+    --btn-retry-hover-end: #ffd9b3;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -1586,6 +1614,10 @@
     --btn-pause-end: #233a4a;
     --btn-hover-start: #3a5062;
     --btn-hover-end: #2a4052;
+    --btn-retry-start: #3a3a2f;
+    --btn-retry-end: #2f2f24;
+    --btn-retry-hover-start: #4a4a3f;
+    --btn-retry-hover-end: #3f3f34;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -1834,6 +1866,10 @@
     --btn-pause-end: #d8b6f0;
     --btn-hover-start: #f4e4fc;
     --btn-hover-end: #e8d1f8;
+    --btn-retry-start: #fff5e6;
+    --btn-retry-end: #ffe8cc;
+    --btn-retry-hover-start: #fff0d9;
+    --btn-retry-hover-end: #ffd9b3;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */
@@ -2068,6 +2104,10 @@
     --btn-pause-end: #2e234a;
     --btn-hover-start: #453862;
     --btn-hover-end: #352852;
+    --btn-retry-start: #3a3a2f;
+    --btn-retry-end: #2f2f24;
+    --btn-retry-hover-start: #4a4a3f;
+    --btn-retry-hover-end: #3f3f34;
     /* }}} */
 
     /* {{{ 阴影 (shadow-) */

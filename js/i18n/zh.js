@@ -177,6 +177,9 @@ export default {
     generating: '生成中...',
     copySuccess: '已复制到剪贴板！',
     copyFailed: '复制失败',
+    retryFailed: '错题重听',
+    retryComplete: '第 {num} 次重试完成',
+    retryRound: '第 {num} 次重试',
 
     // 复读模式
     playCount: '播放 {current}/{total}',
