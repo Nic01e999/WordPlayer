@@ -185,7 +185,7 @@
 /* 公开卡片只读样式 - 轻微禁用提示 */
 #wordInput.readonly-public {
     background: var(--bg-container);
-    background-color: #eeeeeedd;
+    background-color: var(--readonly-bg-textarea);
     cursor: not-allowed;
     border: 1px solid var(--border-pink-light);
     color: var(--text-secondary);

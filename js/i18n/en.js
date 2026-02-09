@@ -53,7 +53,7 @@ export default {
     save: 'Save',
     update: 'Update',
     clearInput: 'Clear',
-    wordInputPlaceholder: 'Enter words (separated by spaces or newlines)',
+    wordInputPlaceholder: 'Enter words\n(separated by spaces or newlines)',
     reloading: 'Reloading...',
     emptyTitle: 'No saved word lists',
     emptyHint: 'Enter words in the sidebar and click Save',

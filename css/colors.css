@@ -199,6 +199,8 @@
     --white-medium: rgba(255, 255, 255, 0.5);
     /* 80%白 | 强透明 */
     --white-strong: rgba(255, 255, 255, 0.8);
+
+    --readonly-bg-textarea: rgba(244, 244, 244, 221);
     /* }}} */
 
 }
@@ -245,6 +247,8 @@
     --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
     --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
     --dark-loading-text: rgba(255, 255, 255, 0.8);
+    --readonly-bg-textarea: rgba(33, 33, 33, 222);
+
     /* }}} */
 
 }

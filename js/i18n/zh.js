@@ -53,7 +53,7 @@ export default {
     save: '保存',
     update: '更新',
     clearInput: '清空',
-    wordInputPlaceholder: '输入单词（用空格或换行分隔）',
+    wordInputPlaceholder: '输入单词\n(用空格或换行分隔)',
     reloading: '重新加载中...',
     emptyTitle: '暂无保存的单词卡',
     emptyHint: '在侧边栏输入单词后点击保存',
