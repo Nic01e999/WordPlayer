@@ -94,13 +94,13 @@
 /* 清空按钮 */
 .btn-clear-input {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0.25rem;
+    right: 0.25rem;
     width: 1.5rem;
     height: 1.5rem;
     padding: 0;
-    border: 1px solid var(--border-pink-light);
-    border-radius: 50%;
+    border: 0px solid var(--border-pink-light);
+    border-radius: 40%;
     background: linear-gradient(135deg, var(--white-button) 0%, var(--white-button-soft) 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -108,7 +108,7 @@
     font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -120,7 +120,7 @@
     opacity: 1;
     background: linear-gradient(135deg, var(--white-button-hover) 0%, var(--white-button-hover-soft) 100%);
     color: var(--text-primary);
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(90deg);
     box-shadow: 0 4px 10px var(--shadow-pink-light);
 }
 

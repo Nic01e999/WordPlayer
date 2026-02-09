@@ -247,7 +247,7 @@
     --dark-button-load-text-hover: rgba(255, 255, 255, 0.95);
     --dark-button-load-shadow: rgba(0, 0, 0, 0.3);
     --dark-loading-text: rgba(255, 255, 255, 0.8);
-    --readonly-bg-textarea: rgba(33, 33, 33, 222);
+    --readonly-bg-textarea: rgba(44, 44, 44, 0.4);
 
     /* }}} */
 
