@@ -75,6 +75,13 @@ export function onLocaleChange(callback) {
  */
 export function updatePageTexts() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
+        // 跳过处于特殊模式的按钮（如公开卡片的"创建副本"按钮）
+        if (el.hasAttribute('data-is-copy-mode')) {
+            const isCopyMode = el.getAttribute('data-is-copy-mode') === 'true';
+            el.textContent = t(isCopyMode ? 'createCopy' : 'save');
+            return;
+        }
+
         const key = el.getAttribute('data-i18n');
         const attr = el.getAttribute('data-i18n-attr');
 

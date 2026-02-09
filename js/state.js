@@ -77,15 +77,17 @@ export function setActiveMode(mode) {
  */
 export let loadedWordcard = {
     name: null,
-    originalContent: null
+    originalContent: null,
+    isPublic: false
 };
 
 /**
  * 设置当前加载的单词卡信息
  */
-export function setLoadedWordcard(name, content) {
+export function setLoadedWordcard(name, content, isPublic = false) {
     loadedWordcard.name = name;
     loadedWordcard.originalContent = content;
+    loadedWordcard.isPublic = isPublic;
 }
 
 /**
@@ -94,4 +96,5 @@ export function setLoadedWordcard(name, content) {
 export function clearLoadedWordcard() {
     loadedWordcard.name = null;
     loadedWordcard.originalContent = null;
+    loadedWordcard.isPublic = false;
 }

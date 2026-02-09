@@ -248,5 +248,12 @@ export default {
     searching: '搜索中...',
     noResults: '暂无结果',
     tryDifferentKeywords: '试试其他关键词吧',
-    folderInvalid: '已失效'
+    folderInvalid: '已失效',
+
+    // 公开卡片副本功能
+    createCopy: '创建副本',
+    copySuffix: '-副本',
+    createCopyAndRename: '创建副本并命名',
+    copyCreatedSuccess: '副本创建成功',
+    cannotModifyPublicCard: '无法修改公开卡片，请使用「创建副本」功能'
 };

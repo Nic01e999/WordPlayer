@@ -181,3 +181,23 @@
         font-size: 1.5rem;
     }
 }
+
+/* 公开卡片只读样式 - 轻微禁用提示 */
+#wordInput.readonly-public {
+    background: var(--bg-container);
+    background-color: #eeeeeedd;
+    cursor: not-allowed;
+    border: 1px solid var(--border-pink-light);
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+#wordInput.readonly-public::placeholder {
+    color: var(--text-placeholder);
+}
+
+#wordInput.readonly-public:focus {
+    outline: none;
+    border-color: var(--border-pink-light);
+}
+

@@ -248,5 +248,12 @@ export default {
     searching: '검색 중...',
     noResults: '결과 없음',
     tryDifferentKeywords: '다른 키워드를 시도해보세요',
-    folderInvalid: '무효'
+    folderInvalid: '무효',
+
+    // 공개 카드 복사 기능
+    createCopy: '복사본 만들기',
+    copySuffix: '-복사본',
+    createCopyAndRename: '복사본 생성 및 이름 변경',
+    copyCreatedSuccess: '복사본이 생성되었습니다',
+    cannotModifyPublicCard: '공개 카드를 수정할 수 없습니다. \'복사본 만들기\' 기능을 사용하세요'
 };

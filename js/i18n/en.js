@@ -248,5 +248,12 @@ export default {
     searching: 'Searching...',
     noResults: 'No Results',
     tryDifferentKeywords: 'Try different keywords',
-    folderInvalid: 'Invalid'
+    folderInvalid: 'Invalid',
+
+    // Public card copy functionality
+    createCopy: 'Make Copy',
+    copySuffix: '-copy',
+    createCopyAndRename: 'Create Copy and Rename',
+    copyCreatedSuccess: 'Copy created successfully',
+    cannotModifyPublicCard: 'Cannot modify public card, please use \'Make Copy\' function'
 };

@@ -248,5 +248,12 @@ export default {
     searching: '検索中...',
     noResults: '結果なし',
     tryDifferentKeywords: '他のキーワードを試してください',
-    folderInvalid: '無効'
+    folderInvalid: '無効',
+
+    // 公開カードのコピー機能
+    createCopy: 'コピーを作成',
+    copySuffix: '-コピー',
+    createCopyAndRename: 'コピーを作成して名前を変更',
+    copyCreatedSuccess: 'コピーが作成されました',
+    cannotModifyPublicCard: '公開カードを変更できません。「コピーを作成」機能を使用してください'
 };

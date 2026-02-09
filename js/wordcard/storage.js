@@ -3,7 +3,7 @@
  * 纯服务端存储，不再使用 localStorage 存储单词卡数据
  */
 
-import { $, detectLanguageFromInput, setTargetLang, updateAccentSelectorVisibility } from '../utils.js';
+import { $, detectLanguageFromInput, setTargetLang, updateAccentSelectorVisibility, showToast } from '../utils.js';
 import { t } from '../i18n/index.js';
 import { preloadCache, setLoadedWordcard } from '../state.js';
 import { startPreload } from '../preload.js';
@@ -283,7 +283,8 @@ export async function loadWordcard(cardId) {
     }
 
     const name = list.name;
-    console.log('[Storage] loadWordcard 通过ID加载:', name, 'ID:', cardId);
+    const isPublic = list.isPublic || false;
+    console.log('[Storage] loadWordcard 通过ID加载:', name, 'ID:', cardId, 'isPublic:', isPublic);
 
     // 重置预加载缓存
     preloadCache.loadId++;
@@ -293,7 +294,34 @@ export async function loadWordcard(cardId) {
 
     // 设置 textarea 内容
     $("wordInput").value = list.words;
-    setLoadedWordcard(name, list.words);
+    setLoadedWordcard(name, list.words, isPublic);
+
+    // 如果是公开卡片，设置为只读
+    const wordInput = $("wordInput");
+    const saveBtn = $("saveListBtn");
+
+    if (isPublic) {
+        wordInput.setAttribute('readonly', 'readonly');
+        wordInput.classList.add('readonly-public');
+
+        // 改变按钮文本为"创建副本"
+        if (saveBtn) {
+            saveBtn.textContent = t('createCopy');
+            saveBtn.setAttribute('data-is-copy-mode', 'true');
+        }
+
+        console.log('[Storage] 公开卡片已设置为只读');
+        console.log('[网页控制台] 公开卡片已设置为只读');
+    } else {
+        wordInput.removeAttribute('readonly');
+        wordInput.classList.remove('readonly-public');
+
+        // 恢复按钮文本为"保存"
+        if (saveBtn) {
+            saveBtn.textContent = t('save');
+            saveBtn.removeAttribute('data-is-copy-mode');
+        }
+    }
 
     // 自动检测语言
     const detected = detectLanguageFromInput(list.words);
@@ -316,6 +344,14 @@ export async function updateWordcard(name) {
     if (!words || !name) return false;
 
     if (!_wordcardsCache[name]) return false;
+
+    // 安全检查 - 禁止更新公开卡片
+    if (_wordcardsCache[name].isPublic) {
+        console.error('[Storage] 禁止更新公开卡片:', name);
+        console.error('[网页控制台] 禁止更新公开卡片:', name);
+        showToast(t('cannotModifyPublicCard'), 'error');
+        return false;
+    }
 
     if (!isLoggedIn()) {
         showLoginDialog();
