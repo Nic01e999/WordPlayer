@@ -42,21 +42,22 @@ export function applyTheme({ color, mode }) {
 
     const html = document.documentElement;
 
-    // 默认 pink + light 不需要任何属性
-    if (color === 'pink' && mode === 'light') {
-        delete html.dataset.themeColor;
-        delete html.dataset.themeMode;
-    } else {
-        html.dataset.themeColor = color;
-        html.dataset.themeMode = mode;
-    }
+    // ✅ 永远显式设置主题（包括默认）
+    html.dataset.themeColor = color;
+    html.dataset.themeMode = mode;
 
     // 更新 UI 中的单选按钮选择状态
-    const colorRadio = document.querySelector(`input[name="theme-color"][value="${color}"]`);
-    const modeRadio = document.querySelector(`input[name="theme-mode"][value="${mode}"]`);
+    const colorRadio = document.querySelector(
+        `input[name="theme-color"][value="${color}"]`
+    );
+    const modeRadio = document.querySelector(
+        `input[name="theme-mode"][value="${mode}"]`
+    );
+
     if (colorRadio) colorRadio.checked = true;
     if (modeRadio) modeRadio.checked = true;
 }
+
 
 /**
  * 保存主题偏好到 localStorage
