@@ -131,6 +131,8 @@ export default {
     // 진행 상황 표시
     progressTranslation: '번역',
     progressAudio: '오디오',
+    progressExamples: '예문',
+    progressLemma: '어근',
 
     // 오류 메시지
     errorNotFound: '번역 실패: 단어를 찾을 수 없습니다',

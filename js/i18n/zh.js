@@ -131,6 +131,8 @@ export default {
     // 进度显示
     progressTranslation: '翻译',
     progressAudio: '音频',
+    progressExamples: '例句',
+    progressLemma: '词根',
 
     // 错误消息
     errorNotFound: '翻译失败: 未找到该单词',

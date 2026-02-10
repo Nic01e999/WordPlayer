@@ -131,6 +131,8 @@ export default {
     // Progress display
     progressTranslation: 'Translation',
     progressAudio: 'Audio',
+    progressExamples: 'Examples',
+    progressLemma: 'Lemma',
 
     // Error messages
     errorNotFound: 'Translation failed: Word not found',

@@ -39,13 +39,21 @@ export const preloadCache = {
     translationTotal: 0,    // 翻译总数
     audioLoaded: 0,         // 音频已加载数（单词数，每个单词1个音频）
     audioTotal: 0,          // 音频总数（单词数）
-    audioPartial: {}        // { text: count } 追踪每个单词已加载的音频数
+    audioPartial: {},       // { text: count } 追踪每个单词已加载的音频数
+    // 新增：例句缓存
+    examples: {},           // { word: [{ en: "...", zh: "..." }] }
+    examplesLoaded: 0,      // 例句已加载数
+    examplesTotal: 0,       // 例句总数
+    // 新增：同词根词汇缓存
+    lemmaWords: {},         // { lemma: [{ word: "...", translation: "..." }] }
+    lemmaLoaded: 0,         // 词根已加载数
+    lemmaTotal: 0           // 词根总数
 };
 
 /**
- * 清理 Blob URL 缓存（释放内存）
+ * 清理所有预加载缓存（释放内存）
  */
-export function clearAudioCache() {
+export function clearPreloadCache() {
     // 使用 BlobManager 释放所有 Blob URL
     audioBlobManager.releaseAll();
     sentenceAudioBlobManager.releaseAll();
@@ -55,6 +63,22 @@ export function clearAudioCache() {
     preloadCache.sentenceAudioUrls = {};
     preloadCache.audioLoaded = 0;
     preloadCache.audioPartial = {};
+
+    // 清空例句和词根缓存
+    preloadCache.examples = {};
+    preloadCache.examplesLoaded = 0;
+    preloadCache.examplesTotal = 0;
+    preloadCache.lemmaWords = {};
+    preloadCache.lemmaLoaded = 0;
+    preloadCache.lemmaTotal = 0;
+}
+
+/**
+ * 清理 Blob URL 缓存（释放内存）- 向后兼容
+ * @deprecated 使用 clearPreloadCache() 代替
+ */
+export function clearAudioCache() {
+    clearPreloadCache();
 }
 
 /**

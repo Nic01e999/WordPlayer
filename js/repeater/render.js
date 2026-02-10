@@ -517,11 +517,42 @@ async function playTextWithFeedback(element, text) {
 }
 
 /**
- * 异步加载同词根词汇（修改为Flex布局）
+ * 异步加载同词根词汇（修改为Flex布局，优先从缓存读取）
  */
 async function loadLemmaWords(lemma) {
     const container = document.querySelector(`[data-lemma="${lemma}"]`);
     if (!container) return;
+
+    // ✅ 优先从缓存读取
+    if (preloadCache.lemmaWords[lemma]) {
+        console.log(`[Load Lemma] ✓ 从缓存加载: ${lemma}`);
+        console.log(`[Server] ✓ 从缓存加载词根: ${lemma}`);
+
+        const words = preloadCache.lemmaWords[lemma];
+        if (words.length > 0) {
+            // 获取当前单词，用于排除自身
+            const currentWord = currentRepeaterState?.words[currentRepeaterState.currentIndex] || '';
+            const filteredWords = words.filter(w => w.word !== currentWord);
+
+            if (filteredWords.length > 0) {
+                container.innerHTML = filteredWords.map(w => `
+                    <div class="lemma-word-item">
+                        <div class="lemma-word">${escapeAndFormat(w.word)}</div>
+                        <div class="lemma-translation">${escapeAndFormat(w.translation || '')}</div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="no-data">' + t('noLemmaWords') + '</div>';
+            }
+        } else {
+            container.innerHTML = '<div class="no-data">' + t('noLemmaWords') + '</div>';
+        }
+        return;
+    }
+
+    // ⚠️ 缓存未命中，回退到懒加载
+    console.log(`[Load Lemma] ⚠ 缓存未命中，懒加载: ${lemma}`);
+    console.log(`[Server] ⚠ 缓存未命中，懒加载词根: ${lemma}`);
 
     try {
         // 获取当前单词，用于排除自身
@@ -532,6 +563,9 @@ async function loadLemmaWords(lemma) {
         const data = await response.json();
 
         if (data.words && data.words.length > 0) {
+            // 更新缓存
+            preloadCache.lemmaWords[lemma] = data.words;
+
             container.innerHTML = data.words.map(w => `
                 <div class="lemma-word-item">
                     <div class="lemma-word">${escapeAndFormat(w.word)}</div>
@@ -548,18 +582,48 @@ async function loadLemmaWords(lemma) {
 }
 
 /**
- * 异步加载例句（限制4句）
+ * 异步加载例句（限制2句，优先从缓存读取）
  */
 async function loadExamples(word, lang) {
     // 直接查找view层
     const container = document.querySelector(`.view-examples[data-word="${word}"]`);
     if (!container) return;
 
+    // ✅ 优先从缓存读取
+    if (preloadCache.examples[word]) {
+        console.log(`[Load Examples] ✓ 从缓存加载: ${word}`);
+        console.log(`[Server] ✓ 从缓存加载例句: ${word}`);
+
+        const examples = preloadCache.examples[word];
+        if (examples.length > 0) {
+            container.innerHTML = examples.map(ex => `
+                <div class="example-item">
+                    <div class="example-en clickable-text" data-text="${escapeAndFormat(ex.en)}">
+                        ${highlightWord(escapeAndFormat(ex.en), word)}
+                    </div>
+                    <div class="example-zh">${escapeAndFormat(ex.zh)}</div>
+                </div>
+            `).join('');
+            // 重新绑定点击事件
+            setupContentClickHandlers(container);
+        } else {
+            container.innerHTML = '<div class="no-data">暂无例句</div>';
+        }
+        return;
+    }
+
+    // ⚠️ 缓存未命中，回退到懒加载
+    console.log(`[Load Examples] ⚠ 缓存未命中，懒加载: ${word}`);
+    console.log(`[Server] ⚠ 缓存未命中，懒加载例句: ${word}`);
+
     try {
         const response = await fetch(`/api/dict/examples/${encodeURIComponent(word)}?lang=${lang}&limit=2`);
         const data = await response.json();
 
         if (data.examples && data.examples.length > 0) {
+            // 更新缓存
+            preloadCache.examples[word] = data.examples;
+
             // 直接渲染到view层，不需要额外的examples-list容器
             container.innerHTML = data.examples.map(ex => `
                 <div class="example-item">

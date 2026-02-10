@@ -2,7 +2,7 @@
  * 预加载系统模块
  */
 
-import { preloadCache, clearAudioCache } from './state.js';
+import { preloadCache, clearPreloadCache } from './state.js';
 import { audioBlobManager } from './storage/blobManager.js';
 import { t } from './i18n/index.js';
 import { promiseAllWithLimit } from './utils/concurrency.js';
@@ -29,12 +29,14 @@ import {
 let wasLoading = false;
 
 /**
- * 更新预加载进度显示（两个进度条）
+ * 更新预加载进度显示（四个进度条：翻译、音频、例句、词根）
  */
 export function updatePreloadProgress() {
     const indicator = $("preloadIndicator");
     const transEl = $("translationProgress");
     const audioEl = $("audioProgress");
+    const examplesEl = $("examplesProgress");
+    const lemmaEl = $("lemmaProgress");
     const loadBtn = $("loadBtn");
     const container = loadBtn?.parentElement; // load-btn-container
     if (!indicator || !container) return;
@@ -81,6 +83,18 @@ export function updatePreloadProgress() {
     }
     if (audioEl) {
         audioEl.textContent = `${t('progressAudio')}: ${preloadCache.audioLoaded}/${preloadCache.audioTotal}`;
+    }
+    if (examplesEl && preloadCache.examplesTotal > 0) {
+        examplesEl.textContent = `${t('progressExamples')}: ${preloadCache.examplesLoaded}/${preloadCache.examplesTotal}`;
+        examplesEl.style.display = 'block';
+    } else if (examplesEl) {
+        examplesEl.style.display = 'none';
+    }
+    if (lemmaEl && preloadCache.lemmaTotal > 0) {
+        lemmaEl.textContent = `${t('progressLemma')}: ${preloadCache.lemmaLoaded}/${preloadCache.lemmaTotal}`;
+        lemmaEl.style.display = 'block';
+    } else if (lemmaEl) {
+        lemmaEl.style.display = 'none';
     }
 
     // 日志输出
@@ -134,7 +148,7 @@ export async function startPreload(forceReload = false) {
 
     // 强制重新加载：清除当前单词的缓存
     if (forceReload) {
-        clearAudioCache(); // 释放 Blob URL 内存
+        clearPreloadCache(); // 释放 Blob URL 内存和所有缓存
         // localStorage 缓存已移除，直接清空内存缓存
         entries.forEach(({ word, definition }) => {
             if (!definition) {
@@ -144,9 +158,9 @@ export async function startPreload(forceReload = false) {
         });
     }
 
-    // 如果单词列表改变，也清理旧的音频缓存
+    // 如果单词列表改变，也清理旧的缓存
     if (entriesChanged) {
-        clearAudioCache();
+        clearPreloadCache();
     }
 
     // 取消旧的加载
@@ -417,13 +431,158 @@ export async function startPreload(forceReload = false) {
         }
     }
 
-    // 等待所有加载完成（使用并发控制，最多同时 6 个请求）
-    await Promise.all([wordInfoPromise, promiseAllWithLimit(audioTasks, 6)]);
+    // 等待 wordInfo 完成后，并行预加载音频、例句和词根
+    await wordInfoPromise;
+
+    if (myId !== preloadCache.loadId) return;
+
+    // 收集所有单词用于预加载例句和词根
+    const allWords = entries.map(e => e.word);
+
+    // 并行预加载：音频、例句、词根（仅英文）
+    await Promise.all([
+        promiseAllWithLimit(audioTasks, 6),
+        preloadExamples(allWords, targetLang, signal, myId),
+        targetLang === 'en' ? preloadLemmaWords(allWords, signal, myId) : Promise.resolve()
+    ]);
 
     if (myId === preloadCache.loadId) {
         preloadCache.loading = false;
         updatePreloadProgress();
     }
+}
+
+/**
+ * 预加载例句（静默失败）
+ */
+async function preloadExamples(words, targetLang, signal, loadId) {
+    if (!words || words.length === 0) return;
+
+    console.log('[Preload Examples] 开始预加载例句，单词数:', words.length);
+    console.log('[Server] 开始预加载例句，单词数:', words.length);
+
+    preloadCache.examplesTotal = words.length;
+    preloadCache.examplesLoaded = 0;
+
+    const tasks = words.map(word => async () => {
+        if (loadId !== preloadCache.loadId) return;
+
+        // 跳过已缓存的
+        if (preloadCache.examples[word]) {
+            preloadCache.examplesLoaded++;
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/dict/examples/${encodeURIComponent(word)}?lang=${targetLang}&limit=2`,
+                { signal }
+            );
+
+            if (loadId !== preloadCache.loadId) return;
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.examples && data.examples.length > 0) {
+                    preloadCache.examples[word] = data.examples;
+                    console.log(`[Preload Examples] ✓ 已缓存: ${word}, 例句数=${data.examples.length}`);
+                    console.log(`[Server] ✓ 已缓存例句: ${word}, 例句数=${data.examples.length}`);
+                } else {
+                    preloadCache.examples[word] = [];
+                    console.log(`[Preload Examples] ⚠ 无例句: ${word}`);
+                }
+            } else {
+                console.warn(`[Preload Examples] ✗ 请求失败: ${word}, status=${response.status}`);
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.warn(`[Preload Examples] ✗ 加载失败: ${word}, error=${err.message}`);
+            }
+        } finally {
+            if (loadId === preloadCache.loadId) {
+                preloadCache.examplesLoaded++;
+                updatePreloadProgress();
+            }
+        }
+    });
+
+    await promiseAllWithLimit(tasks, 6);
+    console.log('[Preload Examples] 预加载完成');
+    console.log('[Server] 例句预加载完成');
+}
+
+/**
+ * 预加载同词根词汇（仅英文，静默失败）
+ */
+async function preloadLemmaWords(words, signal, loadId) {
+    if (!words || words.length === 0) return;
+
+    console.log('[Preload Lemma] 开始预加载词根，单词数:', words.length);
+    console.log('[Server] 开始预加载词根，单词数:', words.length);
+
+    // 提取所有唯一的 lemma
+    const lemmas = new Set();
+    words.forEach(word => {
+        const wordInfo = preloadCache.wordInfo[word];
+        if (wordInfo?.lemma && wordInfo.lemma !== '-') {
+            lemmas.add(wordInfo.lemma);
+        }
+    });
+
+    const lemmaList = Array.from(lemmas);
+    preloadCache.lemmaTotal = lemmaList.length;
+    preloadCache.lemmaLoaded = 0;
+
+    if (lemmaList.length === 0) {
+        console.log('[Preload Lemma] 无需预加载（无有效词根）');
+        return;
+    }
+
+    const tasks = lemmaList.map(lemma => async () => {
+        if (loadId !== preloadCache.loadId) return;
+
+        // 跳过已缓存的
+        if (preloadCache.lemmaWords[lemma]) {
+            preloadCache.lemmaLoaded++;
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/dict/lemma/${encodeURIComponent(lemma)}?limit=30`,
+                { signal }
+            );
+
+            if (loadId !== preloadCache.loadId) return;
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.words && data.words.length > 0) {
+                    preloadCache.lemmaWords[lemma] = data.words;
+                    console.log(`[Preload Lemma] ✓ 已缓存: ${lemma}, 词汇数=${data.words.length}`);
+                    console.log(`[Server] ✓ 已缓存词根: ${lemma}, 词汇数=${data.words.length}`);
+                } else {
+                    preloadCache.lemmaWords[lemma] = [];
+                    console.log(`[Preload Lemma] ⚠ 无词汇: ${lemma}`);
+                }
+            } else {
+                console.warn(`[Preload Lemma] ✗ 请求失败: ${lemma}, status=${response.status}`);
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                console.warn(`[Preload Lemma] ✗ 加载失败: ${lemma}, error=${err.message}`);
+            }
+        } finally {
+            if (loadId === preloadCache.loadId) {
+                preloadCache.lemmaLoaded++;
+                updatePreloadProgress();
+            }
+        }
+    });
+
+    await promiseAllWithLimit(tasks, 6);
+    console.log('[Preload Lemma] 预加载完成');
+    console.log('[Server] 词根预加载完成');
 }
 
 // 防抖版本的预加载函数

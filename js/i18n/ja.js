@@ -131,6 +131,8 @@ export default {
     // 進捗表示
     progressTranslation: '翻訳',
     progressAudio: 'オーディオ',
+    progressExamples: '例文',
+    progressLemma: '語根',
 
     // エラーメッセージ
     errorNotFound: '翻訳失敗: 単語が見つかりません',

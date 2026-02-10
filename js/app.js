@@ -3,7 +3,7 @@
  */
 
 import { currentActiveMode, currentRepeaterState } from './state.js';
-import { initPreloadListeners, startPreload } from './preload.js';
+import { initPreloadListeners, startPreload, updatePreloadProgress } from './preload.js';
 import { Repeater, setDictationRef } from './repeater/index.js';
 import { Dictation, setRepeaterRef } from './dictation/index.js';
 import {
@@ -267,6 +267,9 @@ function initLangSelectors() {
             if (!window.currentActiveMode) {
                 renderWordcardCards();
             }
+
+            // 更新预加载进度条文本（跟随界面语言）
+            updatePreloadProgress();
 
             // 同步到服务端
             await saveSettingToServer('ui_lang', uiLang);
