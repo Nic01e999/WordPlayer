@@ -53,7 +53,7 @@ body::before {
     display: none;
     /* height: 100vh; */
     width: 100vw;
-    padding: 0.9375rem clamp(1rem, 3vw, 1.875rem) 0rem;
+    padding: 0rem clamp(1rem, 3vw, 1.875rem) 0rem;
     /* margin-bottom: 20vh; */
     background: transparent;
     overflow-x: hidden;
@@ -68,14 +68,14 @@ body::before {
 /*================ 主页视图 - flex row 布局 ==============*/
 #homeView.active {
     display: flex;
-    position: relative; /* 为绝对定位的备案信息提供定位上下文 */
 }
 
 /* 单词输入区域 - 主页左侧 */
 #wordSection {
     width: clamp(14rem, 22vw, 17.5rem);
-    min-height: 0;
+    /* min-height: 0; */
     height: 85%;
+    /* max-height: 85%; */
     padding: 1.25rem 1.25rem 0rem 1.25rem ;
     display: flex;
     flex-direction: column;
@@ -84,14 +84,16 @@ body::before {
 }
 
 #wordcardContent {
-    flex: 1;
-    min-width: 0;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto
 }
 
 
 
 /*======================= 复读器主容器 =========================*/
 .repeater-container {
+    margin-top: 1rem;
     position: relative;
     flex: 1;
     min-height: 15rem;

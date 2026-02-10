@@ -280,10 +280,10 @@ body.dictation-mode #dictationWorkplace::after {
 /* 结果序号 - 题号样式 */
 .result-index {
     font-family: 'Cinzel', Georgia, serif;
-    font-weight: 600;
+    font-weight: 666;
     min-width: 2.5rem;
     color: var(--text-label);
-    font-size: 1rem;
+    font-size: 1.5rem;
 }
 
 
@@ -292,7 +292,7 @@ body.dictation-mode #dictationWorkplace::after {
 .result-attempts {
     flex-basis: 100%;
     font-family: 'Caveat', 'STKaiti', 'Kaiti SC', '楷体', cursive;
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: var(--text-dark);
     line-height: 1.6;
 }

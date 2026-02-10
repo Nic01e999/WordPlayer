@@ -194,6 +194,7 @@
     padding: 1.5rem;
     justify-content: center;
     min-height: 0;
+    margin-bottom: 15em;
 }
 
 /* ===== iOS App 图标卡片 ===== */
@@ -1111,7 +1112,7 @@
 
 /* ===== 备案信息样式 - 液态玻璃风格 ===== */
 .icp-filing {
-    bottom: 1rem;
+    /* bottom: 1rem; */
     left: 0.9375rem;
     padding: 0.75rem 1.5rem;
     text-align: center;
