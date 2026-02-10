@@ -75,13 +75,12 @@ body::before {
 #wordSection {
     width: clamp(14rem, 22vw, 17.5rem);
     min-height: 0;
-    height: 100%;
-    padding: 1.25rem;
+    height: 85%;
+    padding: 1.25rem 1.25rem 0rem 1.25rem ;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     overflow: visible;
-    margin-bottom: 13.5rem;
 }
 
 #wordcardContent {
