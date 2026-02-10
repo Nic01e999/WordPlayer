@@ -37,6 +37,12 @@ let dragHandler = null;
 // 保存弹窗位置（同一 session 内保持）
 let savedPopupPosition = null;
 
+// DOM缓存变量（性能优化：复用弹窗DOM）
+let popupElement = null;        // 缓存的弹窗DOM
+let popupInputElement = null;   // 缓存输入框
+let popupRetryInfo = null;      // 缓存重试信息
+let popupTitle = null;          // 缓存标题
+
 export function setQuizDeps(deps) {
     _getState = deps.getState;
     _setState = deps.setState;
@@ -49,63 +55,120 @@ onLocaleChange(() => {
     refreshResultsLanguage();
 });
 
-export function showPopup() {
-    const s = _getState?.();
-
-    if (!s || s.currentIndex >= s.entries.length) {
-        showResults();
-        return;
-    }
-
-    const i = s.currentIndex;
-
-    // 在显示弹窗前，先更新记录区显示已答题目
-    updateWorkplace();
-
-    // 手动添加当前题目的占位符
+/**
+ * 添加当前题目占位符到记录区
+ */
+function addCurrentItemPlaceholder(state) {
     const wp = document.getElementById("dictationWorkplace");
-    if (wp) {
-        const provideText = s.provideTexts[i];
-        const isCustom = s.isCustomWord[i];
-        const shouldShowProvide = isCustom && (s.dictateProvide !== s.dictateWrite);
+    if (!wp) return;
 
-        const currentItemHTML = `<div class="result-item">
-            <span class="result-index">${i + 1}.</span>
-            ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
-            <div class="result-attempts"></div>
-        </div>`;
+    const i = state.currentIndex;
+    const provideText = state.provideTexts[i];
+    const isCustom = state.isCustomWord[i];
+    const shouldShowProvide = isCustom && (state.dictateProvide !== state.dictateWrite);
 
-        wp.insertAdjacentHTML('beforeend', currentItemHTML);
+    const currentItemHTML = `<div class="result-item" id="current-item-${i}">
+        <span class="result-index">${i + 1}.</span>
+        ${shouldShowProvide ? `<div class="result-listened">&lt;${provideText}&gt;</div>` : ''}
+        <div class="result-attempts"></div>
+    </div>`;
 
-        // 自动滚动到底部
-        setTimeout(() => {
-            const view = document.getElementById("dictationView");
-            if (view) {
-                view.scrollTop = view.scrollHeight;
-            }
-        }, 50);
+    wp.insertAdjacentHTML('beforeend', currentItemHTML);
+
+    // 自动滚动到底部
+    setTimeout(() => {
+        const view = document.getElementById("dictationView");
+        if (view) {
+            view.scrollTop = view.scrollHeight;
+        }
+    }, 50);
+}
+
+/**
+ * 初始化拖拽功能（仅调用一次）
+ */
+function initializeDrag() {
+    if (!popupElement) return;
+
+    const handle = popupElement.querySelector('.popup-drag-handle');
+    if (!handle) return;
+
+    popupElement.style.position = 'absolute';
+    popupElement.style.transform = 'rotate(-1deg)';
+
+    // 恢复上次拖拽的位置
+    if (savedPopupPosition) {
+        popupElement.style.left = `${savedPopupPosition.left}px`;
+        popupElement.style.top = `${savedPopupPosition.top}px`;
     }
 
-    const retries = s.attempts[i].length;
+    // 计算当前窗口内的拖拽边界
+    const calcBounds = () => {
+        const rect = popupElement.getBoundingClientRect();
+        return {
+            minX: 0,
+            minY: 0,
+            maxX: window.innerWidth - rect.width,
+            maxY: window.innerHeight - rect.height
+        };
+    };
 
-    const entry = s.entries[i];
-    const isCustom = s.isCustomWord[i];  // 获取单词类型标记
+    dragHandler = createPositionDragger(popupElement, handle, {
+        bounds: calcBounds(),
+
+        onStart: () => popupElement.classList.add('dragging'),
+
+        onEnd: () => {
+            popupElement.classList.remove('dragging');
+
+            // 保存当前位置
+            const rect = popupElement.getBoundingClientRect();
+            savedPopupPosition = {
+                left: rect.left,
+                top: rect.top
+            };
+        }
+    });
+
+    // 窗口变化时更新拖拽范围
+    window.addEventListener('resize', () => {
+        if (dragHandler) {
+            dragHandler.bounds = calcBounds();
+        }
+    });
+}
+
+/**
+ * 绑定弹窗事件（仅调用一次）
+ */
+function bindPopupEvents() {
+    if (!popupInputElement) return;
+
+    popupInputElement.addEventListener("keypress", e => {
+        if (e.key === "Enter" && !_getState?.()?.isPaused) submit();
+    });
+}
+
+/**
+ * 创建弹窗DOM（首次调用）
+ */
+function createPopup(state) {
+    const i = state.currentIndex;
+    const retries = state.attempts[i].length;
+    const isCustom = state.isCustomWord[i];
 
     // 根据单词类型决定 write 提示
     const writeHint = isCustom
-        ? (s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
-        : t('writeWord');  // 非自定义单词永远是"写单词"
+        ? (state.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
+        : t('writeWord');
 
-    const { dictateProvide, dictateWrite, provideTexts } = s;
-    const provideText = provideTexts[i];
+    const provideText = state.provideTexts[i];
 
     // 决定是否显示 provide
     let titleHtml;
-    if (isCustom && dictateProvide !== dictateWrite) {
-        // 自定义单词 && provide != write，显示 provide 内容
+    if (isCustom && state.dictateProvide !== state.dictateWrite) {
         titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
     } else {
-        // 非自定义单词 || provide == write，不显示 provide
         titleHtml = t('wordNum', { num: i + 1 });
     }
 
@@ -115,7 +178,7 @@ export function showPopup() {
     popup.innerHTML = `
         <div class="popup-drag-handle" title=""></div>
         <h3>${titleHtml}</h3>
-        <p id="retryInfo">${t('attempts')}: ${retries}/${s.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
+        <p id="retryInfo">${t('attempts')}: ${retries}/${state.maxRetry} &nbsp;&nbsp;  ${writeHint}</p>
         <br><br>
         <button onclick="Dictation.play()" class="btn-sound"></button>
         <input type="text" id="dictationInput" placeholder="${t('typeWordPlaceholder')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -124,73 +187,114 @@ export function showPopup() {
 
     document.body.append(popup);
 
-    // 初始化拖拽
-    const handle = popup.querySelector('.popup-drag-handle');
-    if (handle) {
-        popup.style.position = 'absolute';
-        popup.style.transform = 'rotate(-1deg)';
+    // 缓存DOM引用
+    popupElement = popup;
+    popupTitle = popup.querySelector('h3');
+    popupRetryInfo = popup.querySelector('#retryInfo');
+    popupInputElement = popup.querySelector('#dictationInput');
 
-        // 恢复上次拖拽的位置
-        if (savedPopupPosition) {
-            popup.style.left = `${savedPopupPosition.left}px`;
-            popup.style.top = `${savedPopupPosition.top}px`;
-        }
+    // 初始化拖拽和事件（仅一次）
+    initializeDrag();
+    bindPopupEvents();
 
-        // 计算当前窗口内的拖拽边界
-        const calcBounds = () => {
-            const rect = popup.getBoundingClientRect();
-            return {
-                minX: 0,
-                minY: 0,
-                maxX: window.innerWidth - rect.width,
-                maxY: window.innerHeight - rect.height
-            };
-        };
+    console.log('[createPopup] 弹窗DOM已创建并缓存');
+}
 
-        dragHandler = createPositionDragger(popup, handle, {
-            bounds: calcBounds(),
-
-            onStart: () => popup.classList.add('dragging'),
-
-            onEnd: () => {
-                popup.classList.remove('dragging');
-
-                // 保存当前位置
-                const rect = popup.getBoundingClientRect();
-                savedPopupPosition = {
-                    left: rect.left,
-                    top: rect.top
-                };
-            }
-        });
-
-        // 窗口变化时更新拖拽范围
-        window.addEventListener('resize', () => {
-            if (dragHandler) {
-                dragHandler.bounds = calcBounds();
-            }
-        });
+/**
+ * 更新弹窗内容（后续调用）
+ */
+function updatePopup(state) {
+    if (!popupElement || !popupTitle || !popupRetryInfo || !popupInputElement) {
+        console.warn('[updatePopup] 缓存的DOM引用失效，重新创建弹窗');
+        createPopup(state);
+        return;
     }
 
+    const i = state.currentIndex;
+    const retries = state.attempts[i].length;
+    const isCustom = state.isCustomWord[i];
+
+    // 根据单词类型决定 write 提示
+    const writeHint = isCustom
+        ? (state.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
+        : t('writeWord');
+
+    const provideText = state.provideTexts[i];
+
+    // 决定是否显示 provide
+    let titleHtml;
+    if (isCustom && state.dictateProvide !== state.dictateWrite) {
+        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
+    } else {
+        titleHtml = t('wordNum', { num: i + 1 });
+    }
+
+    // 只更新3个动态元素
+    popupTitle.innerHTML = titleHtml;
+    popupRetryInfo.textContent = `${t('attempts')}: ${retries}/${state.maxRetry} \u00a0\u00a0  ${writeHint}`;
+    popupInputElement.value = "";
+    popupInputElement.placeholder = t('typeWordPlaceholder');
+
+    // 显示弹窗（如果之前被隐藏）
+    popupElement.style.display = 'block';
+
+    console.log('[updatePopup] 弹窗内容已更新（复用DOM）');
+}
+
+export function showPopup() {
+    const s = _getState?.();
+
+    if (!s || s.currentIndex >= s.entries.length) {
+        showResults();
+        return;
+    }
+
+    // 手动添加当前题目的占位符
+    addCurrentItemPlaceholder(s);
+
+    // 首次创建或复用弹窗
+    if (!popupElement) {
+        createPopup(s);
+    } else {
+        updatePopup(s);
+    }
+
+    // 播放音频和设置焦点
     if (!s.isPaused) {
         setTimeout(() => play(), 500);
     }
 
-    $("dictationInput").addEventListener("keypress", e => {
-        if (e.key === "Enter" && !_getState?.()?.isPaused) submit();
-    });
-
     if (!s.isPaused) {
-        $("dictationInput").focus();
+        popupInputElement?.focus();
     }
 }
 
 export function closePopup() {
+    if (popupElement) {
+        popupElement.style.display = 'none';  // 隐藏而不销毁
+        if (popupInputElement) {
+            popupInputElement.value = "";     // 清空输入
+        }
+        console.log('[closePopup] 弹窗已隐藏（保留DOM）');
+    }
+}
+
+/**
+ * 彻底销毁弹窗（模式切换时调用）
+ */
+export function destroyPopup() {
     if (dragHandler) {
         dragHandler.destroy();
         dragHandler = null;
     }
-    $("dictationPopup")?.remove();
+    if (popupElement) {
+        popupElement.remove();
+        popupElement = null;
+        popupInputElement = null;
+        popupRetryInfo = null;
+        popupTitle = null;
+        console.log('[destroyPopup] 弹窗DOM已彻底销毁');
+    }
 }
 
 /**
@@ -215,8 +319,13 @@ export function submit() {
     const s = _getState?.();
     if (!s) return;
 
-    const input = $("dictationInput");
-    const answer = input.value.trim();
+    // 使用缓存的 DOM 引用
+    if (!popupInputElement) {
+        console.warn('[submit] 输入框引用不存在');
+        return;
+    }
+
+    const answer = popupInputElement.value.trim();
     const correct = s.expectTexts[s.currentIndex];
     const i = s.currentIndex;
 
@@ -228,7 +337,6 @@ export function submit() {
     if (answer.toLowerCase() === correct.toLowerCase()) {
         s.results[i] = { status: "correct", retries: s.attempts[i].length };
         updateWorkplace();
-        closePopup();
         s.currentIndex++;
         setTimeout(() => showPopup(), 500);
     } else {
@@ -237,18 +345,92 @@ export function submit() {
         if (s.attempts[i].length >= s.maxRetry) {
             s.results[i] = { status: "failed", retries: s.attempts[i].length };
             updateWorkplace();
-            closePopup();
             s.currentIndex++;
             setTimeout(() => showPopup(), 500);
         } else {
-            $("retryInfo").textContent = `${t('attempts')}: ${s.attempts[i].length}/${s.maxRetry}`;
-            input.value = "";
-            input.focus();
+            // 使用缓存的 DOM 引用直接更新
+            if (popupRetryInfo) {
+                const isCustom = s.isCustomWord[i];
+                const writeHint = isCustom
+                    ? (s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
+                    : t('writeWord');
+                popupRetryInfo.textContent = `${t('attempts')}: ${s.attempts[i].length}/${s.maxRetry} \u00a0\u00a0  ${writeHint}`;
+            }
+            popupInputElement.value = "";
+            popupInputElement.focus();
         }
     }
 }
 
+/**
+ * 构建单题的答题记录HTML
+ */
+function buildAttemptsHTML(state, i) {
+    const attempts = state.attempts[i];
+    const result = state.results[i];
+
+    return attempts.map((a, j) => {
+        const isLast = j === attempts.length - 1;
+        let symbol, cls;
+
+        if (a.isCorrect) {
+            symbol = "";
+            cls = "correct";
+        } else if (isLast && result?.status === "failed") {
+            symbol = "X";
+            cls = "failed";
+        } else {
+            symbol = "!";
+            cls = "warning";
+        }
+
+        const extra = (isLast && result?.status === "failed")
+            ? `<br><span class="correct">${state.entries[i].word} :<br>${formatTranslation(state.entries[i].definition || preloadCache.translations[state.entries[i].word] || '')}</span>`
+            : '';
+
+        return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
+    }).join('');
+}
+
+/**
+ * 增量更新记录区（只更新当前题目）
+ */
 export function updateWorkplace() {
+    const s = _getState?.();
+    const wp = $("dictationWorkplace");
+    if (!wp || !s) return;
+
+    const i = s.currentIndex;
+
+    // 找到当前题目的容器
+    const currentItem = document.getElementById(`current-item-${i}`);
+    if (currentItem) {
+        // 增量更新：只更新当前题目的 attempts 区域
+        const attemptsContainer = currentItem.querySelector('.result-attempts');
+        if (attemptsContainer && s.attempts[i].length > 0) {
+            const attemptsHTML = buildAttemptsHTML(s, i);
+            attemptsContainer.innerHTML = attemptsHTML;
+            console.log(`[updateWorkplace] 增量更新第 ${i + 1} 题`);
+        }
+    } else {
+        // 降级方案：找不到容器时全量更新
+        console.warn(`[updateWorkplace] 未找到 current-item-${i}，降级到全量更新`);
+        fullUpdateWorkplace();
+    }
+
+    // 滚动到底部
+    setTimeout(() => {
+        const view = document.getElementById("dictationView");
+        if (view) {
+            view.scrollTop = view.scrollHeight;
+        }
+    }, 50);
+}
+
+/**
+ * 全量更新记录区（降级方案）
+ */
+function fullUpdateWorkplace() {
     const s = _getState?.();
     const wp = $("dictationWorkplace");
     if (!wp || !s) return;
@@ -258,28 +440,7 @@ export function updateWorkplace() {
         if (!attempts.length) return '';  // 只显示已答题目
 
         const result = s.results[i];
-
-        const rows = attempts.map((a, j) => {
-            const isLast = j === attempts.length - 1;
-            let symbol, cls;
-
-            if (a.isCorrect) {
-                symbol = "";
-                cls = "correct";
-            } else if (isLast && result?.status === "failed") {
-                symbol = "X";
-                cls = "failed";
-            } else {
-                symbol = "!";
-                cls = "warning";
-            }
-
-            const extra = (isLast && result?.status === "failed")
-                ? `<br><span class="correct">${s.entries[i].word} :<br>${formatTranslation(s.entries[i].definition || preloadCache.translations[s.entries[i].word] || '')}</span>`
-                : '';
-
-            return `<div class="${cls}">${a.answer} ${symbol}(${j + 1})${extra}</div>`;
-        }).join('');
+        const rows = buildAttemptsHTML(s, i);
 
         const provideText = s.provideTexts[i];
         const isCustom = s.isCustomWord[i];
@@ -293,21 +454,13 @@ export function updateWorkplace() {
 
     // 如果有快照，先恢复快照，再追加当前内容
     if (s.workplaceSnapshot) {
-        console.log('[updateWorkplace] 恢复快照 + 追加新内容');
+        console.log('[fullUpdateWorkplace] 恢复快照 + 追加新内容');
         wp.innerHTML = s.workplaceSnapshot + currentRoundHTML;
     } else {
         // 首次听写，直接设置
-        console.log('[updateWorkplace] 首次听写，直接设置内容');
+        console.log('[fullUpdateWorkplace] 首次听写，直接设置内容');
         wp.innerHTML = currentRoundHTML;
     }
-
-    // 滚动到底部
-    setTimeout(() => {
-        const view = document.getElementById("dictationView");
-        if (view) {
-            view.scrollTop = view.scrollHeight;
-        }
-    }, 50);
 }
 
 /**
@@ -477,8 +630,16 @@ export function startRetry() {
     // 保存当前 workplace 的完整内容（在添加分隔线之前）
     const wp = document.getElementById("dictationWorkplace");
     if (wp) {
+        // 移除所有旧的 current-item-X ID，避免与新一轮冲突
+        const oldItems = wp.querySelectorAll('[id^="current-item-"]');
+        oldItems.forEach(item => {
+            console.log(`[startRetry] 移除旧 ID: ${item.id}`);
+            item.removeAttribute('id');
+        });
+
+        // 保存清理后的快照
         s.workplaceSnapshot = wp.innerHTML;
-        console.log('[startRetry] 已保存 workplace 快照');
+        console.log('[startRetry] 已保存 workplace 快照（已清理 ID）');
     }
 
     // 添加分隔线
@@ -797,11 +958,14 @@ function createShareContainerWithRetries(result) {
 }
 
 /**
- * 刷新答题弹窗的语言文本
+ * 刷新答题弹窗的语言文本（兼容缓存DOM）
  */
 function refreshPopupLanguage() {
-    const popup = document.getElementById('dictationPopup');
-    if (!popup) return;
+    // 使用缓存的DOM引用
+    if (!popupElement || !popupTitle || !popupRetryInfo || !popupInputElement) {
+        console.log('[refreshPopupLanguage] 弹窗未显示或DOM引用不存在，跳过更新');
+        return;
+    }
 
     const s = _getState?.();
     if (!s) return;
@@ -818,25 +982,18 @@ function refreshPopupLanguage() {
     } else {
         titleHtml = t('wordNum', { num: i + 1 });
     }
-    const titleEl = popup.querySelector('h3');
-    if (titleEl) titleEl.innerHTML = titleHtml;
+    popupTitle.innerHTML = titleHtml;
 
     // 更新"尝试次数"文本
     const writeHint = isCustom
         ? (s.dictateWrite === 'A' ? t('writeWord') : t('writeDefinition'))
         : t('writeWord');
-    const retryInfo = popup.querySelector('#retryInfo');
-    if (retryInfo) {
-        retryInfo.textContent = `${t('attempts')}: ${retries}/${s.maxRetry} \u00a0\u00a0  ${writeHint}`;
-    }
+    popupRetryInfo.textContent = `${t('attempts')}: ${retries}/${s.maxRetry} \u00a0\u00a0  ${writeHint}`;
 
     // 更新输入框placeholder
-    const input = popup.querySelector('#dictationInput');
-    if (input) {
-        input.placeholder = t('typeWordPlaceholder');
-    }
+    popupInputElement.placeholder = t('typeWordPlaceholder');
 
-    console.log('[refreshPopupLanguage] 答题弹窗语言已更新');
+    console.log('[refreshPopupLanguage] 答题弹窗语言已更新（使用缓存DOM）');
 }
 
 /**

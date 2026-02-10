@@ -11,7 +11,7 @@ import { checkFirstTime } from '../guide.js';
 
 // 导入子模块
 import {
-    showPopup, closePopup, play, submit,
+    showPopup, closePopup, destroyPopup, play, submit,
     updateWorkplace, showResults, playPause,
     setQuizDeps, clearSavedPopupPosition
 } from './quiz.js';
@@ -53,7 +53,8 @@ export class Dictation {
 
     static async startDictation() {
         pauseOtherMode();
-        closePopup();
+        destroyPopup();              // 彻底销毁旧弹窗
+        clearSavedPopupPosition();   // 清除位置记忆
         this.state = null;
         setActiveMode("dictation");
         document.body.classList.remove('repeater-mode');

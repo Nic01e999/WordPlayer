@@ -2,7 +2,7 @@
  * 单词卡模块入口
  * 组合所有子模块并导出公共 API
  */
-
+import { destroyPopup } from '../dictation/quiz.js';
 import { $, showToast } from '../utils.js';
 import { setActiveMode, setRepeaterState, preloadCache, loadedWordcard, clearLoadedWordcard } from '../state.js';
 import { updatePreloadProgress } from '../preload.js';
@@ -60,7 +60,7 @@ export function goHome() {
     preloadCache.loading = false;
     updatePreloadProgress();
 
-    $("dictationPopup")?.remove();
+    destroyPopup();
 
     setActiveMode(null);
     setRepeaterState(null);

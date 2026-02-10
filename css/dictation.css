@@ -266,8 +266,6 @@ body.dictation-mode #dictationWorkplace::after {
     margin: 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--bg-paper-line);
-    border-radius: 0;
     transition: background 0.2s;
     font-size: 1.125rem;
     position: relative;
