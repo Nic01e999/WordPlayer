@@ -258,194 +258,126 @@
  * ================================================== */
 :root {
     /* {{{ 组 */
-    /* 主要文字 | 页面标题 h1, 菜单按钮悬停 */
     --text-primary: #8b5a5a;
-    /* 次要文字 | 设置面板标签 */
     --text-secondary: #9c7a7a;
-    /* 淡化/静音文字 | .hint, textarea placeholder */
     --text-muted: #c9a8a8;
-    /* 深色文字 | 听写输入框, 答题文字 */
     --text-dark: #5a4a4a;
-    /* 激活状态 | 当前播放单词 .current-word */
     --text-active: #8b6060;
-    /* 标签文字 | 设置面板 input/select/textarea */
     --text-label: #8b6f6f;
-    /* 按钮文字 | .btn-pause */
     --text-button: #6b4f4f;
-    /* 菜单按钮文字 | #menu button 默认状态 */
     --text-menu-btn: #a07070;
-    /* 强调文字 | 设置面板标题, .word-en */
     --text-accent: #c48b8b;
-    /* 统计文字 | .stat-item */
     --text-stat: #6b5a5a;
-    /* 计数文字 | .play-count */
     --text-count: #d4a5a5;
-    /* 占位符 | placeholder */
     --text-placeholder: #c9b8b8;
-    /* 页面渐变起点 | body */
+    /* }}} */
+
     --bg-page-start: #fff5f5;
-    /* 页面渐变中点 | body */
     --bg-page-mid: #fef6f0;
-    /* 页面渐变终点 | body */
     --bg-page-end: #fff8f5;
-    /* 容器背景 | .repeater-container */
     --bg-container: #fffafa;
-    /* 菜单栏渐变起点 | .menu-bar */
     --bg-menu-start: #ffd6e0;
-    /* 菜单栏渐变终点 | .menu-bar */
     --bg-menu-end: #ffccd5;
-    /* 输入框背景 | sidebar input/select */
     --bg-input: #fff9f9;
-    /* 纸张渐变起点 | .results-box */
     --bg-paper-start: #fffef8;
-    /* 纸张渐变中点 | .results-box */
     --bg-paper-mid: #fdf8f0;
-    /* 纸张渐变终点 | .results-box */
     --bg-paper-end: #faf5eb;
-    /* 弹窗渐变起点 | .dictation-popup */
     --bg-popup-start: #fffef5;
-    /* 弹窗渐变终点 | .dictation-popup */
     --bg-popup-end: #fff9f0;
-    /* 滚动区域中间色 | .scroll-container */
     --bg-scroll-mid: #fff5f5;
-    /* 主强调色 | 焦点边框, 按钮边框 */
+    /* }}} */
+
     --accent-primary: #ffb6c1;
-    /* 次强调色 | 渐变背景, 按钮背景 */
     --accent-secondary: #ffd1dc;
-    /* 棕色强调 | 强调文字, 标题装饰 */
     --accent-brown: #c48b8b;
-    /* 装订线 | .results-box::before */
     --accent-line: rgb(223, 151, 162);
-    /* 发光粉色 | .results-box h3 border */
-    --glow-pink: rgba(255, 182, 193, 0.6);
-    /* 成功/正确答案 | .result-attempts .correct span */
+    --glow-theme: rgba(255, 182, 193, 0.6);
+    /* }}} */
+
     --status-success: #7f82d1;
-    /* 正确(批改红) | .correct */
     --status-correct: #74b093;
-    /* 错误 | .failed */
     --status-error: #c06565;
-    /* 警告 | .warning */
     --status-warning: #cc7a22;
-    /* 分数显示 | .score-display */
     --status-score: #e25555;
-    /* 翻译错误 | .translation-error */
     --status-translate-error: #c0392b;
-    /* 播放按钮渐变起点 | .btn-play */
+    /* }}} */
+
     --btn-play-start: #d4edda;
-    /* 播放按钮渐变终点 | .btn-play */
     --btn-play-end: #c3e6cb;
-    /* 播放按钮悬停起点 | .btn-play:hover */
     --btn-play-hover-start: #e2f3e6;
-    /* 播放按钮悬停终点 | .btn-play:hover */
     --btn-play-hover-end: #d4edda;
-    /* 播放按钮文字 | .btn-play */
     --btn-play-text: #4a7c59;
-    /* 暂停按钮渐变起点 | .btn-pause, .btn-sound */
+
     --btn-pause-start: #ffd1dc;
-    /* 暂停按钮渐变终点 | .btn-pause, .btn-sound */
     --btn-pause-end: #ffb6c1;
-    /* 悬停渐变起点 | .btn-sound:hover, .btn-pause:hover */
+
     --btn-hover-start: #ffe4e9;
-    /* 悬停渐变终点 | .btn-sound:hover, .btn-pause:hover */
     --btn-hover-end: #ffd1dc;
-    /* 重试按钮渐变起点 | .retry-btn */
+
     --btn-retry-start: #fff5e6;
-    /* 重试按钮渐变终点 | .retry-btn */
     --btn-retry-end: #ffe8cc;
-    /* 重试按钮悬停起点 | .retry-btn:hover */
     --btn-retry-hover-start: #fff0d9;
-    /* 重试按钮悬停终点 | .retry-btn:hover */
     --btn-retry-hover-end: #ffd9b3;
-    /* 柔和阴影 | 通用 */
+    /* }}} */
+
     --shadow-soft: rgba(0, 0, 0, 0.05);
-    /* 粉色轻阴影 | .repeater-container */
     --shadow-themelight: rgba(255, 182, 193, 0.15);
-    /* 粉色中等阴影 | .menu-bar */
     --shadow-thememedium: rgba(255, 182, 193, 0.25);
-    /* 粉色强阴影 | .btn-sound:hover */
     --shadow-themestrong: rgba(255, 182, 193, 0.4);
-    /* 棕色轻阴影 | 容器内阴影 */
     --shadow-brown: rgba(139, 111, 111, 0.1);
-    /* 棕色中等阴影 | 容器内阴影 */
     --shadow-brown-medium: rgba(139, 111, 111, 0.15);
-    /* 菜单按钮阴影 | #menu button */
     --shadow-menu-btn: rgba(180, 140, 150, 0.15);
-    /* 菜单按钮悬停阴影 | #menu button:hover */
     --shadow-menu-btn-hover: rgba(200, 150, 160, 0.55);
-    /* 粉色轻边框 | .repeater-container */
+    /* }}} */
+
     --border-themelight: rgba(255, 182, 193, 0.4);
-    /* 粉色中等边框 | sidebar input */
     --border-thememedium: rgba(255, 182, 193, 0.5);
-    /* 粉色强边框 | 焦点状态 */
     --border-themestrong: rgba(255, 182, 193, 0.6);
-    /* 菜单边框 | .menu-bar 底边框 */
     --border-menu: rgba(255, 150, 170, 0.4);
-    /* 纸张边框 | .results-box */
     --border-paper: rgba(200, 180, 170, 0.3);
-    /* 纸张中等边框 | .results-box */
     --border-paper-medium: rgba(200, 180, 170, 0.4);
-    /* 印章边框 | .results-box::after */
     --border-stamp: rgba(200, 80, 80, 0.5);
-    /* 圆点图案 | body::before */
+    /* }}} */
+
     --bg-themedot: rgba(255, 182, 193, 0.327);
-    /* 粉色遮罩 | .scroll-container 渐变 */
     --bg-themeoverlay: rgba(255, 209, 220, 0.3);
-    /* 粉色轻遮罩 | 渐变 */
     --bg-themeoverlay-light: rgba(255, 209, 220, 0.25);
-    /* 粉色微背景 | .current-word 背景 */
     --bg-themesubtle: rgba(255, 182, 193, 0.3);
-    /* 滑块轨道 | .apple-slider-track */
     --bg-slider-track: rgba(255, 182, 193, 0.3);
-    /* 纸张横线 | .results-box 横线 */
     --bg-paper-line: rgba(200, 180, 170, 0.2);
-    /* 纸张中等横线 | .results-box 横线 */
     --bg-paper-line-medium: rgba(200, 180, 170, 0.25);
-    /* 印章背景 | .results-box::after 文字 */
     --bg-stamp: rgba(200, 80, 80, 0.6);
-    /* 纯白 | 基础白色 */
+    /* }}} */
+
     --white-pure: #ffffff;
-    /* 30%白 | 轻透明 */
     --white-soft: rgba(255, 255, 255, 0.3);
-    /* 按钮白 | #menu button 背景 */
     --white-button: rgba(255, 255, 255, 0.9);
-    /* 按钮微粉白 | #menu button 渐变 */
     --white-button-soft: rgba(255, 248, 250, 0.85);
-    /* 按钮悬停白 | #menu button:hover */
     --white-button-hover: rgba(255, 255, 255, 0.95);
-    /* 按钮悬停微粉白 | #menu button:hover 渐变 */
     --white-button-hover-soft: rgba(255, 240, 245, 0.9);
-    /* 色相旋转角度 | 用于给黑白图片上色 */
+    /* }}} */
+
+    --bg-fold-light: rgba(230, 210, 200, 0.85);
+    --bg-fold-dark: rgba(210, 190, 180, 0.95);
+    --shadow-fold: rgba(139, 111, 111, 0.15);
+    /* }}} */
+
+    --border-play: rgba(195, 230, 203, 0.6);
+    --shadow-play-hover: rgba(195, 230, 203, 0.4);
+    --border-pause: rgba(255, 200, 160, 0.6);
+    --bg-warning-light: rgba(255, 200, 160, 0.2);
+    --bg-error-light: rgba(200, 80, 80, 0.1);
+    --bg-error-medium: rgba(200, 80, 80, 0.2);
+    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
+    --shadow-large: rgba(0, 0, 0, 0.2);
+    --border-drop-indicator: rgba(255, 120, 160, 0.8);
+    --bg-folder-preview: rgba(255, 200, 220, 0.2);
+    --border-folder-preview: rgba(255, 180, 200, 0.3);
+
+    /* 图片滤镜色相 */
     --filter-hue: 330deg;
     /* 饱和度 | 用于调整图片色彩鲜艳度 */
     --filter-saturate: 100%;
-    /* 折角浅色 | 纸张折角外层 */
-    --bg-fold-light: rgba(230, 210, 200, 0.85);
-    /* 折角深色 | 纸张折角内层 */
-    --bg-fold-dark: rgba(210, 190, 180, 0.95);
-    /* 折角阴影 | 纸张折角投影 */
-    --shadow-fold: rgba(139, 111, 111, 0.15);
-    /* 播放按钮边框 | .btn-play */
-    --border-play: rgba(195, 230, 203, 0.6);
-    /* 播放按钮悬停阴影 | .btn-play:hover */
-    --shadow-play-hover: rgba(195, 230, 203, 0.4);
-    /* 暂停按钮边框 | .btn-pause */
-    --border-pause: rgba(255, 200, 160, 0.6);
-    /* 警告背景 | .input-warning */
-    --bg-warning-light: rgba(255, 200, 160, 0.2);
-    /* 错误背景轻 | .wordcard-delete:hover */
-    --bg-error-light: rgba(200, 80, 80, 0.1);
-    /* 错误背景中 | .folder-open-close:hover */
-    --bg-error-medium: rgba(200, 80, 80, 0.2);
-    /* 深色遮罩 | .folder-open-overlay */
-    --bg-overlay-dark: rgba(0, 0, 0, 0.3);
-    /* 大阴影 | .drag-clone, .folder-open-view */
-    --shadow-large: rgba(0, 0, 0, 0.2);
-    /* 放置指示器边框 | .drop-indicator */
-    --border-drop-indicator: rgba(255, 120, 160, 0.8);
-    /* 文件夹预览背景 | .wordcard-folder-preview-item */
-    --bg-folder-preview: rgba(255, 200, 220, 0.2);
-    /* 文件夹预览边框 | .wordcard-folder-preview-item */
-    --border-folder-preview: rgba(255, 180, 200, 0.3);
     /* }}} */
 
 }
@@ -490,7 +422,7 @@
     --accent-secondary: #e87888;
     --accent-brown: #d4909a;
     --accent-line: rgb(220, 120, 140);
-    --glow-pink: rgba(255, 143, 160, 0.6);
+    --glow-theme: rgba(255, 143, 160, 0.6);
     /* }}} */
     --status-error: #e85555;
     --status-warning: #e8a040;
@@ -607,7 +539,7 @@
     --accent-secondary: #ade3ba;
     --accent-brown: #b5c5b5;
     --accent-line: rgb(135, 182, 146);
-    --glow-pink: rgba(173, 222, 175, 0.6);
+    --glow-theme: rgba(173, 222, 175, 0.6);
     /* }}} */
     --status-error: #c55555;
     --status-warning: #cc7a22;
@@ -720,7 +652,7 @@
     --accent-secondary: #3da862;
     --accent-brown: #6ab88a;
     --accent-line: rgb(80, 160, 100);
-    --glow-pink: rgba(80, 200, 120, 0.6);
+    --glow-theme: rgba(80, 200, 120, 0.6);
     /* }}} */
     --status-error: #e85555;
     --status-warning: #e8a040;
@@ -837,7 +769,7 @@
     --accent-secondary: #a8d8f8;
     --accent-brown: #8bb4d4;
     --accent-line: rgb(100, 160, 220);
-    --glow-pink: rgba(77, 166, 255, 0.6);
+    --glow-theme: rgba(77, 166, 255, 0.6);
     /* }}} */
     --status-error: #c55555;
     --status-warning: #cc7a22;
@@ -950,7 +882,7 @@
     --accent-secondary: #3d96ef;
     --accent-brown: #6ab0e8;
     --accent-line: rgb(77, 150, 220);
-    --glow-pink: rgba(77, 166, 255, 0.6);
+    --glow-theme: rgba(77, 166, 255, 0.6);
     /* }}} */
     --status-error: #e85555;
     --status-warning: #e8a040;
@@ -1067,7 +999,7 @@
     --accent-secondary: #d8a8f8;
     --accent-brown: #b48bd4;
     --accent-line: rgb(160, 100, 220);
-    --glow-pink: rgba(168, 85, 247, 0.6);
+    --glow-theme: rgba(168, 85, 247, 0.6);
     /* }}} */
     --status-error: #c55555;
     --status-warning: #cc7a22;
@@ -1180,7 +1112,7 @@
     --accent-secondary: #9645e7;
     --accent-brown: #b070e8;
     --accent-line: rgb(150, 80, 200);
-    --glow-pink: rgba(168, 85, 247, 0.6);
+    --glow-theme: rgba(168, 85, 247, 0.6);
     /* }}} */
     --status-error: #e85555;
     --status-warning: #e8a040;

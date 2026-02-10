@@ -76,7 +76,7 @@
  --accent-line: 装订线颜色
    引用：dictation.css (.results-box::before)
 
- --glow-pink: 发光粉色
+ --glow-theme: 发光粉色
    引用：dictation.css (.results-box h3 border)
 
 # 【状态颜色组 (status-)】

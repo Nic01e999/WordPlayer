@@ -219,7 +219,7 @@
 }
 
 .glass-dialog-input:focus {
-    border-color: var(--glow-pink);
+    border-color: var(--glow-theme);
     box-shadow:
         0 0 0 3px rgba(255, 182, 193, 0.2),
         0 2px 4px var(--input-shadow-inner) inset;
@@ -287,7 +287,7 @@
 
 [data-theme-mode="dark"] .glass-dialog-input:focus {
     box-shadow:
-        0 0 0 2px var(--glow-pink),
+        0 0 0 2px var(--glow-theme),
         0 0 0 1px var(--border-thememedium) inset;
 }
 
