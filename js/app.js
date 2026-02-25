@@ -279,6 +279,9 @@ function initLangSelectors() {
 
 // 页面加载完成后初始化
 document.addEventListener("DOMContentLoaded", () => {
+    // 清除可能因浏览器刷新而残留的模式类（Chrome刷新会保留DOM状态）
+    document.body.classList.remove('dictation-mode', 'repeater-mode');
+
     initTheme();
     initLangSelectors();
     initSettingsListeners();

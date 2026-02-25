@@ -145,7 +145,10 @@ function bindPopupEvents() {
     if (!popupInputElement) return;
 
     popupInputElement.addEventListener("keypress", e => {
-        if (e.key === "Enter" && !_getState?.()?.isPaused) submit();
+        const s = _getState?.();
+        if (e.key === "Enter" && !s?.isPaused && !s?.isSubmitting) {
+            submit();
+        }
     });
 }
 
@@ -319,9 +322,17 @@ export function submit() {
     const s = _getState?.();
     if (!s) return;
 
+    // 防止重复提交
+    if (s.isSubmitting) {
+        console.log('[submit] 提交正在处理中，忽略重复调用');
+        return;
+    }
+    s.isSubmitting = true;  // 设置锁定
+
     // 使用缓存的 DOM 引用
     if (!popupInputElement) {
         console.warn('[submit] 输入框引用不存在');
+        s.isSubmitting = false;  // 清除锁定
         return;
     }
 
@@ -338,7 +349,10 @@ export function submit() {
         s.results[i] = { status: "correct", retries: s.attempts[i].length };
         updateWorkplace();
         s.currentIndex++;
-        setTimeout(() => showPopup(), 500);
+        setTimeout(() => {
+            s.isSubmitting = false;  // 清除锁定
+            showPopup();
+        }, 500);
     } else {
         updateWorkplace();
 
@@ -346,7 +360,10 @@ export function submit() {
             s.results[i] = { status: "failed", retries: s.attempts[i].length };
             updateWorkplace();
             s.currentIndex++;
-            setTimeout(() => showPopup(), 500);
+            setTimeout(() => {
+                s.isSubmitting = false;  // 清除锁定
+                showPopup();
+            }, 500);
         } else {
             // 使用缓存的 DOM 引用直接更新
             if (popupRetryInfo) {
@@ -358,6 +375,7 @@ export function submit() {
             }
             popupInputElement.value = "";
             popupInputElement.focus();
+            s.isSubmitting = false;  // 清除锁定（继续答题）
         }
     }
 }

@@ -123,6 +123,7 @@ export class Dictation {
             results: list.map(() => null),
             slow: settings.slow,
             isPaused: false,
+            isSubmitting: false,  // 新增：防止重复提交
             isCustomWord: list.map(entry => entry.definition !== null),  // 新增：标记每个单词是否为自定义单词
             retryHistory: [],  // 存储所有轮次的完整记录
             currentRound: 0,    // 当前轮次编号（0=首次，1=第一次重试）

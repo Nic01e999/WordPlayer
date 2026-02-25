@@ -56,6 +56,9 @@ body.dictation-mode #menu::after {
 
 #home-btn:hover {
     transform: scale(1.05);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 9px;
 }
 
 #home-btn:active {
