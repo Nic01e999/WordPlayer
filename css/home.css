@@ -1111,18 +1111,21 @@
 }
 
 /* ===== 备案信息样式 - 液态玻璃风格 ===== */
-.icp-filing {
-    /* bottom: 1rem; */
+.site_info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: center; 
+    align-items: center;  
     left: 0.9375rem;
     padding: 0.75rem 1.5rem;
-    text-align: center;
     font-size: 0.875rem;
     color: var(--text-muted);
-    opacity: 0.3;
+    opacity: 0.9;
     z-index: 10;
 }
 
-.icp-filing a {
+.site_info a {
     color: var(--text-muted);
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1130,7 +1133,7 @@
     border-radius: 0.375rem;
 }
 
-.icp-filing a:hover {
+.site_info a:hover {
     color: var(--text-primary);
     background: var(--bg-themeoverlay);
     backdrop-filter: blur(10px);
@@ -1139,9 +1142,16 @@
     opacity: 1;
 }
 
+
+.site_info > a {
+    opacity: 0.3;
+
+}
+
+
 /* 响应式适配 */
 @media (max-width: 700px) {
-    .icp-filing {
+    .site_info {
         font-size: 0.75rem;
         padding: 0.5rem 1rem;
         bottom: 0.5rem;
