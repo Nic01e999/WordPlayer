@@ -1140,12 +1140,17 @@
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 2px 8px var(--shadow-themelight);
     opacity: 1;
+    font-weight: 1000;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+
 }
 
 
-.site_info > a {
+.site_info #filing {
     opacity: 0.3;
-
+}
+.site_info #filing:hover {
+    opacity: 0.6;
 }
 
 
