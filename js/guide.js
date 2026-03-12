@@ -5,23 +5,18 @@
 
 import { t } from './i18n/index.js';
 
-// 指引图片配置（使用CSS渐变作为占位图片）
+// 指引图片配置
 const guideImages = {
     home: [
-        { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: '欢迎使用' },
-        { gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: '输入单词' },
-        { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: '选择模式' },
-        { gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', title: '开始学习' }
+        { src: 'assets/images/guide/home-1.gif' },
+        { src: 'assets/images/guide/home-2.gif' }
     ],
     dictation: [
-        { gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', title: '听写模式' },
-        { gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', title: '听音频' },
-        { gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', title: '输入答案' }
+        { src: 'assets/images/guide/dic-1.gif' },
+        { src: 'assets/images/guide/dic-2.gif' }
     ],
     repeater: [
-        { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', title: '复读模式' },
-        { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', title: '自动播放' },
-        { gradient: 'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)', title: '循环复习' }
+        { src: 'assets/images/guide/rep-1.gif' }
     ]
 };
 
@@ -59,16 +54,6 @@ export function showGuide(mode = 'home') {
 
     const image = document.createElement('div');
     image.className = 'guide-image';
-    image.style.width = '600px';
-    image.style.height = '400px';
-    image.style.borderRadius = '12px';
-    image.style.display = 'flex';
-    image.style.alignItems = 'center';
-    image.style.justifyContent = 'center';
-    image.style.fontSize = '32px';
-    image.style.fontWeight = 'bold';
-    image.style.color = 'white';
-    image.style.textShadow = '0 2px 10px rgba(0,0,0,0.3)';
 
     imageContainer.appendChild(image);
 
@@ -143,8 +128,14 @@ function updateImage() {
     const nextBtn = overlayElement.querySelector('.guide-btn-next');
 
     // 更新图片
-    imageElement.style.background = imageData.gradient;
-    imageElement.textContent = imageData.title;
+    imageElement.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = imageData.src;
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '60vh';
+    img.style.borderRadius = '12px';
+    img.style.display = 'block';
+    imageElement.appendChild(img);
 
     // 更新进度
     progressElement.textContent = `${currentIndex + 1} / ${images.length}`;
