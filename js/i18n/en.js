@@ -36,6 +36,7 @@ export default {
     // Dictation settings
     dictationSettings: 'Dictation',
     maxRetry: 'Max Retry',
+    soundEffects: 'Sound Effects',
     wordWriteDefListen: 'Word(write):Def(listen)',
     dictateProvide: 'Provide',
     dictateWrite: 'Write',

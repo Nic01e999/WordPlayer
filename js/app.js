@@ -35,6 +35,7 @@ import {
 import { initWebSocket, disconnectWebSocket } from './sync/websocket.js';
 import { checkFirstTime } from './guide.js';
 import { initPublicSearch, openPublicSearch } from './public-search.js';
+import { setSoundEffectsEnabled } from './soundEffects.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -182,6 +183,17 @@ function initSettingsListeners() {
 
             // 立即刷新当前模式
             refreshCurrentMode();
+        });
+    }
+
+    // soundEffects 音效开关
+    const soundEffectsCheckbox = $("soundEffects");
+    if (soundEffectsCheckbox) {
+        soundEffectsCheckbox.addEventListener("change", async () => {
+            const value = soundEffectsCheckbox.checked;
+            setSoundEffectsEnabled(value);
+            await saveSettingToServer('sound_effects', value);
+            console.log(`[Settings] 音效已${value ? '启用' : '禁用'}`);
         });
     }
 
@@ -373,6 +385,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (settings.retry_count !== undefined && $("retry")) {
             $("retry").value = settings.retry_count;
+        }
+        if (settings.sound_effects !== undefined && $("soundEffects")) {
+            $("soundEffects").checked = settings.sound_effects;
+            setSoundEffectsEnabled(settings.sound_effects);
         }
         if (settings.dictate_provide !== undefined) {
             const provideRadio = document.querySelector(`input[name="dictate-provide"][value="${settings.dictate_provide}"]`);

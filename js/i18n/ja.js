@@ -36,6 +36,7 @@ export default {
     // ディクテーション設定
     dictationSettings: 'ディクテーション',
     maxRetry: '最大リトライ',
+    soundEffects: '音声効果',
     wordWriteDefListen: '単語(書く):意味(聞く)',
     dictateProvide: '提供',
     dictateWrite: '書く',

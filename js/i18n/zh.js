@@ -36,6 +36,7 @@ export default {
     // 听写设置
     dictationSettings: '听写',
     maxRetry: '最大重试',
+    soundEffects: '答题音效',
     wordWriteDefListen: '单词(写):释义(听)',
     dictateProvide: '提供',
     dictateWrite: '书写',

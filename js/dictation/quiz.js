@@ -7,6 +7,7 @@ import { $, logToWorkplace, escapeHtml, updateTextareaFromEntries } from '../uti
 import { stopAudio, speakWord, updatePlayPauseBtn } from '../audio.js';
 import { createPositionDragger } from '../utils/drag.js';
 import { t, onLocaleChange } from '../i18n/index.js';
+import { playCorrectSound, playIncorrectSound } from '../soundEffects.js';
 
 /**
  * 格式化翻译文本：转换换行符并限制显示行数
@@ -383,6 +384,9 @@ export function submit() {
     });
 
     if (answer.toLowerCase() === correct.toLowerCase()) {
+        // 播放正确音效
+        playCorrectSound();
+
         s.results[i] = { status: "correct", retries: s.attempts[i].length };
         updateWorkplace();
         s.currentIndex++;
@@ -391,6 +395,9 @@ export function submit() {
             showPopup();
         }, 500);
     } else {
+        // 播放错误音效
+        playIncorrectSound();
+
         updateWorkplace();
 
         if (s.attempts[i].length >= s.maxRetry) {

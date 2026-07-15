@@ -19,7 +19,8 @@ const DEFAULT_SETTINGS = {
     interval_ms: 300,
     slow_mode: false,
     shuffle_mode: false,
-    dictate_mode: false
+    dictate_mode: false,
+    sound_effects: true
 };
 
 // 当前用户设置（内存中）

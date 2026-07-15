@@ -36,6 +36,7 @@ export default {
     // 받아쓰기 설정
     dictationSettings: '받아쓰기',
     maxRetry: '최대 재시도',
+    soundEffects: '효과음',
     wordWriteDefListen: '단어(쓰기):뜻(듣기)',
     dictateProvide: '제공',
     dictateWrite: '쓰기',
