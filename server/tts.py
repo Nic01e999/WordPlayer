@@ -74,8 +74,9 @@ def _make_tts_request(url: str, timeout: int = API_TIMEOUT_TTS, error_prefix: st
 
 def get_youdao_tts(text: str, accent: str = "us") -> bytes:
     """使用有道 TTS 获取英语语音（支持 US/UK 口音）"""
-    # type=1 美式发音, type=2 英式发音
-    voice_type = 2 if accent == "uk" else 1
+    # 注意：有道 API 实际行为与文档相反
+    # type=1 实际是英式发音, type=2 实际是美式发音
+    voice_type = 1 if accent == "uk" else 2
     url = f"https://dict.youdao.com/dictvoice?audio={requests.utils.quote(text)}&type={voice_type}"
     return _make_tts_request(url, timeout=API_TIMEOUT_TTS, error_prefix="有道 TTS")
 

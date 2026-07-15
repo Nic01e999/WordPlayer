@@ -20,7 +20,8 @@ function escapeAndFormat(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;')
-        .replace(/\\n/g, '<br>')  // 将 \n 转换为 <br>
+        .replace(/\n/g, '<br>')   // 先处理实际换行符
+        .replace(/\\n/g, '<br>')  // 再处理字面 \n
         .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')  // 将 \t 转换为空格
         .replace(/\\\\/g, '\\');  // 将 \\ 转换为 \
 }
