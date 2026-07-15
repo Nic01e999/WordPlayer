@@ -43,6 +43,9 @@ let popupInputElement = null;   // 缓存输入框
 let popupRetryInfo = null;      // 缓存重试信息
 let popupTitle = null;          // 缓存标题
 
+// 终端式历史回溯：记录最近一次提交的答案（供上箭头调取）
+let lastSubmittedAnswer = "";
+
 export function setQuizDeps(deps) {
     _getState = deps.getState;
     _setState = deps.setState;
@@ -148,6 +151,35 @@ function bindPopupEvents() {
         const s = _getState?.();
         if (e.key === "Enter" && !s?.isPaused && !s?.isSubmitting) {
             submit();
+        }
+    });
+
+    // 终端式快捷键：上箭头调取上次输入、下箭头清空、Tab 重播音频
+    popupInputElement.addEventListener("keydown", e => {
+        const s = _getState?.();
+        if (s?.isPaused) return;
+
+        switch (e.key) {
+            case "ArrowUp":
+                // 调取上一次提交的答案（history recall）
+                e.preventDefault();
+                if (lastSubmittedAnswer) {
+                    popupInputElement.value = lastSubmittedAnswer;
+                    // 光标移到末尾，方便直接修改
+                    const len = popupInputElement.value.length;
+                    popupInputElement.setSelectionRange(len, len);
+                }
+                break;
+            case "ArrowDown":
+                // 清空输入框
+                e.preventDefault();
+                popupInputElement.value = "";
+                break;
+            case "Tab":
+                // 重播当前单词音频，阻止默认焦点切换
+                e.preventDefault();
+                play();
+                break;
         }
     });
 }
@@ -339,6 +371,11 @@ export function submit() {
     const answer = popupInputElement.value.trim();
     const correct = s.expectTexts[s.currentIndex];
     const i = s.currentIndex;
+
+    // 记录本次提交，供上箭头调取（终端式 history recall）
+    if (answer) {
+        lastSubmittedAnswer = answer;
+    }
 
     s.attempts[i].push({
         answer,
