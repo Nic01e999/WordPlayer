@@ -35,9 +35,15 @@ export function showGuide(mode = 'home') {
     currentMode = mode;
     currentIndex = 0;
 
-    // 如果已存在，先移除
+    // 同步移除旧 overlay，避免异步竞态
     if (overlayElement) {
-        closeGuide();
+        if (overlayElement._keyHandler) {
+            document.removeEventListener('keydown', overlayElement._keyHandler);
+        }
+        if (overlayElement.parentNode) {
+            overlayElement.parentNode.removeChild(overlayElement);
+        }
+        overlayElement = null;
     }
 
     // 创建遮罩层

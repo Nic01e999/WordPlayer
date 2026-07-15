@@ -34,7 +34,7 @@
             <div id="settings">
                 <h3>
                     <span data-i18n="general">General</span>
-                    <button class="guide-btn-trigger" onclick="showGuide('home')" title="用户指引">❓</button>
+                    <button class="guide-btn-trigger" onclick="showGuide(window.currentActiveMode || 'home')" title="用户指引">❓</button>
                 </h3>
                 <label><span data-i18n="shuffle">Shuffle</span>: <input type="checkbox" id="shuffle"></label>
                 <label><span data-i18n="slow">Slow</span>: <input type="checkbox" id="slow"></label>

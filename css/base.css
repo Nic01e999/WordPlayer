@@ -12,7 +12,7 @@ html {
 
 body {
     margin: 0;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-mid) 50%, var(--bg-page-end) 100%);
     display: flex;
     flex-direction: column;

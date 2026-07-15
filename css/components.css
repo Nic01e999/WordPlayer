@@ -4,7 +4,7 @@
 
 /* 提示文字样式 */
 .hint {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     font-size: 0.8125rem;
     color: var(--text-muted);
     margin-top: 0.625rem;

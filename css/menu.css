@@ -36,7 +36,7 @@ body.dictation-mode #menu::after {
 
 /* Home 按钮样式（标题按钮） */
 #home-btn {
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Cinzel', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-primary);
     margin: 0;
     font-weight: 500;
@@ -72,7 +72,7 @@ body.dictation-mode #menu::after {
 
 /* 菜单栏按钮样式 */
 #mode-btn button {
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Cinzel', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     border-radius: 1.5625rem;
     width: clamp(9rem, 18vw, 13.75rem);
     font-size: clamp(0.875rem, 1.5vw, 1.125rem);
@@ -232,7 +232,7 @@ body.settings-active .sidebar {
 
 /* 设置面板标题样式 */
 .sidebar h3 {
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Cinzel', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-accent);
     font-size: 120%;
     font-weight: 600;
@@ -249,7 +249,7 @@ body.settings-active .sidebar {
 
 /* 设置项标签样式 */
  .sidebar label {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -275,7 +275,7 @@ body.settings-active .sidebar {
     text-align: center;
     font-weight: 600;
     transition: all 0.2s;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
 }
 
 .sidebar input[type="number"]:focus {
@@ -308,13 +308,13 @@ body.settings-active .sidebar {
 }
 
 .lang-selector > span {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
 .sidebar select {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     padding: 0.3125rem 0.5rem;
     border: 1px solid var(--border-thememedium);
     border-radius: 0.5rem;
@@ -347,7 +347,7 @@ body.settings-active .sidebar {
 }
 
 .accent-selector > span {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-secondary);
     font-size: 0.875rem;
 }
@@ -367,7 +367,7 @@ body.settings-active .sidebar {
 }
 
 .dictate-option > span {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-secondary);
     font-size: 0.875rem;
 }
@@ -422,7 +422,7 @@ body.settings-active .sidebar {
 }
 
 .theme-selector > span {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-secondary);
     font-size: 0.875rem;
 }
@@ -437,7 +437,7 @@ body.settings-active .sidebar {
 .btn-load {
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     background: var(--accent-primary);
     color: white;
     border: none;

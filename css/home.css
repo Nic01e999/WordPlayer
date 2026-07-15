@@ -44,7 +44,7 @@
 
 
 #wordSection h3 {
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Cinzel', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     color: var(--text-accent);
     font-size: 1rem;
     font-weight: 600;
@@ -68,7 +68,7 @@
 }
 
 #wordSection textarea {
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-family: 'Cormorant Garamond', 'Georgia', 'Hannotate SC', '手札体-简', serif;
     flex: 1;
     width: 100%;
     min-height: 0;
