@@ -8,6 +8,7 @@ import { stopAudio, speakWord, updatePlayPauseBtn } from '../audio.js';
 import { createPositionDragger } from '../utils/drag.js';
 import { t, onLocaleChange } from '../i18n/index.js';
 import { playCorrectSound, playIncorrectSound } from '../soundEffects.js';
+import { saveHistory, updateHistory } from './history.js';
 
 /**
  * 格式化翻译文本：转换换行符并限制显示行数
@@ -202,10 +203,11 @@ function createPopup(state) {
 
     // 决定是否显示 provide
     let titleHtml;
+    const totalWords = state.entries.length;
     if (isCustom && state.dictateProvide !== state.dictateWrite) {
-        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords} &lt;${provideText}&gt;`;
     } else {
-        titleHtml = t('wordNum', { num: i + 1 });
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords}`;
     }
 
     const popup = document.createElement("div");
@@ -259,10 +261,11 @@ function updatePopup(state) {
 
     // 决定是否显示 provide
     let titleHtml;
+    const totalWords = state.entries.length;
     if (isCustom && state.dictateProvide !== state.dictateWrite) {
-        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords} &lt;${provideText}&gt;`;
     } else {
-        titleHtml = t('wordNum', { num: i + 1 });
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords}`;
     }
 
     // 只更新3个动态元素
@@ -658,6 +661,33 @@ export function showResults() {
         }
     }, 100);
 
+    // 保存或更新历史记录
+    const wp = document.getElementById("dictationWorkplace");
+    const cardName = s.entries[0]?.cardName || null;
+    const firstWord = s.entries[0]?.word || '';
+
+    const historyRecord = {
+        retryHistory: s.retryHistory || [],
+        timestamp: Date.now(),
+        cardName: cardName,
+        firstWord: firstWord,
+        finalScore: parseFloat(score),
+        totalWords: s.entries.length,
+        workplaceHTML: wp ? wp.innerHTML : '',
+        currentRound: s.currentRound
+    };
+
+    if (s.sessionHistoryId) {
+        // 已有历史记录ID，更新现有记录
+        updateHistory(s.sessionHistoryId, historyRecord);
+        console.log('[showResults] 已更新历史记录，ID:', s.sessionHistoryId);
+    } else {
+        // 首次保存，创建新记录
+        const newId = saveHistory(historyRecord);
+        s.sessionHistoryId = newId;
+        console.log('[showResults] 已创建新历史记录，ID:', newId);
+    }
+
     // 不清空 state，保留历史记录以支持多轮重试
     // _setState?.(null);
 }
@@ -782,7 +812,7 @@ async function shareResult(result) {
         // 4. 使用 html2canvas 生成图片
         const canvas = await html2canvas(container, {
             backgroundColor: '#f5f5dc', // 米黄色背景
-            scale: 2, // 2倍分辨率，提高清晰度
+            scale: 1, // 1倍分辨率，减小文件体积
             logging: false,
             useCORS: true,
             allowTaint: true
@@ -1039,10 +1069,11 @@ function refreshPopupLanguage() {
     // 更新标题
     const provideText = s.provideTexts[i];
     let titleHtml;
+    const totalWords = s.entries.length;
     if (isCustom && s.dictateProvide !== s.dictateWrite) {
-        titleHtml = `${t('wordNum', { num: i + 1 })} &lt;${provideText}&gt;`;
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords} &lt;${provideText}&gt;`;
     } else {
-        titleHtml = t('wordNum', { num: i + 1 });
+        titleHtml = `${t('wordNum', { num: i + 1 })}/${totalWords}`;
     }
     popupTitle.innerHTML = titleHtml;
 

@@ -6,6 +6,7 @@ import { currentActiveMode, currentRepeaterState } from './state.js';
 import { initPreloadListeners, startPreload, updatePreloadProgress } from './preload.js';
 import { Repeater, setDictationRef } from './repeater/index.js';
 import { Dictation, setRepeaterRef } from './dictation/index.js';
+import { initHistoryUI } from './dictation/history-ui.js';
 import {
     $,
     isValidForLanguage,
@@ -301,6 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initWordcardUI();
     initSettingsToggle();  // 初始化设置面板点击切换功能
     initPublicSearch();    // 初始化公开文件夹搜索功能
+    initHistoryUI();       // 初始化听写历史记录UI
 
     // 从 localStorage 恢复语言设置（未登录用户使用，已登录用户会被服务端设置覆盖）
     loadLangSettings();

@@ -127,7 +127,8 @@ export class Dictation {
             isCustomWord: list.map(entry => entry.definition !== null),  // 新增：标记每个单词是否为自定义单词
             retryHistory: [],  // 存储所有轮次的完整记录
             currentRound: 0,    // 当前轮次编号（0=首次，1=第一次重试）
-            workplaceSnapshot: ''  // 新增：保存进入当前轮次前的workplace内容
+            workplaceSnapshot: '',  // 新增：保存进入当前轮次前的workplace内容
+            sessionHistoryId: null  // 新增：当前听写会话的历史记录ID
         };
 
         showPopup();

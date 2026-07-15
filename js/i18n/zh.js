@@ -184,6 +184,17 @@ export default {
     retryFailed: '错题重听',
     retryComplete: '第 {num} 次重试完成',
     retryRound: '第 {num} 次重试',
+    savedToDownload: '已保存到下载文件夹',
+    shareError: '分享失败',
+
+    // 听写历史记录
+    dictationHistory: '听写历史',
+    noHistory: '暂无听写记录',
+    justNow: '刚刚',
+    minutesAgo: '分钟前',
+    hoursAgo: '小时前',
+    daysAgo: '天前',
+    untitled: '未命名',
 
     // 复读模式
     playCount: '播放 {current}/{total}',

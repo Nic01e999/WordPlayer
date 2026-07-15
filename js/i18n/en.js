@@ -184,6 +184,17 @@ export default {
     retryFailed: 'Retry Failed Words',
     retryComplete: 'Retry Round {num} Complete',
     retryRound: 'Retry Round {num}',
+    savedToDownload: 'Saved to downloads',
+    shareError: 'Failed to generate share',
+
+    // Dictation history
+    dictationHistory: 'Dictation History',
+    noHistory: 'No dictation records',
+    justNow: 'Just now',
+    minutesAgo: ' min ago',
+    hoursAgo: ' hr ago',
+    daysAgo: ' days ago',
+    untitled: 'Untitled',
 
     // Repeater mode
     playCount: 'Play {current}/{total}',
