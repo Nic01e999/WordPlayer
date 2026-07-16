@@ -1147,10 +1147,10 @@
 
 
 .site_info #filing {
-    opacity: 0.3;
+    opacity: 0.7;
 }
 .site_info #filing:hover {
-    opacity: 0.6;
+    opacity: 0.9;
 }
 
 
