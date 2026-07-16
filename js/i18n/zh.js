@@ -23,6 +23,9 @@ export default {
     us: '美式',
     uk: '英式',
 
+    // 全屏
+    fullscreen: '全屏',
+
     // 颜色
     pink: '粉色',
     green: '绿色',
@@ -244,6 +247,25 @@ export default {
     guidePrevious: '上一步',
     guideClose: '关闭',
     guideNext: '下一步',
+
+    // 主页指引
+    guideHomeTitle: '欢迎使用单词玩家',
+    guideHomeStep1: '在侧边栏输入单词并加载，选择「听写」或「复读」模式开始学习',
+    guideHomeStep2: '可以保存单词卡或更新现有单词卡。长按单词卡可拖动排序或改变颜色',
+    guideHomeStep3: '点击文件夹图标切换公开/私有状态。使用键盘 ⬅️ ➡️ 翻页',
+    guideHomeStep4: '点击标题"WORD PLAYER"可以搜索公开文件夹',
+
+    // 听写模式指引
+    guideDictationTitle: '听写模式使用说明',
+    guideDictationStep1: '点击音频图标或按 Tab 键播放音频，根据听到的内容输入单词',
+    guideDictationStep2: '可以拖动图钉移动便签位置，方便查看',
+    guideDictationStep3: '按 ⬆️ 返回上一个单词，按 ⬇️ 清空当前输入',
+
+    // 复读模式指引
+    guideRepeaterTitle: '复读模式使用说明',
+    guideRepeaterStep1: '系统会自动循环播放单词和翻译，帮助记忆',
+    guideRepeaterStep2: '按空格键暂停/播放，使用 ⬅️ ➡️ 切换显示信息',
+    guideRepeaterStep3: '使用 ⬆️ ⬇️ 切换单词',
 
     // 其他消息
     shareError: '生成失败',

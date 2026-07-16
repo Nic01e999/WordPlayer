@@ -37,6 +37,7 @@ import { initWebSocket, disconnectWebSocket } from './sync/websocket.js';
 import { checkFirstTime } from './guide.js';
 import { initPublicSearch, openPublicSearch } from './public-search.js';
 import { setSoundEffectsEnabled } from './soundEffects.js';
+import { initFullscreen, toggleFullscreen } from './fullscreen.js';
 
 // 在 DOMContentLoaded 之前应用主题（防止页面闪烁）
 applyTheme(getStoredTheme());
@@ -64,6 +65,7 @@ window.Repeater = Repeater;
 window.Dictation = Dictation;
 window.goHome = goHomeOrSearch;  // 使用新的函数
 window.showLoginDialog = showLoginDialog;
+window.toggleFullscreen = toggleFullscreen;
 
 // 暴露当前模式到全局（供模块内部检测使用）
 Object.defineProperty(window, 'currentActiveMode', {
@@ -303,6 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSettingsToggle();  // 初始化设置面板点击切换功能
     initPublicSearch();    // 初始化公开文件夹搜索功能
     initHistoryUI();       // 初始化听写历史记录UI
+    initFullscreen();      // 初始化全屏功能
 
     // 从 localStorage 恢复语言设置（未登录用户使用，已登录用户会被服务端设置覆盖）
     loadLangSettings();

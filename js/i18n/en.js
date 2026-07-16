@@ -23,6 +23,9 @@ export default {
     us: 'US',
     uk: 'UK',
 
+    // 全屏
+    fullscreen: 'Fullscreen',
+
     // Colors
     pink: 'Pink',
     green: 'Green',
@@ -244,6 +247,25 @@ export default {
     guidePrevious: 'Previous',
     guideClose: 'Close',
     guideNext: 'Next',
+
+    // Home guide
+    guideHomeTitle: 'Welcome to Word Player',
+    guideHomeStep1: 'Enter words in sidebar and load, then choose "Dictation" or "Repeater" mode to start',
+    guideHomeStep2: 'Save or update word cards. Long press a card to drag/reorder or change its color',
+    guideHomeStep3: 'Click folder icon to toggle public/private status. Use ⬅️ ➡️ to navigate pages',
+    guideHomeStep4: 'Click "WORD PLAYER" title to search public folders',
+
+    // Dictation mode guide
+    guideDictationTitle: 'Dictation Mode Guide',
+    guideDictationStep1: 'Click the audio icon or press Tab to play audio, then type the word you heard',
+    guideDictationStep2: 'Drag the pin to move notes for better visibility',
+    guideDictationStep3: 'Press ⬆️ for previous word, press ⬇️ to clear current input',
+
+    // Repeater mode guide
+    guideRepeaterTitle: 'Repeater Mode Guide',
+    guideRepeaterStep1: 'The system automatically loops words and translations to help memorization',
+    guideRepeaterStep2: 'Press Space to pause/play, use ⬅️ ➡️ to change display info',
+    guideRepeaterStep3: 'Use ⬆️ ⬇️ to switch between words',
 
     // Additional messages
     shareError: 'Failed to generate share',

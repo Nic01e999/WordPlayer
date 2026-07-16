@@ -1,28 +1,40 @@
 /**
  * 用户指引模块
- * 提供图片播放器功能，用于显示用户指引
+ * 提供纯文本指引，用于显示用户说明
  */
 
 import { t } from './i18n/index.js';
 
-// 指引图片配置
-const guideImages = {
-    home: [
-        { src: 'assets/images/guide/home-1.gif' },
-        { src: 'assets/images/guide/home-2.gif' }
-    ],
-    dictation: [
-        { src: 'assets/images/guide/dic-1.gif' },
-        { src: 'assets/images/guide/dic-2.gif' }
-    ],
-    repeater: [
-        { src: 'assets/images/guide/rep-1.gif' }
-    ]
+// 指引文本配置
+const guideTexts = {
+    home: {
+        title: 'guideHomeTitle',
+        content: [
+            'guideHomeStep1',
+            'guideHomeStep2',
+            'guideHomeStep3',
+            'guideHomeStep4'
+        ]
+    },
+    dictation: {
+        title: 'guideDictationTitle',
+        content: [
+            'guideDictationStep1',
+            'guideDictationStep2',
+            'guideDictationStep3'
+        ]
+    },
+    repeater: {
+        title: 'guideRepeaterTitle',
+        content: [
+            'guideRepeaterStep1',
+            'guideRepeaterStep2',
+            'guideRepeaterStep3'
+        ]
+    }
 };
 
 // 当前状态
-let currentMode = 'home';
-let currentIndex = 0;
 let overlayElement = null;
 
 /**
@@ -31,9 +43,6 @@ let overlayElement = null;
  */
 export function showGuide(mode = 'home') {
     console.log(`[Guide] 显示指引: ${mode}`);
-
-    currentMode = mode;
-    currentIndex = 0;
 
     // 同步移除旧 overlay，避免异步竞态
     if (overlayElement) {
@@ -46,6 +55,12 @@ export function showGuide(mode = 'home') {
         overlayElement = null;
     }
 
+    const guideData = guideTexts[mode];
+    if (!guideData) {
+        console.error(`[Guide] 未找到模式: ${mode}`);
+        return;
+    }
+
     // 创建遮罩层
     overlayElement = document.createElement('div');
     overlayElement.className = 'guide-overlay';
@@ -54,49 +69,34 @@ export function showGuide(mode = 'home') {
     const viewer = document.createElement('div');
     viewer.className = 'guide-viewer';
 
-    // 创建图片容器
-    const imageContainer = document.createElement('div');
-    imageContainer.className = 'guide-image-container';
+    // 创建标题
+    const title = document.createElement('h2');
+    title.className = 'guide-title';
+    title.textContent = t(guideData.title);
 
-    const image = document.createElement('div');
-    image.className = 'guide-image';
+    // 创建内容容器
+    const contentContainer = document.createElement('div');
+    contentContainer.className = 'guide-content';
 
-    imageContainer.appendChild(image);
+    // 添加所有步骤
+    guideData.content.forEach((stepKey, index) => {
+        const step = document.createElement('p');
+        step.className = 'guide-step';
+        step.textContent = `${index + 1}. ${t(stepKey)}`;
+        contentContainer.appendChild(step);
+    });
 
-    // 创建导航栏
-    const nav = document.createElement('div');
-    nav.className = 'guide-nav';
-
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'guide-btn guide-btn-prev';
-    prevBtn.textContent = t('guidePrevious');
-    prevBtn.onclick = () => prevImage();
-
-    const progress = document.createElement('span');
-    progress.className = 'guide-progress';
-
+    // 创建关闭按钮
     const closeBtn = document.createElement('button');
     closeBtn.className = 'guide-btn guide-btn-close';
     closeBtn.textContent = t('guideClose');
     closeBtn.onclick = () => closeGuide();
 
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'guide-btn guide-btn-next';
-    nextBtn.textContent = t('guideNext');
-    nextBtn.onclick = () => nextImage();
-
-    nav.appendChild(prevBtn);
-    nav.appendChild(progress);
-    nav.appendChild(closeBtn);
-    nav.appendChild(nextBtn);
-
-    viewer.appendChild(imageContainer);
-    viewer.appendChild(nav);
+    viewer.appendChild(title);
+    viewer.appendChild(contentContainer);
+    viewer.appendChild(closeBtn);
     overlayElement.appendChild(viewer);
     document.body.appendChild(overlayElement);
-
-    // 显示第一张图片
-    updateImage();
 
     // 点击遮罩层关闭
     overlayElement.addEventListener('click', (e) => {
@@ -105,73 +105,14 @@ export function showGuide(mode = 'home') {
         }
     });
 
-    // 键盘导航
+    // 键盘导航 (ESC 关闭)
     const keyHandler = (e) => {
-        if (e.key === 'ArrowLeft') {
-            prevImage();
-        } else if (e.key === 'ArrowRight') {
-            nextImage();
-        } else if (e.key === 'Escape') {
+        if (e.key === 'Escape') {
             closeGuide();
         }
     };
     document.addEventListener('keydown', keyHandler);
     overlayElement._keyHandler = keyHandler;
-}
-
-/**
- * 更新图片显示
- */
-function updateImage() {
-    if (!overlayElement) return;
-
-    const images = guideImages[currentMode];
-    const imageData = images[currentIndex];
-
-    const imageElement = overlayElement.querySelector('.guide-image');
-    const progressElement = overlayElement.querySelector('.guide-progress');
-    const prevBtn = overlayElement.querySelector('.guide-btn-prev');
-    const nextBtn = overlayElement.querySelector('.guide-btn-next');
-
-    // 更新图片
-    imageElement.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = imageData.src;
-    img.style.maxWidth = '100%';
-    img.style.maxHeight = '60vh';
-    img.style.borderRadius = '12px';
-    img.style.display = 'block';
-    imageElement.appendChild(img);
-
-    // 更新进度
-    progressElement.textContent = `${currentIndex + 1} / ${images.length}`;
-
-    // 更新按钮状态
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex === images.length - 1;
-
-    console.log(`[Guide] 显示第 ${currentIndex + 1}/${images.length} 张图片`);
-}
-
-/**
- * 下一张图片
- */
-function nextImage() {
-    const images = guideImages[currentMode];
-    if (currentIndex < images.length - 1) {
-        currentIndex++;
-        updateImage();
-    }
-}
-
-/**
- * 上一张图片
- */
-function prevImage() {
-    if (currentIndex > 0) {
-        currentIndex--;
-        updateImage();
-    }
 }
 
 /**

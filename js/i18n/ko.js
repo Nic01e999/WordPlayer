@@ -23,6 +23,9 @@ export default {
     us: '미국식',
     uk: '영국식',
 
+    // 全屏
+    fullscreen: '전체 화면',
+
     // 색상
     pink: '핑크',
     green: '그린',
@@ -233,6 +236,25 @@ export default {
     guidePrevious: '이전',
     guideClose: '닫기',
     guideNext: '다음',
+
+    // 홈 가이드
+    guideHomeTitle: 'Word Player에 오신 것을 환영합니다',
+    guideHomeStep1: '사이드바에 단어를 입력하고 로드한 후 "받아쓰기" 또는 "리피터" 모드를 선택하여 시작하세요',
+    guideHomeStep2: '단어 카드를 저장하거나 업데이트할 수 있습니다. 카드를 길게 누르면 드래그하여 순서를 변경하거나 색상을 바꿀 수 있습니다',
+    guideHomeStep3: '폴더 아이콘을 클릭하여 공개/비공개 상태를 전환합니다. ⬅️ ➡️ 로 페이지를 이동합니다',
+    guideHomeStep4: '제목 "WORD PLAYER"를 클릭하여 공개 폴더를 검색할 수 있습니다',
+
+    // 받아쓰기 모드 가이드
+    guideDictationTitle: '받아쓰기 모드 가이드',
+    guideDictationStep1: '오디오 아이콘을 클릭하거나 Tab 키를 눌러 오디오를 재생하고 들은 단어를 입력하세요',
+    guideDictationStep2: '핀을 드래그하여 메모 위치를 이동할 수 있습니다',
+    guideDictationStep3: '⬆️ 로 이전 단어로 돌아가고, ⬇️ 로 현재 입력을 지웁니다',
+
+    // 리피터 모드 가이드
+    guideRepeaterTitle: '리피터 모드 가이드',
+    guideRepeaterStep1: '시스템이 자동으로 단어와 번역을 반복하여 암기를 도와줍니다',
+    guideRepeaterStep2: '스페이스 키로 일시정지/재생, ⬅️ ➡️ 로 표시 정보를 변경합니다',
+    guideRepeaterStep3: '⬆️ ⬇️ 로 단어를 전환합니다',
 
     // 기타 메시지
     shareError: '생성 실패',

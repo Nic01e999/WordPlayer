@@ -23,6 +23,9 @@ export default {
     us: '米国式',
     uk: '英国式',
 
+    // 全屏
+    fullscreen: '全画面',
+
     // 色
     pink: 'ピンク',
     green: 'グリーン',
@@ -233,6 +236,25 @@ export default {
     guidePrevious: '前へ',
     guideClose: '閉じる',
     guideNext: '次へ',
+
+    // ホームガイド
+    guideHomeTitle: 'Word Playerへようこそ',
+    guideHomeStep1: 'サイドバーに単語を入力して読み込み、「ディクテーション」または「リピーター」モードを選択して開始します',
+    guideHomeStep2: '単語カードを保存または更新できます。カードを長押しすると、ドラッグして並べ替えたり色を変更できます',
+    guideHomeStep3: 'フォルダアイコンをクリックして公開/非公開を切り替えます。⬅️ ➡️ でページを移動します',
+    guideHomeStep4: 'タイトル「WORD PLAYER」をクリックして公開フォルダを検索できます',
+
+    // ディクテーションモードガイド
+    guideDictationTitle: 'ディクテーションモードガイド',
+    guideDictationStep1: '音声アイコンをクリックするか Tab キーを押して音声を再生し、聞いた単語を入力します',
+    guideDictationStep2: 'ピンをドラッグしてメモの位置を移動できます',
+    guideDictationStep3: '⬆️ で前の単語に戻り、⬇️ で現在の入力をクリアします',
+
+    // リピーターモードガイド
+    guideRepeaterTitle: 'リピーターモードガイド',
+    guideRepeaterStep1: 'システムは自動的に単語と翻訳をループして、記憶を助けます',
+    guideRepeaterStep2: 'スペースキーで一時停止/再生、⬅️ ➡️ で表示情報を切り替えます',
+    guideRepeaterStep3: '⬆️ ⬇️ で単語を切り替えます',
 
     // その他のメッセージ
     shareError: '生成に失敗しました',

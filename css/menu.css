@@ -115,6 +115,72 @@ body.dictation-mode #menu::after {
     box-shadow: 0 2px 8px var(--shadow-menu-btn);
 }
 
+/* 全屏按钮 */
+.fullscreen-trigger {
+    position: relative;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 0.375rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    /* 用 currentColor 驱动内部图标颜色 */
+    color: var(--accent-primary);
+    transition: transform 0.3s ease-out, opacity 0.2s;
+}
+
+.fullscreen-trigger:hover {
+    transform: scale(1.12);
+}
+
+.fullscreen-trigger:active {
+    transform: scale(0.96);
+}
+
+/* 全屏图标 - 四角括号（进入全屏） */
+.fullscreen-trigger::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    transition: all 0.25s ease-out;
+    border: 0.15rem solid currentColor;
+    border-radius: 0.2rem;
+    /* 用遮罩只保留四个角，形成全屏图标 */
+    -webkit-mask:
+        linear-gradient(#000 0 0) top left / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) top right / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) bottom left / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) bottom right / 0.45rem 0.45rem no-repeat;
+    mask:
+        linear-gradient(#000 0 0) top left / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) top right / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) bottom left / 0.45rem 0.45rem no-repeat,
+        linear-gradient(#000 0 0) bottom right / 0.45rem 0.45rem no-repeat;
+}
+
+/* 退出全屏状态：四角向内收缩 */
+body.is-fullscreen .fullscreen-trigger::before {
+    width: 0.95rem;
+    height: 0.95rem;
+    -webkit-mask:
+        linear-gradient(#000 0 0) top left / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) top right / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) bottom left / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) bottom right / 0.35rem 0.35rem no-repeat;
+    mask:
+        linear-gradient(#000 0 0) top left / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) top right / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) bottom left / 0.35rem 0.35rem no-repeat,
+        linear-gradient(#000 0 0) bottom right / 0.35rem 0.35rem no-repeat;
+}
+
 /* 设置触发器容器 */
 .settings-trigger {
     position: relative;
@@ -130,10 +196,8 @@ body.dictation-mode #menu::after {
     width: 3.125rem;
     height: 3.125rem;
     cursor: pointer;
-    display: inline-block;
+    display: flex;
     position: relative;
-    font-size: 0;
-    color: transparent;
 }
 
 

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试用户指引</title>
+    <link rel="stylesheet" href="css/guide.css">
+</head>
+<body>
+    <h1 style="text-align: center; margin-top: 50px;">用户指引测试页面</h1>
+    <div style="text-align: center; margin-top: 30px;">
+        <button onclick="showGuide('home')" style="margin: 10px; padding: 10px 20px;">显示主页指引</button>
+        <button onclick="showGuide('dictation')" style="margin: 10px; padding: 10px 20px;">显示听写指引</button>
+        <button onclick="showGuide('repeater')" style="margin: 10px; padding: 10px 20px;">显示复读指引</button>
+    </div>
+
+    <script type="module">
+        import { showGuide } from './js/guide.js';
+        window.showGuide = showGuide;
+    </script>
+</body>
+</html>
